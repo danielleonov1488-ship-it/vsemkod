@@ -1,0 +1,34 @@
+{
+  "data": [
+    {
+      "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "pricing": { "prompt": "0", "completion": "0" },
+      "context_length": 1000000,
+      "architecture": { "output_modalities": ["text"] },
+      "supported_parameters": ["tools", "tool_choice", "temperature"]
+    },
+    {
+      "id": "openai/gpt-oss-120b",
+      "pricing": { "prompt": "0.00", "completion": 0 },
+      "context_length": 131072,
+      "supported_parameters": ["temperature"]
+    },
+    {
+      "id": "example/model:free",
+      "context_length": 1000
+    },
+    {
+      "id": "moonshotai/kimi-k3.1-pro",
+      "pricing": { "prompt": "0", "completion": "0.000001" }
+    },
+    {
+      "id": "example/undetermined",
+      "pricing": { "prompt": "", "completion": null }
+    },
+    {
+      "id": "example/audio",
+      "pricing": { "prompt": "0", "completion": "0" },
+      "architecture": { "output_modalities": ["audio"] }
+    }
+  ]
+}

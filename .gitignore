@@ -1,0 +1,16 @@
+# Секреты — никогда не коммитим
+.env
+.env.*
+!.env.example
+
+# Зависимости и кэши
+node_modules/
+.npm-cache/
+
+# Логи и временное
+*.log
+*.tmp
+codex-*.md
+.chrome-profile/
+.DS_Store
+Thumbs.db

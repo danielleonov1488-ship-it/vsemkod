@@ -1,0 +1,418 @@
+[
+  {
+    "date": "2026-11-24T15:12:29.146Z",
+    "modelId": "deepseek-v4.1-flash",
+    "providerId": "modelscope",
+    "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+    "text": "DeepSeek V4.1 Flash теперь бесплатно у ModelScope",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T15:12:29.146Z",
+    "modelId": "deepseek-v4.1-flash",
+    "providerId": "runcrate",
+    "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+    "text": "DeepSeek V4.1 Flash теперь бесплатно у Runcrate",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T15:12:29.146Z",
+    "modelId": "glm-4.7-flash",
+    "providerId": "zai",
+    "providerModelId": "glm-4.7-flash",
+    "text": "GLM-4.7-Flash теперь бесплатно у Z.ai",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T15:12:29.146Z",
+    "modelId": "glm-5.2",
+    "providerId": "modelscope",
+    "providerModelId": "ZhipuAI/GLM-5.2",
+    "text": "GLM 5.2 теперь бесплатно у ModelScope",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T15:12:29.146Z",
+    "modelId": "glm-5.3",
+    "providerId": "runcrate",
+    "providerModelId": "zai-org/GLM-5.3",
+    "text": "GLM 5.3 теперь бесплатно у Runcrate",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T15:12:29.146Z",
+    "modelId": "glm-5.3-flash",
+    "providerId": "runcrate",
+    "providerModelId": "zai-org/GLM-5.3-Flash",
+    "text": "GLM 5.3 Flash теперь бесплатно у Runcrate",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T15:12:29.146Z",
+    "modelId": "gpt-oss-120b",
+    "providerId": "groq",
+    "providerModelId": "openai/gpt-oss-120b",
+    "text": "gpt-oss-120b теперь бесплатно у Groq",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T15:12:29.146Z",
+    "modelId": "gpt-oss-120b",
+    "providerId": "runcrate",
+    "providerModelId": "openai/gpt-oss-120b",
+    "text": "gpt-oss-120b теперь бесплатно у Runcrate",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T15:12:29.146Z",
+    "modelId": "gpt-oss-20b",
+    "providerId": "groq",
+    "providerModelId": "openai/gpt-oss-20b",
+    "text": "gpt-oss-20b теперь бесплатно у Groq",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T15:12:29.146Z",
+    "modelId": "kimi-k3.1-pro",
+    "providerId": "modelscope",
+    "providerModelId": "moonshotai/Kimi-K3.1-Pro",
+    "text": "Kimi K3.1 Pro теперь бесплатно у ModelScope",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T15:12:29.146Z",
+    "modelId": "minimax-m3",
+    "providerId": "modelscope",
+    "providerModelId": "MiniMax/MiniMax-M3",
+    "text": "MiniMax M3 теперь бесплатно у ModelScope",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T15:12:29.146Z",
+    "modelId": "qwen3.8-27b",
+    "providerId": "groq",
+    "providerModelId": "qwen/qwen3.8-27b",
+    "text": "Qwen3.8-27B теперь бесплатно у Groq",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T15:12:29.146Z",
+    "modelId": "qwen3.8-flash",
+    "providerId": "runcrate",
+    "providerModelId": "Qwen/Qwen3.8-Flash",
+    "text": "Qwen3.8 Flash теперь бесплатно у Runcrate",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "ampersand-v0.1",
+    "providerId": "kilo",
+    "providerModelId": "humansand/ampersand-v0.1",
+    "text": "Проверяем сведения о бесплатной модели humansand/ampersand-v0.1 у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "beam-free",
+    "providerId": "kilo",
+    "providerModelId": "reflection/beam-free",
+    "text": "Проверяем сведения о бесплатной модели reflection/beam-free у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "deepseek-v4.1-flash-uncensored-fp8",
+    "providerId": "numes",
+    "providerModelId": "dealignai/deepseek-v4.1-flash-uncensored-fp8:free",
+    "text": "Проверяем сведения о бесплатной модели dealignai/deepseek-v4.1-flash-uncensored-fp8:free у Numes",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "dots-3-note-preview",
+    "providerId": "kilo",
+    "providerModelId": "dots-studio/dots-3-note-preview:free",
+    "text": "Проверяем сведения о бесплатной модели dots-studio/dots-3-note-preview:free у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "dots-3-note-preview",
+    "providerId": "openrouter",
+    "providerModelId": "dots-studio/dots-3-note-preview:free",
+    "text": "Проверяем сведения о бесплатной модели dots-studio/dots-3-note-preview:free у OpenRouter",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "ernie-5.5-flash-preview",
+    "providerId": "kilo",
+    "providerModelId": "baidu/ernie-5.5-flash-preview:free",
+    "text": "Проверяем сведения о бесплатной модели baidu/ernie-5.5-flash-preview:free у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "ernie-5.5-flash-preview",
+    "providerId": "openrouter",
+    "providerModelId": "baidu/ernie-5.5-flash-preview:free",
+    "text": "Проверяем сведения о бесплатной модели baidu/ernie-5.5-flash-preview:free у OpenRouter",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "flint-v1.0",
+    "providerId": "kilo",
+    "providerModelId": "recursive/flint-v1.0",
+    "text": "Проверяем сведения о бесплатной модели recursive/flint-v1.0 у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "flint-v1.0",
+    "providerId": "kilo",
+    "providerModelId": "recursive/flint-v1.0:free",
+    "text": "Проверяем сведения о бесплатной модели recursive/flint-v1.0:free у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "flint-v1.0",
+    "providerId": "openrouter",
+    "providerModelId": "recursive/flint-v1.0:free",
+    "text": "Проверяем сведения о бесплатной модели recursive/flint-v1.0:free у OpenRouter",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "gemma-4-26b-a4b-it",
+    "providerId": "openrouter",
+    "providerModelId": "google/gemma-4-26b-a4b-it:free",
+    "text": "Проверяем сведения о бесплатной модели google/gemma-4-26b-a4b-it:free у OpenRouter",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "gemma-4-31b-it",
+    "providerId": "openrouter",
+    "providerModelId": "google/gemma-4-31b-it:free",
+    "text": "Проверяем сведения о бесплатной модели google/gemma-4-31b-it:free у OpenRouter",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "glm-5.3-flash-uncensored-fp8",
+    "providerId": "numes",
+    "providerModelId": "dealignai/glm-5.3-flash-uncensored-fp8:free",
+    "text": "Проверяем сведения о бесплатной модели dealignai/glm-5.3-flash-uncensored-fp8:free у Numes",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "glm-5.3-uncensored-fp8",
+    "providerId": "numes",
+    "providerModelId": "dealignai/glm-5.3-uncensored-fp8:free",
+    "text": "Проверяем сведения о бесплатной модели dealignai/glm-5.3-uncensored-fp8:free у Numes",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "glyph-cluster",
+    "providerId": "kilo",
+    "providerModelId": "stealth/glyph-cluster",
+    "text": "Проверяем сведения о бесплатной модели stealth/glyph-cluster у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "kimi-k3-abliterated-v1",
+    "providerId": "numes",
+    "providerModelId": "uniboshi/kimi-k3-abliterated-v1:free",
+    "text": "Проверяем сведения о бесплатной модели uniboshi/kimi-k3-abliterated-v1:free у Numes",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "lfm-3-1.7b",
+    "providerId": "kilo",
+    "providerModelId": "liquid/lfm-3-1.7b:free",
+    "text": "Проверяем сведения о бесплатной модели liquid/lfm-3-1.7b:free у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "lfm-3-1.7b",
+    "providerId": "openrouter",
+    "providerModelId": "liquid/lfm-3-1.7b:free",
+    "text": "Проверяем сведения о бесплатной модели liquid/lfm-3-1.7b:free у OpenRouter",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "ling-3.2-flash",
+    "providerId": "kilo",
+    "providerModelId": "inclusionai/ling-3.2-flash:free",
+    "text": "Проверяем сведения о бесплатной модели inclusionai/ling-3.2-flash:free у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "ling-3.2-flash",
+    "providerId": "openrouter",
+    "providerModelId": "inclusionai/ling-3.2-flash:free",
+    "text": "Проверяем сведения о бесплатной модели inclusionai/ling-3.2-flash:free у OpenRouter",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "lyria-3-clip-preview",
+    "providerId": "kilo",
+    "providerModelId": "google/lyria-3-clip-preview",
+    "text": "Проверяем сведения о бесплатной модели google/lyria-3-clip-preview у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "lyria-3-clip-preview",
+    "providerId": "openrouter",
+    "providerModelId": "google/lyria-3-clip-preview",
+    "text": "Проверяем сведения о бесплатной модели google/lyria-3-clip-preview у OpenRouter",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "lyria-3-pro-preview",
+    "providerId": "kilo",
+    "providerModelId": "google/lyria-3-pro-preview",
+    "text": "Проверяем сведения о бесплатной модели google/lyria-3-pro-preview у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "lyria-3-pro-preview",
+    "providerId": "openrouter",
+    "providerModelId": "google/lyria-3-pro-preview",
+    "text": "Проверяем сведения о бесплатной модели google/lyria-3-pro-preview у OpenRouter",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "nemotron-3-nano-omni-30b-a3b-reasoning",
+    "providerId": "kilo",
+    "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+    "text": "Проверяем сведения о бесплатной модели nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "nemotron-3-nano-omni-30b-a3b-reasoning",
+    "providerId": "openrouter",
+    "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+    "text": "Проверяем сведения о бесплатной модели nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free у OpenRouter",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "nemotron-3.5-lightning",
+    "providerId": "kilo",
+    "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+    "text": "Проверяем сведения о бесплатной модели nvidia/nemotron-3.5-lightning:free у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "nemotron-3.5-lightning",
+    "providerId": "openrouter",
+    "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+    "text": "Проверяем сведения о бесплатной модели nvidia/nemotron-3.5-lightning:free у OpenRouter",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "particle-1",
+    "providerId": "kilo",
+    "providerModelId": "particle-ai/particle-1:free",
+    "text": "Проверяем сведения о бесплатной модели particle-ai/particle-1:free у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "particle-1",
+    "providerId": "openrouter",
+    "providerModelId": "particle-ai/particle-1:free",
+    "text": "Проверяем сведения о бесплатной модели particle-ai/particle-1:free у OpenRouter",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "deepseek-v4.1-flash",
+    "providerId": "numes",
+    "providerModelId": "deepseek/deepseek-v4.1-flash:free",
+    "text": "DeepSeek V4.1 Flash теперь бесплатно у Numes",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "glm-5.3",
+    "providerId": "numes",
+    "providerModelId": "z-ai/glm-5.3:free",
+    "text": "GLM 5.3 теперь бесплатно у Numes",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "glm-5.3-flash",
+    "providerId": "numes",
+    "providerModelId": "z-ai/glm-5.3-flash:free",
+    "text": "GLM 5.3 Flash теперь бесплатно у Numes",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "kimi-k3.1-pro",
+    "providerId": "numes",
+    "providerModelId": "moonshotai/kimi-k3.1-pro:free",
+    "text": "Kimi K3.1 Pro теперь бесплатно у Numes",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "nemotron-3-ultra",
+    "providerId": "kilo",
+    "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "text": "Nemotron 3 Ultra теперь бесплатно у Kilo Gateway",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "nemotron-3-ultra",
+    "providerId": "numes",
+    "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "text": "Nemotron 3 Ultra теперь бесплатно у Numes",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "nemotron-3-ultra",
+    "providerId": "openrouter",
+    "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "text": "Nemotron 3 Ultra теперь бесплатно у OpenRouter",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "nemotron-3.5-super",
+    "providerId": "kilo",
+    "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+    "text": "Nemotron 3.5 Super теперь бесплатно у Kilo Gateway",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-24T14:58:16.109Z",
+    "modelId": "nemotron-3.5-super",
+    "providerId": "openrouter",
+    "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+    "text": "Nemotron 3.5 Super теперь бесплатно у OpenRouter",
+    "type": "offer_added"
+  }
+]

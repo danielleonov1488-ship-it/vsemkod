@@ -1,0 +1,854 @@
+{
+  "llmCache": {},
+  "pageChecks": {
+    "page:groq": {
+      "changedAt": "2026-11-24T15:12:29.146Z",
+      "checkedAt": "2026-11-24T15:12:29.146Z",
+      "hash": "34dcf2cfab29787fbf6996ff0beb94011ceb1dfe066670b92ed2458f37a2d4ad"
+    },
+    "page:modelscope": {
+      "changedAt": "2026-11-24T15:12:29.146Z",
+      "checkedAt": "2026-11-24T15:12:29.146Z",
+      "hash": "b84f5a2c3f6c54778285e39fb4d064fe92a05e29aca9a2244b7e906fec73c33f"
+    },
+    "page:runcrate": {
+      "changedAt": "2026-11-24T15:12:29.146Z",
+      "checkedAt": "2026-11-24T15:12:29.146Z",
+      "hash": "7716ead50463b7a609a6be0bb539a643b92ec9613099ef1f1c36bb13cd7fa549"
+    },
+    "page:zai": {
+      "changedAt": "2026-11-24T15:12:29.146Z",
+      "checkedAt": "2026-11-24T15:12:29.146Z",
+      "hash": "567997bd64b126bde95802f3b89ce19c02668f604244c22e04dbbda630a9bb72"
+    }
+  },
+  "pages": {},
+  "seenNews": {},
+  "tracks": {
+    "groq:openai/gpt-oss-120b": {
+      "evidence": {
+        "registry:groq": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 131072,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "groq",
+            "providerModelId": "openai/gpt-oss-120b",
+            "reviewBy": "2026-12-08T00:00:00.000Z",
+            "source": "registry:groq",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "groq:openai/gpt-oss-20b": {
+      "evidence": {
+        "registry:groq": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 131072,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "groq",
+            "providerModelId": "openai/gpt-oss-20b",
+            "reviewBy": "2026-12-08T00:00:00.000Z",
+            "source": "registry:groq",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "groq:qwen/qwen3.8-27b": {
+      "evidence": {
+        "registry:groq": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 131072,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "groq",
+            "providerModelId": "qwen/qwen3.8-27b",
+            "reviewBy": "2026-12-08T00:00:00.000Z",
+            "source": "registry:groq",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "kilo:baidu/ernie-5.5-flash-preview:free": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1024000,
+            "providerId": "kilo",
+            "providerModelId": "baidu/ernie-5.5-flash-preview:free",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "kilo:dots-studio/dots-3-note-preview:free": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 512000,
+            "providerId": "kilo",
+            "providerModelId": "dots-studio/dots-3-note-preview:free",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "kilo:google/lyria-3-clip-preview": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "kilo",
+            "providerModelId": "google/lyria-3-clip-preview",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": false
+          }
+        }
+      }
+    },
+    "kilo:google/lyria-3-pro-preview": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "kilo",
+            "providerModelId": "google/lyria-3-pro-preview",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": false
+          }
+        }
+      }
+    },
+    "kilo:humansand/ampersand-v0.1": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1000000,
+            "providerId": "kilo",
+            "providerModelId": "humansand/ampersand-v0.1",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "kilo:inclusionai/ling-3.2-flash:free": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "kilo",
+            "providerModelId": "inclusionai/ling-3.2-flash:free",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "kilo:liquid/lfm-3-1.7b:free": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 262144,
+            "providerId": "kilo",
+            "providerModelId": "liquid/lfm-3-1.7b:free",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "kilo:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 256000,
+            "providerId": "kilo",
+            "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "kilo:nvidia/nemotron-3-ultra-550b-a55b:free": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1000000,
+            "providerId": "kilo",
+            "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "kilo:nvidia/nemotron-3.5-lightning:free": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1000000,
+            "providerId": "kilo",
+            "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "kilo:nvidia/nemotron-3.5-super-vl:free": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1000000,
+            "providerId": "kilo",
+            "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "kilo:particle-ai/particle-1:free": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "kilo",
+            "providerModelId": "particle-ai/particle-1:free",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "kilo:recursive/flint-v1.0": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 262144,
+            "providerId": "kilo",
+            "providerModelId": "recursive/flint-v1.0",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "kilo:recursive/flint-v1.0:free": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 262144,
+            "providerId": "kilo",
+            "providerModelId": "recursive/flint-v1.0:free",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "kilo:reflection/beam-free": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "kilo",
+            "providerModelId": "reflection/beam-free",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "kilo:stealth/glyph-cluster": {
+      "evidence": {
+        "kilo": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 256000,
+            "providerId": "kilo",
+            "providerModelId": "stealth/glyph-cluster",
+            "source": "kilo:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "modelscope:MiniMax/MiniMax-M3": {
+      "evidence": {
+        "registry:modelscope": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "MiniMax/MiniMax-M3",
+            "reviewBy": "2026-12-08T00:00:00.000Z",
+            "source": "registry:modelscope",
+            "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "modelscope:ZhipuAI/GLM-5.2": {
+      "evidence": {
+        "registry:modelscope": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "ZhipuAI/GLM-5.2",
+            "reviewBy": "2026-12-08T00:00:00.000Z",
+            "source": "registry:modelscope",
+            "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "modelscope:deepseek-ai/DeepSeek-V4.1-Flash": {
+      "evidence": {
+        "registry:modelscope": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "reviewBy": "2026-12-08T00:00:00.000Z",
+            "source": "registry:modelscope",
+            "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "modelscope:moonshotai/Kimi-K3.1-Pro": {
+      "evidence": {
+        "registry:modelscope": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "moonshotai/Kimi-K3.1-Pro",
+            "reviewBy": "2026-12-08T00:00:00.000Z",
+            "source": "registry:modelscope",
+            "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "numes:dealignai/deepseek-v4.1-flash-uncensored-fp8:free": {
+      "evidence": {
+        "numes": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "numes",
+            "providerModelId": "dealignai/deepseek-v4.1-flash-uncensored-fp8:free",
+            "source": "https://numes.ai/api/public-catalogue/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "numes:dealignai/glm-5.3-flash-uncensored-fp8:free": {
+      "evidence": {
+        "numes": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "numes",
+            "providerModelId": "dealignai/glm-5.3-flash-uncensored-fp8:free",
+            "source": "https://numes.ai/api/public-catalogue/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "numes:dealignai/glm-5.3-uncensored-fp8:free": {
+      "evidence": {
+        "numes": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "numes",
+            "providerModelId": "dealignai/glm-5.3-uncensored-fp8:free",
+            "source": "https://numes.ai/api/public-catalogue/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "numes:deepseek/deepseek-v4.1-flash:free": {
+      "evidence": {
+        "numes": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "numes",
+            "providerModelId": "deepseek/deepseek-v4.1-flash:free",
+            "source": "https://numes.ai/api/public-catalogue/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "numes:moonshotai/kimi-k3.1-pro:free": {
+      "evidence": {
+        "numes": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "numes",
+            "providerModelId": "moonshotai/kimi-k3.1-pro:free",
+            "source": "https://numes.ai/api/public-catalogue/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "numes:nvidia/nemotron-3-ultra-550b-a55b:free": {
+      "evidence": {
+        "numes": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 202800,
+            "providerId": "numes",
+            "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+            "source": "https://numes.ai/api/public-catalogue/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "numes:uniboshi/kimi-k3-abliterated-v1:free": {
+      "evidence": {
+        "numes": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "numes",
+            "providerModelId": "uniboshi/kimi-k3-abliterated-v1:free",
+            "source": "https://numes.ai/api/public-catalogue/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "numes:z-ai/glm-5.3-flash:free": {
+      "evidence": {
+        "numes": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048575,
+            "providerId": "numes",
+            "providerModelId": "z-ai/glm-5.3-flash:free",
+            "source": "https://numes.ai/api/public-catalogue/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "numes:z-ai/glm-5.3:free": {
+      "evidence": {
+        "numes": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "numes",
+            "providerModelId": "z-ai/glm-5.3:free",
+            "source": "https://numes.ai/api/public-catalogue/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "openrouter:baidu/ernie-5.5-flash-preview:free": {
+      "evidence": {
+        "openrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1024000,
+            "providerId": "openrouter",
+            "providerModelId": "baidu/ernie-5.5-flash-preview:free",
+            "source": "openrouter:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "openrouter:dots-studio/dots-3-note-preview:free": {
+      "evidence": {
+        "openrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 512000,
+            "providerId": "openrouter",
+            "providerModelId": "dots-studio/dots-3-note-preview:free",
+            "source": "openrouter:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "openrouter:google/gemma-4-26b-a4b-it:free": {
+      "evidence": {
+        "openrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 262144,
+            "providerId": "openrouter",
+            "providerModelId": "google/gemma-4-26b-a4b-it:free",
+            "source": "openrouter:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "openrouter:google/gemma-4-31b-it:free": {
+      "evidence": {
+        "openrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 262144,
+            "providerId": "openrouter",
+            "providerModelId": "google/gemma-4-31b-it:free",
+            "source": "openrouter:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "openrouter:google/lyria-3-clip-preview": {
+      "evidence": {
+        "openrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "openrouter",
+            "providerModelId": "google/lyria-3-clip-preview",
+            "source": "openrouter:/api/v1/models",
+            "supportsTools": false
+          }
+        }
+      }
+    },
+    "openrouter:google/lyria-3-pro-preview": {
+      "evidence": {
+        "openrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "openrouter",
+            "providerModelId": "google/lyria-3-pro-preview",
+            "source": "openrouter:/api/v1/models",
+            "supportsTools": false
+          }
+        }
+      }
+    },
+    "openrouter:inclusionai/ling-3.2-flash:free": {
+      "evidence": {
+        "openrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "openrouter",
+            "providerModelId": "inclusionai/ling-3.2-flash:free",
+            "source": "openrouter:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "openrouter:liquid/lfm-3-1.7b:free": {
+      "evidence": {
+        "openrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 262144,
+            "providerId": "openrouter",
+            "providerModelId": "liquid/lfm-3-1.7b:free",
+            "source": "openrouter:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "openrouter:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+      "evidence": {
+        "openrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 256000,
+            "providerId": "openrouter",
+            "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+            "source": "openrouter:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "openrouter:nvidia/nemotron-3-ultra-550b-a55b:free": {
+      "evidence": {
+        "openrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1000000,
+            "providerId": "openrouter",
+            "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+            "source": "openrouter:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "openrouter:nvidia/nemotron-3.5-lightning:free": {
+      "evidence": {
+        "openrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1000000,
+            "providerId": "openrouter",
+            "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+            "source": "openrouter:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "openrouter:nvidia/nemotron-3.5-super-vl:free": {
+      "evidence": {
+        "openrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1000000,
+            "providerId": "openrouter",
+            "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+            "source": "openrouter:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "openrouter:particle-ai/particle-1:free": {
+      "evidence": {
+        "openrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "providerId": "openrouter",
+            "providerModelId": "particle-ai/particle-1:free",
+            "source": "openrouter:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "openrouter:recursive/flint-v1.0:free": {
+      "evidence": {
+        "openrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 262144,
+            "providerId": "openrouter",
+            "providerModelId": "recursive/flint-v1.0:free",
+            "source": "openrouter:/api/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "runcrate:Qwen/Qwen3.8-Flash": {
+      "evidence": {
+        "registry:runcrate": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1000000,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "runcrate",
+            "providerModelId": "Qwen/Qwen3.8-Flash",
+            "reviewBy": "2026-12-08T00:00:00.000Z",
+            "source": "registry:runcrate",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "runcrate:deepseek-ai/DeepSeek-V4.1-Flash": {
+      "evidence": {
+        "registry:runcrate": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "runcrate",
+            "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "reviewBy": "2026-12-08T00:00:00.000Z",
+            "source": "registry:runcrate",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "runcrate:openai/gpt-oss-120b": {
+      "evidence": {
+        "registry:runcrate": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 131072,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "runcrate",
+            "providerModelId": "openai/gpt-oss-120b",
+            "reviewBy": "2026-12-08T00:00:00.000Z",
+            "source": "registry:runcrate",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "runcrate:zai-org/GLM-5.3": {
+      "evidence": {
+        "registry:runcrate": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "runcrate",
+            "providerModelId": "zai-org/GLM-5.3",
+            "reviewBy": "2026-12-08T00:00:00.000Z",
+            "source": "registry:runcrate",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "runcrate:zai-org/GLM-5.3-Flash": {
+      "evidence": {
+        "registry:runcrate": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "runcrate",
+            "providerModelId": "zai-org/GLM-5.3-Flash",
+            "reviewBy": "2026-12-08T00:00:00.000Z",
+            "source": "registry:runcrate",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "zai:glm-4.7-flash": {
+      "evidence": {
+        "registry:zai": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 200000,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "zai",
+            "providerModelId": "glm-4.7-flash",
+            "reviewBy": "2026-12-08T00:00:00.000Z",
+            "source": "registry:zai",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    }
+  },
+  "version": 1
+}

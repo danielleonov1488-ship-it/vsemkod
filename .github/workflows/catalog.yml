@@ -1,0 +1,58 @@
+name: Update catalog
+
+on:
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: catalog-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: catalog-bot
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - run: npm ci --cache ./.npm-cache
+      - run: npm run update
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ vars.LLM_BASE_URL }}
+          LLM_MODEL: ${{ vars.LLM_MODEL }}
+          LLM_MAX_TOKENS_PER_RUN: ${{ vars.LLM_MAX_TOKENS_PER_RUN }}
+          NUMES_API_KEY: ${{ secrets.NUMES_API_KEY }}
+          OFFER_MISSING_RUNS: ${{ vars.OFFER_MISSING_RUNS }}
+          OFFER_ENDED_RETENTION_DAYS: ${{ vars.OFFER_ENDED_RETENTION_DAYS }}
+          HEALTH_INTERVAL_HOURS: ${{ vars.HEALTH_INTERVAL_HOURS }}
+          HEALTH_FAILURE_THRESHOLD: ${{ vars.HEALTH_FAILURE_THRESHOLD }}
+          HEALTH_KILO_KEY: ${{ secrets.HEALTH_KILO_KEY }}
+          HEALTH_OPENROUTER_KEY: ${{ secrets.HEALTH_OPENROUTER_KEY }}
+          HEALTH_NUMES_KEY: ${{ secrets.HEALTH_NUMES_KEY }}
+          HEALTH_RUNCRATE_KEY: ${{ secrets.HEALTH_RUNCRATE_KEY }}
+          HEALTH_ZAI_KEY: ${{ secrets.HEALTH_ZAI_KEY }}
+          HEALTH_MODELSCOPE_KEY: ${{ secrets.HEALTH_MODELSCOPE_KEY }}
+          HEALTH_GROQ_KEY: ${{ secrets.HEALTH_GROQ_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      - run: npm run validate
+      - name: Commit updated data
+        run: |
+          git add -- data/catalog.json data/changes.json data/state.json
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Update free model catalog'
+            git push
+          fi
