@@ -1,9 +1,10 @@
 import { modelSlug, matchModel } from "./match.js";
+import { newModel } from "./newModel.js";
 import { models } from "./registry/models.js";
 import { registryPageHash, registryReviewMs } from "./registry/offers.js";
 import { providers } from "./registry/providers.js";
 import { catalogSchema, offerKey } from "./schema.js";
-import type { Candidate, Catalog, Change, Offer } from "./schema.js";
+import type { Candidate, Catalog, Change, Model, Offer } from "./schema.js";
 import type { HealthState, Track, State } from "./state.js";
 import type { Observation, SourceResult } from "./sources/common.js";
 
@@ -62,7 +63,7 @@ interface MergeOptions {
   healthFailureThreshold: number;
 }
 
-function recoverTrack(offer: Candidate, previous: Catalog): Track {
+function recoverTrack(offer: Candidate, previous: Catalog, model: Model | undefined): Track {
   // При восстановлении state.json достраиваем счётчики из последнего опубликованного каталога.
   const evidence: Track["evidence"] = {};
   for (const source of offer.sources) {
@@ -73,7 +74,12 @@ function recoverTrack(offer: Candidate, previous: Catalog): Track {
     else if (source.startsWith("https://www.reddit.com/")) id = "reddit";
     else if (source.startsWith("https://github.com/")) id = "github";
     evidence[id] = {
-      observation: { ...offer, source, contextWindow: offer.contextWindow || undefined },
+      observation: {
+        ...offer, source, contextWindow: offer.contextWindow || undefined,
+        name: model?.name,
+        supportsReasoning: model?.capabilities.includes("reasoning"),
+        supportsVision: model?.capabilities.includes("vision"),
+      },
       missedRuns: 0,
     };
   }
@@ -128,13 +134,14 @@ export function mergeCatalog(
   const tracks = structuredClone(state.tracks);
   const previousEntries = new Map<string, Candidate>();
   const previousOffers = new Map(previous?.offers.map((offer) => [offerKey(offer), offer]));
+  const previousAutomatic = new Map(previous?.models.filter(({ tier }) => tier === "new").map((model) => [model.id, model]));
   const seen = new Set<string>();
 
   if (previous) {
     for (const entry of [...previous.offers, ...previous.candidates]) {
       const key = offerKey(entry);
       previousEntries.set(key, entry);
-      tracks[key] ??= recoverTrack(entry, previous);
+      tracks[key] ??= recoverTrack(entry, previous, previousAutomatic.get(entry.modelId));
     }
   }
 
@@ -159,7 +166,9 @@ export function mergeCatalog(
 
   const offers: Offer[] = [];
   const candidates: Candidate[] = [];
-  for (const [key, track] of Object.entries(tracks)) {
+  const automaticModels = new Map<string, { model: Model; priority: number }>();
+  for (const key of Object.keys(tracks).sort(compare)) {
+    const track = tracks[key];
     track.health = healthUpdates[key] ?? track.health;
     const prior = previousEntries.get(key);
     const priorOffer = previousOffers.get(key);
@@ -178,8 +187,13 @@ export function mergeCatalog(
       delete tracks[key];
       continue;
     }
-    const model = matchModel(strongest.providerModelId);
-    const confirmed = model !== undefined && (live.some((entry) => entry.confidence !== "news") || (live.length > 0 && verified !== null));
+    const registered = matchModel(strongest.providerModelId);
+    const automatic = !registered && live.length ? newModel(strongest) : undefined;
+    const formerModel = priorOffer && previousAutomatic.get(priorOffer.modelId);
+    const model = registered ?? automatic ?? formerModel;
+    const confirmed = registered
+      ? live.some((entry) => entry.confidence !== "news") || (live.length > 0 && verified !== null)
+      : automatic !== undefined;
     const eligible = model !== undefined && (confirmed || priorOffer !== undefined);
     // Для завершившегося публичного предложения сохраняем исходное подтверждение.
     const endedByAbsence = !live.length || (priorOffer !== undefined && !confirmed && model !== undefined);
@@ -227,7 +241,14 @@ export function mergeCatalog(
       verifiedAt: registry?.verifiedAt ?? prior?.verifiedAt,
       reviewBy: registry?.reviewBy ?? prior?.reviewBy,
     };
-    if (eligible) offers.push(entry);
+    if (eligible) {
+      offers.push(entry);
+      if (model.tier === "new" && !registered) {
+        const priority = entry.status === "ended" ? 0 : strongest.name ? 2 : 1;
+        const current = automaticModels.get(model.id);
+        if (!current || priority > current.priority) automaticModels.set(model.id, { model, priority });
+      }
+    }
     else candidates.push({
       ...entry,
       suggestedTier: evidence.find((observation) => observation.suggestedTier)?.suggestedTier ?? prior?.suggestedTier,
@@ -236,7 +257,9 @@ export function mergeCatalog(
   }
 
   const catalog = sortedCatalog({
-    schemaVersion: 1, generatedAt: now, models, providers: Object.values(providers), offers, candidates,
+    schemaVersion: 1, generatedAt: now,
+    models: [...models, ...[...automaticModels.values()].map(({ model }) => model)],
+    providers: Object.values(providers), offers, candidates,
   });
   catalogSchema.parse(catalog);
   return { catalog, tracks, changes: makeChanges(previous, catalog) };
@@ -248,6 +271,7 @@ function makeChanges(previous: Catalog | undefined, next: Catalog): Change[] {
   const activeKeys = new Set(next.offers.map(offerKey));
   const priorCandidates = new Set(previous?.candidates.map(offerKey));
   const modelNames = new Map(next.models.map(({ id, name }) => [id, name]));
+  const automaticIds = new Set(next.models.filter(({ tier }) => tier === "new").map(({ id }) => id));
   const date = next.generatedAt;
   const nameFor = (offer: Offer) => modelNames.get(offer.modelId) ?? offer.providerModelId;
   const offerChange = (type: Change["type"], offer: Offer, text: string) => changes.push({
@@ -265,7 +289,11 @@ function makeChanges(previous: Catalog | undefined, next: Catalog): Change[] {
         offerChange("offer_changed", offer, "Раздача " + nameFor(offer) + " у " + providers[offer.providerId].name + " требует перепроверки");
       }
     } else if (!prior || prior.status === "ended") {
-      offerChange("offer_added", offer, nameFor(offer) + " теперь бесплатно у " + providers[offer.providerId].name);
+      const provider = providers[offer.providerId].name;
+      const text = automaticIds.has(offer.modelId)
+        ? "Новая модель: " + nameFor(offer) + " бесплатно у " + provider
+        : nameFor(offer) + " теперь бесплатно у " + provider;
+      offerChange("offer_added", offer, text);
     } else if (details(prior) !== details(offer)) {
       offerChange("offer_changed", offer, "Условия раздачи " + nameFor(offer) + " у " + providers[offer.providerId].name + " изменились");
     }

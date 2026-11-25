@@ -41,6 +41,22 @@ it("читает бесплатные текстовые модели OpenRouter
   expect(() => parseOpenRouter({ data: [{ slug: "wrong" }] })).toThrow();
 });
 
+it("читает название, reasoning и vision, отбрасывает роутеры и нетекстовый вывод", () => {
+  const row = {
+    name: "Model from API", context_length: 131072, supported_parameters: ["tools", "include_reasoning"],
+    architecture: { input_modalities: ["text", "image"], output_modalities: ["text"] },
+  };
+  expect(parseOpenRouter({ data: [
+    { ...row, id: "example/chat:free" },
+    { ...row, id: "example/image:free", output_modalities: ["image"] },
+    { ...row, id: "example/audio:free", output_modalities: ["audio"] },
+    { ...row, id: "example/router:free", autoRouting: { models: ["example/chat:free"] } },
+  ] })).toMatchObject([{
+    providerModelId: "example/chat:free", name: row.name,
+    supportsTools: true, supportsReasoning: true, supportsVision: true,
+  }]);
+});
+
 it("читает все страницы публичного каталога Numes и использует совместимый ID", async () => {
   const row = { id: "uuid", compatible_request_id: "moonshotai/kimi-k3.1-pro:free", supported_parameters: ["tools"] };
   const fetchMock = vi.fn()

@@ -14,7 +14,7 @@ export const watchedPages = [
 export const feedIds = ["hn", "reddit", "github"] as const;
 export const structuredIds = ["openrouter", "kilo", "numes"] as const;
 export const sourceSelectors = [
-  ...structuredIds, "watchPages", "feeds", ...feedIds,
+  ...structuredIds, "opencode-zen", "watchPages", "feeds", ...feedIds,
   ...watchedPages.map(({ providerId }) => "page:" + providerId),
 ];
 

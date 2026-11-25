@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { catalogChanged, mergeCatalog, stableJson } from "../src/merge.js";
+import { modelRegistry } from "../src/registry/models.js";
 import { catalogSchema, offerKey } from "../src/schema.js";
 import { newState } from "../src/state.js";
 import type { Observation, SourceResult } from "../src/sources/common.js";
@@ -12,9 +13,92 @@ const known: Observation = {
   confidence: "structured", source: "openrouter:/api/v1/models", supportsTools: true,
 };
 const unknown: Observation = { ...known, providerModelId: "example/model:free", suggestedTier: "good", suggestedDescription: "Быстрая модель" };
+const newcomer: Observation = {
+  ...known, providerModelId: "xiaomi/MiMo_Test-27B:free", name: "MiMo Test",
+  contextWindow: 128_000, supportsReasoning: true, supportsVision: true,
+};
 const batch = (...observations: Observation[]): SourceResult => ({ id: "openrouter", observations });
 
 describe("слияние", () => {
+  it("добавляет новый уровень после реестра, сохраняя название и возможности из API", () => {
+    const { catalog, changes } = mergeCatalog(undefined, newState(), [batch(newcomer)], options());
+    expect(catalog.models.at(-1)).toMatchObject({
+      id: "mimo-test-27b", name: "MiMo Test", tier: "new", vendor: "Xiaomi",
+      description: "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      capabilities: ["reasoning", "tools", "vision"], contextWindow: 128_000,
+    });
+    expect(catalog.models.at(-1)!.rank).toBeGreaterThan(Math.max(...modelRegistry.map(({ rank }) => rank)));
+    expect(catalog.offers).toMatchObject([{ modelId: "mimo-test-27b", status: "active", confidence: "structured" }]);
+    expect(catalog.candidates).toEqual([]);
+    expect(changes).toMatchObject([{ type: "offer_added", text: "Новая модель: MiMo Test бесплатно у OpenRouter" }]);
+  });
+
+  it("создаёт одну модель для нескольких предложений и использует slug, если API не дало название", () => {
+    const row = { ...newcomer, name: undefined, providerModelId: "example/new_model-24b:free" };
+    const kilo: Observation = { ...row, providerId: "kilo", source: "kilo:/api/v1/models" };
+    const { catalog } = mergeCatalog(undefined, newState(), [
+      batch(row), { id: "kilo", observations: [kilo] },
+    ], options());
+    expect(catalog.models.filter(({ tier }) => tier === "new")).toMatchObject([
+      { id: "new-model-24b", name: "New Model 24B", vendor: "Неизвестно" },
+    ]);
+    expect(catalog.offers.filter(({ modelId }) => modelId === "new-model-24b")).toHaveLength(2);
+  });
+
+  it.each<Partial<Observation>>([
+    { supportsTools: false },
+    { contextWindow: 32_000 },
+    { contextWindow: undefined },
+    { providerModelId: "vendor/text-embedding-27b:free" },
+    { providerModelId: "vendor/model-reranker:free" },
+    { providerModelId: "vendor/text-moderation:free" },
+    { providerModelId: "openrouter/free" },
+    { providerModelId: "kilo-auto/free" },
+    { providerModelId: "vendor/tiny-1.7b:free" },
+    { providerModelId: "vendor/tiny-19b:free" },
+    { providerModelId: "vendor/glm-5.3-uncensored-fp8:free" },
+    { providerModelId: "vendor/kimi-k3-abliterated-v1:free" },
+    { confidence: "page" },
+    { confidence: "news" },
+  ])("сохраняет неподходящую модель кандидатом (%j)", (fields) => {
+    const { catalog } = mergeCatalog(undefined, newState(), [batch({ ...newcomer, ...fields })], options());
+    expect(catalog.models.every(({ tier }) => tier !== "new")).toBe(true);
+    expect(catalog.offers).toHaveLength(0);
+    expect(catalog.candidates).toHaveLength(1);
+  });
+
+  it("использует запись реестра и переносит старое предложение с алиаса", () => {
+    const state = newState();
+    const row = { ...newcomer, providerModelId: "xiaomi/test-alias-27b:free" };
+    const first = mergeCatalog(undefined, state, [batch(row)], options());
+    state.tracks = first.tracks;
+    const registryEntry = modelRegistry.find(({ id }) => id === "nemotron-3-ultra")!;
+    registryEntry.aliases.push(/^test-alias-27b$/);
+    try {
+      const next = mergeCatalog(first.catalog, state, [batch(row, known)], options(later(1)));
+      expect(next.catalog.models.every(({ tier }) => tier !== "new")).toBe(true);
+      expect(next.catalog.offers.map(({ modelId }) => modelId)).toEqual(["nemotron-3-ultra", "nemotron-3-ultra"]);
+      expect(next.catalog.offers.find(({ providerModelId }) => providerModelId === row.providerModelId))
+        .toMatchObject({ firstSeen: start, status: "active" });
+    } finally {
+      registryEntry.aliases.pop();
+    }
+  });
+
+  it("держит модель new, пока её завершённое предложение ещё хранится", () => {
+    const state = newState();
+    const first = mergeCatalog(undefined, state, [batch(newcomer)], options());
+    state.tracks = first.tracks;
+    const missed = { ...options(later(6)), missingRuns: 1 };
+    const ended = mergeCatalog(first.catalog, state, [batch()], missed);
+    expect(ended.catalog.offers).toMatchObject([{ status: "ended" }]);
+    expect(ended.catalog.models.at(-1)?.tier).toBe("new");
+    state.tracks = ended.tracks;
+    const next = mergeCatalog(ended.catalog, state, [batch()], { ...missed, now: later(6 + 7 * 24) });
+    expect(next.catalog.offers).toHaveLength(0);
+    expect(next.catalog.models.some(({ tier }) => tier === "new")).toBe(false);
+  });
+
   it("добавляет известную модель и оставляет неизвестную кандидатом", () => {
     const { catalog, changes } = mergeCatalog(undefined, newState(), [batch(known, unknown)], options());
     expect(catalog.offers[0]).toMatchObject({ modelId: "nemotron-3-ultra", status: "active", firstSeen: start });

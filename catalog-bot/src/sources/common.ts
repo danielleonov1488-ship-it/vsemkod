@@ -8,9 +8,12 @@ export const observationSchema = z.object({
   providerModelId: z.string().trim().min(1).max(250),
   confidence: confidenceSchema,
   source: z.string().min(1),
+  name: z.string().trim().min(1).optional(),
   promo: z.boolean().optional(),
   expiresAt: dateSchema.nullable().optional(),
   supportsTools: z.boolean().optional(),
+  supportsReasoning: z.boolean().optional(),
+  supportsVision: z.boolean().optional(),
   contextWindow: z.int().positive().optional(),
   limits: limitsSchema.optional(),
   suggestedTier: tierSchema.optional(),
@@ -21,6 +24,13 @@ export const observationSchema = z.object({
 
 export type Observation = z.infer<typeof observationSchema>;
 export type SourceResult = { id: string; observations: Observation[]; complete?: boolean };
+
+export const priceSchema = z.union([z.string(), z.number()]).nullish();
+
+export function isZeroPrice(value: z.infer<typeof priceSchema>): boolean {
+  if (typeof value === "number") return value === 0;
+  return typeof value === "string" && /^(?:0+\.?0*|\.0+)(?:e[+-]?\d+)?$/i.test(value.trim());
+}
 
 export function sha256(value: string): string {
   return createHash("sha256").update(value).digest("hex");

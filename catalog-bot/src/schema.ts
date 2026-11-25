@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const providerIdSchema = z.enum(["openrouter", "kilo", "numes", "runcrate", "zai", "modelscope", "groq"]);
-export const tierSchema = z.enum(["top", "good", "basic"]);
+export const tierSchema = z.enum(["top", "good", "new", "basic"]);
 export const confidenceSchema = z.enum(["structured", "page", "news"]);
 export const dateSchema = z.iso.datetime({ offset: true });
 
@@ -122,6 +122,25 @@ export const changeSchema = z.object({
 }).strict();
 export const changesSchema = z.array(changeSchema).max(200);
 
+const radarModelSchema = z.object({
+  source: z.literal("opencode-zen"),
+  id: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string(),
+  contextWindow: z.int().nonnegative(),
+  tools: z.boolean(),
+  free: z.literal(true),
+  firstSeen: dateSchema,
+  lastSeen: dateSchema,
+  active: z.boolean(),
+}).strict();
+
+export const radarSchema = z.object({
+  schemaVersion: z.literal(1),
+  generatedAt: dateSchema,
+  models: z.array(radarModelSchema),
+}).strict();
+
 export type ProviderId = z.infer<typeof providerIdSchema>;
 export type Provider = z.infer<typeof providerSchema>;
 export type Model = z.infer<typeof modelSchema>;
@@ -130,6 +149,9 @@ export type Candidate = z.infer<typeof candidateSchema>;
 export type Catalog = z.infer<typeof catalogSchema>;
 export type Change = z.infer<typeof changeSchema>;
 export type Limits = z.infer<typeof limitsSchema>;
+export type Radar = z.infer<typeof radarSchema>;
+export type RadarModel = z.infer<typeof radarModelSchema>;
+export type RadarObservation = Omit<RadarModel, "firstSeen" | "lastSeen" | "active">;
 
 export function offerKey(offer: Pick<Offer, "providerId" | "providerModelId">): string {
   return offer.providerId + ":" + offer.providerModelId;

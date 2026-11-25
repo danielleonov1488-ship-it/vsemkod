@@ -1,19 +1,27 @@
 import { z } from "zod";
 import { providers } from "../registry/providers.js";
 import type { ProviderId } from "../schema.js";
-import { requestJson } from "./common.js";
+import { isZeroPrice, priceSchema, requestJson } from "./common.js";
 import type { Observation, SourceResult } from "./common.js";
 
-const price = z.union([z.string(), z.number()]).nullable().optional();
+export const modelDetailsSchema = z.object({
+  name: z.string().nullish(),
+  context_length: z.int().nonnegative().nullish(),
+  supported_parameters: z.array(z.string()).nullish(),
+  input_modalities: z.array(z.string()).nullish(),
+  output_modalities: z.array(z.string()).nullish(),
+  architecture: z.object({
+    input_modalities: z.array(z.string()).nullish(),
+    output_modalities: z.array(z.string()).nullish(),
+  }).nullish(),
+  reasoning: z.union([z.boolean(), z.object({})]).nullish(),
+});
 
 export const modelList = z.object({
-  data: z.array(z.object({
+  data: z.array(modelDetailsSchema.extend({
     id: z.string().min(1).max(250),
-    pricing: z.object({ prompt: price, completion: price }).nullable().optional(),
-    context_length: z.int().nonnegative().nullable().optional(),
-    supported_parameters: z.array(z.string()).nullable().optional(),
-    output_modalities: z.array(z.string()).nullable().optional(),
-    architecture: z.object({ output_modalities: z.array(z.string()).nullable().optional() }).nullable().optional(),
+    pricing: z.object({ prompt: priceSchema, completion: priceSchema }).nullish(),
+    autoRouting: z.unknown().optional(),
   })),
 });
 
@@ -21,9 +29,18 @@ export function hasQualifier(id: string, qualifier: string): boolean {
   return id.toLowerCase().split(":").slice(1).includes(qualifier);
 }
 
-function isZero(value: string | number | null | undefined): boolean {
-  if (typeof value === "number") return value === 0;
-  return typeof value === "string" && /^(?:0+\.?0*|\.0+)(?:e[+-]?\d+)?$/i.test(value.trim());
+export function textModelDetails(model: z.infer<typeof modelDetailsSchema>) {
+  const output = model.output_modalities ?? model.architecture?.output_modalities;
+  if (output?.length && !output.includes("text")) return undefined;
+  const input = model.input_modalities ?? model.architecture?.input_modalities;
+  const parameters = model.supported_parameters ?? [];
+  return {
+    name: model.name?.trim() || undefined,
+    contextWindow: model.context_length || undefined,
+    supportsTools: parameters.includes("tools"),
+    supportsReasoning: parameters.some((parameter) => ["reasoning", "include_reasoning", "reasoning_effort"].includes(parameter)) || !!model.reasoning,
+    supportsVision: input?.includes("image") ?? false,
+  };
 }
 
 export function parseOpenAIModels(
@@ -35,20 +52,18 @@ export function parseOpenAIModels(
       // Только маршруты, которые не переключаются на платный inference, без приватных org-вариантов.
       if (!hasQualifier(model.id, "free") || /:org-/i.test(model.id)) return [];
     } else if (!hasQualifier(model.id, "free") &&
-      !(isZero(model.pricing?.prompt) && isZero(model.pricing?.completion))) {
+      !(isZeroPrice(model.pricing?.prompt) && isZeroPrice(model.pricing?.completion))) {
       return [];
     }
-    const output = model.output_modalities ?? model.architecture?.output_modalities;
-    if (output?.length && !output.includes("text")) return [];
-    if (model.id === "openrouter/free" || model.id === "kilo-auto/free") return [];
+    const details = textModelDetails(model);
+    if (!details || model.autoRouting || model.id === "openrouter/free" || model.id === "kilo-auto/free") return [];
 
     return [{
       providerId,
       providerModelId: model.id,
       confidence: "structured",
       source: providerId + ":/api/v1/models",
-      contextWindow: model.context_length || undefined,
-      supportsTools: model.supported_parameters?.includes("tools") ?? false,
+      ...details,
     }];
   });
 }

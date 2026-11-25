@@ -2,14 +2,12 @@ import { z } from "zod";
 import { numesPublicModelsUrl, providers } from "../registry/providers.js";
 import { requestJson } from "./common.js";
 import type { Observation, SourceResult } from "./common.js";
-import { hasQualifier, parseOpenAIModels } from "./openrouter.js";
+import { hasQualifier, modelDetailsSchema, parseOpenAIModels, textModelDetails } from "./openrouter.js";
 
 const publicPageSchema = z.object({
-  data: z.array(z.object({
+  data: z.array(modelDetailsSchema.extend({
     compatible_request_id: z.string().min(1).max(250),
-    context_length: z.int().nonnegative().nullable().optional(),
-    supported_parameters: z.array(z.string()).nullable().optional(),
-    output_modalities: z.array(z.string()).nullable().optional(),
+    tasks: z.array(z.string()).nullish(),
   })),
   meta: z.object({
     next_cursor: z.string().min(1).nullish(),
@@ -30,15 +28,15 @@ async function fetchPublic(): Promise<Observation[]> {
     if (meta.catalogue?.stale) throw new Error("Публичный каталог Numes помечен как устаревший");
     for (const row of data) {
       const id = row.compatible_request_id;
-      if (!hasQualifier(id, "free") || /:org-/i.test(id) ||
-          (row.output_modalities?.length && !row.output_modalities.includes("text"))) continue;
+      const details = textModelDetails(row);
+      if (!hasQualifier(id, "free") || /:org-/i.test(id) || !details ||
+          (row.tasks?.length && !row.tasks.includes("chat"))) continue;
       observations.set(id, {
         providerId: "numes",
         providerModelId: id,
         confidence: "structured",
         source: numesPublicModelsUrl,
-        contextWindow: row.context_length || undefined,
-        supportsTools: row.supported_parameters?.includes("tools") ?? false,
+        ...details,
       });
     }
     const cursor = meta.next_cursor;

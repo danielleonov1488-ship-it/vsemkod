@@ -2,13 +2,15 @@ import { feedIds, readConfig, sourceSelectors, structuredIds, watchedPages } fro
 import { checkOffers } from "./health.js";
 import { LlmClient } from "./llm/client.js";
 import { mergeCatalog } from "./merge.js";
-import { notifyTelegram, publish, readCatalog, readPublication } from "./publish.js";
+import { notifyTelegram, publish, readCatalog, readPublication, readRadar } from "./publish.js";
+import { mergeRadar, radarChanged } from "./radar.js";
 import { registryBatches, registryPageHash } from "./registry/offers.js";
 import { describeError } from "./sources/common.js";
 import type { SourceResult } from "./sources/common.js";
 import { fetchFeed, processFeed } from "./sources/feeds.js";
 import { fetchKilo } from "./sources/kilo.js";
 import { fetchNumes } from "./sources/numes.js";
+import { fetchOpenCodeZen } from "./sources/opencodeZen.js";
 import { fetchOpenRouter } from "./sources/openrouter.js";
 import { fetchPageText, processPage } from "./sources/watchPages.js";
 import { pruneState } from "./state.js";
@@ -51,10 +53,11 @@ async function update(args: string[]): Promise<void> {
   );
   const feeds = useLlm ? feedIds.filter((id) => !only || only === "feeds" || only === id) : [];
 
-  const [apiResults, pageResults, feedResults] = await Promise.all([
+  const [apiResults, pageResults, feedResults, [zenResult]] = await Promise.all([
     Promise.allSettled(structuredJobs.map(({ load }) => load())),
     Promise.allSettled(pages.map(fetchPageText)),
     Promise.allSettled(feeds.map((id) => fetchFeed[id]())),
+    Promise.allSettled(!only || only === "opencode-zen" ? [fetchOpenCodeZen()] : []),
   ]);
   for (const [i, result] of apiResults.entries()) {
     if (result.status === "fulfilled") batches.push(result.value);
@@ -86,6 +89,11 @@ async function update(args: string[]): Promise<void> {
     errors.push(...batch.errors.map((error) => id + " — " + error));
     if (batch.complete === false && !batch.errors.length) errors.push(id + " — часть записей отложена из-за бюджета LLM");
   }
+  const zen = zenResult?.status === "fulfilled"
+    ? mergeRadar(previous.radar, zenResult.value, now, state.radarMissingSince)
+    : undefined;
+  if (zen) state.radarMissingSince = zen.missingSince;
+  if (zenResult?.status === "rejected") failure("opencode-zen", zenResult.reason);
 
   const options = { now, ...config };
   let merged = mergeCatalog(previous.catalog, state, batches, options);
@@ -96,10 +104,10 @@ async function update(args: string[]): Promise<void> {
   }
   state.tracks = merged.tracks;
   const { catalog, changes } = merged;
-  const changed = await publish(previous, catalog, changes, state, dryRun);
+  const changed = await publish(previous, catalog, changes, state, dryRun, zen?.radar);
   if (config.telegram && !dryRun) {
     try {
-      if (await notifyTelegram(config.telegram, changes, catalog)) console.log("Telegram: отправлено одно сообщение.");
+      if (await notifyTelegram(config.telegram, changes, catalog, zen?.added)) console.log("Telegram: отправлено одно сообщение.");
     } catch (error) {
       failure("Telegram", error);
     }
@@ -112,6 +120,13 @@ async function update(args: string[]): Promise<void> {
   if (!useLlm) console.log("LLM выключена. Страницы реестра проверяются по хешам.");
   console.log("Предложения: " + active.length + " активных, " + unverified.length + " на перепроверке, " + degraded.length + " с ошибками, " + ended.length + " завершённых. Кандидаты: " + catalog.candidates.length + ".");
   for (const { id, observations } of batches) console.log("  " + id + " — наблюдений " + observations.length);
+  if (zen) {
+    const active = zen.radar.models.filter((model) => model.active).length;
+    console.log("Радар OpenCode Zen: " + active + " активных, " + zen.added.length + " новых.");
+    for (const model of zen.added) console.log("  " + model.name + " (" + model.id + ")");
+    const updated = radarChanged(previous.radar, zen.radar);
+    if (updated) console.log(dryRun ? "Пробный запуск: радар изменился бы." : "Радар записан.");
+  }
   const added = changes.filter(({ type }) => type === "offer_added").length;
   const finished = changes.filter(({ type }) => type === "offer_ended").length;
   console.log("Добавлено " + added + ", завершено " + finished + ".");
@@ -128,9 +143,10 @@ async function update(args: string[]): Promise<void> {
 async function main(): Promise<void> {
   const [command, ...args] = process.argv.slice(2);
   if (command === "validate" && !args.length) {
-    const catalog = await readCatalog();
+    const [catalog, radar] = await Promise.all([readCatalog(), readRadar()]);
     if (!catalog) throw new Error("Отсутствует data/catalog.json");
     console.log("data/catalog.json соответствует схеме v" + catalog.schemaVersion + ".");
+    if (radar) console.log("data/radar.json соответствует схеме v" + radar.schemaVersion + ".");
   } else if (command === "update") {
     await update(args);
   } else {

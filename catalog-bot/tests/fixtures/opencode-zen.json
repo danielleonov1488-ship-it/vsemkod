@@ -1,0 +1,24 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "hungerg-free",
+      "name": "Hungerg Free",
+      "description": "Модель из тестового ответа.",
+      "release_date": "2026-11-24",
+      "limit": { "context": 262144 },
+      "capabilities": { "tools": { "supported": true } }
+    },
+    {
+      "id": "big-pickle",
+      "name": "Big Pickle",
+      "limit": { "context": 200000 },
+      "cost": { "text": { "input": { "price": 0 }, "output": { "price": "0.00" } } }
+    },
+    {
+      "id": "paid-output",
+      "cost": { "text": { "input": { "price": 0 }, "output": { "price": 1 } } }
+    },
+    { "id": "unknown-cost" }
+  ]
+}

@@ -37,6 +37,7 @@ export const stateSchema = z.object({
   seenNews: z.record(z.string(), cachedSchema),
   llmCache: z.record(z.string(), cachedSchema),
   tracks: z.record(z.string(), trackSchema),
+  radarMissingSince: z.record(z.string(), dateSchema).default({}),
 });
 
 export type HealthState = z.infer<typeof healthStateSchema>;
@@ -44,7 +45,7 @@ export type Track = z.infer<typeof trackSchema>;
 export type State = z.infer<typeof stateSchema>;
 
 export function newState(): State {
-  return { version: 1, pages: {}, pageChecks: {}, seenNews: {}, llmCache: {}, tracks: {} };
+  return { version: 1, pages: {}, pageChecks: {}, seenNews: {}, llmCache: {}, tracks: {}, radarMissingSince: {} };
 }
 
 const day = 24 * 60 * 60 * 1000;

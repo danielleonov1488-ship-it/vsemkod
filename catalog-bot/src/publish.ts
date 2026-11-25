@@ -3,8 +3,9 @@ import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { z } from "zod";
 import { catalogChanged, compare, stableJson } from "./merge.js";
-import { catalogSchema, changesSchema, offerKey } from "./schema.js";
-import type { Catalog, Change } from "./schema.js";
+import { radarChanged } from "./radar.js";
+import { catalogSchema, changesSchema, offerKey, radarSchema } from "./schema.js";
+import type { Catalog, Change, Radar, RadarObservation } from "./schema.js";
 import { newState, stateSchema } from "./state.js";
 import type { State } from "./state.js";
 import type { Config } from "./config.js";
@@ -15,12 +16,14 @@ const dataDir = "data";
 const catalogFile = "catalog.json";
 const changesFile = "changes.json";
 const stateFile = "state.json";
+const radarFile = "radar.json";
 const pendingFile = ".pending.json";
 
 const pendingSchema = z.object({
   catalog: catalogSchema.optional(),
   changes: changesSchema.optional(),
   state: stateSchema.optional(),
+  radar: radarSchema.optional(),
 });
 type Pending = z.infer<typeof pendingSchema>;
 
@@ -49,6 +52,7 @@ async function writeAtomic(file: string, data: unknown): Promise<void> {
 async function writePending(pending: Pending): Promise<void> {
   if (pending.changes) await writeAtomic(changesFile, pending.changes);
   if (pending.catalog) await writeAtomic(catalogFile, pending.catalog);
+  if (pending.radar) await writeAtomic(radarFile, pending.radar);
   if (pending.state) await writeAtomic(stateFile, pending.state);
 }
 
@@ -56,28 +60,35 @@ export async function readCatalog(): Promise<Catalog | undefined> {
   return read(catalogFile, catalogSchema);
 }
 
-export async function readPublication(dryRun: boolean): Promise<{ catalog?: Catalog; changes: Change[]; state: State }> {
+export async function readRadar(): Promise<Radar | undefined> {
+  return read(radarFile, radarSchema);
+}
+
+export async function readPublication(dryRun: boolean): Promise<{ catalog?: Catalog; changes: Change[]; state: State; radar?: Radar }> {
   const pending = await read(pendingFile, pendingSchema);
   if (pending && !dryRun) {
     await writePending(pending);
     await unlink(join(dataDir, pendingFile));
   }
-  const [catalog, changes, state] = await Promise.all([
+  const [catalog, changes, state, radar] = await Promise.all([
     pending?.catalog ?? readCatalog(),
     pending?.changes ?? read(changesFile, changesSchema),
     pending?.state ?? read(stateFile, stateSchema),
+    pending?.radar ?? readRadar(),
   ]);
-  return { catalog, changes: changes ?? [], state: state ?? newState() };
+  return { catalog, changes: changes ?? [], state: state ?? newState(), radar };
 }
 
 export async function publish(
   previous: Awaited<ReturnType<typeof readPublication>>,
   catalog: Catalog, events: Change[], state: State, dryRun: boolean,
+  radar?: Radar,
 ): Promise<boolean> {
   const changed = catalogChanged(previous.catalog, catalog);
   if (dryRun) return changed;
   const pending: Pending = {};
   if (changed) pending.catalog = catalog;
+  if (radar && radarChanged(previous.radar, radar)) pending.radar = radar;
   if (events.length || !previous.catalog) {
     pending.changes = [...events, ...previous.changes].sort((a, b) =>
       Date.parse(b.date) - Date.parse(a.date) ||
@@ -102,6 +113,7 @@ export async function publish(
 
 export async function notifyTelegram(
   config: NonNullable<Config["telegram"]>, events: Change[], catalog: Catalog,
+  radarAdded: RadarObservation[] = [],
 ): Promise<boolean> {
   const models = new Map(catalog.models.filter(({ tier }) => tier === "top").map(({ id, name }) => [id, name]));
   const active = new Set(catalog.offers.filter(({ status }) => status === "active").map(offerKey));
@@ -113,10 +125,12 @@ export async function notifyTelegram(
         !active.has(offerKey({ providerId, providerModelId }))) continue;
     lines.add(model + " бесплатно у " + providers[providerId].name);
   }
-  if (!lines.size) return false;
-  const text = lines.size === 1
+  const notices = radarAdded.map(({ name }) => "Радар: в OpenCode Zen появилась бесплатная модель " + name);
+  if (lines.size) notices.unshift(lines.size === 1
     ? "🦛 Новая раздача: " + [...lines][0] + ". Подключить — в vsemkod"
-    : "🦛 Новые раздачи\n" + [...lines].map((line) => "• " + line).join("\n").slice(0, 3700) + "\nПодключить — в vsemkod";
+    : "🦛 Новые раздачи\n" + [...lines].map((line) => "• " + line).join("\n").slice(0, 3700) + "\nПодключить — в vsemkod");
+  if (!notices.length) return false;
+  const text = notices.join("\n").slice(0, 4096);
   const response = await request("https://api.telegram.org/bot" + config.token + "/sendMessage",
     (result) => result.json(), {
       method: "POST", redirect: "error", headers: { "Content-Type": "application/json" },
