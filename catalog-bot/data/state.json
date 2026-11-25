@@ -1,29 +1,1175 @@
 {
-  "llmCache": {},
+  "llmCache": {
+    "04c106978467cd03200624da5ce46c62b2ac588465528917940b397e5625237a": {
+      "observations": [
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "openrouter/free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно без API-ключа, 200 запросов/час на IP; авто-роутер может направлять к провайдерам, логирующим промпты.",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "kilo-auto/free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "stealth/glyph-cluster",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "google/gemma-4-26b-a4b-it:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "google/gemma-4-31b-it:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "recursive/flint-v1.0:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимиты бесплатного плана для чат-моделей; точные лимиты организации — на странице аккаунта.",
+            "rpd": 1000,
+            "rpm": 30,
+            "tpd": 200000,
+            "tpm": 8000
+          },
+          "promo": false,
+          "providerId": "groq",
+          "providerModelId": "qwen/qwen3.8-27b",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно для зарегистрированных пользователей; требуется привязка аккаунта Alibaba Cloud и верификация личности; лимит 2000 запросов/день суммарно, на модель до 500.",
+            "rpd": 2000
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "API-Inference",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатное использование пяти открытых моделей при входе через GitHub (аккаунт старше 30 дней), без карты; недельная квота, сброс каждый понедельник; при входе через Google требуется карта."
+          },
+          "promo": false,
+          "providerId": "runcrate",
+          "providerModelId": "five open models",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Постоянно бесплатные модели без карты; регистрация принимает зарубежные номера."
+          },
+          "promo": false,
+          "providerId": "zai",
+          "providerModelId": "free models",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        }
+      ],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "05deb47479012fd09b6458ad20b47da0ca7b28cdf25aea045aa414f0ab8ccafc": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "08f1fb388a3c5d979408fed6543875ee0f3b33550d809200a738458a6eea40f2": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "1fb25aebdc464991d8a6670bbd882982a21af9d641cd07f54af69f437c876ebd": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "23132f9380677b812a94c3330dc21a2f957e98c89fc5949d07d84b3b9dd8be1c": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "2d35d191f9599fd5e81ea1464515532f8b56a053f562033ed0074485b90abfef": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "2d91104ff9ecf6632b4a4165ea466bd679b373cf7e18c4cbf4c01f10d4f71fce": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "319602025645ffb679bc729517bbf91ef2756da7278ca0072d152f0ea447ff31": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "32a4bc70b65475a8ca16035d4f98554e94b81f94b3dfec8f9ae172be8bada1d2": {
+      "observations": [
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "promo": false,
+          "providerId": "zai",
+          "providerModelId": "glm-4.7-flash",
+          "source": "https://docs.z.ai/guides/overview/pricing"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "promo": false,
+          "providerId": "zai",
+          "providerModelId": "GLM-4.5-Flash",
+          "source": "https://docs.z.ai/guides/overview/pricing"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "promo": false,
+          "providerId": "zai",
+          "providerModelId": "GLM-4.6V-Flash",
+          "source": "https://docs.z.ai/guides/overview/pricing"
+        }
+      ],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "468d26c19294ffdde561708982e50dd5655ed294f6321915b08ee95706aaefb6": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "4690ce80661853ec8b0f3ba4c2edfdb852b7cefb4534d9292e8bb896c5ab8ee0": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "47e261eb4c4bb673f601965dff33c3fcb18d21f9c59158f1f43d86b23c7118a5": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "540c68cfde00260d3a6f30911628ffe5b660c73999be7ed06ca5f784d3ffb4c0": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "66ab0746e95bb6b13e64c96154b9afe2f2aebbac9f633aeead528095b553a4c7": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "6ff6fead1f811ea86a2d9b003d4ee1293e5fa44328f558305ff8837775445e73": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "715b14bf63883ec5ecb2afc38a8050687ab4cb069c2b834da9b818e18d3e67d3": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "74e65f547ab3935531e0b957729acb26012d634fff397589876ca374ecd1ae16": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "76e9c1538193c11e7bd7494ad4aec26830bb4cab53c2c4fae0d1b7427305d7f5": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "81ce98a70497d59986baebf52b0a6868d703a409ac7f99a2de0c8a1e7b7ffc19": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "82151b84dccb4e732d3fbac33fde0afdf8e02921475e47c24de34a1d05a4d7d4": {
+      "observations": [
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+          },
+          "promo": false,
+          "providerId": "runcrate",
+          "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+          "source": "https://www.runcrate.ai/inference/free"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+          },
+          "promo": false,
+          "providerId": "runcrate",
+          "providerModelId": "zai-org/GLM-5.3-Flash",
+          "source": "https://www.runcrate.ai/inference/free"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+          },
+          "promo": false,
+          "providerId": "runcrate",
+          "providerModelId": "zai-org/GLM-5.3",
+          "source": "https://www.runcrate.ai/inference/free"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+          },
+          "promo": false,
+          "providerId": "runcrate",
+          "providerModelId": "openai/gpt-oss-120b",
+          "source": "https://www.runcrate.ai/inference/free"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+          },
+          "promo": false,
+          "providerId": "runcrate",
+          "providerModelId": "Qwen/Qwen3.8-Flash",
+          "source": "https://www.runcrate.ai/inference/free"
+        }
+      ],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "83dd0a9eb608e2994e2e8c72d5b41d689b2ed987b665087137f125a8c1f3c278": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "83f54e4f26cb67d676f6ae7d9554e9dbb94ea33fdc3243ea5d8a7e65824341c9": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "8fdb8c7b0ca72d46f77fce7ed5d180b3d234c863b6132b347a8fa0392340f47d": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "92dd255bbb14e0aba4dd2423bb93190d367191b6db1f3b3a2c9a2e9bf3e37ff5": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "9b2cb502ba95220abbaaa1735c7555a5b11716cda7127b86962fcc5aab4fd364": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "a3254541411882361c975195e36b5f7402c5b653e1132a971aaa9b32ee82a569": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "a9ad7dff9025304da4ced1f73c3993cfc48c9d0bd2856acdf10a3867f39e8377": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "acf3c06de6d1f74ebcd3ea4ff523b56c04d9b4b55010ac0ccfdf1ecfcbd3ae96": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "b63cec59dbdddd9e3d7b4beba787d91c695ea562d4dbffa97b9408d6b0ee2a28": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "b93f216d6b9c0ef0cfd46a5bfebb3d04df71ea7c7d7e65d0ea1e19e77704156a": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "bdc5743b6616d3e249ffb54f4de2b9d2dbcaf5a156cab2d6935f783d9f96c4f9": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "c139eff454dd223686e174a29034754915525dfe680a56ed82060c27f486692f": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "c89919a2c218eb6ad0ba6c42c8993cc7eb17ce4b88319f5a86aa047fb25e9ed8": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "cad32075eccb66f6f6029e93e9e32b8f89f916a85b3d5d3b396fe283eab4a14a": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "ccba168ab2ff94a68c5e33697ee8d3bb05dc484ed841102886a39f54d479d0e6": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "d159b2c396e7507c3f80688c3c6754898ac4a91a53576ffb39a2ff525d064b0a": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "f231a00a20c2b41764abb1f6d18b04a728fe009c4b8d3a5f9c8e400fdb076b08": {
+      "observations": [
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "MiniMax/MiniMax-M3",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "Qwen/Qwen3.8-27B",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "ZhipuAI/GLM-4.7-Flash",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "ZhipuAI/GLM-5.2",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "moonshotai/Kimi-K3.1-Pro",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        }
+      ],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "f581162f93b40b0f6bfc53aa93c31a119a2c18a0a7025bc83fed2dc4ad1ba7a4": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "fae0dddf2b7ec014bf6a9e49d521093787d054dc04012b8937cdf79fb8755aa7": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "ff2f0cb51a6db2ddb2b992644e9e8962dbc3b7dd60125c879ab55ed6d4eeceb3": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    }
+  },
   "pageChecks": {
     "page:groq": {
       "changedAt": "2026-11-24T15:12:29.146Z",
-      "checkedAt": "2026-11-24T15:12:29.146Z",
+      "checkedAt": "2026-11-25T12:06:35.747Z",
       "hash": "34dcf2cfab29787fbf6996ff0beb94011ceb1dfe066670b92ed2458f37a2d4ad"
     },
     "page:modelscope": {
       "changedAt": "2026-11-24T15:12:29.146Z",
-      "checkedAt": "2026-11-24T15:12:29.146Z",
+      "checkedAt": "2026-11-25T12:06:35.747Z",
       "hash": "b84f5a2c3f6c54778285e39fb4d064fe92a05e29aca9a2244b7e906fec73c33f"
+    },
+    "page:numes": {
+      "changedAt": "2026-11-25T12:06:35.747Z",
+      "checkedAt": "2026-11-25T12:06:35.747Z",
+      "hash": "c636e7f9d2482f208841317335ea973798f20138fa1197297d1ca826c1f00a8d"
     },
     "page:runcrate": {
       "changedAt": "2026-11-24T15:12:29.146Z",
-      "checkedAt": "2026-11-24T15:12:29.146Z",
+      "checkedAt": "2026-11-25T12:06:35.747Z",
       "hash": "7716ead50463b7a609a6be0bb539a643b92ec9613099ef1f1c36bb13cd7fa549"
     },
     "page:zai": {
       "changedAt": "2026-11-24T15:12:29.146Z",
-      "checkedAt": "2026-11-24T15:12:29.146Z",
+      "checkedAt": "2026-11-25T12:06:35.747Z",
       "hash": "567997bd64b126bde95802f3b89ce19c02668f604244c22e04dbbda630a9bb72"
     }
   },
-  "pages": {},
-  "seenNews": {},
+  "pages": {
+    "page:groq": {
+      "hash": "34dcf2cfab29787fbf6996ff0beb94011ceb1dfe066670b92ed2458f37a2d4ad",
+      "observations": []
+    },
+    "page:modelscope": {
+      "hash": "b84f5a2c3f6c54778285e39fb4d064fe92a05e29aca9a2244b7e906fec73c33f",
+      "observations": [
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "MiniMax/MiniMax-M3",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "Qwen/Qwen3.8-27B",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "ZhipuAI/GLM-4.7-Flash",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "ZhipuAI/GLM-5.2",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "moonshotai/Kimi-K3.1-Pro",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        }
+      ]
+    },
+    "page:numes": {
+      "hash": "c636e7f9d2482f208841317335ea973798f20138fa1197297d1ca826c1f00a8d",
+      "observations": []
+    },
+    "page:runcrate": {
+      "hash": "7716ead50463b7a609a6be0bb539a643b92ec9613099ef1f1c36bb13cd7fa549",
+      "observations": [
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+          },
+          "promo": false,
+          "providerId": "runcrate",
+          "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+          "source": "https://www.runcrate.ai/inference/free"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+          },
+          "promo": false,
+          "providerId": "runcrate",
+          "providerModelId": "zai-org/GLM-5.3-Flash",
+          "source": "https://www.runcrate.ai/inference/free"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+          },
+          "promo": false,
+          "providerId": "runcrate",
+          "providerModelId": "zai-org/GLM-5.3",
+          "source": "https://www.runcrate.ai/inference/free"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+          },
+          "promo": false,
+          "providerId": "runcrate",
+          "providerModelId": "openai/gpt-oss-120b",
+          "source": "https://www.runcrate.ai/inference/free"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+          },
+          "promo": false,
+          "providerId": "runcrate",
+          "providerModelId": "Qwen/Qwen3.8-Flash",
+          "source": "https://www.runcrate.ai/inference/free"
+        }
+      ]
+    },
+    "page:zai": {
+      "hash": "567997bd64b126bde95802f3b89ce19c02668f604244c22e04dbbda630a9bb72",
+      "observations": [
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "promo": false,
+          "providerId": "zai",
+          "providerModelId": "glm-4.7-flash",
+          "source": "https://docs.z.ai/guides/overview/pricing"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "promo": false,
+          "providerId": "zai",
+          "providerModelId": "GLM-4.5-Flash",
+          "source": "https://docs.z.ai/guides/overview/pricing"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "promo": false,
+          "providerId": "zai",
+          "providerModelId": "GLM-4.6V-Flash",
+          "source": "https://docs.z.ai/guides/overview/pricing"
+        }
+      ]
+    }
+  },
+  "seenNews": {
+    "github:db7a9b76865521101c18abde1b4b70bbd690b66eb064ba005291f00fffc7e781": {
+      "observations": [
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "openrouter/free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно без API-ключа, 200 запросов/час на IP; авто-роутер может направлять к провайдерам, логирующим промпты.",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "kilo-auto/free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "stealth/glyph-cluster",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "google/gemma-4-26b-a4b-it:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "google/gemma-4-31b-it:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "recursive/flint-v1.0:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Лимиты бесплатного плана для чат-моделей; точные лимиты организации — на странице аккаунта.",
+            "rpd": 1000,
+            "rpm": 30,
+            "tpd": 200000,
+            "tpm": 8000
+          },
+          "promo": false,
+          "providerId": "groq",
+          "providerModelId": "qwen/qwen3.8-27b",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно для зарегистрированных пользователей; требуется привязка аккаунта Alibaba Cloud и верификация личности; лимит 2000 запросов/день суммарно, на модель до 500.",
+            "rpd": 2000
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "API-Inference",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатное использование пяти открытых моделей при входе через GitHub (аккаунт старше 30 дней), без карты; недельная квота, сброс каждый понедельник; при входе через Google требуется карта."
+          },
+          "promo": false,
+          "providerId": "runcrate",
+          "providerModelId": "five open models",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Постоянно бесплатные модели без карты; регистрация принимает зарубежные номера."
+          },
+          "promo": false,
+          "providerId": "zai",
+          "providerModelId": "free models",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        }
+      ],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50602561": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50603421": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50603754": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50609708": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50611887": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50612033": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50612762": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50614327": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50614568": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50617632": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50619761": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50620027": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50620275": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50622161": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50623005": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50624684": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50627008": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50627051": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50627625": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50627633": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50627646": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50627930": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50628011": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50628114": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50628963": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50629040": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50630317": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50631044": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50631103": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50631626": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50631791": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50633297": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50633321": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50633601": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50634230": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50634426": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50635126": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50635452": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50638216": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50639615": {
+      "observations": [],
+      "savedAt": "2026-11-25T12:06:35.747Z"
+    }
+  },
   "tracks": {
     "groq:openai/gpt-oss-120b": {
       "evidence": {
@@ -65,6 +1211,24 @@
     },
     "groq:qwen/qwen3.8-27b": {
       "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "expiresAt": null,
+            "limits": {
+              "note": "Лимиты бесплатного плана для чат-моделей; точные лимиты организации — на странице аккаунта.",
+              "rpd": 1000,
+              "rpm": 30,
+              "tpd": 200000,
+              "tpm": 8000
+            },
+            "promo": false,
+            "providerId": "groq",
+            "providerModelId": "qwen/qwen3.8-27b",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        },
         "registry:groq": {
           "missedRuns": 0,
           "observation": {
@@ -100,7 +1264,7 @@
     "kilo:dots-studio/dots-3-note-preview:free": {
       "evidence": {
         "kilo": {
-          "missedRuns": 0,
+          "missedRuns": 1,
           "observation": {
             "confidence": "structured",
             "contextWindow": 512000,
@@ -172,6 +1336,26 @@
         }
       }
     },
+    "kilo:kilo-auto/free": {
+      "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "contextWindow": 256000,
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатно без API-ключа, 200 запросов/час на IP; авто-роутер может направлять к провайдерам, логирующим промпты.",
+              "rph": 200
+            },
+            "promo": false,
+            "providerId": "kilo",
+            "providerModelId": "kilo-auto/free",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        }
+      }
+    },
     "kilo:liquid/lfm-3-1.7b:free": {
       "evidence": {
         "kilo": {
@@ -189,6 +1373,22 @@
     },
     "kilo:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
       "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "contextWindow": 256000,
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+              "rph": 200
+            },
+            "promo": false,
+            "providerId": "kilo",
+            "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        },
         "kilo": {
           "missedRuns": 0,
           "observation": {
@@ -204,6 +1404,22 @@
     },
     "kilo:nvidia/nemotron-3-ultra-550b-a55b:free": {
       "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "contextWindow": 1000000,
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+              "rph": 200
+            },
+            "promo": false,
+            "providerId": "kilo",
+            "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        },
         "kilo": {
           "missedRuns": 0,
           "observation": {
@@ -219,6 +1435,22 @@
     },
     "kilo:nvidia/nemotron-3.5-lightning:free": {
       "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "contextWindow": 1000000,
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+              "rph": 200
+            },
+            "promo": false,
+            "providerId": "kilo",
+            "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        },
         "kilo": {
           "missedRuns": 0,
           "observation": {
@@ -234,6 +1466,22 @@
     },
     "kilo:nvidia/nemotron-3.5-super-vl:free": {
       "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "contextWindow": 1000000,
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+              "rph": 200
+            },
+            "promo": false,
+            "providerId": "kilo",
+            "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        },
         "kilo": {
           "missedRuns": 0,
           "observation": {
@@ -243,6 +1491,25 @@
             "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
             "source": "kilo:/api/v1/models",
             "supportsTools": true
+          }
+        }
+      }
+    },
+    "kilo:openrouter/free": {
+      "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+              "rph": 200
+            },
+            "promo": false,
+            "providerId": "kilo",
+            "providerModelId": "openrouter/free",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
           }
         }
       }
@@ -309,6 +1576,22 @@
     },
     "kilo:stealth/glyph-cluster": {
       "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "contextWindow": 256000,
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+              "rph": 200
+            },
+            "promo": false,
+            "providerId": "kilo",
+            "providerModelId": "stealth/glyph-cluster",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        },
         "kilo": {
           "missedRuns": 0,
           "observation": {
@@ -322,8 +1605,41 @@
         }
       }
     },
+    "modelscope:API-Inference": {
+      "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатно для зарегистрированных пользователей; требуется привязка аккаунта Alibaba Cloud и верификация личности; лимит 2000 запросов/день суммарно, на модель до 500.",
+              "rpd": 2000
+            },
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "API-Inference",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        }
+      }
+    },
     "modelscope:MiniMax/MiniMax-M3": {
       "evidence": {
+        "page:modelscope": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+            },
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "MiniMax/MiniMax-M3",
+            "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+          }
+        },
         "registry:modelscope": {
           "missedRuns": 0,
           "observation": {
@@ -339,8 +1655,58 @@
         }
       }
     },
+    "modelscope:Qwen/Qwen3.8-27B": {
+      "evidence": {
+        "page:modelscope": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+            },
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "Qwen/Qwen3.8-27B",
+            "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+          }
+        }
+      }
+    },
+    "modelscope:ZhipuAI/GLM-4.7-Flash": {
+      "evidence": {
+        "page:modelscope": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+            },
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "ZhipuAI/GLM-4.7-Flash",
+            "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+          }
+        }
+      }
+    },
     "modelscope:ZhipuAI/GLM-5.2": {
       "evidence": {
+        "page:modelscope": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+            },
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "ZhipuAI/GLM-5.2",
+            "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+          }
+        },
         "registry:modelscope": {
           "missedRuns": 0,
           "observation": {
@@ -358,6 +1724,20 @@
     },
     "modelscope:deepseek-ai/DeepSeek-V4.1-Flash": {
       "evidence": {
+        "page:modelscope": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+            },
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+          }
+        },
         "registry:modelscope": {
           "missedRuns": 0,
           "observation": {
@@ -373,8 +1753,40 @@
         }
       }
     },
+    "modelscope:deepseek-ai/DeepSeek-V4.1-Flash-1017": {
+      "evidence": {
+        "page:modelscope": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+            },
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+            "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+          }
+        }
+      }
+    },
     "modelscope:moonshotai/Kimi-K3.1-Pro": {
       "evidence": {
+        "page:modelscope": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+            },
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "moonshotai/Kimi-K3.1-Pro",
+            "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+          }
+        },
         "registry:modelscope": {
           "missedRuns": 0,
           "observation": {
@@ -471,7 +1883,7 @@
           "missedRuns": 0,
           "observation": {
             "confidence": "structured",
-            "contextWindow": 202800,
+            "contextWindow": 1048576,
             "providerId": "numes",
             "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
             "source": "https://numes.ai/api/public-catalogue/models",
@@ -501,7 +1913,7 @@
           "missedRuns": 0,
           "observation": {
             "confidence": "structured",
-            "contextWindow": 1048575,
+            "contextWindow": 1048576,
             "providerId": "numes",
             "providerModelId": "z-ai/glm-5.3-flash:free",
             "source": "https://numes.ai/api/public-catalogue/models",
@@ -516,7 +1928,7 @@
           "missedRuns": 0,
           "observation": {
             "confidence": "structured",
-            "contextWindow": 1048576,
+            "contextWindow": 262144,
             "providerId": "numes",
             "providerModelId": "z-ai/glm-5.3:free",
             "source": "https://numes.ai/api/public-catalogue/models",
@@ -543,7 +1955,7 @@
     "openrouter:dots-studio/dots-3-note-preview:free": {
       "evidence": {
         "openrouter": {
-          "missedRuns": 0,
+          "missedRuns": 1,
           "observation": {
             "confidence": "structured",
             "contextWindow": 512000,
@@ -557,6 +1969,23 @@
     },
     "openrouter:google/gemma-4-26b-a4b-it:free": {
       "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "contextWindow": 262000,
+            "expiresAt": null,
+            "limits": {
+              "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+              "rpd": 50,
+              "rpm": 20
+            },
+            "promo": false,
+            "providerId": "openrouter",
+            "providerModelId": "google/gemma-4-26b-a4b-it:free",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        },
         "openrouter": {
           "missedRuns": 0,
           "observation": {
@@ -572,6 +2001,23 @@
     },
     "openrouter:google/gemma-4-31b-it:free": {
       "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "contextWindow": 262000,
+            "expiresAt": null,
+            "limits": {
+              "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+              "rpd": 50,
+              "rpm": 20
+            },
+            "promo": false,
+            "providerId": "openrouter",
+            "providerModelId": "google/gemma-4-31b-it:free",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        },
         "openrouter": {
           "missedRuns": 0,
           "observation": {
@@ -647,6 +2093,23 @@
     },
     "openrouter:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
       "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "contextWindow": 256000,
+            "expiresAt": null,
+            "limits": {
+              "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+              "rpd": 50,
+              "rpm": 20
+            },
+            "promo": false,
+            "providerId": "openrouter",
+            "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        },
         "openrouter": {
           "missedRuns": 0,
           "observation": {
@@ -662,6 +2125,23 @@
     },
     "openrouter:nvidia/nemotron-3-ultra-550b-a55b:free": {
       "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "contextWindow": 1000000,
+            "expiresAt": null,
+            "limits": {
+              "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+              "rpd": 50,
+              "rpm": 20
+            },
+            "promo": false,
+            "providerId": "openrouter",
+            "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        },
         "openrouter": {
           "missedRuns": 0,
           "observation": {
@@ -677,6 +2157,23 @@
     },
     "openrouter:nvidia/nemotron-3.5-lightning:free": {
       "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "contextWindow": 1000000,
+            "expiresAt": null,
+            "limits": {
+              "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+              "rpd": 50,
+              "rpm": 20
+            },
+            "promo": false,
+            "providerId": "openrouter",
+            "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        },
         "openrouter": {
           "missedRuns": 0,
           "observation": {
@@ -692,6 +2189,23 @@
     },
     "openrouter:nvidia/nemotron-3.5-super-vl:free": {
       "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "contextWindow": 1000000,
+            "expiresAt": null,
+            "limits": {
+              "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+              "rpd": 50,
+              "rpm": 20
+            },
+            "promo": false,
+            "providerId": "openrouter",
+            "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        },
         "openrouter": {
           "missedRuns": 0,
           "observation": {
@@ -722,6 +2236,23 @@
     },
     "openrouter:recursive/flint-v1.0:free": {
       "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "contextWindow": 262000,
+            "expiresAt": null,
+            "limits": {
+              "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
+              "rpd": 50,
+              "rpm": 20
+            },
+            "promo": false,
+            "providerId": "openrouter",
+            "providerModelId": "recursive/flint-v1.0:free",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        },
         "openrouter": {
           "missedRuns": 0,
           "observation": {
@@ -737,6 +2268,20 @@
     },
     "runcrate:Qwen/Qwen3.8-Flash": {
       "evidence": {
+        "page:runcrate": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+            },
+            "promo": false,
+            "providerId": "runcrate",
+            "providerModelId": "Qwen/Qwen3.8-Flash",
+            "source": "https://www.runcrate.ai/inference/free"
+          }
+        },
         "registry:runcrate": {
           "missedRuns": 0,
           "observation": {
@@ -756,6 +2301,20 @@
     },
     "runcrate:deepseek-ai/DeepSeek-V4.1-Flash": {
       "evidence": {
+        "page:runcrate": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+            },
+            "promo": false,
+            "providerId": "runcrate",
+            "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "source": "https://www.runcrate.ai/inference/free"
+          }
+        },
         "registry:runcrate": {
           "missedRuns": 0,
           "observation": {
@@ -773,8 +2332,40 @@
         }
       }
     },
+    "runcrate:five open models": {
+      "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатное использование пяти открытых моделей при входе через GitHub (аккаунт старше 30 дней), без карты; недельная квота, сброс каждый понедельник; при входе через Google требуется карта."
+            },
+            "promo": false,
+            "providerId": "runcrate",
+            "providerModelId": "five open models",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        }
+      }
+    },
     "runcrate:openai/gpt-oss-120b": {
       "evidence": {
+        "page:runcrate": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+            },
+            "promo": false,
+            "providerId": "runcrate",
+            "providerModelId": "openai/gpt-oss-120b",
+            "source": "https://www.runcrate.ai/inference/free"
+          }
+        },
         "registry:runcrate": {
           "missedRuns": 0,
           "observation": {
@@ -794,6 +2385,20 @@
     },
     "runcrate:zai-org/GLM-5.3": {
       "evidence": {
+        "page:runcrate": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+            },
+            "promo": false,
+            "providerId": "runcrate",
+            "providerModelId": "zai-org/GLM-5.3",
+            "source": "https://www.runcrate.ai/inference/free"
+          }
+        },
         "registry:runcrate": {
           "missedRuns": 0,
           "observation": {
@@ -813,6 +2418,20 @@
     },
     "runcrate:zai-org/GLM-5.3-Flash": {
       "evidence": {
+        "page:runcrate": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
+            },
+            "promo": false,
+            "providerId": "runcrate",
+            "providerModelId": "zai-org/GLM-5.3-Flash",
+            "source": "https://www.runcrate.ai/inference/free"
+          }
+        },
         "registry:runcrate": {
           "missedRuns": 0,
           "observation": {
@@ -830,8 +2449,67 @@
         }
       }
     },
+    "zai:GLM-4.5-Flash": {
+      "evidence": {
+        "page:zai": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "zai",
+            "providerModelId": "GLM-4.5-Flash",
+            "source": "https://docs.z.ai/guides/overview/pricing"
+          }
+        }
+      }
+    },
+    "zai:GLM-4.6V-Flash": {
+      "evidence": {
+        "page:zai": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "zai",
+            "providerModelId": "GLM-4.6V-Flash",
+            "source": "https://docs.z.ai/guides/overview/pricing"
+          }
+        }
+      }
+    },
+    "zai:free models": {
+      "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "expiresAt": null,
+            "limits": {
+              "note": "Постоянно бесплатные модели без карты; регистрация принимает зарубежные номера."
+            },
+            "promo": false,
+            "providerId": "zai",
+            "providerModelId": "free models",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        }
+      }
+    },
     "zai:glm-4.7-flash": {
       "evidence": {
+        "page:zai": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "zai",
+            "providerModelId": "glm-4.7-flash",
+            "source": "https://docs.z.ai/guides/overview/pricing"
+          }
+        },
         "registry:zai": {
           "missedRuns": 0,
           "observation": {

@@ -1,5 +1,181 @@
 [
   {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "api-inference",
+    "providerId": "modelscope",
+    "providerModelId": "API-Inference",
+    "text": "Проверяем сведения о бесплатной модели API-Inference у ModelScope",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "five-open-models",
+    "providerId": "runcrate",
+    "providerModelId": "five open models",
+    "text": "Проверяем сведения о бесплатной модели five open models у Runcrate",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "free",
+    "providerId": "kilo",
+    "providerModelId": "kilo-auto/free",
+    "text": "Проверяем сведения о бесплатной модели kilo-auto/free у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "free",
+    "providerId": "kilo",
+    "providerModelId": "openrouter/free",
+    "text": "Проверяем сведения о бесплатной модели openrouter/free у Kilo Gateway",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "free-models",
+    "providerId": "zai",
+    "providerModelId": "free models",
+    "text": "Проверяем сведения о бесплатной модели free models у Z.ai",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "glm-4.5-flash",
+    "providerId": "zai",
+    "providerModelId": "GLM-4.5-Flash",
+    "text": "Проверяем сведения о бесплатной модели GLM-4.5-Flash у Z.ai",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "glm-4.6v-flash",
+    "providerId": "zai",
+    "providerModelId": "GLM-4.6V-Flash",
+    "text": "Проверяем сведения о бесплатной модели GLM-4.6V-Flash у Z.ai",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "deepseek-v4.1-flash",
+    "providerId": "modelscope",
+    "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+    "text": "DeepSeek V4.1 Flash теперь бесплатно у ModelScope",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "glm-4.7-flash",
+    "providerId": "modelscope",
+    "providerModelId": "ZhipuAI/GLM-4.7-Flash",
+    "text": "GLM-4.7-Flash теперь бесплатно у ModelScope",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "qwen3.8-27b",
+    "providerId": "modelscope",
+    "providerModelId": "Qwen/Qwen3.8-27B",
+    "text": "Qwen3.8-27B теперь бесплатно у ModelScope",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "deepseek-v4.1-flash",
+    "providerId": "modelscope",
+    "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+    "text": "Условия раздачи DeepSeek V4.1 Flash у ModelScope изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "deepseek-v4.1-flash",
+    "providerId": "runcrate",
+    "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+    "text": "Условия раздачи DeepSeek V4.1 Flash у Runcrate изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "glm-5.2",
+    "providerId": "modelscope",
+    "providerModelId": "ZhipuAI/GLM-5.2",
+    "text": "Условия раздачи GLM 5.2 у ModelScope изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "glm-5.3",
+    "providerId": "numes",
+    "providerModelId": "z-ai/glm-5.3:free",
+    "text": "Условия раздачи GLM 5.3 у Numes изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "glm-5.3",
+    "providerId": "runcrate",
+    "providerModelId": "zai-org/GLM-5.3",
+    "text": "Условия раздачи GLM 5.3 у Runcrate изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "glm-5.3-flash",
+    "providerId": "numes",
+    "providerModelId": "z-ai/glm-5.3-flash:free",
+    "text": "Условия раздачи GLM 5.3 Flash у Numes изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "glm-5.3-flash",
+    "providerId": "runcrate",
+    "providerModelId": "zai-org/GLM-5.3-Flash",
+    "text": "Условия раздачи GLM 5.3 Flash у Runcrate изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "gpt-oss-120b",
+    "providerId": "runcrate",
+    "providerModelId": "openai/gpt-oss-120b",
+    "text": "Условия раздачи gpt-oss-120b у Runcrate изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "kimi-k3.1-pro",
+    "providerId": "modelscope",
+    "providerModelId": "moonshotai/Kimi-K3.1-Pro",
+    "text": "Условия раздачи Kimi K3.1 Pro у ModelScope изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "minimax-m3",
+    "providerId": "modelscope",
+    "providerModelId": "MiniMax/MiniMax-M3",
+    "text": "Условия раздачи MiniMax M3 у ModelScope изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "nemotron-3-ultra",
+    "providerId": "numes",
+    "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "text": "Условия раздачи Nemotron 3 Ultra у Numes изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-25T12:06:35.747Z",
+    "modelId": "qwen3.8-flash",
+    "providerId": "runcrate",
+    "providerModelId": "Qwen/Qwen3.8-Flash",
+    "text": "Условия раздачи Qwen3.8 Flash у Runcrate изменились",
+    "type": "offer_changed"
+  },
+  {
     "date": "2026-11-24T15:12:29.146Z",
     "modelId": "deepseek-v4.1-flash",
     "providerId": "modelscope",
