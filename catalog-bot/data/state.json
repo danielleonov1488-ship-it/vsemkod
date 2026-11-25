@@ -250,6 +250,10 @@
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
     },
+    "0f6546fd6e205726d70df2964441e7b002f4d29100feec98a9cb2b85e9a07e29": {
+      "observations": [],
+      "savedAt": "2026-11-25T14:01:23.871Z"
+    },
     "1fb25aebdc464991d8a6670bbd882982a21af9d641cd07f54af69f437c876ebd": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
@@ -257,6 +261,10 @@
     "23132f9380677b812a94c3330dc21a2f957e98c89fc5949d07d84b3b9dd8be1c": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "2c9f11c257081b06232f14a4714e6d4d88261396186e8ddac095cd186f629a2f": {
+      "observations": [],
+      "savedAt": "2026-11-25T14:01:23.871Z"
     },
     "2d35d191f9599fd5e81ea1464515532f8b56a053f562033ed0074485b90abfef": {
       "observations": [],
@@ -319,6 +327,10 @@
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
     },
+    "670521a8543e69378304db2ae91bcc42e1525af536d4eccc6c45425e2266f076": {
+      "observations": [],
+      "savedAt": "2026-11-25T14:01:23.871Z"
+    },
     "6ff6fead1f811ea86a2d9b003d4ee1293e5fa44328f558305ff8837775445e73": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
@@ -334,6 +346,10 @@
     "76e9c1538193c11e7bd7494ad4aec26830bb4cab53c2c4fae0d1b7427305d7f5": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "7fd503cc174db1aebfabe5e200bb0b26afc482ec29842e72b5be5d2e9b4709e3": {
+      "observations": [],
+      "savedAt": "2026-11-25T14:01:23.871Z"
     },
     "81ce98a70497d59986baebf52b0a6868d703a409ac7f99a2de0c8a1e7b7ffc19": {
       "observations": [],
@@ -419,6 +435,10 @@
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
     },
+    "9fd129ae623dc9ad66f1968393db0350deabc71e114011791dead5c71c413979": {
+      "observations": [],
+      "savedAt": "2026-11-25T14:01:23.871Z"
+    },
     "a3254541411882361c975195e36b5f7402c5b653e1132a971aaa9b32ee82a569": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
@@ -426,6 +446,185 @@
     "a9ad7dff9025304da4ced1f73c3993cfc48c9d0bd2856acdf10a3867f39e8377": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "acb90741419abb6dca3cf58476d737b15ba1b266c6e43814db50a289c856a18d": {
+      "observations": [
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "openrouter/free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "kilo-auto/free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "stealth/glyph-cluster",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262000,
+          "expiresAt": null,
+          "limits": {
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "google/gemma-4-26b-a4b-it:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262000,
+          "expiresAt": null,
+          "limits": {
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "google/gemma-4-31b-it:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262000,
+          "expiresAt": null,
+          "limits": {
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "recursive/flint-v1.0:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        }
+      ],
+      "savedAt": "2026-11-25T14:01:23.871Z"
     },
     "acf3c06de6d1f74ebcd3ea4ff523b56c04d9b4b55010ac0ccfdf1ecfcbd3ae96": {
       "observations": [],
@@ -447,6 +646,10 @@
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
     },
+    "c277f50f22fc3c1ea1992b8bfa233f37be1b74d2cd7ccd21dd1f6a69a80b5c67": {
+      "observations": [],
+      "savedAt": "2026-11-25T14:01:23.871Z"
+    },
     "c89919a2c218eb6ad0ba6c42c8993cc7eb17ce4b88319f5a86aa047fb25e9ed8": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
@@ -462,6 +665,10 @@
     "d159b2c396e7507c3f80688c3c6754898ac4a91a53576ffb39a2ff525d064b0a": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "df4ad30ecfd3246f1002cab7c036c8290f26653b65f0112690e42bf42451d6da": {
+      "observations": [],
+      "savedAt": "2026-11-25T14:01:23.871Z"
     },
     "f231a00a20c2b41764abb1f6d18b04a728fe009c4b8d3a5f9c8e400fdb076b08": {
       "observations": [
@@ -766,7 +973,187 @@
       ]
     }
   },
+  "radarMissingSince": {},
   "seenNews": {
+    "github:692fbee205f7e74e87155aae308bf507ed150780fe7c76daf3c6720209d86aed": {
+      "observations": [
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "openrouter/free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "kilo-auto/free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "stealth/glyph-cluster",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262000,
+          "expiresAt": null,
+          "limits": {
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "google/gemma-4-26b-a4b-it:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262000,
+          "expiresAt": null,
+          "limits": {
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "google/gemma-4-31b-it:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262000,
+          "expiresAt": null,
+          "limits": {
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "recursive/flint-v1.0:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        }
+      ],
+      "savedAt": "2026-11-25T14:01:23.871Z"
+    },
     "github:db7a9b76865521101c18abde1b4b70bbd690b66eb064ba005291f00fffc7e781": {
       "observations": [
         {
@@ -1045,6 +1432,10 @@
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
     },
+    "hn:50615222": {
+      "observations": [],
+      "savedAt": "2026-11-25T14:01:23.871Z"
+    },
     "hn:50617632": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
@@ -1168,6 +1559,30 @@
     "hn:50639615": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "hn:50641520": {
+      "observations": [],
+      "savedAt": "2026-11-25T14:01:23.871Z"
+    },
+    "hn:50641578": {
+      "observations": [],
+      "savedAt": "2026-11-25T14:01:23.871Z"
+    },
+    "hn:50641746": {
+      "observations": [],
+      "savedAt": "2026-11-25T14:01:23.871Z"
+    },
+    "hn:50641798": {
+      "observations": [],
+      "savedAt": "2026-11-25T14:01:23.871Z"
+    },
+    "hn:50642145": {
+      "observations": [],
+      "savedAt": "2026-11-25T14:01:23.871Z"
+    },
+    "hn:50642169": {
+      "observations": [],
+      "savedAt": "2026-11-25T14:01:23.871Z"
     }
   },
   "tracks": {
@@ -1212,7 +1627,7 @@
     "groq:qwen/qwen3.8-27b": {
       "evidence": {
         "github": {
-          "missedRuns": 0,
+          "missedRuns": 1,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -1253,10 +1668,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1024000,
+            "name": "Baidu: ERNIE-5.5-Flash-Preview (free)",
             "providerId": "kilo",
             "providerModelId": "baidu/ernie-5.5-flash-preview:free",
             "source": "kilo:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1264,7 +1682,7 @@
     "kilo:dots-studio/dots-3-note-preview:free": {
       "evidence": {
         "kilo": {
-          "missedRuns": 1,
+          "missedRuns": 2,
           "observation": {
             "confidence": "structured",
             "contextWindow": 512000,
@@ -1283,10 +1701,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "Google: Lyria 3 Clip Preview",
             "providerId": "kilo",
             "providerModelId": "google/lyria-3-clip-preview",
             "source": "kilo:/api/v1/models",
-            "supportsTools": false
+            "supportsReasoning": false,
+            "supportsTools": false,
+            "supportsVision": true
           }
         }
       }
@@ -1298,10 +1719,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "Google: Lyria 3 Pro Preview",
             "providerId": "kilo",
             "providerModelId": "google/lyria-3-pro-preview",
             "source": "kilo:/api/v1/models",
-            "supportsTools": false
+            "supportsReasoning": false,
+            "supportsTools": false,
+            "supportsVision": true
           }
         }
       }
@@ -1313,10 +1737,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1000000,
+            "name": "Ampersand v0.1",
             "providerId": "kilo",
             "providerModelId": "humansand/ampersand-v0.1",
             "source": "kilo:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1328,10 +1755,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "inclusionAI: Ling 3.2 Flash (free)",
             "providerId": "kilo",
             "providerModelId": "inclusionai/ling-3.2-flash:free",
             "source": "kilo:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": true
           }
         }
       }
@@ -1345,7 +1775,6 @@
             "contextWindow": 256000,
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно без API-ключа, 200 запросов/час на IP; авто-роутер может направлять к провайдерам, логирующим промпты.",
               "rph": 200
             },
             "promo": false,
@@ -1363,10 +1792,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 262144,
+            "name": "LiquidAI: LFM3-1.7B (free)",
             "providerId": "kilo",
             "providerModelId": "liquid/lfm-3-1.7b:free",
             "source": "kilo:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1380,7 +1812,6 @@
             "contextWindow": 256000,
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
               "rph": 200
             },
             "promo": false,
@@ -1394,10 +1825,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 256000,
+            "name": "NVIDIA: Nemotron 3 Nano Omni (free)",
             "providerId": "kilo",
             "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
             "source": "kilo:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": true
           }
         }
       }
@@ -1411,7 +1845,6 @@
             "contextWindow": 1000000,
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
               "rph": 200
             },
             "promo": false,
@@ -1425,10 +1858,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1000000,
+            "name": "NVIDIA: Nemotron 3 Ultra (free)",
             "providerId": "kilo",
             "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
             "source": "kilo:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1442,7 +1878,6 @@
             "contextWindow": 1000000,
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
               "rph": 200
             },
             "promo": false,
@@ -1456,10 +1891,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1000000,
+            "name": "NVIDIA: Nemotron 3.5 Lightning (free)",
             "providerId": "kilo",
             "providerModelId": "nvidia/nemotron-3.5-lightning:free",
             "source": "kilo:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1473,7 +1911,6 @@
             "contextWindow": 1000000,
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
               "rph": 200
             },
             "promo": false,
@@ -1487,10 +1924,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1000000,
+            "name": "NVIDIA: Nemotron 3.5 Super VL (free)",
             "providerId": "kilo",
             "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
             "source": "kilo:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": true
           }
         }
       }
@@ -1503,7 +1943,6 @@
             "confidence": "news",
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
               "rph": 200
             },
             "promo": false,
@@ -1521,10 +1960,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "Particle AI: Particle-1 (free)",
             "providerId": "kilo",
             "providerModelId": "particle-ai/particle-1:free",
             "source": "kilo:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": true
           }
         }
       }
@@ -1536,10 +1978,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 262144,
+            "name": "Recursive: Flint",
             "providerId": "kilo",
             "providerModelId": "recursive/flint-v1.0",
             "source": "kilo:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1551,10 +1996,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 262144,
+            "name": "Recursive: Flint (free)",
             "providerId": "kilo",
             "providerModelId": "recursive/flint-v1.0:free",
             "source": "kilo:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1566,10 +2014,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "Reflection: Beam 1.0 (Free)",
             "providerId": "kilo",
             "providerModelId": "reflection/beam-free",
             "source": "kilo:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1583,7 +2034,6 @@
             "contextWindow": 256000,
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
               "rph": 200
             },
             "promo": false,
@@ -1597,10 +2047,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 256000,
+            "name": "Glyph Cluster",
             "providerId": "kilo",
             "providerModelId": "stealth/glyph-cluster",
             "source": "kilo:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1608,7 +2061,7 @@
     "modelscope:API-Inference": {
       "evidence": {
         "github": {
-          "missedRuns": 0,
+          "missedRuns": 1,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -1809,10 +2262,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "DeepSeek V4.1 Flash Uncensored FP8 (free)",
             "providerId": "numes",
             "providerModelId": "dealignai/deepseek-v4.1-flash-uncensored-fp8:free",
             "source": "https://numes.ai/api/public-catalogue/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": true
           }
         }
       }
@@ -1824,10 +2280,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "GLM 5.3 Flash Uncensored FP8 (free)",
             "providerId": "numes",
             "providerModelId": "dealignai/glm-5.3-flash-uncensored-fp8:free",
             "source": "https://numes.ai/api/public-catalogue/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": true
           }
         }
       }
@@ -1839,10 +2298,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "GLM 5.3 Uncensored FP8 (free)",
             "providerId": "numes",
             "providerModelId": "dealignai/glm-5.3-uncensored-fp8:free",
             "source": "https://numes.ai/api/public-catalogue/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1854,10 +2316,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "DeepSeek V4.1 Flash (free)",
             "providerId": "numes",
             "providerModelId": "deepseek/deepseek-v4.1-flash:free",
             "source": "https://numes.ai/api/public-catalogue/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1869,10 +2334,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "Kimi K3.1 Pro (free)",
             "providerId": "numes",
             "providerModelId": "moonshotai/kimi-k3.1-pro:free",
             "source": "https://numes.ai/api/public-catalogue/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1884,10 +2352,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "Nemotron 3 Ultra (free)",
             "providerId": "numes",
             "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
             "source": "https://numes.ai/api/public-catalogue/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1899,10 +2370,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "Kimi K3 Abliterated (free)",
             "providerId": "numes",
             "providerModelId": "uniboshi/kimi-k3-abliterated-v1:free",
             "source": "https://numes.ai/api/public-catalogue/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": true
           }
         }
       }
@@ -1914,10 +2388,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "GLM 5.3 Flash (free)",
             "providerId": "numes",
             "providerModelId": "z-ai/glm-5.3-flash:free",
             "source": "https://numes.ai/api/public-catalogue/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1929,10 +2406,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 262144,
+            "name": "GLM 5.3 (free)",
             "providerId": "numes",
             "providerModelId": "z-ai/glm-5.3:free",
             "source": "https://numes.ai/api/public-catalogue/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1944,10 +2424,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1024000,
+            "name": "Baidu: ERNIE-5.5-Flash-Preview (free)",
             "providerId": "openrouter",
             "providerModelId": "baidu/ernie-5.5-flash-preview:free",
             "source": "openrouter:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -1955,7 +2438,7 @@
     "openrouter:dots-studio/dots-3-note-preview:free": {
       "evidence": {
         "openrouter": {
-          "missedRuns": 1,
+          "missedRuns": 2,
           "observation": {
             "confidence": "structured",
             "contextWindow": 512000,
@@ -1976,7 +2459,6 @@
             "contextWindow": 262000,
             "expiresAt": null,
             "limits": {
-              "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
               "rpd": 50,
               "rpm": 20
             },
@@ -1991,10 +2473,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 262144,
+            "name": "Google: Gemma 4 26B A4B  (free)",
             "providerId": "openrouter",
             "providerModelId": "google/gemma-4-26b-a4b-it:free",
             "source": "openrouter:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": true
           }
         }
       }
@@ -2008,7 +2493,6 @@
             "contextWindow": 262000,
             "expiresAt": null,
             "limits": {
-              "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
               "rpd": 50,
               "rpm": 20
             },
@@ -2023,10 +2507,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 262144,
+            "name": "Google: Gemma 4 31B (free)",
             "providerId": "openrouter",
             "providerModelId": "google/gemma-4-31b-it:free",
             "source": "openrouter:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": true
           }
         }
       }
@@ -2038,10 +2525,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "Google: Lyria 3 Clip Preview",
             "providerId": "openrouter",
             "providerModelId": "google/lyria-3-clip-preview",
             "source": "openrouter:/api/v1/models",
-            "supportsTools": false
+            "supportsReasoning": false,
+            "supportsTools": false,
+            "supportsVision": true
           }
         }
       }
@@ -2053,10 +2543,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "Google: Lyria 3 Pro Preview",
             "providerId": "openrouter",
             "providerModelId": "google/lyria-3-pro-preview",
             "source": "openrouter:/api/v1/models",
-            "supportsTools": false
+            "supportsReasoning": false,
+            "supportsTools": false,
+            "supportsVision": true
           }
         }
       }
@@ -2068,10 +2561,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "inclusionAI: Ling 3.2 Flash (free)",
             "providerId": "openrouter",
             "providerModelId": "inclusionai/ling-3.2-flash:free",
             "source": "openrouter:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": true
           }
         }
       }
@@ -2083,10 +2579,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 262144,
+            "name": "LiquidAI: LFM3-1.7B (free)",
             "providerId": "openrouter",
             "providerModelId": "liquid/lfm-3-1.7b:free",
             "source": "openrouter:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -2100,7 +2599,6 @@
             "contextWindow": 256000,
             "expiresAt": null,
             "limits": {
-              "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
               "rpd": 50,
               "rpm": 20
             },
@@ -2115,10 +2613,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 256000,
+            "name": "NVIDIA: Nemotron 3 Nano Omni (free)",
             "providerId": "openrouter",
             "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
             "source": "openrouter:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": true
           }
         }
       }
@@ -2132,7 +2633,6 @@
             "contextWindow": 1000000,
             "expiresAt": null,
             "limits": {
-              "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
               "rpd": 50,
               "rpm": 20
             },
@@ -2147,10 +2647,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1000000,
+            "name": "NVIDIA: Nemotron 3 Ultra (free)",
             "providerId": "openrouter",
             "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
             "source": "openrouter:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -2164,7 +2667,6 @@
             "contextWindow": 1000000,
             "expiresAt": null,
             "limits": {
-              "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
               "rpd": 50,
               "rpm": 20
             },
@@ -2179,10 +2681,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1000000,
+            "name": "NVIDIA: Nemotron 3.5 Lightning (free)",
             "providerId": "openrouter",
             "providerModelId": "nvidia/nemotron-3.5-lightning:free",
             "source": "openrouter:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -2196,7 +2701,6 @@
             "contextWindow": 1000000,
             "expiresAt": null,
             "limits": {
-              "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
               "rpd": 50,
               "rpm": 20
             },
@@ -2211,10 +2715,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1000000,
+            "name": "NVIDIA: Nemotron 3.5 Super VL (free)",
             "providerId": "openrouter",
             "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
             "source": "openrouter:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": true
           }
         }
       }
@@ -2226,10 +2733,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
+            "name": "Particle AI: Particle-1 (free)",
             "providerId": "openrouter",
             "providerModelId": "particle-ai/particle-1:free",
             "source": "openrouter:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": true
           }
         }
       }
@@ -2243,7 +2753,6 @@
             "contextWindow": 262000,
             "expiresAt": null,
             "limits": {
-              "note": "Лимит 20 RPM и 50 RPD суммарно по всем бесплатным моделям; промпты могут логироваться для обучения.",
               "rpd": 50,
               "rpm": 20
             },
@@ -2258,10 +2767,13 @@
           "observation": {
             "confidence": "structured",
             "contextWindow": 262144,
+            "name": "Recursive: Flint (free)",
             "providerId": "openrouter",
             "providerModelId": "recursive/flint-v1.0:free",
             "source": "openrouter:/api/v1/models",
-            "supportsTools": true
+            "supportsReasoning": true,
+            "supportsTools": true,
+            "supportsVision": false
           }
         }
       }
@@ -2335,7 +2847,7 @@
     "runcrate:five open models": {
       "evidence": {
         "github": {
-          "missedRuns": 0,
+          "missedRuns": 1,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -2482,7 +2994,7 @@
     "zai:free models": {
       "evidence": {
         "github": {
-          "missedRuns": 0,
+          "missedRuns": 1,
           "observation": {
             "confidence": "news",
             "expiresAt": null,

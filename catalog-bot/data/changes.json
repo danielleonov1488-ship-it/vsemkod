@@ -1,5 +1,165 @@
 [
   {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "ampersand-v0.1",
+    "providerId": "kilo",
+    "providerModelId": "humansand/ampersand-v0.1",
+    "text": "Новая модель: Ampersand v0.1 бесплатно у Kilo Gateway",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "beam-free",
+    "providerId": "kilo",
+    "providerModelId": "reflection/beam-free",
+    "text": "Новая модель: Reflection: Beam 1.0 (Free) бесплатно у Kilo Gateway",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "dots-3-note-preview",
+    "providerId": "kilo",
+    "providerModelId": "dots-studio/dots-3-note-preview:free",
+    "text": "Новая модель: Dots 3 Note Preview бесплатно у Kilo Gateway",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "dots-3-note-preview",
+    "providerId": "openrouter",
+    "providerModelId": "dots-studio/dots-3-note-preview:free",
+    "text": "Новая модель: Dots 3 Note Preview бесплатно у OpenRouter",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "ernie-5.5-flash-preview",
+    "providerId": "kilo",
+    "providerModelId": "baidu/ernie-5.5-flash-preview:free",
+    "text": "Новая модель: Baidu: ERNIE-5.5-Flash-Preview (free) бесплатно у Kilo Gateway",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "ernie-5.5-flash-preview",
+    "providerId": "openrouter",
+    "providerModelId": "baidu/ernie-5.5-flash-preview:free",
+    "text": "Новая модель: Baidu: ERNIE-5.5-Flash-Preview (free) бесплатно у OpenRouter",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "flint-v1.0",
+    "providerId": "kilo",
+    "providerModelId": "recursive/flint-v1.0",
+    "text": "Новая модель: Recursive: Flint бесплатно у Kilo Gateway",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "flint-v1.0",
+    "providerId": "kilo",
+    "providerModelId": "recursive/flint-v1.0:free",
+    "text": "Новая модель: Recursive: Flint бесплатно у Kilo Gateway",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "flint-v1.0",
+    "providerId": "openrouter",
+    "providerModelId": "recursive/flint-v1.0:free",
+    "text": "Новая модель: Recursive: Flint бесплатно у OpenRouter",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "gemma-4-26b-a4b-it",
+    "providerId": "openrouter",
+    "providerModelId": "google/gemma-4-26b-a4b-it:free",
+    "text": "Новая модель: Google: Gemma 4 26B A4B  (free) бесплатно у OpenRouter",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "gemma-4-31b-it",
+    "providerId": "openrouter",
+    "providerModelId": "google/gemma-4-31b-it:free",
+    "text": "Новая модель: Google: Gemma 4 31B (free) бесплатно у OpenRouter",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "glyph-cluster",
+    "providerId": "kilo",
+    "providerModelId": "stealth/glyph-cluster",
+    "text": "Новая модель: Glyph Cluster бесплатно у Kilo Gateway",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "ling-3.2-flash",
+    "providerId": "kilo",
+    "providerModelId": "inclusionai/ling-3.2-flash:free",
+    "text": "Новая модель: inclusionAI: Ling 3.2 Flash (free) бесплатно у Kilo Gateway",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "ling-3.2-flash",
+    "providerId": "openrouter",
+    "providerModelId": "inclusionai/ling-3.2-flash:free",
+    "text": "Новая модель: inclusionAI: Ling 3.2 Flash (free) бесплатно у OpenRouter",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "nemotron-3-nano-omni-30b-a3b-reasoning",
+    "providerId": "kilo",
+    "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+    "text": "Новая модель: NVIDIA: Nemotron 3 Nano Omni (free) бесплатно у Kilo Gateway",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "nemotron-3-nano-omni-30b-a3b-reasoning",
+    "providerId": "openrouter",
+    "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+    "text": "Новая модель: NVIDIA: Nemotron 3 Nano Omni (free) бесплатно у OpenRouter",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "nemotron-3.5-lightning",
+    "providerId": "kilo",
+    "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+    "text": "Новая модель: NVIDIA: Nemotron 3.5 Lightning (free) бесплатно у Kilo Gateway",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "nemotron-3.5-lightning",
+    "providerId": "openrouter",
+    "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+    "text": "Новая модель: NVIDIA: Nemotron 3.5 Lightning (free) бесплатно у OpenRouter",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "particle-1",
+    "providerId": "kilo",
+    "providerModelId": "particle-ai/particle-1:free",
+    "text": "Новая модель: Particle AI: Particle-1 (free) бесплатно у Kilo Gateway",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-25T14:01:23.871Z",
+    "modelId": "particle-1",
+    "providerId": "openrouter",
+    "providerModelId": "particle-ai/particle-1:free",
+    "text": "Новая модель: Particle AI: Particle-1 (free) бесплатно у OpenRouter",
+    "type": "offer_added"
+  },
+  {
     "date": "2026-11-25T12:06:35.747Z",
     "modelId": "api-inference",
     "providerId": "modelscope",

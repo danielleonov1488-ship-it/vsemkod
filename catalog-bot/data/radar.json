@@ -1,0 +1,138 @@
+{
+  "generatedAt": "2026-11-25T14:01:23.871Z",
+  "models": [
+    {
+      "active": true,
+      "contextWindow": 1048576,
+      "description": "Sparse mixture-of-experts reasoning model with 23B active parameters for coding and agentic workflows",
+      "firstSeen": "2026-11-25T14:01:23.871Z",
+      "free": true,
+      "id": "beam-free",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "name": "Beam Free",
+      "source": "opencode-zen",
+      "tools": true
+    },
+    {
+      "active": true,
+      "contextWindow": 200000,
+      "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
+      "firstSeen": "2026-11-25T14:01:23.871Z",
+      "free": true,
+      "id": "big-pickle",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "name": "Big Pickle",
+      "source": "opencode-zen",
+      "tools": true
+    },
+    {
+      "active": true,
+      "contextWindow": 200000,
+      "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+      "firstSeen": "2026-11-25T14:01:23.871Z",
+      "free": true,
+      "id": "deepseek-v4.1-flash-free",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "name": "DeepSeek V4.1 Flash Free",
+      "source": "opencode-zen",
+      "tools": true
+    },
+    {
+      "active": true,
+      "contextWindow": 262144,
+      "description": "Open-weight mixture-of-experts model with about 2.5B active parameters for local coding agents",
+      "firstSeen": "2026-11-25T14:01:23.871Z",
+      "free": true,
+      "id": "flint-40b-free",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "name": "Flint 40B Free",
+      "source": "opencode-zen",
+      "tools": true
+    },
+    {
+      "active": true,
+      "contextWindow": 1048576,
+      "description": "Tencent's lower-cost Hy4 tier for everyday agent and productivity tasks, with image understanding and a 1M-token context window.",
+      "firstSeen": "2026-11-25T14:01:23.871Z",
+      "free": true,
+      "id": "hy4-flash-free",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "name": "Hy4 flash Free",
+      "source": "opencode-zen",
+      "tools": true
+    },
+    {
+      "active": true,
+      "contextWindow": 262144,
+      "description": "Stealth model, free for a limited time",
+      "firstSeen": "2026-11-25T14:01:23.871Z",
+      "free": true,
+      "id": "iceman-free",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "name": "Iceman Free",
+      "source": "opencode-zen",
+      "tools": true
+    },
+    {
+      "active": true,
+      "contextWindow": 64000,
+      "description": "System One model for fast, typed probabilistic decisions over text or structured state",
+      "firstSeen": "2026-11-25T14:01:23.871Z",
+      "free": true,
+      "id": "jev-1.13-free",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "name": "Jev 1.13 Free",
+      "source": "opencode-zen",
+      "tools": false
+    },
+    {
+      "active": true,
+      "contextWindow": 200000,
+      "description": "MiMo Flash model for multimodal coding agents and long-context automation",
+      "firstSeen": "2026-11-25T14:01:23.871Z",
+      "free": true,
+      "id": "mimo-v2.6-flash-free",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "name": "MiMo-V2.6-Flash Free",
+      "source": "opencode-zen",
+      "tools": true
+    },
+    {
+      "active": true,
+      "contextWindow": 262144,
+      "description": "Fast NVIDIA Nemotron MoE for reliable agentic tasks across enterprise workloads",
+      "firstSeen": "2026-11-25T14:01:23.871Z",
+      "free": true,
+      "id": "nemotron-3.5-lightning-free",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "name": "Nemotron 3.5 Lightning Free",
+      "source": "opencode-zen",
+      "tools": true
+    },
+    {
+      "active": true,
+      "contextWindow": 1048576,
+      "description": "NVIDIA vision-language reasoning model for text, image, and video understanding and agentic tool use",
+      "firstSeen": "2026-11-25T14:01:23.871Z",
+      "free": true,
+      "id": "nemotron-3.5-super-vl-free",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "name": "Nemotron 3.5 Super VL Free",
+      "source": "opencode-zen",
+      "tools": true
+    },
+    {
+      "active": true,
+      "contextWindow": 1048576,
+      "description": "Stealth reasoning model, free for a limited time",
+      "firstSeen": "2026-11-25T14:01:23.871Z",
+      "free": true,
+      "id": "tidepool-alpha-free",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "name": "Tidepool Alpha Free",
+      "source": "opencode-zen",
+      "tools": true
+    }
+  ],
+  "schemaVersion": 1
+}
