@@ -1,6 +1,7 @@
 import type { Attachment, CatalogState, ChatEvent, ChatHistory, Conversation, DesktopApi, FileChange, Notice, Preferences, ProjectEntry } from "../shared/api";
 import type { Catalog, ProviderId } from "../shared/catalog-schema";
 import { pathMentions } from "../shared/workspace";
+import { replySpeed } from "../shared/usage";
 import { version } from "../../package.json";
 import { DemoError, startSession, status, streamChat, type DemoMessage, type DemoStatus } from "./transport";
 
@@ -68,6 +69,7 @@ export function createDemo({ scenario, showDesktop, setAvailability }: {
   const requests = new Map<string, AbortController>();
   const chat = broadcast<ChatEvent>();
   const notices = broadcast<Notice>();
+  const quota = broadcast<number | undefined>();
   const noSubscription = () => () => {};
   const desktop = async () => { showDesktop(); };
   const prefs: Preferences = {
@@ -81,7 +83,7 @@ export function createDemo({ scenario, showDesktop, setAvailability }: {
   let session: Awaited<ReturnType<typeof startSession>> | undefined;
   let availability: Availability = {};
   let scriptTurn: ScriptTurn | undefined;
-  const feedback = (state: Availability) => { availability = state; setAvailability(state); };
+  const feedback = (state: Availability) => { availability = state; setAvailability(state); quota.emit(state.remaining); };
   const offline = "Живой чат временно недоступен.";
 
   async function initialize() {
@@ -93,10 +95,11 @@ export function createDemo({ scenario, showDesktop, setAvailability }: {
       scenario ? undefined : status()
     ]);
     if (online.status === "fulfilled" && online.value) {
-      const { model, open } = online.value;
+      const { model, open, remaining } = online.value;
       if (model?.name && model.id) demoModel = { id: "browser:" + model.id, name: model.name };
-      if (!open) feedback({ closed: "Дневная квота демо исчерпана." });
+      if (!open) feedback({ remaining: 0, closed: "Дневная квота демо исчерпана." });
       else if (!demoModel) feedback({ closed: offline });
+      else if (remaining !== undefined) feedback({ remaining });
     } else if (!scenario) feedback({ closed: offline });
     const source = catalog.status === "fulfilled" ? catalog.value : emptyCatalog;
     catalogState = browserCatalog(source, demoModel, scenario);
@@ -188,9 +191,22 @@ export function createDemo({ scenario, showDesktop, setAvailability }: {
           if (context && text.length < 1970) messages.at(-1)!.content += ("\n\nФайлы демо-проекта:\n" + context).slice(0, 2000 - text.length);
           const liveSignal = AbortSignal.any([signal, AbortSignal.timeout(120_000)]);
           const request = async () => {
-            if (!session || session.expiresAt <= Date.now()) session = await startSession(liveSignal);
+            if (!session || session.expiresAt <= Date.now()) {
+              session = await startSession(liveSignal);
+              feedback({ remaining: session.remaining });
+            }
             if (session.remaining <= 0) throw new DemoError("limit", "Сообщения закончились.");
-            return streamChat(session.token, messages, liveSignal, delta => emit({ type: "delta", partId, delta }));
+            const start = performance.now();
+            let first: number | undefined;
+            const result = await streamChat(session.token, messages, liveSignal, delta => {
+              if (delta) first ??= performance.now();
+              emit({ type: "delta", partId, delta });
+            });
+            if (result.usage) {
+              const { output, reasoning } = result.usage;
+              emit({ type: "usage", usage: result.usage, speed: replySpeed(output, reasoning, start, first, performance.now()) });
+            }
+            return result.remaining;
           };
           let remaining: number;
           try {
@@ -209,7 +225,7 @@ export function createDemo({ scenario, showDesktop, setAvailability }: {
         if (signal.aborted) stopped = true;
         else {
           if (error instanceof DemoError && error.code === "auth") session = undefined;
-          if (error instanceof DemoError && (error.code === "limit" || error.code === "closed")) feedback({ closed: error.message });
+          if (error instanceof DemoError && (error.code === "limit" || error.code === "closed")) feedback({ remaining: 0, closed: error.message });
           if (error instanceof TypeError) throw new Error(offline);
           if (error instanceof DOMException && error.name === "TimeoutError") throw new Error("Сервер отвечает слишком долго. Попробуй ещё раз.");
           throw error;
@@ -223,6 +239,7 @@ export function createDemo({ scenario, showDesktop, setAvailability }: {
       stored.conversation = { ...stored.conversation, updatedAt: Date.now(), modelId, access: options?.access };
       return { changes: history.changes, stopped };
     },
+    onDemoQuota(listener) { listener(availability.remaining); return quota.listen(listener); },
     async stop(id) { requests.get(id)?.abort(); },
     async answer(id, permissionId) { chat.emit({ type: "permission-resolved", sessionId: id, id: permissionId }); },
     async answerQuestion(id, formId) { chat.emit({ type: "question-resolved", sessionId: id, id: formId }); },

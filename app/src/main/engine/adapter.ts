@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
 import { OpenCode, type SessionInfo, type SessionMessageAssistantTool } from "@opencode/client";
 import type { ChatAction, ChatEvent, ChatHistory, ChatPart, Conversation, FileChange, McpConfig, PermissionDecision, ProjectTools, QuestionAnswer, SubscriptionId, TurnOptions, Usage } from "../../shared/api";
+import { cachePercent, replySpeed } from "../../shared/usage";
 import { nativeNames, type PersonalModel } from "../../shared/providers";
 import { modelReference } from "../connect-service";
 import { accessModes, imageFile, pathMentions } from "../../shared/workspace";
@@ -17,7 +18,7 @@ const eventTypes = [
   "session.text.delta", "session.text.ended", "session.tool.input.started", "session.tool.called",
   "session.tool.success", "session.tool.failed", "permission.asked", "permission.replied",
   "session.reasoning.started", "session.reasoning.delta", "session.reasoning.ended", "session.tool.input.delta",
-  "session.retry.scheduled", "session.compaction.ended", "session.compaction.failed", "session.step.started", "session.step.ended",
+  "session.retry.scheduled", "session.compaction.ended", "session.compaction.failed", "session.step.started", "session.step.streamed", "session.step.ended",
   "form.created", "form.replied", "form.cancelled", "session.execution.failed", "session.execution.interrupted", "session.execution.succeeded"
 ] as const;
 
@@ -380,6 +381,8 @@ export class EngineAdapter {
     void timeout.catch(() => {});
     const waitForModel = () => { if (!runningTools.size && !blockers.size) watchdog.wait(); };
     let context: number | undefined;
+    let step: { id: string; started: number; first?: number } | undefined;
+    const firstToken = (id: string, time: number) => { if (step?.id === id) step.first ??= time; };
     const update = (part: ChatPart) => emit({ type: "part", sessionId, part });
     let queued = false;
     let error: string | undefined;
@@ -419,7 +422,10 @@ export class EngineAdapter {
             reasoning.set(event.data.assistantMessageID + "/" + event.data.ordinal, event.created);
             break;
           case "session.reasoning.delta": {
-            if (event.data.delta) waitForModel();
+            if (event.data.delta) {
+              firstToken(event.data.assistantMessageID, event.created);
+              waitForModel();
+            }
             emit({ type: "delta", sessionId, partId: event.data.assistantMessageID + "/" + event.data.ordinal,
               delta: event.data.delta, kind: "reasoning" });
             break;
@@ -431,11 +437,23 @@ export class EngineAdapter {
             break;
           }
           case "session.step.started":
+            step = { id: event.data.assistantMessageID, started: event.created };
             waitForModel();
             break;
-          case "session.step.ended":
-            emit({ type: "usage", sessionId, usage: { ...event.data.tokens, context } });
+          case "session.step.streamed":
+            firstToken(event.data.assistantMessageID, event.created);
             break;
+          case "session.step.ended": {
+            const tokens = event.data.tokens;
+            const timing = step?.id === event.data.assistantMessageID ? step : undefined;
+            const speed = timing && !options.compact && event.data.finish !== "error"
+              ? replySpeed(tokens.output, tokens.reasoning, timing.started, timing.first, event.created) : undefined;
+            const nativeCachePercent = model.providerID !== "vsemkod"
+              ? (tokens.cache.read > 0 ? cachePercent(tokens.input, tokens.cache.read) : undefined) ?? null : undefined;
+            emit({ type: "usage", sessionId, usage: { ...tokens, context }, speed, nativeCachePercent });
+            if (timing) step = undefined;
+            break;
+          }
           case "session.compaction.ended":
             update({ id: event.id, kind: "note", text: "Контекст сжат" });
             if (event.data.tokens) emit({ type: "usage", sessionId, usage: { ...event.data.tokens, context } });
@@ -448,7 +466,10 @@ export class EngineAdapter {
           case "session.text.ended": {
             const id = event.data.assistantMessageID + "/" + event.data.ordinal;
             if (event.type === "session.text.delta") {
-              if (event.data.delta) waitForModel();
+              if (event.data.delta) {
+                firstToken(event.data.assistantMessageID, event.created);
+                waitForModel();
+              }
               emit({ type: "delta", sessionId, partId: id, delta: event.data.delta });
             } else update({ id, kind: "text", text: event.data.text });
             break;

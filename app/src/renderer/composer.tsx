@@ -180,7 +180,7 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
             </button>
           </div>}
         </div>
-        <div className="composer-popup">
+        <div className="composer-popup composer-project">
           <button className="composer-control folder-chip" type="button" title={directory || "Выбрать папку проекта"}
             aria-label={"Проект · " + (folderName(directory) || "Выбрать папку")} aria-expanded={menu === "project"} disabled={busy}
             onClick={event => toggleMenu("project", event.currentTarget)}><Icon name="folder" />

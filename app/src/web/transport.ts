@@ -1,8 +1,10 @@
 export type DemoConfig = { DEMO_API: string; TURNSTILE_SITEKEY: string };
-export type DemoStatus = { open: boolean; model: { id: string; name: string } };
+import type { Usage } from "../shared/api";
+
+export type DemoStatus = { open: boolean; model: { id: string; name: string }; remaining?: number };
 export type DemoMessage = { role: "user" | "assistant"; content: string };
 type Session = { token: string; expiresAt: number; remaining: number };
-type StreamEvent = { t: "delta"; v: string } | { t: "done"; remaining: number } |
+type StreamEvent = { t: "delta"; v: string } | { t: "done"; remaining: number; usage?: Usage } |
   { t: "error"; code: string; message: string };
 
 export class DemoError extends Error {
@@ -127,7 +129,7 @@ export async function streamChat(token: string, messages: DemoMessage[], signal:
         buffer = buffer.slice(separator.index + separator[0].length);
         if (!data) continue;
         const event = JSON.parse(data) as StreamEvent;
-        if (event.t === "done") return event.remaining;
+        if (event.t === "done") return event;
         if (event.t === "error") throw new DemoError(event.code, event.message);
         if (event.t === "delta") delta(event.v);
       }

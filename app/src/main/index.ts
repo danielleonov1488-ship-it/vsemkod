@@ -163,7 +163,8 @@ async function start() {
     catalog: catalog.current, connected: connections.connected(catalog.current), personal: connections.connectedPersonal(), subscriptions,
     personalModels: [...personalModels(), ...nativeModels.filter(({ model }) => model.providerId !== "opencode").map(({ model }) => model)],
     zenModels: nativeModels.filter(({ model }) => model.providerId === "opencode").map(({ model }) => model),
-    latencies: health.latencies()
+    latencies: health.latencies(),
+    customProviderUrl: URL.parse(keys.profile("custom-api")?.baseUrl ?? "")?.origin
   });
   const publishState = () => {
     const next = state();
@@ -190,7 +191,9 @@ async function start() {
     key: providerId => connections.key(providerId),
     personal: () => connections.personalRoutes(),
     health,
-    onRoute: route => broadcast("chat:event", { type: "route", ...route } satisfies ChatEvent)
+    onRoute: route => broadcast("chat:event", { type: "route", ...route } satisfies ChatEvent),
+    onReplyCache: (sessionId, cachePercent) => broadcast("chat:event", { type: "reply-cache", sessionId, cachePercent } satisfies ChatEvent),
+    onStats: stats => broadcast("router:stats", stats)
   });
   await router.start();
   console.info("[router] Запущен: " + router.baseUrl);
@@ -266,6 +269,7 @@ async function start() {
   }
 
   handle("app:initial", z.tuple([]), () => ({ ...state(), projects: recentProjects, preferences, version: app.getVersion(), update: updates.ready }));
+  handle("router:stats", z.tuple([]), () => router.stats());
   handle("updates:check", z.tuple([]), () => updates.check());
   handle("updates:apply", z.tuple([]), () => updates.apply());
   handle("projects:choose", z.tuple([]), async () => {

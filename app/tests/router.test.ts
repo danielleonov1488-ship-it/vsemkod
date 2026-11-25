@@ -283,11 +283,30 @@ describe("Router", () => {
     const local = await mkdtemp(join(root, "router-test-"));
     const path = join(local, "usage.json");
     cleanup.push(async () => { await rm(path, { force: true }); await rmdir(local); });
-    const failure = await upstream(res => res.writeHead(429).end());
+    const failure = await upstream(res => res.writeHead(429, {
+      "X-RateLimit-Limit": "200", "X-RateLimit-Remaining": "0", "X-RateLimit-Reset": "60"
+    }).end());
     const { router, send } = await fixture([provider("kilo", failure.url)],
       [offer("first", "kilo")], { health: new ProviderHealth(path) });
     expect((await send("first")).status).toBe(429);
     await router.close();
-    expect(JSON.parse(await readFile(path, "utf8"))).toEqual({ providers: { kilo: { requests: 1, errors: 1 } }, ttfb: [] });
+    const persisted = JSON.parse(await readFile(path, "utf8"));
+    expect(persisted).toEqual({
+      providers: { kilo: { requests: 1, errors: 1 } }, ttfb: [], windows: { kilo: [expect.any(Number)] },
+      headers: { kilo: { at: expect.any(Number), requests: { limit: 200, remaining: 0, resetAt: expect.any(Number) } } }
+    });
+    const restored = new ProviderHealth(path);
+    await restored.load();
+    expect(restored.stats(sample).kilo?.requests).toMatchObject({ limit: 200, remaining: 0, source: "headers" });
+  });
+
+  it("forwards the original SSE and reports cache usage for the correct chat", async () => {
+    const payload = 'data: {"usage":{"prompt_tokens":100,"prompt_tokens_details":{"cached_tokens":87}}}\n\ndata: [DONE]\n\n';
+    const gateway = await upstream(res => res.writeHead(200, { "content-type": "text/event-stream" }).end(payload));
+    const readings: unknown[] = [];
+    const { send } = await fixture([provider("kilo", gateway.url)], [offer("first", "kilo")],
+      { onReplyCache: (id, cache) => readings.push([id, cache]) });
+    expect(await (await send("first", { stream: true }, "session-f")).text()).toBe(payload);
+    expect(readings).toEqual([["session-f", 87]]);
   });
 });

@@ -5,11 +5,13 @@ import { once } from "node:events";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { activeOffers, automaticModels, rankedModels } from "../../shared/catalog";
-import type { ChatEvent } from "../../shared/api";
+import type { ChatEvent, RouterStats } from "../../shared/api";
 import type { Catalog } from "../../shared/catalog-schema";
 import type { KeyId } from "../../shared/providers";
 import type { ConnectService } from "../connect-service";
 import { ProviderHealth } from "./health";
+import { parseKeyCredits } from "./quotas";
+import { readReplyUsage } from "./reply-usage";
 
 type Route = Omit<Extract<ChatEvent, { type: "route" }>, "type">;
 export const FREE_FIRST_BYTE_MS = 45_000;
@@ -23,6 +25,8 @@ interface RouterOptions {
   auto?: () => boolean;
   firstByteMs?: number;
   onRoute?: (event: Route) => void;
+  onReplyCache?: (sessionId: string, cachePercent?: number) => void;
+  onStats?: (stats: RouterStats) => void;
 }
 
 class RequestError extends Error {
@@ -100,6 +104,30 @@ export class Router {
     return this.context?.sessionId === sessionId ? this.context.error : undefined;
   }
 
+  stats(): RouterStats {
+    this.refreshOpenRouter();
+    return this.options.health.stats(this.options.catalog());
+  }
+
+  private publishStats() {
+    this.options.onStats?.(this.options.health.stats(this.options.catalog()));
+  }
+
+  private refreshOpenRouter() {
+    const key = this.options.key("openrouter");
+    if (!key || !this.options.health.beginCreditsCheck()) return;
+    void fetch("https://openrouter.ai/api/v1/key", {
+      headers: { authorization: "Bearer " + key }, redirect: "error", signal: AbortSignal.timeout(8000)
+    }).then(async response => {
+      if (!response.ok) { await response.body?.cancel(); return; }
+      const credits = parseKeyCredits(await response.json());
+      if (credits && this.options.key("openrouter") === key) {
+        this.options.health.setCredits(credits);
+        this.publishStats();
+      }
+    }).catch(() => { /* Keep the last credit reading during connection failures. */ });
+  }
+
   private async handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const actual = Buffer.from(req.headers.authorization ?? "");
     const expected = Buffer.from("Bearer " + this.token);
@@ -175,7 +203,8 @@ export class Router {
           continue;
         }
         attempted = true;
-        health.request(provider.id);
+        const freeLimits = catalog.providers.find(entry => entry.id === provider.id)?.freeLimits;
+        health.request(provider.id, Boolean(freeLimits?.rph || freeLimits?.rpd));
         const started = performance.now();
         const deadline = new AbortController();
         const timer = setTimeout(() => deadline.abort(), this.options.firstByteMs ?? (personal ? 35_000 : FREE_FIRST_BYTE_MS));
@@ -194,6 +223,11 @@ export class Router {
             body: JSON.stringify({ ...body, model: upstreamId }),
             signal: AbortSignal.any([signal, deadline.signal])
           });
+          if (!needsKey || this.options.key(provider.id) === key) {
+            health.response(provider.id, response.headers);
+            this.publishStats();
+          }
+          if (provider.id === "openrouter") this.refreshOpenRouter();
           const quota = response.status === 429 || response.status === 402;
           if (quota || response.status === 408 || response.status >= 500) {
             if (quota) rateLimited.add(routeKey);
@@ -222,6 +256,7 @@ export class Router {
           if (error instanceof RequestError) throw error;
           if (deadline.signal.aborted) timedOut = true;
           health.error(provider.id, "unavailable");
+          this.publishStats();
           continue;
         } finally {
           clearTimeout(timer);
@@ -249,7 +284,11 @@ export class Router {
         });
         try {
           const onStreamError = () => { if (!signal.aborted) health.error(provider.id); };
-          await pipeline(Readable.from(readStream(reader, first.value, deadline, onStreamError)), res);
+          const usage = sessionId && this.options.onReplyCache
+            ? readReplyUsage(response.headers.get("content-type")?.includes("text/event-stream") || body.stream === true && !response.headers.has("content-type"))
+            : undefined;
+          const onEnd = sessionId && usage ? () => this.options.onReplyCache?.(sessionId, usage.finish()) : undefined;
+          await pipeline(Readable.from(readStream(reader, first.value, deadline, onStreamError, usage?.push, onEnd)), res);
           health.success(provider.id);
         } catch { /* A started response cannot switch providers. */ }
         return;
@@ -266,14 +305,16 @@ export class Router {
 
 async function* readStream(
   reader: ReadableStreamDefaultReader<Uint8Array>, first: Uint8Array,
-  deadline: AbortController, onError: () => void
+  deadline: AbortController, onError: () => void, onChunk?: (chunk: Uint8Array) => void, onEnd?: () => void
 ) {
   try {
+    onChunk?.(first);
     yield first;
     while (true) {
       const timer = setTimeout(() => deadline.abort(), 120_000);
       const next = await reader.read().finally(() => clearTimeout(timer));
-      if (next.done) return;
+      if (next.done) { onEnd?.(); return; }
+      onChunk?.(next.value);
       yield next.value;
     }
   } catch (error) {

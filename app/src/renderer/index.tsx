@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import type { Attachment, ChatAction, ChatHistory, ProjectTools, Question, TurnOptions, Usage, CatalogState, ChatEvent, ChatPart, ConnectionId, Conversation, DesktopApi, FileChange, InitialState, Notice, Permission, Preferences, UpdateReady } from "../shared/api";
+import type { ReplySpeed, RouterStats } from "../shared/api";
 import { Chat } from "./chat";
 import { catalogConnection, ConnectDialog, ConnectionsPage, readableError, type Connection } from "./connections";
 import { accessModes, enqueue, dequeue, slashCommand, type AccessMode } from "../shared/workspace";
@@ -8,6 +9,7 @@ import { defaultModel } from "../shared/catalog";
 import type { ChatStatus } from "./turns";
 import { ChatGroups } from "./chat-groups";
 import { Composer } from "./composer";
+import { ComposerStatus } from "./composer-status";
 import { Settings } from "./settings";
 import { WorkspacePanel, type PanelTab } from "./workspace-panel";
 import { Icon } from "./icons";
@@ -46,6 +48,7 @@ function App() {
   const [sessions, setSessions] = useState<Conversation[]>([]);
   const [chat, setChat] = useState<Conversation>();
   const [settings, setSettings] = useState(false);
+  const [settingsModels, setSettingsModels] = useState(false);
   const [subscriptions, setSubscriptions] = useState(false);
   const [query, setQuery] = useState("");
   const [draft, setDraft] = useState("");
@@ -61,6 +64,9 @@ function App() {
   const [tools, setTools] = useState<ProjectTools>();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [usage, setUsage] = useState<Usage>();
+  const [replyStats, setReplyStats] = useState<Record<string, { speed?: ReplySpeed; cache?: number }>>({});
+  const [routerStats, setRouterStats] = useState<RouterStats>();
+  const [demoRemaining, setDemoRemaining] = useState<number>();
   const [reverted, setReverted] = useState(false);
   const [planReady, setPlanReady] = useState(false);
   const [panel, setPanel] = useState(false);
@@ -133,7 +139,19 @@ function App() {
     if (event.type === "permission-resolved") setPermissions(value => value.filter(item => item.id !== event.id));
     if (event.type === "question") setQuestions(current => [...current.filter(item => item.id !== event.question.id), event.question]);
     if (event.type === "question-resolved") setQuestions(current => current.filter(item => item.id !== event.id));
-    if (event.type === "usage") setUsage(event.usage);
+    if (event.type === "usage") {
+      setUsage(event.usage);
+      if (event.speed || event.nativeCachePercent !== undefined) setReplyStats(state => {
+        const previous = state[event.sessionId];
+        return { ...state, [event.sessionId]: {
+          speed: event.speed ?? previous?.speed,
+          cache: event.nativeCachePercent === undefined ? previous?.cache : event.nativeCachePercent ?? undefined
+        } };
+      });
+    }
+    if (event.type === "reply-cache") setReplyStats(state => ({
+      ...state, [event.sessionId]: { ...state[event.sessionId], cache: event.cachePercent }
+    }));
     if (event.type === "route") {
       setRouteProvider(event.providerId);
       const route = event.modelId + "/" + event.providerId;
@@ -154,6 +172,23 @@ function App() {
       lastRoute.current = route;
     }
   }), [notify]);
+
+  const connectionsKey = catalog && [...catalog.connected, ...catalog.personal].join("/");
+  useEffect(() => {
+    const load = api.routerStats;
+    if (!load || connectionsKey === undefined) return;
+    let revision = 0;
+    let current = true;
+    const stop = api.onRouterStats?.(stats => { revision++; setRouterStats(stats); });
+    const refresh = () => {
+      const read = ++revision;
+      void load().then(stats => { if (current && read === revision) setRouterStats(stats); }).catch(() => {});
+    };
+    refresh();
+    const timer = setInterval(refresh, 30_000);
+    return () => { current = false; stop?.(); clearInterval(timer); };
+  }, [connectionsKey]);
+  useEffect(() => api.onDemoQuota?.(setDemoRemaining), []);
 
   useEffect(() => {
     if (!initial) return;
@@ -193,9 +228,7 @@ function App() {
   const selected = available.find(item => item.model.id === model) ?? available.find(item => item.model.id === preferred?.id) ??
     available.find(item => item.model.tier !== "new") ?? available[0];
   const modelId = ownModel?.id ?? selected?.model.id;
-  const provider = routeProvider
-    ? catalog?.catalog.providers.find(provider => provider.id === routeProvider)
-    : selected?.available[0]?.provider;
+  const currentProviderId = routeProvider ?? ownModel?.providerId ?? selected?.available[0]?.provider.id;
 
   const vision = ownModel?.vision ?? selected?.model.capabilities.includes("vision") ?? false;
   const contextWindow = ownModel?.context ?? selected?.model.contextWindow;
@@ -435,24 +468,39 @@ function App() {
     const message = text.trim();
     const command = slashCommand(message);
     if (command && quickCommand(command.name)) return;
+    if (command?.name === "compact") {
+      if (compactContext(intervene, mode)) setDraft("");
+      return;
+    }
     if (!modelId) return;
     if (!vision && readyFiles.some(file => file.image)) {
       showError("Выбранная модель не принимает изображения.");
       return;
     }
-    if (command?.name === "compact" && !chat) { showError("Сначала откройте чат."); return; }
     const skill = command && tools?.skills.find(item => command.name === "skill." + item.name);
     const custom = command && tools?.commands.find(item => item.name === command.name);
     const turn: PendingTurn = {
       id: crypto.randomUUID(), modelId, files: readyFiles, target: chat?.id,
       text: skill ? command?.args.trim() || "Примени навык «" + skill.name + "» к текущей задаче." : message,
-      options: { access: mode, replayMessageId: replayMessageId ?? undefined, variant: variant || undefined, compact: command?.name === "compact",
-        command: command && custom && command.name !== "compact" ? { name: command.name, args: command.args } : undefined,
+      options: { access: mode, replayMessageId: replayMessageId ?? undefined, variant: variant || undefined,
+        command: command && custom ? { name: command.name, args: command.args } : undefined,
         skill: skill ? skill.id : undefined }
     };
     setDraft("");
     setFiles([]);
     setReplayId(undefined);
+    scheduleTurn(turn, intervene);
+  }
+
+  function compactContext(intervene = false, mode = access) {
+    if (!chat) { showError("Сначала откройте чат."); return false; }
+    if (!modelId || !directory || loadingChat) return false;
+    scheduleTurn({ id: crypto.randomUUID(), modelId, files: [], target: chat.id, text: "/compact",
+      options: { compact: true, access: mode, variant: variant || undefined } }, intervene);
+    return true;
+  }
+
+  function scheduleTurn(turn: PendingTurn, intervene: boolean) {
     if (requestPending.current || queue.length) {
       const interrupt = intervene || prefs?.busyEnter === "interrupt";
       setQueue(value => enqueue(value, turn, interrupt));
@@ -538,7 +586,7 @@ function App() {
       if (key === "KeyK") searchInput.current?.focus();
       if (key === "KeyB") setPanel(value => !value);
       if (key === "KeyJ") { setSettings(false); setSubscriptions(false); setPanelTab("terminal"); setPanel(true); }
-      if (key === "Comma") { setSettings(value => subscriptions || !value); setSubscriptions(false); }
+      if (key === "Comma") { setSettingsModels(false); setSettings(value => subscriptions || !value); setSubscriptions(false); }
     };
     window.addEventListener("keydown", keydown);
     return () => window.removeEventListener("keydown", keydown);
@@ -580,15 +628,9 @@ function App() {
     }
   }
 
-  const consumed = usage ? usage.input + usage.output + usage.reasoning + usage.cache.read + usage.cache.write : 0;
   const capacity = usage?.context ?? contextWindow;
-  const percent = usage && capacity ? Math.min(100, Math.round(consumed / capacity * 100)) : undefined;
-  const formatted = (value: number) => value.toLocaleString("ru-RU");
-  const usageLabel = percent === undefined || !usage ? "" : [
-    formatted(consumed) + " / " + formatted(capacity!) + " токенов",
-    "Вход " + formatted(usage.input), "Выход " + formatted(usage.output), "Рассуждения " + formatted(usage.reasoning),
-    "Кэш " + formatted(usage.cache.read) + " чтение, " + formatted(usage.cache.write) + " запись"
-  ].join("\n");
+  const reply = chat ? replyStats[chat.id] : undefined;
+  const demo = !!api.onDemoQuota;
   const composer = <>
     {queue.length > 0 && <ul className="message-queue" aria-label="Очередь сообщений">
       {queue.map(item => <li key={item.id}><span className="subtle">В очереди</span><span>{item.text || item.files.map(file => file.name).join(", ")}</span>
@@ -601,22 +643,14 @@ function App() {
       canSend={!!modelId && !!directory && !loadingChat} attachments={files} remove={id => setFiles(items => items.filter(file => file.id !== id))}
       add={value => void captureFiles(value)} pick={() => void chooseFiles()} choose={() => void chooseDirectory()}
       access={access} cycle={cycleAccess} submit={submit} stop={stop} selectCommand={quickCommand} tools={tools} vision={vision} onError={showError}
-      modelControls={<>
-        {percent !== undefined && <span className="context-usage" title={usageLabel} aria-label={"Контекст " + percent + "%"}>
-          <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12" pathLength="100" />
-            <circle cx="14" cy="14" r="12" pathLength="100" strokeDasharray={percent + " 100"} /></svg>
-          <span>{percent}%</span>
-        </span>}
-        {variants.length > 0 && <select className="composer-control variant-select" aria-label="Уровень рассуждений"
-          value={variant} onChange={event => setVariant(event.target.value)}>
-          <option value="">По умолчанию</option>{variants.map(id => <option key={id} value={id}>
-            {({ minimal: "Минимум", low: "Низкий", medium: "Средний", high: "Высокий", max: "Максимум", xhigh: "Очень высокий" } as Record<string, string>)[id] ?? id}
-          </option>)}
-        </select>}
-        <ModelPicker selected={modelId} options={options} personal={personal} zen={zen} auto={prefs?.auto ?? true} latencies={catalog?.latencies}
+      modelControls={<ModelPicker selected={modelId} catalog={catalog?.catalog} options={options} personal={personal} zen={zen} auto={prefs?.auto ?? true} latencies={catalog?.latencies}
+          variant={variant} variants={variants} onVariant={setVariant}
           openSignal={modelMenu} onSelect={id => { setModel(id); setVariant(""); setRouteProvider(undefined); }}
-          onAuto={auto => updatePrefs({ auto })} onConnect={setConnection} onSubscriptions={() => setSubscriptions(true)} />
-      </>} />
+          onAuto={auto => updatePrefs({ auto })} onConnect={setConnection} onSubscriptions={() => setSubscriptions(true)} />} />
+    <ComposerStatus key={"stats:" + (chat?.id ?? directory)} state={catalog} providerId={currentProviderId} usage={usage}
+      capacity={capacity} speed={reply?.speed} cache={reply?.cache} stats={routerStats} demo={demo} demoRemaining={demoRemaining}
+      onCompact={chat && !demo && !loadingChat ? () => compactContext() : undefined} onConnect={setConnection} onDisconnect={disconnect}
+      onOpen={url => void api.openExternal(url).catch(showError)} onSettings={() => { setSettingsModels(true); setSettings(true); }} />
   </>;
 
   return <>
@@ -643,13 +677,13 @@ function App() {
           disabled={busy || loadingChat} start={startChat} open={session => void openChat(session)} perform={changeChat} />
         <div className="sidebar-end">
           <button type="button" className="sidebar-row" aria-current={settings || subscriptions ? "page" : undefined} disabled={loadingChat}
-            onClick={() => { setSettings(subscriptions || !settings); setSubscriptions(false); }}><Icon name="settings" />Настройки</button>
+            onClick={() => { setSettingsModels(false); setSettings(subscriptions || !settings); setSubscriptions(false); }}><Icon name="settings" />Настройки</button>
           <p className="catalog-note">{catalogAge(catalog?.catalog.generatedAt)}</p>
         </div>
       </aside>
       <div className="workspace-layout">
         {subscriptions ? <ConnectionsPage state={catalog} close={() => setSubscriptions(false)} connect={setConnection} />
-          : settings ? <Settings state={catalog} prefs={prefs} version={initial?.version} directory={directory} choose={() => void chooseDirectory(true)}
+          : settings ? <Settings state={catalog} prefs={prefs} version={initial?.version} directory={directory} choose={() => void chooseDirectory(true)} showModels={settingsModels}
             update={patch => {
               if (patch.defaultAccess === "full") {
                 if (!confirmFull()) return;
@@ -672,8 +706,7 @@ function App() {
               setAccess(mode);
               submit(false, "Выполни план", [], mode, null);
             } : undefined}>
-            {composer}{ownModel ? <p className="provider-note">{ownModel.providerId === "opencode" ? "Бесплатно · " : ""}{ownModel.providerName}</p>
-              : provider && <p className="provider-note">Бесплатно · модель от {provider.name}</p>}
+            {composer}
           </Chat> : <main className="workspace workspace--home">
             <button className="composer-control home-panel-toggle" type="button" aria-label="Правая панель" aria-expanded={panel}
               title="Правая панель · Ctrl+B" onClick={() => setPanel(value => !value)}><Icon name="panel" /></button>

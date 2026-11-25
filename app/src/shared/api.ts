@@ -25,7 +25,8 @@ export type ChatEvent =
   | { type: "permission-resolved"; sessionId: string; id: string }
   | { type: "question"; sessionId: string; question: Question }
   | { type: "question-resolved"; sessionId: string; id: string }
-  | { type: "usage"; sessionId: string; usage: Usage }
+  | { type: "usage"; sessionId: string; usage: Usage; speed?: ReplySpeed; nativeCachePercent?: number | null }
+  | { type: "reply-cache"; sessionId: string; cachePercent?: number }
   | { type: "route"; sessionId: string; modelId: string; previousModelId?: string; previousProviderId?: KeyId;
     providerId: KeyId; averageMs: number; reason?: "quota" | "unavailable" };
 
@@ -33,7 +34,15 @@ export type Preferences = z.infer<typeof preferencesSchema>;
 export type Attachment = { id: string; name: string; image: boolean; preview?: string };
 export type TurnOptions = { access?: AccessMode; variant?: string; compact?: boolean; replayMessageId?: string; command?: { name: string; args: string }; skill?: string };
 export type ChatHistory = { parts: ChatPart[]; changes: FileChange[]; reverted?: boolean; usage?: Usage };
-export type Usage = { input: number; output: number; reasoning: number; cache: { read: number; write: number }; context?: number };
+export type Usage = { input: number; output: number; reasoning: number; cache: { read: number; write: number }; context?: number;
+  breakdown?: { system: number; tools: number; messages: number } };
+export type ReplySpeed = { tokensPerSecond: number; firstTokenMs: number };
+export type QuotaPeriod = "hour" | "day" | "minute";
+export type RequestQuota = { limit: number; remaining: number; resetAt?: number; period?: QuotaPeriod; source: "headers" | "local" };
+export type KeyCredits = { usage: number; limit: number | null; remaining?: number | null; isFreeTier: boolean };
+export type RouterStats = Partial<Record<KeyId, {
+  requests?: RequestQuota; tokens?: { limit?: number; remaining?: number; resetAt?: number }; credits?: KeyCredits;
+}>>;
 export type ProjectEntry = { path: string; type: "file" | "directory" };
 export type SkillSummary = { id: string; name: string; description?: string; path: string };
 export type ProjectTools = { commands: { name: string; description?: string }[]; skills: SkillSummary[] };
@@ -58,7 +67,7 @@ export type ModelLatency = { modelId: string; providerId: KeyId; averageMs: numb
 
 export type CatalogState = {
   catalog: Catalog; connected: ProviderId[]; personal: PersonalId[]; subscriptions: SubscriptionId[];
-  personalModels: PersonalModel[]; zenModels: PersonalModel[]; latencies?: ModelLatency[];
+  personalModels: PersonalModel[]; zenModels: PersonalModel[]; latencies?: ModelLatency[]; customProviderUrl?: string;
 };
 export type Notice = { text: string; tone?: "error"; connect?: { modelId: string; providerId: ProviderId } };
 export type UpdateReady = { version: string; action: "restart" | "download" };
@@ -67,6 +76,9 @@ export type InitialState = CatalogState & { projects?: string[]; preferences: Pr
 
 export interface DesktopApi {
   voice?: VoiceApi;
+  routerStats?(): Promise<RouterStats>;
+  onRouterStats?(listener: (stats: RouterStats) => void): () => void;
+  onDemoQuota?(listener: (remaining?: number) => void): () => void;
   initial(): Promise<InitialState>;
   sessions(directory?: string): Promise<Conversation[]>;
   create(directory: string, title: string): Promise<Conversation>;

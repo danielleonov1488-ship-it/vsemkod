@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { keyIdSchema, type KeyId } from "../../shared/providers";
-import type { ModelLatency } from "../../shared/api";
+import type { KeyCredits, ModelLatency, RouterStats } from "../../shared/api";
+import type { Catalog } from "../../shared/catalog-schema";
 import { readJson, writeJson } from "../storage";
+import { day, keyCredits, parseRateHeaders, providerQuota, rateHeaders } from "./quotas";
 
 const counters = z.partialRecord(keyIdSchema, z.object({
   requests: z.int().nonnegative(),
@@ -11,11 +13,18 @@ const counters = z.partialRecord(keyIdSchema, z.object({
 const sample = z.object({
   modelId: z.string(), providerId: keyIdSchema, averageMs: z.number().nonnegative(), samples: z.int().positive()
 });
-const usage = z.object({ providers: counters, ttfb: z.array(sample) });
+const windows = z.partialRecord(keyIdSchema, z.array(z.number()));
+const headers = z.partialRecord(keyIdSchema, rateHeaders);
+const usage = z.object({ providers: counters, ttfb: z.array(sample),
+  windows: windows.optional(), headers: headers.optional(), credits: keyCredits.optional(), creditsCheckedAt: z.number().optional() });
 
 export class ProviderHealth {
   private counts: z.infer<typeof counters> = {};
   private firstBytes = new Map<string, z.infer<typeof sample>>();
+  private windows: z.infer<typeof windows> = {};
+  private headers: z.infer<typeof headers> = {};
+  private credits?: KeyCredits;
+  private creditsCheckedAt?: number;
   private cooling = new Map<KeyId, { failures: number; until: number; limited: boolean }>();
   private writes = Promise.resolve();
 
@@ -25,6 +34,10 @@ export class ProviderHealth {
     if (!this.path) return;
     const persisted = await readJson(this.path, usage);
     this.counts = persisted?.providers ?? await readJson(this.path, counters) ?? {};
+    this.windows = persisted?.windows ?? {};
+    this.headers = persisted?.headers ?? {};
+    this.credits = persisted?.credits;
+    this.creditsCheckedAt = persisted?.creditsCheckedAt;
     for (const entry of persisted?.ttfb ?? []) this.firstBytes.set(entry.providerId + "/" + entry.modelId, entry);
   }
 
@@ -54,8 +67,47 @@ export class ProviderHealth {
     return !this.ready(id) && this.cooling.get(id)?.limited === true;
   }
 
-  request(id: KeyId): void {
+  request(id: KeyId, trackWindow = true): void {
     (this.counts[id] ??= { requests: 0, errors: 0 }).requests++;
+    if (trackWindow) {
+      const now = this.now();
+      this.windows[id] = [...(this.windows[id] ?? []).filter(at => at > now - day && at <= now), now];
+    }
+    this.save();
+  }
+
+  response(id: KeyId, responseHeaders: Headers): void {
+    const parsed = parseRateHeaders(responseHeaders, this.now());
+    if (parsed) this.headers[id] = parsed;
+    else if (this.headers[id]) delete this.headers[id];
+    else return;
+    this.save();
+  }
+
+  stats(catalog: Catalog): RouterStats {
+    const now = this.now();
+    const result: RouterStats = {};
+    for (const id of keyIdSchema.options.flatMap(schema => schema.options)) {
+      const limits = catalog.providers.find(provider => provider.id === id)?.freeLimits ?? {};
+      const entry = this.headers[id];
+      const requests = providerQuota(id, limits, entry, this.windows[id] ?? [], now);
+      const tokens = entry?.tokens && now < (entry.tokens.resetAt ?? entry.at + day) ? entry.tokens : undefined;
+      const credits = id === "openrouter" ? this.credits : undefined;
+      if (requests || tokens || credits) result[id] = { requests, tokens, credits };
+    }
+    return result;
+  }
+
+  beginCreditsCheck(): boolean {
+    const now = this.now();
+    if (this.creditsCheckedAt !== undefined && now < this.creditsCheckedAt + 600_000) return false;
+    this.creditsCheckedAt = now;
+    this.save();
+    return true;
+  }
+
+  setCredits(credits: KeyCredits) {
+    this.credits = credits;
     this.save();
   }
 
@@ -81,14 +133,21 @@ export class ProviderHealth {
     this.save();
   }
 
-  reset(id: KeyId) { this.cooling.delete(id); }
+  reset(id: KeyId) {
+    this.cooling.delete(id);
+    delete this.windows[id];
+    delete this.headers[id];
+    if (id === "openrouter") this.credits = undefined;
+    this.save();
+  }
 
   flush(): Promise<void> { return this.writes; }
 
   private save(): void {
     const path = this.path;
     if (path) this.writes = this.writes.then(() => writeJson(path, {
-      providers: this.counts, ttfb: [...this.firstBytes.values()]
+      providers: this.counts, ttfb: [...this.firstBytes.values()], windows: this.windows, headers: this.headers,
+      credits: this.credits, creditsCheckedAt: this.creditsCheckedAt
     })).catch(() => {});
   }
 }

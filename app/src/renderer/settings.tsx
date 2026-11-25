@@ -150,8 +150,8 @@ type SettingsProps = Omit<Parameters<typeof ModelSettings>[0], "prefs"> & {
   onError: (error: unknown) => void; onNotice: (text: string) => void;
 };
 
-export function Settings({ prefs, version, directory, choose, update, open, checkUpdates, checkingUpdates, exportAll, onError, onNotice, ...models }: SettingsProps) {
-  const [section, setSection] = useState(0);
+export function Settings({ prefs, version, directory, choose, update, open, checkUpdates, checkingUpdates, exportAll, onError, onNotice, showModels, ...models }: SettingsProps & { showModels?: boolean }) {
+  const [section, setSection] = useState(showModels ? 1 : 0);
   return <main className="workspace settings-workspace">
     <header className="chat-header"><h1>Настройки</h1></header>
     <div className="settings-layout">

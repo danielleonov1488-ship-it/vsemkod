@@ -20,6 +20,8 @@ const api: DesktopApi = {
     subscribe: listener => subscribe("voice:event", listener)
   },
   initial: () => ipcRenderer.invoke("app:initial"),
+  routerStats: () => ipcRenderer.invoke("router:stats"),
+  onRouterStats: listener => subscribe("router:stats", listener),
   sessions: directory => ipcRenderer.invoke("chat:list", directory),
   create: (directory, title) => ipcRenderer.invoke("chat:create", directory, title),
   history: sessionId => ipcRenderer.invoke("chat:history", sessionId),
