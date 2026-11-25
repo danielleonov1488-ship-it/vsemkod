@@ -385,6 +385,7 @@ summary::-webkit-details-marker { display: none; }
 .faq details[open] summary::after { transform: rotate(45deg); }
 .faq summary:hover { color: var(--accent-text); }
 .faq details p { padding: 0 22px 15px 0; color: var(--muted); font-size: 14.5px; }
+.faq details code { padding: 1px 6px; border-radius: 5px; background: var(--raised); color: var(--text); font: 13px var(--mono); white-space: nowrap; }
 @supports (interpolate-size: allow-keywords) {
   .faq details { interpolate-size: allow-keywords; }
   .faq details::details-content { height: 0; overflow: clip; transition: height 250ms var(--ease), content-visibility 250ms allow-discrete; }

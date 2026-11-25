@@ -1,7 +1,15 @@
 export const DEMO_API = "https://vsemkod-demo.vsemkod.workers.dev";
 export const TURNSTILE_SITEKEY = "0x4AAAAAAGSiofqewQIBBTcx";
 const RELEASE_URL = "https://github.com/danielleonov1488-ship-it/vsemkod/releases/latest";
-const RELEASED = false;
+const RELEASED = true;
+// Постоянные ссылки: GitHub сам отдаёт файл из последнего релиза.
+const DOWNLOAD_URL = RELEASE_URL + "/download/";
+const ASSETS = {
+  Windows: "vsemkod-windows-x64.exe",
+  macOS: "vsemkod-macos-arm64.dmg",
+  macOSIntel: "vsemkod-macos-x64.dmg",
+  Linux: "vsemkod-linux-x86_64.AppImage",
+};
 
 const CATALOG_URL = "/catalog.json";
 const CHANGES_URL = "/changes.json";
@@ -121,7 +129,17 @@ function configureDownload(motion) {
   const download = document.getElementById("step-download");
   const status = document.getElementById("step-download-status");
 
-  document.querySelectorAll("[data-release]").forEach((link) => { link.href = RELEASE_URL; });
+  const direct = RELEASED && !mobile;
+  const setLinks = (asset) => {
+    document.querySelectorAll("[data-release]").forEach((link) => { link.href = direct ? DOWNLOAD_URL + asset : RELEASE_URL; });
+  };
+  setLinks(ASSETS[platform]);
+  // Chromium на Mac умеет сказать архитектуру; Safari — нет, там Apple Silicon по умолчанию, Intel — в «Все загрузки».
+  if (direct && platform === "macOS") {
+    navigator.userAgentData?.getHighEntropyValues?.(["architecture"])
+      .then(({ architecture }) => { if (architecture === "x86") setLinks(ASSETS.macOSIntel); })
+      .catch(() => {});
+  }
   document.getElementById("platform-label").textContent = label;
   document.getElementById("step-download-label").textContent = label;
   document.getElementById("release-status").hidden = RELEASED;
@@ -132,7 +150,7 @@ function configureDownload(motion) {
     event.preventDefault();
     if (download.classList.contains("is-opening")) return;
     download.classList.add("is-opening");
-    status.textContent = "Открываем страницу релиза.";
+    status.textContent = direct ? "Начинаем загрузку." : "Открываем страницу релиза.";
     setTimeout(() => {
       download.classList.remove("is-opening");
       status.textContent = "";
