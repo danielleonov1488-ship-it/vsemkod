@@ -250,6 +250,10 @@
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
     },
+    "0b213c9698212ce214d2362490bb292ab28879ed6e1d3d8bdc36ae54db32bc1e": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
     "0f6546fd6e205726d70df2964441e7b002f4d29100feec98a9cb2b85e9a07e29": {
       "observations": [],
       "savedAt": "2026-11-25T14:01:23.871Z"
@@ -273,6 +277,10 @@
     "2d91104ff9ecf6632b4a4165ea466bd679b373cf7e18c4cbf4c01f10d4f71fce": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "2e1a36f8e89408a029f632f0926de97021df155b7d5828f0e9c6915398f8cb3b": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
     },
     "319602025645ffb679bc729517bbf91ef2756da7278ca0072d152f0ea447ff31": {
       "observations": [],
@@ -307,6 +315,10 @@
       ],
       "savedAt": "2026-11-25T12:06:35.747Z"
     },
+    "45a75c20abc21fb4ead45deae9149e74b69e16ab9318a52b88d4e1f31942c525": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
     "468d26c19294ffdde561708982e50dd5655ed294f6321915b08ee95706aaefb6": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
@@ -319,9 +331,21 @@
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
     },
+    "4bd89e3084954a564c4d2e311cabb37b32fbccf10d48016343600591bcc9cd92": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
     "540c68cfde00260d3a6f30911628ffe5b660c73999be7ed06ca5f784d3ffb4c0": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "64cd2ff1380ef4ed2e3cc6a6336be6cfa6405a44adede46d143088c8585fd3b9": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
+    "64d8c5491988c5611f1437500320b12600dc663157391c299513972c64e077ad": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
     },
     "66ab0746e95bb6b13e64c96154b9afe2f2aebbac9f633aeead528095b553a4c7": {
       "observations": [],
@@ -330,6 +354,10 @@
     "670521a8543e69378304db2ae91bcc42e1525af536d4eccc6c45425e2266f076": {
       "observations": [],
       "savedAt": "2026-11-25T14:01:23.871Z"
+    },
+    "6f0870cb76af020b25beb4a812920e39a2d47facef5e0f18af9ff2a8cd09f76c": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
     },
     "6ff6fead1f811ea86a2d9b003d4ee1293e5fa44328f558305ff8837775445e73": {
       "observations": [],
@@ -650,6 +678,10 @@
       "observations": [],
       "savedAt": "2026-11-25T14:01:23.871Z"
     },
+    "c29023c5b16d117e061ffbe9eb3c1718ce78c336dc624e787c8e5016c39a7f97": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
     "c89919a2c218eb6ad0ba6c42c8993cc7eb17ce4b88319f5a86aa047fb25e9ed8": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
@@ -665,6 +697,10 @@
     "d159b2c396e7507c3f80688c3c6754898ac4a91a53576ffb39a2ff525d064b0a": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "db7a72959c86fd849df2a447369ad33b980f4e3f791e2c2b598684bfe39a8c2a": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
     },
     "df4ad30ecfd3246f1002cab7c036c8290f26653b65f0112690e42bf42451d6da": {
       "observations": [],
@@ -759,6 +795,10 @@
     "fae0dddf2b7ec014bf6a9e49d521093787d054dc04012b8937cdf79fb8755aa7": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "fe3296cc916d25ba31ede38be07f54e8b4c8e3e7e7c7ad77fb3f028e45208038": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
     },
     "ff2f0cb51a6db2ddb2b992644e9e8962dbc3b7dd60125c879ab55ed6d4eeceb3": {
       "observations": [],
@@ -1504,6 +1544,10 @@
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
     },
+    "hn:50630132": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
     "hn:50630317": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
@@ -1583,6 +1627,54 @@
     "hn:50642169": {
       "observations": [],
       "savedAt": "2026-11-25T14:01:23.871Z"
+    },
+    "hn:50642538": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
+    "hn:50642710": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
+    "hn:50642976": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
+    "hn:50643708": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
+    "hn:50643836": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
+    "hn:50643888": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
+    "hn:50644420": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
+    "hn:50644731": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
+    "hn:50644833": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
+    "hn:50645432": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
+    "hn:50645458": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
+    },
+    "hn:50646533": {
+      "observations": [],
+      "savedAt": "2026-11-25T20:09:57.184Z"
     }
   },
   "tracks": {
@@ -1627,7 +1719,7 @@
     "groq:qwen/qwen3.8-27b": {
       "evidence": {
         "github": {
-          "missedRuns": 1,
+          "missedRuns": 2,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -1682,7 +1774,7 @@
     "kilo:dots-studio/dots-3-note-preview:free": {
       "evidence": {
         "kilo": {
-          "missedRuns": 2,
+          "missedRuns": 3,
           "observation": {
             "confidence": "structured",
             "contextWindow": 512000,
@@ -2061,7 +2153,7 @@
     "modelscope:API-Inference": {
       "evidence": {
         "github": {
-          "missedRuns": 1,
+          "missedRuns": 2,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -2438,7 +2530,7 @@
     "openrouter:dots-studio/dots-3-note-preview:free": {
       "evidence": {
         "openrouter": {
-          "missedRuns": 2,
+          "missedRuns": 3,
           "observation": {
             "confidence": "structured",
             "contextWindow": 512000,
@@ -2847,7 +2939,7 @@
     "runcrate:five open models": {
       "evidence": {
         "github": {
-          "missedRuns": 1,
+          "missedRuns": 2,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -2994,7 +3086,7 @@
     "zai:free models": {
       "evidence": {
         "github": {
-          "missedRuns": 1,
+          "missedRuns": 2,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
