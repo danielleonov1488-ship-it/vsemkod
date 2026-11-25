@@ -32,7 +32,7 @@ jobs:
         run: |
           mkdir -p _site
           for item in site/*; do
-            if [ "$item" != "site/BRIEF.md" ]; then
+            if [ "${item%.md}" = "$item" ] && [ "$item" != "site/dev" ]; then
               cp -R -- "$item" _site/
             fi
           done

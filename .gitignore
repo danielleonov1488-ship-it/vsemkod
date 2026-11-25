@@ -14,3 +14,7 @@ codex-*.md
 .chrome-profile/
 .DS_Store
 Thumbs.db
+
+# Скриншоты проверок (пересоздаются)
+site/dev/screenshots/
+app/.stage-d-work/
