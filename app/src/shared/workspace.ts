@@ -42,6 +42,10 @@ export function dequeue<T>(queue: readonly T[]): [T | undefined, T[]] {
   return [queue[0], queue.slice(1)];
 }
 
+export function folderName(path: string) {
+  return path.split(/[\\/]/).filter(Boolean).at(-1) ?? path;
+}
+
 export function imageFile(name: string) {
   return /\.(png|jpe?g|gif|webp|bmp|svg|heic|avif|tiff?|ico|jxl|heif)$/i.test(name);
 }

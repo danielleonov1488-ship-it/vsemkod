@@ -7,6 +7,7 @@ import type { ChatAction, ChatEvent, ChatHistory, ChatPart, Conversation, FileCh
 import { nativeNames, type PersonalModel } from "../../shared/providers";
 import { modelReference } from "../connect-service";
 import { accessModes, imageFile, pathMentions } from "../../shared/workspace";
+import { ModelWatchdog } from "./model-watchdog";
 import { sessionAccess } from "./access";
 import { DiffTracker, fileTools, inside } from "./diff-tracker";
 
@@ -15,7 +16,8 @@ const nativeMethods: Record<SubscriptionId, string> = { "github-copilot": "devic
 const eventTypes = [
   "session.text.delta", "session.text.ended", "session.tool.input.started", "session.tool.called",
   "session.tool.success", "session.tool.failed", "permission.asked", "permission.replied",
-  "session.reasoning.started", "session.reasoning.ended", "session.compaction.ended", "session.compaction.failed", "session.step.ended",
+  "session.reasoning.started", "session.reasoning.delta", "session.reasoning.ended", "session.tool.input.delta",
+  "session.retry.scheduled", "session.compaction.ended", "session.compaction.failed", "session.step.started", "session.step.ended",
   "form.created", "form.replied", "form.cancelled", "session.execution.failed", "session.execution.interrupted", "session.execution.succeeded"
 ] as const;
 
@@ -79,7 +81,8 @@ function userError(error: { message: string; status?: number }): string {
   if (error.status === 429 || /quota|rate.limit/i.test(error.message)) return "Квота модели исчерпана. Попробуйте позже или выберите другую модель.";
   if (error.status === 401 || error.status === 403) return "Провайдер отклонил доступ к выбранной модели.";
   if (error.status === 503) return "Для этой модели сейчас нет доступной раздачи.";
-  if ((error.status ?? 0) >= 500 || /fetch|network|timeout|timed out/i.test(error.message)) return "Провайдер не ответил. Проверьте соединение или повторите позже.";
+  if (error.status === 408 || error.status === 504 || /timeout|timed out/i.test(error.message)) return "Провайдер не ответил вовремя. Повторите запрос или выберите другую модель.";
+  if ((error.status ?? 0) >= 500 || /fetch|network/i.test(error.message)) return "Провайдер не ответил. Проверьте соединение или повторите позже.";
   return "Агент не смог выполнить запрос. " + error.message.slice(0, 400);
 }
 
@@ -299,6 +302,7 @@ export class EngineAdapter {
     let cursor: string | undefined;
     let tokens: Usage | undefined;
     let hidden = false;
+    let turnStarted: number | undefined;
     do {
       const page = await this.client.message.list({
         sessionID: sessionId, limit: 100, ...(cursor ? { cursor } : { order: "asc" })
@@ -307,8 +311,10 @@ export class EngineAdapter {
         if (!includeReverted && message.id === session.revert?.messageID) hidden = true;
         if (hidden) break;
         if (message.type === "user") {
+          turnStarted = message.time.created;
           parts.push({ id: message.id, kind: "user", text: message.text, files: message.files?.map(file => file.name ?? "") });
         } else if (message.type === "assistant") {
+          turnStarted ??= message.time.created;
           tokens = message.tokens ?? tokens;
           for (const [index, item] of message.content.entries()) {
             const id = message.id + "/" + index;
@@ -323,6 +329,10 @@ export class EngineAdapter {
         } else if (message.type === "compaction" && message.status === "completed") {
           parts.push({ id: message.id, kind: "note", text: "Контекст сжат" });
           tokens = message.tokens ?? tokens;
+        } else if (message.type === "idle" && turnStarted !== undefined) {
+          parts.push({ id: message.id, kind: "turn", seconds: Math.max(0, (message.time.created - turnStarted) / 1000),
+            stopped: message.outcome === "interrupted" });
+          turnStarted = undefined;
         }
       }
       cursor = hidden ? undefined : page.cursor?.next ?? undefined;
@@ -353,7 +363,7 @@ export class EngineAdapter {
     files: string[],
     emit: (event: ChatEvent) => void,
     interrupted: () => boolean,
-    options: TurnOptions & { webSearch?: boolean } = {}
+    options: TurnOptions & { webSearch?: boolean; routerError?: () => string | undefined } = {}
   ) {
     const signal = new AbortController();
     const events = this.client.event.subscribe({ types: eventTypes, signal: signal.signal })[Symbol.asyncIterator]();
@@ -361,6 +371,14 @@ export class EngineAdapter {
     const toolTodos = new Map<string, ReturnType<typeof readTodos>>();
     const tracker = new DiffTracker(directory);
     const reasoning = new Map<string, number>();
+    const runningTools = new Set<string>();
+    const blockers = new Set<string>();
+    let watchdog!: ModelWatchdog;
+    const timeout = new Promise<never>((_, reject) => {
+      watchdog = new ModelWatchdog(since => emit({ type: "model-wait", sessionId, since }), reject);
+    });
+    void timeout.catch(() => {});
+    const waitForModel = () => { if (!runningTools.size && !blockers.size) watchdog.wait(); };
     let context: number | undefined;
     const update = (part: ChatPart) => emit({ type: "part", sessionId, part });
     let queued = false;
@@ -382,24 +400,39 @@ export class EngineAdapter {
         const event = next.value;
         if (event.type === "form.created") {
           const { form } = event.data;
-          if (form.sessionID === sessionId) emit({ type: "question", sessionId, question: form });
+          if (form.sessionID === sessionId) {
+            blockers.add(form.id);
+            watchdog.pause();
+            emit({ type: "question", sessionId, question: form });
+          }
           continue;
         }
         if (!("sessionID" in event.data) || event.data.sessionID !== sessionId) continue;
         switch (event.type) {
           case "form.replied":
           case "form.cancelled":
+            blockers.delete(event.data.id);
+            waitForModel();
             emit({ type: "question-resolved", sessionId, id: event.data.id });
             break;
           case "session.reasoning.started":
             reasoning.set(event.data.assistantMessageID + "/" + event.data.ordinal, event.created);
             break;
+          case "session.reasoning.delta": {
+            if (event.data.delta) waitForModel();
+            emit({ type: "delta", sessionId, partId: event.data.assistantMessageID + "/" + event.data.ordinal,
+              delta: event.data.delta, kind: "reasoning" });
+            break;
+          }
           case "session.reasoning.ended": {
             const id = event.data.assistantMessageID + "/" + event.data.ordinal;
             update({ id, kind: "reasoning", text: event.data.text,
               seconds: Math.max(0, Math.round((event.created - (reasoning.get(id) ?? event.created)) / 1000)) });
             break;
           }
+          case "session.step.started":
+            waitForModel();
+            break;
           case "session.step.ended":
             emit({ type: "usage", sessionId, usage: { ...event.data.tokens, context } });
             break;
@@ -414,31 +447,41 @@ export class EngineAdapter {
           case "session.text.delta":
           case "session.text.ended": {
             const id = event.data.assistantMessageID + "/" + event.data.ordinal;
-            if (event.type === "session.text.delta") emit({ type: "delta", sessionId, partId: id, delta: event.data.delta });
-            else update({ id, kind: "text", text: event.data.text });
+            if (event.type === "session.text.delta") {
+              if (event.data.delta) waitForModel();
+              emit({ type: "delta", sessionId, partId: id, delta: event.data.delta });
+            } else update({ id, kind: "text", text: event.data.text });
             break;
           }
           case "session.tool.input.started": {
             const { id, name } = event.data;
             const tool = { id, kind: "tool", tool: name, target: "", status: "running" } as const;
             tools.set(id, tool);
+            waitForModel();
             update(tool);
             break;
           }
+          case "session.tool.input.delta":
+            if (event.data.delta) waitForModel();
+            break;
           case "session.tool.called": {
             const { id, input } = event.data;
-            const tool = tools.get(id);
-            if (tool) {
-              tool.target = target(input, directory);
-              if (tool.tool === "todowrite") toolTodos.set(id, readTodos(input.todos));
-              update({ ...tool });
-              if (fileTools.has(tool.tool)) await tracker.capture(id, mutationTargets(input, tool.target));
-            }
+            const name = tools.get(id)?.tool ?? "tool";
+            runningTools.add(id);
+            watchdog.pause();
+            const paths = mutationTargets(input, target(input, directory));
+            const tool = { id, kind: "tool", tool: name, target: paths.join(", "), status: "running" } as const;
+            tools.set(id, tool);
+            if (tool.tool === "todowrite") toolTodos.set(id, readTodos(input.todos));
+            update(tool);
+            if (fileTools.has(tool.tool)) await tracker.capture(id, paths);
             break;
           }
           case "session.tool.success":
           case "session.tool.failed": {
-            const tool = tools.get(event.data.id);
+            const id = event.data.id;
+            runningTools.delete(id);
+            const tool = tools.get(id);
             if (tool) {
               tool.status = event.type === "session.tool.success" ? "completed" : "error";
               if (tool.status === "completed" && tool.tool === "todowrite") tool.todos = toolTodos.get(tool.id);
@@ -449,19 +492,26 @@ export class EngineAdapter {
               }
               update({ ...tool });
             }
+            waitForModel();
             break;
           }
           case "permission.asked": {
             const { id, action, resources, save } = event.data;
+            blockers.add(id);
+            watchdog.pause();
             if (action === "edit" && event.data.source?.id) await tracker.capture(event.data.source.id, resources);
             emit({ type: "permission", sessionId, permission: { id, action, resources, save } });
             break;
           }
           case "permission.replied":
+            blockers.delete(event.data.requestID);
+            waitForModel();
             emit({ type: "permission-resolved", sessionId, id: event.data.requestID });
             break;
+          case "session.retry.scheduled":
+            throw new Error(options.routerError?.() ?? userError(event.data.error));
           case "session.execution.failed":
-            error = userError(event.data.error);
+            error = options.routerError?.() ?? userError(event.data.error);
             return;
           case "session.execution.interrupted":
             stopped = true;
@@ -502,6 +552,7 @@ export class EngineAdapter {
           return { uri: pathToFileURL(target).href, name: basename(target), mention };
         }))
       ];
+      waitForModel();
       if (options.compact) await this.client.session.compact({ sessionID: sessionId }, request());
       else if (options.command) await this.client.session.command({
         sessionID: sessionId, name: options.command.name, text: options.command.args, files: attachments
@@ -514,13 +565,16 @@ export class EngineAdapter {
         await this.stop(sessionId);
         return { changes: await this.changes(sessionId), stopped: true };
       }
-      await stream;
+      await Promise.race([stream, timeout]);
       if (error) throw new Error(error);
       return { changes: mergeChanges(tracker.results(), await this.changes(sessionId)), stopped };
     } catch (failure) {
+      const routed = options.routerError?.();
       if (queued) await this.stop(sessionId).catch(() => {});
+      if (routed) throw new Error(routed);
       throw failure;
     } finally {
+      watchdog.pause();
       signal.abort();
       await events.return?.().catch(() => {});
     }

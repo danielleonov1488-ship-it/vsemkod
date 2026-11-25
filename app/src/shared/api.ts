@@ -13,17 +13,20 @@ export type FileChange = { file: string; patch: string; additions: number; delet
 export type ChatPart =
   | { id: string; kind: "user" | "text"; text: string; files?: string[] }
   | { id: string; kind: "reasoning" | "note"; text: string; seconds?: number }
+  | { id: string; kind: "turn"; seconds: number; stopped?: boolean }
   | { id: string; kind: "tool"; tool: string; target: string; status: "running" | "completed" | "error"; diffs?: FileChange[]; output?: string; todos?: { content: string; status: string }[]; diff?: FileChange };
 
 export type ChatEvent =
   | { type: "part"; sessionId: string; part: ChatPart }
-  | { type: "delta"; sessionId: string; partId: string; delta: string }
+  | { type: "delta"; sessionId: string; partId: string; delta: string; kind?: "text" | "reasoning" }
+  | { type: "model-wait"; sessionId: string; since: number | null }
   | { type: "permission"; sessionId: string; permission: Permission }
   | { type: "permission-resolved"; sessionId: string; id: string }
   | { type: "question"; sessionId: string; question: Question }
   | { type: "question-resolved"; sessionId: string; id: string }
   | { type: "usage"; sessionId: string; usage: Usage }
-  | { type: "route"; sessionId: string; modelId: string; previousModelId?: string; providerId: KeyId; reason?: "quota" | "unavailable" };
+  | { type: "route"; sessionId: string; modelId: string; previousModelId?: string; previousProviderId?: KeyId;
+    providerId: KeyId; averageMs: number; reason?: "quota" | "unavailable" };
 
 export type Preferences = z.infer<typeof preferencesSchema>;
 export type Attachment = { id: string; name: string; image: boolean; preview?: string };
@@ -50,14 +53,16 @@ export type ConnectEvent = { id: string } & (
   { type: "clipboard"; key: string } | { type: "clipboard-expired" } |
   { type: "waiting"; code?: string; url?: string }
 );
+export type ModelLatency = { modelId: string; providerId: KeyId; averageMs: number };
+
 export type CatalogState = {
   catalog: Catalog; connected: ProviderId[]; personal: PersonalId[]; subscriptions: SubscriptionId[];
-  personalModels: PersonalModel[]; zenModels: PersonalModel[];
+  personalModels: PersonalModel[]; zenModels: PersonalModel[]; latencies?: ModelLatency[];
 };
 export type Notice = { text: string; tone?: "error"; connect?: { modelId: string; providerId: ProviderId } };
 export type UpdateReady = { version: string; action: "restart" | "download" };
 export type UpdateCheck = UpdateReady | "disabled" | "current" | "downloading";
-export type InitialState = CatalogState & { preferences: Preferences; version: string; update?: UpdateReady };
+export type InitialState = CatalogState & { projects?: string[]; preferences: Preferences; version: string; update?: UpdateReady };
 
 export interface DesktopApi {
   initial(): Promise<InitialState>;

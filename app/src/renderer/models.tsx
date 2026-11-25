@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { activeOffers, rankedModels } from "../shared/catalog";
-import type { CatalogState } from "../shared/api";
+import type { CatalogState, ModelLatency } from "../shared/api";
 import type { Model, Offer } from "../shared/catalog-schema";
 import type { PersonalModel } from "../shared/providers";
 import type { Connection } from "./connections";
@@ -37,8 +37,8 @@ export function AutoSwitch({ auto, onAuto }: { auto: boolean; onAuto: (auto: boo
   </label>;
 }
 
-export function ModelPicker({ selected, options, personal, zen, auto, openSignal, onSelect, onAuto, onConnect, onSubscriptions }: {
-  selected?: string; openSignal?: number; options: ReturnType<typeof modelOptions>; auto: boolean;
+export function ModelPicker({ selected, options, personal, zen, auto, latencies, openSignal, onSelect, onAuto, onConnect, onSubscriptions }: {
+  selected?: string; openSignal?: number; latencies?: ModelLatency[]; options: ReturnType<typeof modelOptions>; auto: boolean;
   personal: PersonalModel[]; zen: PersonalModel[];
   onSelect: (id: string) => void; onAuto: (auto: boolean) => void; onConnect: (connection: Connection) => void;
   onSubscriptions: () => void;
@@ -69,11 +69,11 @@ export function ModelPicker({ selected, options, personal, zen, auto, openSignal
     };
   }, []);
 
-  const visible = options.filter(option => option.model.tier !== "new" &&
-    (option.model.tier === "top" || showGood || option.model.id === selected));
+  const visible = options.filter(option => option.model.id === selected ||
+    (option.model.tier !== "new" && (option.model.tier === "top" || showGood)));
   const connected = visible.filter(option => option.available.length);
   const locked = visible.filter(option => !option.available.length && option.locked.length);
-  const experimental = options.filter(option => option.model.tier === "new");
+  const experimental = options.filter(option => option.model.tier === "new" && option.model.id !== selected);
   const name = options.find(option => option.model.id === selected)?.model.name ??
     [...personal, ...zen].find(model => model.id === selected)?.name ?? "Выбрать модель";
   function close() {
@@ -83,6 +83,19 @@ export function ModelPicker({ selected, options, personal, zen, auto, openSignal
   function select(id: string) {
     onSelect(id);
     close();
+  }
+  function latency(id: string, providers: { id: string; name: string }[]) {
+    const samples = providers.flatMap(provider => {
+      const measurement = latencies?.find(value => value.modelId === id && value.providerId === provider.id);
+      return measurement ? [{ ...measurement, name: provider.name }] : [];
+    });
+    const first = samples[0];
+    if (!first) return null;
+    const seconds = (ms: number) => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: ms < 1000 ? 1 : 0 })
+      .format(Math.max(0.1, ms / 1000)) + " с";
+    return <small className="model-speed" title={samples.map(item => item.name + " · " + seconds(item.averageMs)).join("\n")}>
+      ~{seconds(first.averageMs)}
+    </small>;
   }
   function freeOption({ model, available, locked }: (typeof options)[number]) {
     const provider = locked[0]?.provider;
@@ -96,14 +109,18 @@ export function ModelPicker({ selected, options, personal, zen, auto, openSignal
       }}>
       <ModelCopy model={model} offers={available.length ? available : locked} />
       {!available.length ? <span className={provider ? "connect-label" : "subtle"}>{provider ? "Подключить" : "Нет раздачи"}</span> :
-        model.id === selected && <span className="model-check"><Icon name="check" /></span>}
+        <span className="model-details">{latency(model.id, available.map(item => item.provider))}
+          {model.id === selected && <span className="model-check"><Icon name="check" /></span>}
+        </span>}
     </button></li>;
   }
   function personalOptions(models: PersonalModel[]) {
     return <ul className="model-list">{models.map(model =>
       <li key={model.id}><button className="model-option" type="button" aria-pressed={model.id === selected} onClick={() => select(model.id)}>
         <span className="model-copy"><span className="model-name">{model.name}</span><span className="model-description">{model.providerName}</span></span>
-        {model.id === selected && <span className="model-check"><Icon name="check" /></span>}
+        <span className="model-details">{latency(model.id, [{ id: model.providerId, name: model.providerName }])}
+          {model.id === selected && <span className="model-check"><Icon name="check" /></span>}
+        </span>
       </button></li>)}</ul>;
   }
 

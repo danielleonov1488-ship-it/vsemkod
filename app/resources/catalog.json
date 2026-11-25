@@ -1,28 +1,6 @@
 {
   "candidates": [
     {
-      "confidence": "structured",
-      "contextWindow": 1000000,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "На IP-адрес",
-        "rph": 200
-      },
-      "modelId": "ampersand-v0.1",
-      "promo": false,
-      "providerId": "kilo",
-      "providerModelId": "humansand/ampersand-v0.1",
-      "sources": [
-        "kilo:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
       "confidence": "news",
       "contextWindow": 0,
       "expiresAt": null,
@@ -50,29 +28,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "На IP-адрес",
-        "rph": 200
-      },
-      "modelId": "beam-free",
-      "promo": false,
-      "providerId": "kilo",
-      "providerModelId": "reflection/beam-free",
-      "sources": [
-        "kilo:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 1048576,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -83,96 +39,6 @@
       "providerModelId": "dealignai/deepseek-v4.1-flash-uncensored-fp8:free",
       "sources": [
         "https://numes.ai/api/public-catalogue/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 512000,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-24T15:12:29.146Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "На IP-адрес",
-        "rph": 200
-      },
-      "modelId": "dots-3-note-preview",
-      "promo": false,
-      "providerId": "kilo",
-      "providerModelId": "dots-studio/dots-3-note-preview:free",
-      "sources": [
-        "kilo:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 512000,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-24T15:12:29.146Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
-        "rpd": 50,
-        "rpm": 20
-      },
-      "modelId": "dots-3-note-preview",
-      "promo": false,
-      "providerId": "openrouter",
-      "providerModelId": "dots-studio/dots-3-note-preview:free",
-      "sources": [
-        "openrouter:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 1024000,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "На IP-адрес",
-        "rph": 200
-      },
-      "modelId": "ernie-5.5-flash-preview",
-      "promo": false,
-      "providerId": "kilo",
-      "providerModelId": "baidu/ernie-5.5-flash-preview:free",
-      "sources": [
-        "kilo:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 1024000,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
-        "rpd": 50,
-        "rpm": 20
-      },
-      "modelId": "ernie-5.5-flash-preview",
-      "promo": false,
-      "providerId": "openrouter",
-      "providerModelId": "baidu/ernie-5.5-flash-preview:free",
-      "sources": [
-        "openrouter:/api/v1/models"
       ],
       "status": "unverified",
       "supportsTools": true
@@ -199,83 +65,15 @@
       "supportsTools": false
     },
     {
-      "confidence": "structured",
-      "contextWindow": 262144,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "На IP-адрес",
-        "rph": 200
-      },
-      "modelId": "flint-v1.0",
-      "promo": false,
-      "providerId": "kilo",
-      "providerModelId": "recursive/flint-v1.0",
-      "sources": [
-        "kilo:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 262144,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "На IP-адрес",
-        "rph": 200
-      },
-      "modelId": "flint-v1.0",
-      "promo": false,
-      "providerId": "kilo",
-      "providerModelId": "recursive/flint-v1.0:free",
-      "sources": [
-        "kilo:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 262144,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
-        "rpd": 50,
-        "rpm": 20
-      },
-      "modelId": "flint-v1.0",
-      "promo": false,
-      "providerId": "openrouter",
-      "providerModelId": "recursive/flint-v1.0:free",
-      "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis",
-        "openrouter:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
       "confidence": "news",
       "contextWindow": 256000,
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатно без API-ключа, 200 запросов/час на IP; авто-роутер может направлять к провайдерам, логирующим промпты.",
+        "note": "На IP-адрес",
         "rph": 200
       },
       "modelId": "free",
@@ -294,10 +92,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатно без API-ключа, 200 запросов/час на IP; промпты могут логироваться.",
+        "note": "На IP-адрес",
         "rph": 200
       },
       "modelId": "free",
@@ -332,60 +130,12 @@
       "supportsTools": false
     },
     {
-      "confidence": "structured",
-      "contextWindow": 262144,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
-        "rpd": 50,
-        "rpm": 20
-      },
-      "modelId": "gemma-4-26b-a4b-it",
-      "promo": false,
-      "providerId": "openrouter",
-      "providerModelId": "google/gemma-4-26b-a4b-it:free",
-      "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis",
-        "openrouter:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 262144,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
-        "rpd": 50,
-        "rpm": 20
-      },
-      "modelId": "gemma-4-31b-it",
-      "promo": false,
-      "providerId": "openrouter",
-      "providerModelId": "google/gemma-4-31b-it:free",
-      "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis",
-        "openrouter:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
       "confidence": "page",
       "contextWindow": 0,
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "GLM-4.7-Flash бесплатна. Ограничение параллельных запросов смотрите в кабинете API."
@@ -406,7 +156,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "GLM-4.7-Flash бесплатна. Ограничение параллельных запросов смотрите в кабинете API."
@@ -427,7 +177,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -448,7 +198,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -465,34 +215,11 @@
     },
     {
       "confidence": "structured",
-      "contextWindow": 256000,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "На IP-адрес",
-        "rph": 200
-      },
-      "modelId": "glyph-cluster",
-      "promo": false,
-      "providerId": "kilo",
-      "providerModelId": "stealth/glyph-cluster",
-      "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis",
-        "kilo:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
       "contextWindow": 1048576,
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -513,7 +240,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -535,7 +262,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -558,52 +285,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "На IP-адрес",
-        "rph": 200
-      },
-      "modelId": "ling-3.2-flash",
-      "promo": false,
-      "providerId": "kilo",
-      "providerModelId": "inclusionai/ling-3.2-flash:free",
-      "sources": [
-        "kilo:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 1048576,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
-        "rpd": 50,
-        "rpm": 20
-      },
-      "modelId": "ling-3.2-flash",
-      "promo": false,
-      "providerId": "openrouter",
-      "providerModelId": "inclusionai/ling-3.2-flash:free",
-      "sources": [
-        "openrouter:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 1048576,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -625,7 +307,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -648,7 +330,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -670,7 +352,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -686,148 +368,9 @@
       ],
       "status": "unverified",
       "supportsTools": false
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 256000,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "На IP-адрес",
-        "rph": 200
-      },
-      "modelId": "nemotron-3-nano-omni-30b-a3b-reasoning",
-      "promo": false,
-      "providerId": "kilo",
-      "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
-      "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis",
-        "kilo:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 256000,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
-        "rpd": 50,
-        "rpm": 20
-      },
-      "modelId": "nemotron-3-nano-omni-30b-a3b-reasoning",
-      "promo": false,
-      "providerId": "openrouter",
-      "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
-      "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis",
-        "openrouter:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 1000000,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "На IP-адрес",
-        "rph": 200
-      },
-      "modelId": "nemotron-3.5-lightning",
-      "promo": false,
-      "providerId": "kilo",
-      "providerModelId": "nvidia/nemotron-3.5-lightning:free",
-      "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis",
-        "kilo:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 1000000,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
-        "rpd": 50,
-        "rpm": 20
-      },
-      "modelId": "nemotron-3.5-lightning",
-      "promo": false,
-      "providerId": "openrouter",
-      "providerModelId": "nvidia/nemotron-3.5-lightning:free",
-      "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis",
-        "openrouter:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 1048576,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "На IP-адрес",
-        "rph": 200
-      },
-      "modelId": "particle-1",
-      "promo": false,
-      "providerId": "kilo",
-      "providerModelId": "particle-ai/particle-1:free",
-      "sources": [
-        "kilo:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 1048576,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
-        "rpd": 50,
-        "rpm": 20
-      },
-      "modelId": "particle-1",
-      "promo": false,
-      "providerId": "openrouter",
-      "providerModelId": "particle-ai/particle-1:free",
-      "sources": [
-        "openrouter:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
     }
   ],
-  "generatedAt": "2026-11-25T12:06:35.747Z",
+  "generatedAt": "2026-11-25T14:01:23.871Z",
   "models": [
     {
       "capabilities": [
@@ -1025,16 +568,220 @@
       "rank": 210,
       "tier": "basic",
       "vendor": "OpenAI"
+    },
+    {
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "contextWindow": 1000000,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "ampersand-v0.1",
+      "name": "Ampersand v0.1",
+      "rank": 211,
+      "tier": "new",
+      "vendor": "Humans&"
+    },
+    {
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "contextWindow": 1048576,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "beam-free",
+      "name": "Reflection: Beam 1.0 (Free)",
+      "rank": 211,
+      "tier": "new",
+      "vendor": "Reflection AI"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 512000,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "dots-3-note-preview",
+      "name": "Dots 3 Note Preview",
+      "rank": 211,
+      "tier": "new",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "contextWindow": 1024000,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "ernie-5.5-flash-preview",
+      "name": "Baidu: ERNIE-5.5-Flash-Preview (free)",
+      "rank": 211,
+      "tier": "new",
+      "vendor": "Baidu"
+    },
+    {
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "contextWindow": 262144,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "flint-v1.0",
+      "name": "Recursive: Flint",
+      "rank": 211,
+      "tier": "new",
+      "vendor": "Recursive"
+    },
+    {
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "vision"
+      ],
+      "contextWindow": 262144,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "gemma-4-26b-a4b-it",
+      "name": "Google: Gemma 4 26B A4B  (free)",
+      "rank": 211,
+      "tier": "new",
+      "vendor": "Google"
+    },
+    {
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "vision"
+      ],
+      "contextWindow": 262144,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "gemma-4-31b-it",
+      "name": "Google: Gemma 4 31B (free)",
+      "rank": 211,
+      "tier": "new",
+      "vendor": "Google"
+    },
+    {
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "contextWindow": 256000,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "glyph-cluster",
+      "name": "Glyph Cluster",
+      "rank": 211,
+      "tier": "new",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "vision"
+      ],
+      "contextWindow": 1048576,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "ling-3.2-flash",
+      "name": "inclusionAI: Ling 3.2 Flash (free)",
+      "rank": 211,
+      "tier": "new",
+      "vendor": "inclusionAI"
+    },
+    {
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "vision"
+      ],
+      "contextWindow": 256000,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "nemotron-3-nano-omni-30b-a3b-reasoning",
+      "name": "NVIDIA: Nemotron 3 Nano Omni (free)",
+      "rank": 211,
+      "tier": "new",
+      "vendor": "NVIDIA"
+    },
+    {
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "contextWindow": 1000000,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "nemotron-3.5-lightning",
+      "name": "NVIDIA: Nemotron 3.5 Lightning (free)",
+      "rank": 211,
+      "tier": "new",
+      "vendor": "NVIDIA"
+    },
+    {
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "vision"
+      ],
+      "contextWindow": 1048576,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "particle-1",
+      "name": "Particle AI: Particle-1 (free)",
+      "rank": 211,
+      "tier": "new",
+      "vendor": "Particle AI"
     }
   ],
   "offers": [
+    {
+      "confidence": "structured",
+      "contextWindow": 1000000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "На IP-адрес",
+        "rph": 200
+      },
+      "modelId": "ampersand-v0.1",
+      "promo": false,
+      "providerId": "kilo",
+      "providerModelId": "humansand/ampersand-v0.1",
+      "sources": [
+        "kilo:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "На IP-адрес",
+        "rph": 200
+      },
+      "modelId": "beam-free",
+      "promo": false,
+      "providerId": "kilo",
+      "providerModelId": "reflection/beam-free",
+      "sources": [
+        "kilo:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
     {
       "confidence": "page",
       "contextWindow": 1048576,
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
@@ -1058,7 +805,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
@@ -1079,7 +826,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -1100,7 +847,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
@@ -1119,12 +866,218 @@
       "verifiedAt": "2026-11-24T00:00:00Z"
     },
     {
+      "confidence": "structured",
+      "contextWindow": 512000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-24T15:12:29.146Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "На IP-адрес",
+        "rph": 200
+      },
+      "modelId": "dots-3-note-preview",
+      "promo": false,
+      "providerId": "kilo",
+      "providerModelId": "dots-studio/dots-3-note-preview:free",
+      "sources": [
+        "kilo:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 512000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-24T15:12:29.146Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "rpd": 50,
+        "rpm": 20
+      },
+      "modelId": "dots-3-note-preview",
+      "promo": false,
+      "providerId": "openrouter",
+      "providerModelId": "dots-studio/dots-3-note-preview:free",
+      "sources": [
+        "openrouter:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1024000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "На IP-адрес",
+        "rph": 200
+      },
+      "modelId": "ernie-5.5-flash-preview",
+      "promo": false,
+      "providerId": "kilo",
+      "providerModelId": "baidu/ernie-5.5-flash-preview:free",
+      "sources": [
+        "kilo:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1024000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "rpd": 50,
+        "rpm": 20
+      },
+      "modelId": "ernie-5.5-flash-preview",
+      "promo": false,
+      "providerId": "openrouter",
+      "providerModelId": "baidu/ernie-5.5-flash-preview:free",
+      "sources": [
+        "openrouter:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 262144,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "На IP-адрес",
+        "rph": 200
+      },
+      "modelId": "flint-v1.0",
+      "promo": false,
+      "providerId": "kilo",
+      "providerModelId": "recursive/flint-v1.0",
+      "sources": [
+        "kilo:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 262144,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "На IP-адрес",
+        "rph": 200
+      },
+      "modelId": "flint-v1.0",
+      "promo": false,
+      "providerId": "kilo",
+      "providerModelId": "recursive/flint-v1.0:free",
+      "sources": [
+        "kilo:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 262144,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "rpd": 50,
+        "rpm": 20
+      },
+      "modelId": "flint-v1.0",
+      "promo": false,
+      "providerId": "openrouter",
+      "providerModelId": "recursive/flint-v1.0:free",
+      "sources": [
+        "https://github.com/mnfst/awesome-free-llm-apis",
+        "openrouter:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 262144,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "rpd": 50,
+        "rpm": 20
+      },
+      "modelId": "gemma-4-26b-a4b-it",
+      "promo": false,
+      "providerId": "openrouter",
+      "providerModelId": "google/gemma-4-26b-a4b-it:free",
+      "sources": [
+        "https://github.com/mnfst/awesome-free-llm-apis",
+        "openrouter:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 262144,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "rpd": 50,
+        "rpm": 20
+      },
+      "modelId": "gemma-4-31b-it",
+      "promo": false,
+      "providerId": "openrouter",
+      "providerModelId": "google/gemma-4-31b-it:free",
+      "sources": [
+        "https://github.com/mnfst/awesome-free-llm-apis",
+        "openrouter:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 200000,
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
@@ -1145,7 +1098,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "GLM-4.7-Flash бесплатна. Ограничение параллельных запросов смотрите в кабинете API."
@@ -1169,7 +1122,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
@@ -1193,7 +1146,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -1214,7 +1167,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
@@ -1238,7 +1191,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -1259,7 +1212,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
@@ -1278,12 +1231,35 @@
       "verifiedAt": "2026-11-24T00:00:00Z"
     },
     {
+      "confidence": "structured",
+      "contextWindow": 256000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "На IP-адрес",
+        "rph": 200
+      },
+      "modelId": "glyph-cluster",
+      "promo": false,
+      "providerId": "kilo",
+      "providerModelId": "stealth/glyph-cluster",
+      "sources": [
+        "https://github.com/mnfst/awesome-free-llm-apis",
+        "kilo:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 131072,
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B",
@@ -1310,7 +1286,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."
@@ -1334,7 +1310,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B",
@@ -1361,7 +1337,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
@@ -1385,7 +1361,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -1401,12 +1377,57 @@
       "supportsTools": true
     },
     {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "На IP-адрес",
+        "rph": 200
+      },
+      "modelId": "ling-3.2-flash",
+      "promo": false,
+      "providerId": "kilo",
+      "providerModelId": "inclusionai/ling-3.2-flash:free",
+      "sources": [
+        "kilo:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "rpd": 50,
+        "rpm": 20
+      },
+      "modelId": "ling-3.2-flash",
+      "promo": false,
+      "providerId": "openrouter",
+      "providerModelId": "inclusionai/ling-3.2-flash:free",
+      "sources": [
+        "openrouter:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 1048576,
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
@@ -1426,11 +1447,58 @@
     },
     {
       "confidence": "structured",
+      "contextWindow": 256000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "На IP-адрес",
+        "rph": 200
+      },
+      "modelId": "nemotron-3-nano-omni-30b-a3b-reasoning",
+      "promo": false,
+      "providerId": "kilo",
+      "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "sources": [
+        "https://github.com/mnfst/awesome-free-llm-apis",
+        "kilo:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 256000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "rpd": 50,
+        "rpm": 20
+      },
+      "modelId": "nemotron-3-nano-omni-30b-a3b-reasoning",
+      "promo": false,
+      "providerId": "openrouter",
+      "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "sources": [
+        "https://github.com/mnfst/awesome-free-llm-apis",
+        "openrouter:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
       "contextWindow": 1000000,
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1453,7 +1521,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -1474,7 +1542,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -1498,7 +1566,54 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "На IP-адрес",
+        "rph": 200
+      },
+      "modelId": "nemotron-3.5-lightning",
+      "promo": false,
+      "providerId": "kilo",
+      "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+      "sources": [
+        "https://github.com/mnfst/awesome-free-llm-apis",
+        "kilo:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1000000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "rpd": 50,
+        "rpm": 20
+      },
+      "modelId": "nemotron-3.5-lightning",
+      "promo": false,
+      "providerId": "openrouter",
+      "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+      "sources": [
+        "https://github.com/mnfst/awesome-free-llm-apis",
+        "openrouter:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1000000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1521,7 +1636,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -1540,12 +1655,57 @@
       "supportsTools": true
     },
     {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "На IP-адрес",
+        "rph": 200
+      },
+      "modelId": "particle-1",
+      "promo": false,
+      "providerId": "kilo",
+      "providerModelId": "particle-ai/particle-1:free",
+      "sources": [
+        "kilo:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-25T14:01:23.871Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "rpd": 50,
+        "rpm": 20
+      },
+      "modelId": "particle-1",
+      "promo": false,
+      "providerId": "openrouter",
+      "providerModelId": "particle-ai/particle-1:free",
+      "sources": [
+        "openrouter:/api/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 131072,
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B",
@@ -1573,7 +1733,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
@@ -1594,7 +1754,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-25T12:06:35.747Z",
+      "lastSeen": "2026-11-25T14:01:23.871Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота на workspace, сбрасывается каждый понедельник; при входе через Google требуется карта, сверх квоты возможно автоматическое списание с карты (top-up)."

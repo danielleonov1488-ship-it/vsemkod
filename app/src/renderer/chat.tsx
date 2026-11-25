@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { ChatPart, FileChange, Permission, PermissionDecision, Question, QuestionAnswer } from "../shared/api";
 import { Icon } from "./icons";
+import { modelWaitState } from "../shared/model-wait";
+import { chatStatusLabel, duration, groupTurns, turnContent, type ChatStatus } from "./turns";
 
 function external(event: React.MouseEvent<HTMLAnchorElement>, href?: string) {
   event.preventDefault();
@@ -34,13 +36,19 @@ function Action({ part }: { part: Extract<ChatPart, { kind: "tool" }> }) {
   const write = ["edit", "patch", "write", "apply_patch", "multiedit"].includes(part.tool);
   const command = ["shell", "bash"].includes(part.tool);
   const reading = ["read", "glob", "grep", "list"].includes(part.tool);
+  const testSummary = part.status === "completed" && command && part.output
+    ? /(?:^|\n)\s*(?:Tests\s*:?[ \t]*)?(\d+) passed\b/im.exec(part.output)?.[1]
+      ?? /# pass (\d+)/.exec(part.output)?.[1] : undefined;
   const label = part.status === "error" ? "Действие не выполнено"
-    : part.status === "running" ? (write ? "Готовит изменения" : command ? "Готовит команду" : reading ? "Читает" : "Выполняет")
+    : part.status === "running" ? (write ? "Вносит изменения" : command ? "Запускает" : reading ? "Читает" : "Выполняет")
     : write ? (part.diff?.status === "added" || part.output?.startsWith("Created file") ? "Создал" : part.diff?.status === "deleted" ? "Удалил" : "Изменил")
     : command ? "Запустил" : part.tool === "read" ? "Прочитал" : reading ? "Проверил" : "Выполнил";
   const content = <>
     <Icon name={write ? "file" : command ? "terminal" : "read"} />
-    <span className="action-label">{label} <code>{part.target || (!write && !command && !reading ? part.tool : "")}</code>
+    <span className="action-label">{label}
+      {(part.target || (!write && !command && !reading)) && <> <code>{part.target || part.tool}</code></>}
+      {part.status === "running" && <span className="action-spinner" aria-label="Выполняется" />}
+      {testSummary && <span>· {testSummary} пройдено</span>}
       {part.diff && <Delta change={part.diff} />}
     </span>
   </>;
@@ -135,34 +143,59 @@ function QuestionCard({ question, answer }: { question: Question; answer: (answe
   </form>;
 }
 
+const AgentText = memo(function AgentText({ text }: { text: string }) {
+  return <div className="agent-text"><Markdown remarkPlugins={[remarkGfm]} disallowedElements={["img"]} components={{
+    a: ({ href, children }) => <a className="text-link" href={href} onClick={event => external(event, href)}>{children}</a>
+  }}>{text}</Markdown></div>;
+});
+
+function Reasoning({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  if (!text) return null;
+  return <div className="turn-reasoning">
+    <button type="button" className="composer-control reasoning-toggle" aria-expanded={open} onClick={() => setOpen(value => !value)}>
+      Рассуждения <Icon name="chevron" />
+    </button>
+    <p className={open ? "" : "reasoning-preview"}>{text}</p>
+  </div>;
+}
+
 export function Chat({ title, parts, permissions, questions, changeCount, busy, answer, answerQuestion, children, panel, openPanel,
-  copy, edit, revert, retry, reverted, executePlan }: {
+  copy, edit, revert, retry, reverted, executePlan, status, progress, failure, retryFailed, chooseModel }: {
   title: string; parts: ChatPart[]; permissions: Permission[]; questions: Question[]; changeCount: number;
   busy: boolean; answer: (id: string, decision: PermissionDecision) => Promise<void>;
   answerQuestion: (id: string, answer?: QuestionAnswer) => Promise<void>; children: ReactNode;
   panel: boolean; openPanel: () => void; copy: (text: string) => void;
   edit: (part: UserPart) => void; revert: (id?: string) => void; retry: (part: UserPart) => void;
   reverted: boolean; executePlan?: () => void;
+  status?: ChatStatus; progress?: { started: number; since: number | null }; failure?: string;
+  retryFailed: () => void; chooseModel: () => void;
 }) {
   const scroll = useRef<HTMLDivElement>(null);
   const atBottom = useRef(true);
+  const [clock, setClock] = useState(Date.now);
+  useEffect(() => {
+    if (!progress) return;
+    setClock(Date.now());
+    const timer = setInterval(() => setClock(Date.now()), 250);
+    return () => clearInterval(timer);
+  }, [progress?.started]);
+
+  const wait = modelWaitState(progress?.since ?? null, clock);
   useEffect(() => {
     if (atBottom.current && scroll.current) scroll.current.scrollTop = scroll.current.scrollHeight;
-  }, [parts, permissions, questions]);
-
-  const messages: { user?: UserPart; agent: ChatPart[] }[] = [];
-  for (const part of parts) {
-    if (part.kind === "user") messages.push({ user: part, agent: [] });
-    else {
-      if (!messages.length) messages.push({ agent: [] });
-      messages.at(-1)?.agent.push(part);
-    }
-  }
+  }, [parts, permissions, questions, failure, progress?.started, wait]);
+  const messages = groupTurns(parts);
+  if (progress && !messages.length) messages.push({ agent: [] });
   const lastTodo = parts.findLast(part => part.kind === "tool" && part.todos !== undefined);
   const todos = lastTodo?.kind === "tool" ? lastTodo.todos ?? [] : [];
   return <main className="workspace">
     <header className="chat-header">
-      <h1>{title}</h1>
+      <div className="chat-heading"><h1>{title}</h1>
+        {status && <span className="chat-status" data-status={status} role="status">
+          <span className="chat-status-dot" />{chatStatusLabel[status]}
+        </span>}
+      </div>
       <button className="changes" type="button" aria-expanded={panel} aria-label="Правая панель" onClick={openPanel}>
         <Icon name="panel" /><span>{changeCount ? "Изменения " + changeCount : "Панель"}</span>
       </button>
@@ -172,9 +205,18 @@ export function Chat({ title, parts, permissions, questions, changeCount, busy, 
       atBottom.current = element.scrollHeight - element.scrollTop - element.clientHeight < 96;
     }}>
       <section className="chat-thread" aria-label="Диалог с агентом">
-        {messages.map(({ user, agent }, index) => {
+        {messages.map(({ user, agent, end }, index) => {
           const last = index === messages.length - 1;
-          const response = agent.flatMap(part => part.kind === "text" ? [part.text] : []).join("\n\n");
+          const live = last ? progress : undefined;
+          const content = turnContent(agent, !!live, end);
+          const response = content.answer.map(part => part.text).join("\n\n");
+          const work = content.work.map(part => {
+            if (part.kind === "tool") return <Action key={part.id} part={part} />;
+            if (part.kind === "reasoning") return <Reasoning key={part.id} text={part.text} />;
+            if (part.kind === "note") return <p className="subtle context-note" key={part.id}>{part.text}</p>;
+            if (part.kind === "text") return <AgentText key={part.id} text={part.text} />;
+            return null;
+          });
           return <div className="turn" key={user?.id ?? index}>
             {user && <div className="user-turn">
               <div className="user-message" aria-label="Сообщение пользователя">{user.text}
@@ -186,18 +228,24 @@ export function Chat({ title, parts, permissions, questions, changeCount, busy, 
                 <button type="button" className="composer-control" disabled={busy} onClick={() => revert(user.id)}>Откатить сюда</button>
               </div>}
             </div>}
-            {agent.length > 0 && <article className="agent-message" aria-label="Ответ агента">
-              {agent.map(part => {
-                if (part.kind === "tool") return part.tool === "todowrite" ? null : <Action key={part.id} part={part} />;
-                if (part.kind === "reasoning") return <details key={part.id} className="reasoning">
-                  <summary>{part.seconds ? "Думал " + Math.round(part.seconds) + " с" : "Рассуждения"}</summary>
-                  <p>{part.text}</p>
-                </details>;
-                if (part.kind === "note") return <p className="subtle context-note" key={part.id}>{part.text}</p>;
-                return <div key={part.id} className="agent-text"><Markdown remarkPlugins={[remarkGfm]} disallowedElements={["img"]} components={{
-                  a: ({ href, children }) => <a className="text-link" href={href} onClick={event => external(event, href)}>{children}</a>
-                }}>{part.text}</Markdown></div>;
-              })}
+            {(live || end || agent.length > 0) && <article className="agent-message" aria-label="Ответ агента">
+              {live ? <section className="turn-work" aria-label="Ход агента">
+                <div className="turn-line"><span className="action-spinner" aria-hidden="true" />
+                  {status === "permission" || status === "question" ? chatStatusLabel[status] : live.since === null ? "Выполняет действия…" : "Думает…"}
+                  <time>{duration((clock - live.started) / 1000)}</time>
+                </div>
+                {work}
+              </section> : content.collapsed && (work.length > 0 || end) && <details className="turn-work turn-summary">
+                <summary className="turn-line"><Icon name="chevron" />
+                  {end?.stopped ? "Остановлен" : "Работал"} {duration(content.seconds)} · {content.actions} {actionCount(content.actions)}
+                </summary>
+                {work.length ? work : <p className="subtle">Без вызовов инструментов.</p>}
+              </details>}
+              {live && status === "working" && (wait === "slow" || wait === "timeout") && <div className="model-wait" role="status">
+                <span>Модель думает дольше обычного. Бесплатные модели иногда отвечают до минуты.</span>
+                <button type="button" className="text-link" onClick={chooseModel}>Сменить модель</button>
+              </div>}
+              {content.answer.map(part => <AgentText key={part.id} text={part.text} />)}
               {response && (!busy || !last) && <div className="message-actions">
                 <button type="button" className="composer-control" onClick={() => copy(response)}>Копировать</button>
                 {user && <button type="button" className="composer-control" disabled={busy} onClick={() => retry(user)}>Повторить</button>}
@@ -212,7 +260,13 @@ export function Chat({ title, parts, permissions, questions, changeCount, busy, 
           disabled={busy} onClick={() => revert()}>Вернуть</button></div>}
         {permissions.map(permission => <Approval permission={permission} answer={answer} key={permission.id} />)}
         {questions.map(question => <QuestionCard question={question} answer={value => answerQuestion(question.id, value)} key={question.id} />)}
-        {busy && permissions.length === 0 && questions.length === 0 && <p className="working" role="status"><span className="status-dot" /> Агент работает</p>}
+        {failure && <section className="turn-failure">
+          <p>{failure}</p>
+          <div className="approval-actions">
+            <button type="button" className="small-button" onClick={retryFailed} disabled={busy}>Повторить</button>
+            <button type="button" className="composer-control" onClick={chooseModel}>Сменить модель</button>
+          </div>
+        </section>}
       </section>
     </div>
     <div className="compose-area">
@@ -225,6 +279,13 @@ export function Chat({ title, parts, permissions, questions, changeCount, busy, 
       {children}
     </div>
   </main>;
+}
+
+function actionCount(count: number) {
+  const lastTwo = count % 100;
+  if (lastTwo >= 11 && lastTwo <= 14) return "действий";
+  const last = count % 10;
+  return last === 1 ? "действие" : last >= 2 && last <= 4 ? "действия" : "действий";
 }
 
 type UserPart = Extract<ChatPart, { kind: "user" | "text" }>;

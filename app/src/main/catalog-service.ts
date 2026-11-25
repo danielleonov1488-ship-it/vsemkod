@@ -33,8 +33,10 @@ export class CatalogService {
   }
 
   async loadInitial(): Promise<void> {
-    this.value = await readJson(join(this.data, "catalog.json"), catalogSchema) ??
-      await readJson(this.bundled, catalogSchema);
+    const [cached, bundled] = await Promise.all([
+      readJson(join(this.data, "catalog.json"), catalogSchema), readJson(this.bundled, catalogSchema)
+    ]);
+    this.value = cached && (!bundled || Date.parse(cached.generatedAt) >= Date.parse(bundled.generatedAt)) ? cached : bundled;
     if (!this.value) await this.refresh();
     void this.current;
   }
@@ -77,6 +79,7 @@ export class CatalogService {
     const latest = await download(publicOrigin + "/catalog.json", catalogSchema, signal) ??
       await download(mirror + "/catalog.json", catalogSchema, signal);
     if (signal.aborted) return;
+    if (latest && previous && Date.parse(latest.generatedAt) < Date.parse(previous.generatedAt)) return;
     const current = latest ?? previous ?? await readJson(cache, catalogSchema) ?? await readJson(this.bundled, catalogSchema);
     if (!current) return;
     const changes = latest && previous && Date.parse(latest.generatedAt) > Date.parse(previous.generatedAt)

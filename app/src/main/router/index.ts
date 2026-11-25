@@ -1,15 +1,18 @@
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { performance } from "node:perf_hooks";
 import { once } from "node:events";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
-import { activeOffers, rankedModels } from "../../shared/catalog";
+import { activeOffers, automaticModels, rankedModels } from "../../shared/catalog";
+import type { ChatEvent } from "../../shared/api";
 import type { Catalog } from "../../shared/catalog-schema";
 import type { KeyId } from "../../shared/providers";
 import type { ConnectService } from "../connect-service";
 import { ProviderHealth } from "./health";
 
-type Route = { sessionId: string; modelId: string; providerId: KeyId; previousModelId?: string; reason?: "quota" | "unavailable" };
+type Route = Omit<Extract<ChatEvent, { type: "route" }>, "type">;
+export const FREE_FIRST_BYTE_MS = 45_000;
 type Completion = Record<string, unknown> & { model: string; messages: unknown[] };
 
 interface RouterOptions {
@@ -51,9 +54,9 @@ async function readCompletion(req: IncomingMessage): Promise<Completion> {
 export class Router {
   readonly token = randomBytes(32).toString("base64url");
   private endpoint?: string;
-  private context?: { sessionId: string; auto: boolean };
+  private context?: { sessionId: string; auto: boolean; error?: string };
   private sticky = new Map<string, KeyId>();
-  private lastModels = new Map<string, string>();
+  private lastRoutes = new Map<string, { modelId: string; providerId: KeyId }>();
   private server = createServer((req, res) => {
     void this.handle(req, res).catch((error: unknown) => {
       if (res.destroyed) return;
@@ -93,6 +96,10 @@ export class Router {
     this.context = context;
   }
 
+  turnError(sessionId: string) {
+    return this.context?.sessionId === sessionId ? this.context.error : undefined;
+  }
+
   private async handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const actual = Buffer.from(req.headers.authorization ?? "");
     const expected = Buffer.from("Bearer " + this.token);
@@ -116,22 +123,33 @@ export class Router {
     }
     const cancel = new AbortController();
     res.once("close", () => cancel.abort());
-    await this.complete(req, res, catalog, await readCompletion(req), cancel.signal);
+    const context = this.context;
+    if (context) context.error = undefined;
+    try {
+      await this.complete(req, res, catalog, await readCompletion(req), cancel.signal, context);
+    } catch (error) {
+      if (context && error instanceof RequestError) context.error = error.message;
+      throw error;
+    }
   }
 
-  private async complete(req: IncomingMessage, res: ServerResponse, catalog: Catalog, body: Completion, signal: AbortSignal) {
+  private async complete(req: IncomingMessage, res: ServerResponse, catalog: Catalog, body: Completion, signal: AbortSignal,
+    context: Router["context"]) {
     const models = rankedModels(catalog);
     const explicit = models.find(model => model.id === body.model);
     const personal = this.options.personal?.().find(route => route.model.id === body.model);
     if (!explicit && !personal && body.model !== "auto") throw new RequestError(404, "Модель недоступна.");
     const header = req.headers["x-vsemkod-session"];
-    const sessionId = this.context?.sessionId ?? (typeof header === "string" ? header.slice(0, 200) : undefined);
-    const allowFallback = !explicit || (this.context?.auto ?? this.options.auto?.() ?? false);
-    const alternatives = models.filter(model => (model.tier === "top" || model.tier === "good") && model.id !== explicit?.id);
+    const sessionId = context?.sessionId ?? (typeof header === "string" ? header.slice(0, 200) : undefined);
+    const allowFallback = !explicit || (context?.auto ?? this.options.auto?.() ?? false);
+    const alternatives = automaticModels(catalog).filter(model => model.id !== explicit?.id);
     const ordered = personal ? [personal.model] : explicit ? [explicit, ...(allowFallback ? alternatives : [])] : alternatives;
     const health = this.options.health;
     const requiresTools = Array.isArray(body.tools) && body.tools.length > 0;
     const rateLimited = new Set<string>();
+    let firstAttempt: { modelId: string; providerId: KeyId } | undefined;
+    let timedOut = false;
+    let rejected: RequestError | undefined;
     let attempted = false;
     let cooling = false;
 
@@ -149,15 +167,18 @@ export class Router {
         if (signal.aborted) return;
         const key = needsKey ? this.options.key(provider.id) : undefined;
         if (needsKey && !key) continue;
+        firstAttempt ??= { modelId: model.id, providerId: provider.id };
+        const routeKey = model.id + "/" + provider.id;
         if (!health.ready(provider.id)) {
           cooling = true;
-          if (health.limited(provider.id)) rateLimited.add(model.id);
+          if (health.limited(provider.id)) rateLimited.add(routeKey);
           continue;
         }
         attempted = true;
         health.request(provider.id);
+        const started = performance.now();
         const deadline = new AbortController();
-        const timer = setTimeout(() => deadline.abort(), this.options.firstByteMs ?? 35_000);
+        const timer = setTimeout(() => deadline.abort(), this.options.firstByteMs ?? (personal ? 35_000 : FREE_FIRST_BYTE_MS));
         let response: Response;
         let reader: ReadableStreamDefaultReader<Uint8Array>;
         let first: ReadableStreamReadResult<Uint8Array>;
@@ -173,9 +194,11 @@ export class Router {
             body: JSON.stringify({ ...body, model: upstreamId }),
             signal: AbortSignal.any([signal, deadline.signal])
           });
-          if (response.status === 429 || response.status >= 500) {
-            if (response.status === 429) rateLimited.add(model.id);
-            health.error(provider.id, response.status === 429 ? "quota" : "unavailable", response.headers.get("retry-after"));
+          const quota = response.status === 429 || response.status === 402;
+          if (quota || response.status === 408 || response.status >= 500) {
+            if (quota) rateLimited.add(routeKey);
+            if (response.status === 408 || response.status === 504) timedOut = true;
+            health.error(provider.id, quota ? "quota" : "unavailable", response.headers.get("retry-after"));
             void response.body?.cancel().catch(() => {});
             continue;
           }
@@ -185,7 +208,10 @@ export class Router {
             const message = response.status === 401 || response.status === 403
               ? provider.name + " отклонил доступ к модели."
               : provider.name + " отклонил запрос (HTTP " + response.status + ").";
-            throw new RequestError(response.status, message);
+            const failure = new RequestError(response.status, message);
+            if (personal || ![401, 403, 404].includes(response.status)) throw failure;
+            rejected ??= failure;
+            continue;
           }
           if (!response.body) throw new Error("Пустой ответ.");
           reader = response.body.getReader();
@@ -194,27 +220,32 @@ export class Router {
         } catch (error) {
           if (signal.aborted) return;
           if (error instanceof RequestError) throw error;
+          if (deadline.signal.aborted) timedOut = true;
           health.error(provider.id, "unavailable");
           continue;
         } finally {
           clearTimeout(timer);
         }
 
-        const previousModelId = personal?.model.id ?? explicit?.id ?? (sessionId ? this.lastModels.get(sessionId) : undefined);
-        const switched = previousModelId !== undefined && previousModelId !== model.id;
+        const averageMs = health.firstByte(provider.id, model.id, performance.now() - started);
+        const previous = body.model === "auto" && sessionId ? this.lastRoutes.get(sessionId) ?? firstAttempt : firstAttempt;
+        const fallback = previous && (previous.modelId !== model.id || previous.providerId !== provider.id);
+        const switched = fallback && previous.modelId !== model.id;
         if (stickyKey) this.sticky.set(stickyKey, provider.id);
         if (sessionId) {
-          this.lastModels.set(sessionId, model.id);
+          this.lastRoutes.set(sessionId, { modelId: model.id, providerId: provider.id });
           this.options.onRoute?.({
-            sessionId, modelId: model.id, providerId: provider.id, previousModelId: switched ? previousModelId : undefined,
-            reason: switched ? rateLimited.has(previousModelId) ? "quota" : "unavailable" : undefined
+            sessionId, modelId: model.id, providerId: provider.id, averageMs,
+            previousModelId: fallback ? previous.modelId : undefined,
+            previousProviderId: fallback ? previous.providerId : undefined,
+            reason: fallback ? rateLimited.has(previous.modelId + "/" + previous.providerId) ? "quota" : "unavailable" : undefined
           });
         }
         res.writeHead(response.status, {
           "content-type": response.headers.get("content-type") ?? "application/json",
           "cache-control": "no-store",
           "x-vsemkod-model": model.id,
-          ...(switched ? { "x-vsemkod-fallback-from": previousModelId } : {})
+          ...(switched ? { "x-vsemkod-fallback-from": previous.modelId } : {})
         });
         try {
           const onStreamError = () => { if (!signal.aborted) health.error(provider.id); };
@@ -226,6 +257,8 @@ export class Router {
     }
 
     if (rateLimited.size) throw new RequestError(429, personal ? "Квота этой модели исчерпана. Повторите позже." : "Квота бесплатных моделей исчерпана. Повторите позже.");
+    if (timedOut) throw new RequestError(504, "Провайдер не ответил вовремя. Повторите запрос или выберите другую модель.");
+    if (rejected) throw rejected;
     if (attempted || cooling) throw new RequestError(502, "Провайдеры не ответили. Проверьте соединение или повторите позже.");
     throw new RequestError(503, "Для этой модели сейчас нет доступной бесплатной раздачи.");
   }

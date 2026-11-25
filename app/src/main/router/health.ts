@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { keyIdSchema, type KeyId } from "../../shared/providers";
+import type { ModelLatency } from "../../shared/api";
 import { readJson, writeJson } from "../storage";
 
 const counters = z.partialRecord(keyIdSchema, z.object({
@@ -7,15 +8,38 @@ const counters = z.partialRecord(keyIdSchema, z.object({
   errors: z.int().nonnegative()
 }));
 
+const sample = z.object({
+  modelId: z.string(), providerId: keyIdSchema, averageMs: z.number().nonnegative(), samples: z.int().positive()
+});
+const usage = z.object({ providers: counters, ttfb: z.array(sample) });
+
 export class ProviderHealth {
   private counts: z.infer<typeof counters> = {};
+  private firstBytes = new Map<string, z.infer<typeof sample>>();
   private cooling = new Map<KeyId, { failures: number; until: number; limited: boolean }>();
   private writes = Promise.resolve();
 
   constructor(private readonly path?: string, private readonly now: () => number = Date.now) {}
 
   async load(): Promise<void> {
-    if (this.path) this.counts = await readJson(this.path, counters) ?? {};
+    if (!this.path) return;
+    const persisted = await readJson(this.path, usage);
+    this.counts = persisted?.providers ?? await readJson(this.path, counters) ?? {};
+    for (const entry of persisted?.ttfb ?? []) this.firstBytes.set(entry.providerId + "/" + entry.modelId, entry);
+  }
+
+  latencies(): ModelLatency[] {
+    return [...this.firstBytes.values()].map(({ modelId, providerId, averageMs }) => ({ modelId, providerId, averageMs }));
+  }
+
+  firstByte(providerId: KeyId, modelId: string, ms: number): number {
+    const key = providerId + "/" + modelId;
+    const previous = this.firstBytes.get(key);
+    const samples = (previous?.samples ?? 0) + 1;
+    const averageMs = previous ? previous.averageMs + (ms - previous.averageMs) / samples : ms;
+    this.firstBytes.set(key, { modelId, providerId, averageMs, samples });
+    this.save();
+    return averageMs;
   }
 
   ready(id: KeyId): boolean {
@@ -63,6 +87,8 @@ export class ProviderHealth {
 
   private save(): void {
     const path = this.path;
-    if (path) this.writes = this.writes.then(() => writeJson(path, this.counts)).catch(() => {});
+    if (path) this.writes = this.writes.then(() => writeJson(path, {
+      providers: this.counts, ttfb: [...this.firstBytes.values()]
+    })).catch(() => {});
   }
 }

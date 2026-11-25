@@ -120,7 +120,10 @@ async function start() {
     await mkdir(defaultDirectory, { recursive: true });
     preferences.directory = await realpath(defaultDirectory);
   }
-  const projects = new Set([preferences.directory]);
+  const projectsPath = join(data, "projects.json");
+  let recentProjects = await readJson(projectsPath, z.array(localPath)) ?? [];
+  const projects = new Set([preferences.directory, ...recentProjects]);
+  let projectWrites = Promise.resolve();
   const attachments = new Attachments(join(data, "attachments"));
   const mcpPath = join(data, "mcp.json");
   let mcp: Record<string, McpConfig> = await readJson(mcpPath, z.record(z.string(), mcpConfig)) ?? {};
@@ -144,10 +147,13 @@ async function start() {
   let subscriptions: SubscriptionId[] = [];
   let nativeModels: NativeModel[] = [];
   const personalModels = () => connections.personalRoutes().map(({ model }) => model);
+  const health = new ProviderHealth(join(data, "usage.json"));
+  await health.load();
   const state = () => ({
     catalog: catalog.current, connected: connections.connected(catalog.current), personal: connections.connectedPersonal(), subscriptions,
     personalModels: [...personalModels(), ...nativeModels.filter(({ model }) => model.providerId !== "opencode").map(({ model }) => model)],
-    zenModels: nativeModels.filter(({ model }) => model.providerId === "opencode").map(({ model }) => model)
+    zenModels: nativeModels.filter(({ model }) => model.providerId === "opencode").map(({ model }) => model),
+    latencies: health.latencies()
   });
   const publishState = () => {
     const next = state();
@@ -169,8 +175,6 @@ async function start() {
     }
   });
   await catalog.loadInitial();
-  const health = new ProviderHealth(join(data, "usage.json"));
-  await health.load();
   const router = new Router({
     catalog: () => catalog.current,
     key: providerId => connections.key(providerId),
@@ -249,7 +253,7 @@ async function start() {
     return session;
   }
 
-  handle("app:initial", z.tuple([]), () => ({ ...state(), preferences, version: app.getVersion(), update: updates.ready }));
+  handle("app:initial", z.tuple([]), () => ({ ...state(), projects: recentProjects, preferences, version: app.getVersion(), update: updates.ready }));
   handle("updates:check", z.tuple([]), () => updates.check());
   handle("updates:apply", z.tuple([]), () => updates.apply());
   handle("projects:choose", z.tuple([]), async () => {
@@ -258,7 +262,14 @@ async function start() {
     });
     if (choice.canceled || !choice.filePaths[0]) return null;
     const directory = await realpath(choice.filePaths[0]);
-    projects.add(directory);
+    const write = projectWrites.then(async () => {
+      const next = [directory, ...recentProjects.filter(path => path !== directory)];
+      await writeJson(projectsPath, next);
+      recentProjects = next;
+      projects.add(directory);
+    });
+    projectWrites = write.catch(() => {});
+    await write;
     return directory;
   });
   handle("projects:attach", z.tuple([localPath]), async ([directory]) => {

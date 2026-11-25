@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import bundled from "../resources/catalog.json";
 import { catalogSchema, type Catalog, type Offer, type Provider } from "../src/shared/catalog-schema";
-import { Router } from "../src/main/router";
+import { FREE_FIRST_BYTE_MS, Router } from "../src/main/router";
 import { ProviderHealth } from "../src/main/router/health";
 
 const sample = catalogSchema.parse(bundled);
@@ -131,6 +131,32 @@ describe("Router", () => {
     expect(reserve.calls).toHaveLength(4);
   });
 
+  it("emits a quota fallback to the next model and skips Kilo until Retry-After passes", async () => {
+    let time = 5000;
+    const health = new ProviderHealth(undefined, () => time);
+    const primary = await upstream(res => {
+      if (time < 15_000) res.writeHead(429, { "retry-after": "10" }).end();
+      else text(res);
+    });
+    const reserve = await upstream();
+    const routes: unknown[] = [];
+    const { send } = await fixture(
+      [provider("kilo", primary.url), provider("numes", reserve.url)],
+      [offer("first", "kilo"), offer("second", "kilo"), offer("second", "numes")],
+      { auto: () => true, onRoute: event => routes.push(event), health }
+    );
+    expect((await send("first")).headers.get("x-vsemkod-model")).toBe("second");
+    expect(health.limited("kilo")).toBe(true);
+    expect(routes[0]).toMatchObject({ reason: "quota", previousModelId: "first", previousProviderId: "kilo",
+      modelId: "second", providerId: "numes", averageMs: expect.any(Number) });
+    time += 9999;
+    expect((await send("first", {}, "next")).headers.get("x-vsemkod-model")).toBe("second");
+    expect(primary.calls).toHaveLength(1);
+    time++;
+    expect((await send("first")).headers.get("x-vsemkod-model")).toBe("first");
+    expect(primary.calls).toHaveLength(2);
+  });
+
   it("cools down network errors exponentially and accepts Retry-After dates", () => {
     let time = 60_000;
     const health = new ProviderHealth(undefined, () => time);
@@ -185,6 +211,7 @@ describe("Router", () => {
   });
 
   it("falls back if upstream headers arrive but no body byte arrives in time", async () => {
+    expect(FREE_FIRST_BYTE_MS).toBe(45_000);
     const stalled = await upstream(res => { res.writeHead(200, { "content-type": "text/event-stream" }); res.flushHeaders(); });
     const reserve = await upstream();
     const { send } = await fixture(
@@ -224,6 +251,32 @@ describe("Router", () => {
     expect(reserve.calls).toHaveLength(0);
   });
 
+  it("restores provider/model averages and migrates legacy usage counters", async () => {
+    const root = fileURLToPath(new URL("../.vsemkod-dev/", import.meta.url));
+    await mkdir(root, { recursive: true });
+    const local = await mkdtemp(join(root, "router-test-"));
+    const path = join(local, "usage.json");
+    cleanup.push(async () => { await rm(path, { force: true }); await rmdir(local); });
+    const { writeJson } = await import("../src/main/storage");
+    await writeJson(path, { kilo: { requests: 7, errors: 2 } });
+    const health = new ProviderHealth(path);
+    await health.load();
+    const delayed = await upstream(res => setTimeout(() => text(res), 30));
+    const { send, router } = await fixture([provider("kilo", delayed.url)], [offer("first", "kilo")], { health });
+    await (await send("first")).text();
+    const measured = health.latencies()[0].averageMs;
+    expect(measured).toBeGreaterThanOrEqual(20);
+    expect(health.firstByte("kilo", "first", measured * 3)).toBeCloseTo(measured * 2);
+    expect(health.firstByte("numes", "first", 750)).toBe(750);
+    await router.close();
+    const restored = new ProviderHealth(path);
+    await restored.load();
+    expect(restored.latencies()).toEqual(health.latencies());
+    expect(restored.firstByte("kilo", "first", measured * 5)).toBeCloseTo(measured * 3);
+    expect(JSON.parse(await readFile(path, "utf8")).providers.kilo).toEqual({ requests: 8, errors: 2 });
+    await restored.flush();
+  });
+
   it("persists request and error counts without request contents", async () => {
     const root = fileURLToPath(new URL("../.vsemkod-dev/", import.meta.url));
     await mkdir(root, { recursive: true });
@@ -235,6 +288,6 @@ describe("Router", () => {
       [offer("first", "kilo")], { health: new ProviderHealth(path) });
     expect((await send("first")).status).toBe(429);
     await router.close();
-    expect(JSON.parse(await readFile(path, "utf8"))).toEqual({ kilo: { requests: 1, errors: 1 } });
+    expect(JSON.parse(await readFile(path, "utf8"))).toEqual({ providers: { kilo: { requests: 1, errors: 1 } }, ttfb: [] });
   });
 });

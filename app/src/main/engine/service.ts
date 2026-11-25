@@ -120,7 +120,7 @@ export class EngineService {
           changed = true;
         }
         this.emit(event);
-      }, () => this.stopRequested, { ...options, webSearch: this.settings().webSearch });
+      }, () => this.stopRequested, { ...options, webSearch: this.settings().webSearch, routerError: () => this.router.turnError(sessionId) });
       if (changed) { await writeJson(path, diffs); changed = false; }
       const history = await this.history(sessionId, directory);
       return { changes: history.changes, stopped: result.stopped };
@@ -229,7 +229,8 @@ export class EngineService {
     await this.close();
     await access(this.executable).catch(() => { throw new Error("Бинарник OpenCode отсутствует. Выполните npm run fetch:engine."); });
     const temp = join(this.data, "tmp");
-    await mkdir(temp, { recursive: true });
+    const engineHome = join(this.data, "home");
+    await Promise.all([mkdir(temp, { recursive: true }), mkdir(engineHome, { recursive: true })]);
     const catalog = this.catalog();
     const personal = this.personalModels();
     const password = randomBytes(32).toString("base64url");
@@ -246,7 +247,9 @@ export class EngineService {
       OPENCODE_PASSWORD: password,
       OPENCODE_PURE: "true",
       OPENCODE_DISABLE_PROJECT_CONFIG: "true",
-      OPENCODE_DISABLE_EXTERNAL_SKILLS: "true",
+      OPENCODE_DISABLE_CLAUDE_CODE: "true",
+      // OpenCode 2.4.1 resolves global .agents from Global.home, independently of XDG.
+      OPENCODE_TEST_HOME: engineHome,
       OPENCODE_DISABLE_DEFAULT_PLUGINS: "true",
       OPENCODE_DISABLE_MODELS_FETCH: "true",
       OPENCODE_DISABLE_LSP_DOWNLOAD: "true",
@@ -319,6 +322,7 @@ export class EngineService {
       lsp: false,
       snapshots: true,
       instructions: ["AGENTS.md"],
+      skills: [join(this.configDirectory, "skills"), ".opencode/skills"],
       todo: true,
       websearch: this.settings().webSearch ? { provider: "tinyfish" } : false,
       compaction: { auto: true },
@@ -330,7 +334,7 @@ export class EngineService {
         title: { disabled: true }
       },
       plugins: [
-        "-opencode.provider.kilo", "-opencode.provider.claude-agent",
+        "-opencode.provider.kilo", "-opencode.provider.claude-agent", "-opencode.config.compatibility", "-opencode.skill", "-opencode.browser",
         ...(enableOpenCodeZenFree ? [] : ["-opencode.provider.opencode"])
       ],
       providers: {

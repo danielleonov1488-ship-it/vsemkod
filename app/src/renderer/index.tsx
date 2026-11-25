@@ -4,6 +4,8 @@ import type { Attachment, ChatAction, ChatHistory, ProjectTools, Question, TurnO
 import { Chat } from "./chat";
 import { catalogConnection, ConnectDialog, ConnectionsPage, readableError, type Connection } from "./connections";
 import { accessModes, enqueue, dequeue, slashCommand, type AccessMode } from "../shared/workspace";
+import { defaultModel } from "../shared/catalog";
+import type { ChatStatus } from "./turns";
 import { ChatGroups } from "./chat-groups";
 import { Composer } from "./composer";
 import { Settings } from "./settings";
@@ -40,6 +42,7 @@ function App() {
   const [catalog, setCatalog] = useState<CatalogState>();
   const [prefs, setPrefs] = useState<Preferences>();
   const [directory, setDirectory] = useState("");
+  const [recentProjects, setRecentProjects] = useState<string[]>([]);
   const [sessions, setSessions] = useState<Conversation[]>([]);
   const [chat, setChat] = useState<Conversation>();
   const [settings, setSettings] = useState(false);
@@ -70,6 +73,8 @@ function App() {
   const stopping = useRef<Promise<void> | undefined>(undefined);
   const stopPending = useRef(false);
   const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState<{ started: number; since: number | null }>();
+  const [failures, setFailures] = useState<Record<string, { message: string; turn: PendingTurn }>>({});
   const [loadingChat, setLoadingChat] = useState(false);
   const [model, setModel] = useState<string>();
   const [routeProvider, setRouteProvider] = useState<string>();
@@ -110,6 +115,7 @@ function App() {
       setPrefs(info.preferences);
       setAccess(info.preferences.defaultAccess);
       setDirectory(info.preferences.directory);
+      setRecentProjects(info.projects ?? []);
     }).catch(showError);
     return () => { mounted = false; stopCatalog(); stopNotice(); stopUpdate(); clearTimeout(noticeTimer.current); };
   }, [notify, showError]);
@@ -118,9 +124,11 @@ function App() {
     if (event.sessionId !== activeChat.current) return;
     if (event.type === "part") setParts(value => replacePart(value, event.part));
     if (event.type === "delta") setParts(value => {
+      const kind = event.kind ?? "text";
       const part = value.find(part => part.id === event.partId);
-      return replacePart(value, { id: event.partId, kind: "text", text: (part?.kind === "text" ? part.text : "") + event.delta });
+      return replacePart(value, { id: event.partId, kind, text: (part?.kind === kind ? part.text : "") + event.delta });
     });
+    if (event.type === "model-wait") setProgress(value => value && { ...value, since: event.since });
     if (event.type === "permission") setPermissions(value => [...value.filter(item => item.id !== event.permission.id), event.permission]);
     if (event.type === "permission-resolved") setPermissions(value => value.filter(item => item.id !== event.id));
     if (event.type === "question") setQuestions(current => [...current.filter(item => item.id !== event.question.id), event.question]);
@@ -128,14 +136,22 @@ function App() {
     if (event.type === "usage") setUsage(event.usage);
     if (event.type === "route") {
       setRouteProvider(event.providerId);
-      if (event.previousModelId && lastRoute.current !== event.modelId) {
-        const names = liveCatalog.current?.catalog.models;
-        const next = names?.find(model => model.id === event.modelId)?.name ?? event.modelId;
-        const previous = names?.find(model => model.id === event.previousModelId)?.name ?? event.previousModelId;
+      const route = event.modelId + "/" + event.providerId;
+      if (event.previousModelId && lastRoute.current !== route) {
+        const names = liveCatalog.current?.catalog;
+        const modelName = (id: string) => names?.models.find(model => model.id === id)?.name ?? id;
+        const providerName = (id: string) => names?.providers.find(provider => provider.id === id)?.name ?? id;
+        const previousProvider = event.previousModelId === event.modelId ? event.previousProviderId : undefined;
+        const next = previousProvider ? providerName(event.providerId) : modelName(event.modelId);
+        const previous = previousProvider ? providerName(previousProvider) : modelName(event.previousModelId);
         notify({ text: "Переключился на " + next + (event.reason === "quota"
-          ? " — у модели " + previous + " кончилась квота" : " — модель " + previous + " временно недоступна") });
+          ? " — у " + previous + " кончилась квота" : " — " + previous + " временно недоступен") });
       }
-      lastRoute.current = event.modelId;
+      if (event.averageMs !== undefined) setCatalog(state => state && { ...state,
+        latencies: [...(state.latencies ?? []).filter(item => item.modelId !== event.modelId || item.providerId !== event.providerId),
+          { modelId: event.modelId, providerId: event.providerId, averageMs: event.averageMs }]
+      });
+      lastRoute.current = route;
     }
   }), [notify]);
 
@@ -173,7 +189,9 @@ function App() {
   const ownModels = [...personal, ...zen];
   const available = options.filter(item => item.available.length);
   const ownModel = ownModels.find(item => item.id === model);
-  const selected = available.find(item => item.model.id === model) ?? available.find(item => item.model.tier !== "new");
+  const preferred = catalog && defaultModel(catalog.catalog);
+  const selected = available.find(item => item.model.id === model) ?? available.find(item => item.model.id === preferred?.id) ??
+    available.find(item => item.model.tier !== "new") ?? available[0];
   const modelId = ownModel?.id ?? selected?.model.id;
   const provider = routeProvider
     ? catalog?.catalog.providers.find(provider => provider.id === routeProvider)
@@ -210,20 +228,26 @@ function App() {
     setReplayId(undefined);
   }
 
+  const projectDirectories = [...new Set([directory, ...recentProjects, ...sessions.map(item => item.directory), prefs?.directory]
+    .filter((path): path is string => Boolean(path)))];
+  const failed = chat && failures[chat.id];
+  const status: ChatStatus | undefined = permissions.length ? "permission" : questions.length ? "question"
+    : failed ? "error" : busy ? "working" : undefined;
+
   async function chooseDirectory(asDefault = false) {
     try {
       const chosen = await api.chooseDirectory();
       if (!chosen) return;
+      setRecentProjects(list => [chosen, ...list.filter(path => path !== chosen)]);
       if (asDefault) {
         setPrefs(await api.preferences({ directory: chosen }));
         if (!chat) {
           setDirectory(chosen);
           setFiles([]);
         }
-      } else {
-        if (chat) resetChat();
-        else setFiles([]);
-        setDirectory(chosen);
+      } else if (chosen !== directory || settings || subscriptions) {
+        setQuery("");
+        startChat(chosen);
       }
     } catch (error) { showError(error); }
   }
@@ -279,7 +303,7 @@ function App() {
       setChat(session);
       setDirectory(session.directory);
       setAccess(session.access ?? prefs?.defaultAccess ?? "ask");
-      setPlanReady(session.access === "read" && history.parts.at(-1)?.kind === "text");
+      setPlanReady(session.access === "read" && history.parts.findLast(part => part.kind !== "turn")?.kind === "text");
       setModel(session.modelId);
       setVariant(session.variant ?? "");
       showHistory(history);
@@ -297,7 +321,9 @@ function App() {
   async function runTurn(turn: PendingTurn) {
     requestPending.current = true;
     stopPending.current = false;
+    const started = Date.now();
     setBusy(true);
+    setProgress({ started, since: started });
     setPlanReady(false);
     lastRoute.current = undefined;
     let session = chat;
@@ -313,6 +339,13 @@ function App() {
         notify({ text: "Ответ остановлен" });
         return;
       }
+      const sessionId = session.id;
+      setFailures(list => {
+        if (!list[sessionId]) return list;
+        const next = { ...list };
+        delete next[sessionId];
+        return next;
+      });
       const current = { ...session, access: turn.options.access, variant: turn.options.variant, modelId: turn.modelId, updatedAt: Date.now() };
       setChat(current);
       setSessions(list => [current, ...list.filter(item => item.id !== current.id)]);
@@ -321,12 +354,19 @@ function App() {
       setChanges(result.changes);
       const history = await api.history(session.id);
       showHistory(history);
-      setPlanReady(!result.stopped && !turn.options.compact && turn.options.access === "read" && history.parts.at(-1)?.kind === "text");
+      if (history.parts.at(-1)?.kind !== "turn") setParts(list => [...list, {
+        id: "work:" + turn.id, kind: "turn", seconds: (Date.now() - started) / 1000, stopped: result.stopped
+      }]);
+      setPlanReady(!result.stopped && !turn.options.compact && turn.options.access === "read" &&
+        history.parts.findLast(part => part.kind !== "turn")?.kind === "text");
       if (result.stopped) notify({ text: "Ответ остановлен" });
     } catch (error) {
-      showError(error);
+      const message = readableError(error);
+      notify({ text: message, tone: "error" });
       if (session) {
-        const history = await api.history(session.id).catch(() => undefined);
+        const id = session.id;
+        setFailures(list => ({ ...list, [id]: { message, turn: { ...turn, target: id } } }));
+        const history = await api.history(id).catch(() => undefined);
         if (history) showHistory(history);
       }
       if (!turn.options.compact) { setDraft(value => value || turn.text); setFiles(value => value.length ? value : turn.files); }
@@ -335,8 +375,21 @@ function App() {
       setPermissions([]);
       setQuestions([]);
       requestPending.current = false;
+      setProgress(undefined);
       setBusy(false);
     }
+  }
+
+  function retryFailed() {
+    if (!failed || !modelId || requestPending.current || loadingChat) return;
+    if (!vision && failed.turn.files.some(file => file.image)) {
+      showError("Выбранная модель не принимает изображения.");
+      return;
+    }
+    if (draft === failed.turn.text) setDraft("");
+    if (files === failed.turn.files) setFiles([]);
+    void runTurn({ ...failed.turn, id: crypto.randomUUID(), modelId,
+      options: { ...failed.turn.options, variant: variant || undefined } });
   }
 
   function stop() {
@@ -357,7 +410,9 @@ function App() {
   function startChat(folder?: string) {
     if (requestPending.current || loadingChat) return;
     resetChat();
-    setDirectory(folder ?? prefs?.directory ?? directory);
+    const next = folder ?? (directory || prefs?.directory || "");
+    setDirectory(next);
+    if (next) setRecentProjects(list => [next, ...list.filter(path => path !== next)]);
     requestAnimationFrame(() => draftInput.current?.focus());
   }
 
@@ -541,6 +596,7 @@ function App() {
         </button></li>)}
     </ul>}
     <Composer active={!!chat} input={draftInput} draft={draft} change={setDraft} directory={directory} busy={busy}
+      projects={projectDirectories} switchProject={path => { if (path !== directory) startChat(path); }}
       canSend={!!modelId && !!directory && !loadingChat} attachments={files} remove={id => setFiles(items => items.filter(file => file.id !== id))}
       add={value => void captureFiles(value)} pick={() => void chooseFiles()} choose={() => void chooseDirectory()}
       access={access} cycle={cycleAccess} submit={submit} stop={stop} selectCommand={quickCommand} tools={tools} vision={vision} onError={showError}
@@ -556,7 +612,7 @@ function App() {
             {({ minimal: "Минимум", low: "Низкий", medium: "Средний", high: "Высокий", max: "Максимум", xhigh: "Очень высокий" } as Record<string, string>)[id] ?? id}
           </option>)}
         </select>}
-        <ModelPicker selected={modelId} options={options} personal={personal} zen={zen} auto={prefs?.auto ?? true}
+        <ModelPicker selected={modelId} options={options} personal={personal} zen={zen} auto={prefs?.auto ?? true} latencies={catalog?.latencies}
           openSignal={modelMenu} onSelect={id => { setModel(id); setVariant(""); setRouteProvider(undefined); }}
           onAuto={auto => updatePrefs({ auto })} onConnect={setConnection} onSubscriptions={() => setSubscriptions(true)} />
       </>} />
@@ -576,11 +632,13 @@ function App() {
         <button type="button" className="wordmark" disabled={busy || loadingChat} onClick={() => startChat()}>
           <img src={logo} width="18" height="18" alt="" /><span>vsem<span className="wordmark-suffix">kod</span></span>
         </button>
-        <button className="sidebar-row sidebar-row--new" type="button" disabled={busy || loadingChat} onClick={resetChat}><Icon name="newChat" />Новый чат</button>
+        <button className="sidebar-row sidebar-row--new" type="button" disabled={busy || loadingChat} onClick={() => startChat()}><Icon name="newChat" />Новый чат</button>
         <label className="sidebar-row search">
           <Icon name="search" /><input ref={searchInput} type="search" value={query} aria-label="Поиск чатов" placeholder="Поиск чатов" onChange={event => setQuery(event.target.value)} />
         </label>
-        <ChatGroups sessions={sessions} query={query} active={!settings && !subscriptions ? chat?.id : undefined}
+        <ChatGroups sessions={sessions} projects={projectDirectories} selectedProject={directory} query={query}
+          active={!settings && !subscriptions ? chat?.id : undefined} statusChat={chat?.id} status={status}
+          errors={Object.keys(failures)} addProject={() => void chooseDirectory()}
           disabled={busy || loadingChat} start={startChat} open={session => void openChat(session)} perform={changeChat} />
         <div className="sidebar-end">
           <button type="button" className="sidebar-row" aria-current={settings || subscriptions ? "page" : undefined} disabled={loadingChat}
@@ -603,7 +661,8 @@ function App() {
             open={url => void api.openExternal(url).catch(showError)} onError={showError} onNotice={text => notify({ text })}
             onCatalog={setCatalog} exportAll={() => void exportChats()} />
           : chat ? <Chat key={chat.id} title={chat.title} parts={parts} permissions={permissions} questions={questions} changeCount={changes.length}
-            busy={busy || loadingChat} panel={panel} openPanel={() => { if (!panel) setPanelTab("changes"); setPanel(value => !value); }}
+            busy={busy || loadingChat} status={status} progress={progress} failure={failed?.message}
+            retryFailed={retryFailed} chooseModel={() => setModelMenu(value => value + 1)} panel={panel} openPanel={() => { if (!panel) setPanelTab("changes"); setPanel(value => !value); }}
             answer={(id, decision) => api.answer(chat.id, id, decision)} answerQuestion={(id, value) => api.answerQuestion(chat.id, id, value)}
             copy={text => void api.copyText(text).then(() => notify({ text: "Скопировано" })).catch(showError)}
             edit={part => void editMessage(part)} revert={message => void revertMessage(message)} retry={part => submit(false, part.text, [], access, part.files?.length ? part.id : null)}

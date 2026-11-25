@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
 import type { Attachment, ProjectTools } from "../shared/api";
-import { accessLabels, builtInCommands, imageFile, suggestionAt, type AccessMode } from "../shared/workspace";
+import { accessLabels, builtInCommands, folderName, imageFile, suggestionAt, type AccessMode } from "../shared/workspace";
 import { Icon } from "./icons";
 
 const api = window.vsemkod;
 type Suggestion = { key: string; text: string; detail?: string; folder?: boolean };
 
 export function Composer({ active, input, draft, change, directory, busy, canSend, attachments, remove, add, pick, choose,
-  access, cycle, submit, stop, selectCommand, tools, modelControls, vision, onError }: {
+  projects, switchProject, access, cycle, submit, stop, selectCommand, tools, modelControls, vision, onError }: {
   active: boolean; input: RefObject<HTMLTextAreaElement | null>; draft: string; change: (value: string) => void;
-  directory: string; busy: boolean; canSend: boolean; attachments: Attachment[]; remove: (id: string) => void;
+  directory: string; projects: string[]; switchProject: (path: string) => void; busy: boolean; canSend: boolean; attachments: Attachment[]; remove: (id: string) => void;
   add: (files: File[]) => void; pick: () => void; choose: () => void; access: AccessMode; cycle: () => void;
   submit: (intervene?: boolean) => void; stop: () => void; selectCommand: (name: string) => boolean;
   tools?: ProjectTools; modelControls: ReactNode; vision: boolean; onError: (text: string) => void;
@@ -20,7 +20,26 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
   const [paths, setPaths] = useState<Suggestion[]>([]);
   const [dragging, setDragging] = useState(false);
   const dragDepth = useRef(0);
-  const token = dismissed ? undefined : suggestionAt(draft, cursor);
+  const [menu, setMenu] = useState<"add" | "project">();
+  const popupTrigger = useRef<HTMLButtonElement>(null);
+  const [commands, setCommands] = useState(false);
+  const token = dismissed ? undefined : commands ? { kind: "command" as const, query: "", start: 0, end: 0 }
+    : suggestionAt(draft, cursor);
+  useEffect(() => {
+    if (!menu) return;
+    const outside = (event: PointerEvent) => {
+      if (!(event.target instanceof Element) || !event.target.closest(".composer-popup")) setMenu(undefined);
+    };
+    const escape = (event: globalThis.KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setMenu(undefined);
+      popupTrigger.current?.focus();
+    };
+    window.addEventListener("pointerdown", outside);
+    window.addEventListener("keydown", escape, true);
+    return () => { window.removeEventListener("pointerdown", outside); window.removeEventListener("keydown", escape, true); };
+  }, [menu]);
   const search = token?.kind === "path" ? token.query : undefined;
   useEffect(() => {
     setPaths([]);
@@ -40,6 +59,7 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
   const selected = suggestions[Math.min(index, suggestions.length - 1)];
   function pickSuggestion(item: Suggestion) {
     if (!token) return;
+    setCommands(false);
     if (token.kind === "command" && selectCommand(item.key)) {
       setDismissed(true);
       return;
@@ -78,9 +98,32 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       setDismissed(true);
+      setCommands(false);
       submit(event.ctrlKey || event.metaKey);
     }
   }
+  function toggleMenu(next: "add" | "project", trigger: HTMLButtonElement) {
+    popupTrigger.current = trigger;
+    setDismissed(true);
+    setCommands(false);
+    setMenu(menu === next ? undefined : next);
+  }
+
+  function openSuggestions(kind: "path" | "command") {
+    setMenu(undefined);
+    setDismissed(false);
+    setIndex(0);
+    setCommands(kind === "command" && draft.length > 0);
+    const start = input.current?.selectionStart ?? draft.length;
+    const end = input.current?.selectionEnd ?? start;
+    const prefix = draft.slice(0, start);
+    const inserted = kind === "path" ? (/\S$/.test(prefix) ? " @" : "@") : draft ? "" : "/";
+    if (inserted) change(prefix + inserted + draft.slice(end));
+    const position = start + inserted.length;
+    setCursor(position);
+    requestAnimationFrame(() => { input.current?.focus(); input.current?.setSelectionRange(position, position); });
+  }
+
   function receive(files: File[]) {
     const images = files.filter(file => file.type.startsWith("image/") || imageFile(file.name));
     if (!vision && images.length) onError("Выбранная модель не принимает изображения. Выберите модель с поддержкой изображений.");
@@ -104,7 +147,7 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
     </div>}
     <textarea ref={input} className="composer-input" value={draft} rows={1} aria-label="Сообщение агенту" maxLength={100_000}
       placeholder={active ? "Что сделать дальше?" : "Опиши задачу — агент сам напишет код"}
-      onChange={event => { change(event.target.value); setCursor(event.target.selectionStart); setIndex(0); setDismissed(false); }}
+      onChange={event => { change(event.target.value); setCursor(event.target.selectionStart); setIndex(0); setDismissed(false); setCommands(false); }}
       onSelect={event => setCursor(event.currentTarget.selectionStart)}
       onKeyDown={keydown} onPaste={event => {
         const files = Array.from(event.clipboardData.files);
@@ -117,12 +160,38 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
     </ul>}
     <div className="composer-toolbar">
       <div className="composer-controls">
-        <button className="composer-control attach" type="button" aria-label="Прикрепить файл" title="Прикрепить файл" disabled={!directory}
-          onClick={pick}><Icon name="paperclip" /></button>
-        <button className="composer-control folder-chip" type="button" title={directory || "Выбрать папку проекта"}
-          disabled={busy} onClick={choose}><Icon name="folder" />
-          <span>{directory.split(/[\\/]/).filter(Boolean).at(-1) ?? "Папка проекта"}</span><Icon name="chevron" className="chevron" />
-        </button>
+        <div className="composer-popup">
+          <button className="composer-control attach" type="button" aria-label="Добавить в сообщение" title="Добавить в сообщение"
+            aria-expanded={menu === "add"} onClick={event => toggleMenu("add", event.currentTarget)}><Icon name="plus" /></button>
+          {menu === "add" && <div className="model-panel composer-popup-list" aria-label="Добавить в сообщение" role="region">
+            <button className="model-option" type="button" disabled={!directory} onClick={() => { setMenu(undefined); pick(); }}>
+              <Icon name="paperclip" />Прикрепить файлы или картинки
+            </button>
+            <button className="model-option" type="button" disabled={!directory} onClick={() => openSuggestions("path")}>
+              <Icon name="file" />Упомянуть файл (@)
+            </button>
+            <button className="model-option" type="button" onClick={() => openSuggestions("command")}>
+              <Icon name="terminal" />Команды (/)
+            </button>
+          </div>}
+        </div>
+        <div className="composer-popup">
+          <button className="composer-control folder-chip" type="button" title={directory || "Выбрать папку проекта"}
+            aria-label={"Проект · " + (folderName(directory) || "Выбрать папку")} aria-expanded={menu === "project"} disabled={busy}
+            onClick={event => toggleMenu("project", event.currentTarget)}><Icon name="folder" />
+            <span>{folderName(directory) || "Папка проекта"}</span><Icon name="chevron" className="chevron" />
+          </button>
+          {menu === "project" && <div className="model-panel composer-popup-list" aria-label="Выбор проекта" role="region">
+            {projects.map(path => <button className="model-option" key={path} type="button" title={path} aria-pressed={path === directory}
+              onClick={() => { setMenu(undefined); switchProject(path); }}>
+              <Icon name="folder" /><span className="project-option-name">{folderName(path)}</span>
+              {path === directory && <Icon name="check" />}
+            </button>)}
+            <button className="model-option project-pick" type="button" onClick={() => { setMenu(undefined); choose(); }}>
+              <Icon name="plus" />Выбрать папку…
+            </button>
+          </div>}
+        </div>
         <button type="button" className="composer-control folder-chip access-chip" onClick={cycle} title="Изменить режим доступа · Shift+Tab">
           <Icon name="lock" /><span>{accessLabels[access]}</span>
         </button>

@@ -10,6 +10,7 @@ export function chatMarkdown(title: string, parts: ChatPart[]) {
   const lines = ["# " + title.replace(/\s+/g, " ").trim()];
   let speaker = "";
   for (const part of parts) {
+    if (part.kind === "turn") continue;
     const next = part.kind === "user" ? "Вы" : "Агент";
     if (next !== speaker) lines.push("## " + next);
     speaker = next;

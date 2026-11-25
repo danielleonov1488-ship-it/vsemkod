@@ -156,7 +156,8 @@ try {
     assert.equal(await page.locator("html").getAttribute("data-theme"), theme);
     await shot("home");
     await page.getByRole("button", { name: "Лендинг для кофейни", exact: true }).click();
-    await page.getByText("Думал 12 с").waitFor();
+    await page.locator(".turn-summary > summary").click();
+    await page.getByRole("button", { name: "Рассуждения" }).waitFor();
     await page.locator(".chat-thread summary.action").filter({ hasText: "src/App.tsx" }).click();
     await shot("chat");
     const draft = page.getByRole("textbox", { name: "Сообщение агенту" });
@@ -170,7 +171,8 @@ try {
     await draft.press("Tab");
     assert.match(await draft.inputValue(), /@src\//);
     await draft.fill("");
-    await page.getByRole("button", { name: "Прикрепить файл" }).click();
+    await page.getByRole("button", { name: "Добавить в сообщение" }).click();
+    await page.getByRole("button", { name: "Прикрепить файлы или картинки" }).click();
     await page.getByText("Выбранная модель не принимает изображения.", { exact: true }).waitFor();
     await page.getByRole("button", { name: "Закрыть уведомление" }).click();
     await page.keyboard.press("Control+b");

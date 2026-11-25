@@ -24,6 +24,19 @@ const model = rankedModels(catalog.current).find(candidate =>
   activeOffers(catalog.current, candidate.id).some(({ offer, provider }) => provider.id === "kilo" && provider.auth.type === "none" && offer.supportsTools));
 assert(model, "Нет бесплатной модели Kilo с инструментами.");
 const useMock = process.env.VSEMKOD_STAGE_D_MOCK === "1";
+if (useMock) {
+  const writeSkill = async (root: string, name: string) => {
+    const directory = join(root, name);
+    await mkdir(directory, { recursive: true });
+    await writeFile(join(directory, "SKILL.md"), "---\nname: " + name + "\ndescription: Test fixture\n---\nTest skill.\n");
+  };
+  await Promise.all([
+    writeSkill(join(data, "engine", "config", "opencode", "skills"), "global-fixture"),
+    writeSkill(join(project, ".opencode", "skills"), "project-fixture"),
+    writeSkill(join(data, "engine", "home", ".agents", "skills"), "foreign-agents"),
+    writeSkill(join(project, ".claude", "skills"), "foreign-claude")
+  ]);
+}
 let phase = "";
 let sawMention = false;
 let pendingWrite = false;
@@ -33,6 +46,10 @@ const provider = createServer(async (request, response) => {
     return;
   }
   try {
+    if (phase === "quota") {
+      response.writeHead(429, { "retry-after": "10" }).end();
+      return;
+    }
     const pieces: Buffer[] = [];
     for await (const piece of request) pieces.push(Buffer.from(piece));
     const input = JSON.parse(Buffer.concat(pieces).toString("utf8"));
@@ -47,7 +64,8 @@ const provider = createServer(async (request, response) => {
     const chunk = (payload: object, finish = null as string | null) => ({ id: "chatcmpl-test", object: "chat.completion.chunk",
       created: Math.floor(Date.now() / 1000), model: input.model, choices: [{ index: 0, delta: payload, finish_reason: finish }] });
     response.writeHead(200, { "content-type": "text/event-stream" });
-    response.end([chunk({ role: "assistant" }), chunk(delta), chunk({}, call ? "tool_calls" : "stop"),
+    const reasoning = phase === "reasoning" ? [chunk({ reasoning_content: "Проверю " }), chunk({ reasoning_content: "ответ." })] : [];
+    response.end([chunk({ role: "assistant" }), ...reasoning, chunk(delta), chunk({}, call ? "tool_calls" : "stop"),
       { ...chunk({}), choices: [], usage: { prompt_tokens: 100, completion_tokens: 10, total_tokens: 110 } }]
       .map(payload => "data: " + JSON.stringify(payload) + "\n\n").join("") + "data: [DONE]\n\n");
   } catch { response.writeHead(500).end(); }
@@ -61,6 +79,7 @@ const router = new Router({ catalog: activeCatalog, key: () => undefined, health
 await router.start();
 const approvals: string[] = [];
 let issued: Promise<void>[] = [];
+const reasoningDeltas: string[] = [];
 const engine = new EngineService(process.env.VSEMKOD_STAGE_D_ENGINE ?? engineBinary(join(root, "resources")), join(data, "engine"),
   activeCatalog, router, event => {
     if (event.type === "permission") {
@@ -69,6 +88,7 @@ const engine = new EngineService(process.env.VSEMKOD_STAGE_D_ENGINE ?? engineBin
       void answer.catch(console.error);
       issued.push(answer);
     }
+    if (event.type === "delta" && event.kind === "reasoning") reasoningDeltas.push(event.delta);
     if (event.type === "part" && event.part.kind === "tool") console.log("Инструмент", event.part.status, event.part.tool, event.part.target);
   });
 const timeout = setTimeout(() => {
@@ -137,6 +157,19 @@ try {
   await engine.send(id, project, "/compact", model.id, false, [], undefined, { access: "read", compact: true });
   assert((await engine.history(id, project)).parts.some(part => part.kind === "note" && part.text === "Контекст сжат"));
   console.log("Упоминание файла попало в запрос модели, /compact сжал контекст.", useMock ? "Провайдер подменён локальным сервером." : "Провайдер Kilo.");
+  if (useMock) {
+    const skills = await client.tools(project);
+    assert.deepEqual(skills.skills.map(skill => skill.id).sort(), ["global-fixture", "project-fixture"]);
+    phase = "reasoning";
+    await engine.send(id, project, "жив?", model.id, false, []);
+    assert.equal(reasoningDeltas.join(""), "Проверю ответ.");
+    const liveHistory = await engine.history(id, project);
+    assert(liveHistory.parts.some(part => part.kind === "reasoning" && part.text === "Проверю ответ."));
+    assert.equal(liveHistory.parts.at(-1)?.kind, "turn");
+    phase = "quota";
+    await assert.rejects(engine.send(id, project, "Проверка квоты", model.id, false, []), /Квота бесплатных моделей исчерпана/);
+    console.log("Изоляция навыков, поток рассуждений, длительность хода и ошибка квоты проверены.");
+  }
 } finally {
   clearTimeout(timeout);
   await engine.close();
