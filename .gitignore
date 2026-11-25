@@ -17,4 +17,5 @@ Thumbs.db
 
 # Скриншоты проверок (пересоздаются)
 site/dev/screenshots/
+site/harness/
 app/.stage-d-work/

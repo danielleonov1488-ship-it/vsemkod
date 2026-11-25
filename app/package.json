@@ -10,6 +10,7 @@
     "postinstall": "node scripts/install-electron.mjs && node scripts/fetch-engine.mjs",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
+    "build:web": "vite build --config vite.web.config.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:live": "esbuild scripts/smoke.ts --bundle --platform=node --format=esm --packages=external --outfile=.vsemkod-dev/smoke.mjs && node .vsemkod-dev/smoke.mjs",

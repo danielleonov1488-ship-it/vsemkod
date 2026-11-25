@@ -29,11 +29,13 @@
       try { theme = localStorage.getItem("vsemkod-theme"); } catch {}
       if (theme !== "light") theme = "dark";
       document.documentElement.dataset.theme = theme;
+      document.documentElement.classList.add("js");
       document.querySelector('meta[name="theme-color"]').content = theme === "light" ? "#F5F4F0" : "#0F1112";
     })();
   </script>
   <link rel="stylesheet" href="/styles.css">
   <script type="module" src="/app.js"></script>
+  <script type="module" src="/motion.js"></script>
 </head>
 <body id="top">
   <svg class="icon-defs" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
@@ -43,16 +45,16 @@
     <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
     <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 17v4h14v-4"/></symbol>
-    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5m-5 5 5-5 5 5"/></symbol>
-    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14m6-14v14"/></symbol>
-    <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 5 10 7-10 7z"/></symbol>
-    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></symbol>
-    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
-    <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 13h6m-6 4h6"/></symbol>
-    <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m7 9 3 3-3 3m6 0h4"/></symbol>
-    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M11 5H5v14h14v-6M10 14l1-4 7-7 3 3-7 7z"/></symbol>
-    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.5"/><circle cx="15" cy="17" r="2.5"/></symbol>
-    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4Z"/></symbol>
+    <symbol id="i-term" viewBox="0 0 24 24"><path d="m5 8 4 4-4 4m6 0h8"/></symbol>
+    <symbol id="i-bot" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="11" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 14h6l-1 7 8-11h-6Z"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5m8-10 5 5-5 5"/></symbol>
   </svg>
 
   <a class="skip-link" href="#main">К содержимому</a>
@@ -65,7 +67,7 @@
       <nav class="site-nav" id="site-nav" aria-label="Основная навигация">
         <a href="#models">Модели</a>
         <a href="#how">Как это работает</a>
-        <a href="#features">Возможности</a>
+        <a href="#features">Что умеет</a>
         <a href="#faq">FAQ</a>
         <a href="https://github.com/danielleonov1488-ship-it/vsemkod">GitHub</a>
       </nav>
@@ -83,165 +85,189 @@
     </div>
   </header>
 
+  <canvas class="code-rain" id="code-rain" aria-hidden="true"></canvas>
+
   <main id="main">
     <section class="hero wrap" aria-labelledby="hero-title">
-      <a class="announcement" id="announcement" href="#source"><span aria-hidden="true"></span><span id="announcement-label">Открытый код · MIT</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-      <div class="hero-heading">
-        <h1 id="hero-title">Бесплатный AI‑кодинг для всех</h1>
-        <p>Агент пишет код в твоей папке на лучших бесплатных моделях. Без подписок, без карты.</p>
-      </div>
-      <div class="hero-actions">
-        <a class="button button-primary" id="platform-download" data-release href="https://github.com/danielleonov1488-ship-it/vsemkod/releases/latest" aria-describedby="release-status">
-          <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg><span id="platform-label">Скачать для Windows</span>
-        </a>
-        <a class="button button-secondary" data-release href="https://github.com/danielleonov1488-ship-it/vsemkod/releases/latest">
-          Все загрузки <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>
-        </a>
-        <span class="release-status" id="release-status">Скоро первая версия</span>
-      </div>
-
-      <div class="demo-scene">
-        <svg class="scene-lines" viewBox="0 0 1200 540" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-          <path d="M-165 420C 100 565 152 318 325 250S 614 359 855 171S 1123 -49 1340 10"/>
-          <path d="M-165 494C 101 630 168 374 353 301S 660 418 915 214S 1119 2 1330 67"/>
-          <path d="M-130 546C 141 642 188 451 387 364S 696 472 956 272S 1160 58 1330 125"/>
-        </svg>
-        <section class="demo-window" id="demo" aria-label="Демо vsemkod">
-          <header class="window-titlebar">
-            <span class="window-name"><img src="/assets/logo.svg" width="15" height="15" alt="">vsemkod</span>
-            <span class="window-controls" aria-hidden="true"><i></i><i></i><i></i></span>
-          </header>
-          <aside class="demo-sidebar" aria-label="Чаты и настройки">
-            <span class="brand demo-brand"><img src="/assets/logo.svg" width="19" height="19" alt=""><span>vsem<span class="brand-accent">kod</span></span></span>
-            <button class="sidebar-row new-chat" id="new-chat" type="button"><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg>Новый чат</button>
-            <p class="sidebar-label">Недавние</p>
-            <ul class="sidebar-chats" aria-label="Примеры чатов">
-              <li id="example-chat" class="active">Тёмная тема</li>
-              <li>Форма заказа</li>
-              <li>Мобильная версия</li>
-            </ul>
-            <a class="sidebar-row sidebar-settings" id="demo-settings" href="#features"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg>Настройки</a>
-          </aside>
-
-          <div class="demo-workspace">
-            <header class="workspace-header">
-              <h2 id="demo-title">Тёмная тема</h2>
-              <span class="privacy-chip"><span aria-hidden="true"></span><span id="privacy-label">Не сохраняется</span></span>
-              <button class="icon-button pause-example" id="pause-example" type="button" aria-label="Поставить пример на паузу" title="Поставить пример на паузу" hidden>
-                <svg class="icon" aria-hidden="true"><use href="#i-pause"/></svg>
-              </button>
-              <button class="burn-button" id="burn" type="button" hidden>Сжечь</button>
-            </header>
-            <div class="chat-scroll" id="chat-scroll" tabindex="0" aria-label="Переписка" role="region">
-              <div class="chat-thread" id="chat-thread"></div>
-              <div class="demo-notice" id="demo-notice" hidden>
-                <strong>Демо на сегодня закончилось.</strong>
-                <p>В приложении — без лимитов сайта, с файлами и командами.</p>
-                <a class="button button-small button-primary" data-release href="https://github.com/danielleonov1488-ship-it/vsemkod/releases/latest">Скачать</a>
-              </div>
-            </div>
-            <div class="compose-area">
-              <form class="composer" id="composer" autocomplete="off">
-                <textarea id="prompt" aria-label="Сообщение агенту" rows="2" maxlength="2000" placeholder="Живой чат скоро — а пока скачай приложение" disabled></textarea>
-                <div class="composer-toolbar">
-                  <span class="folder-chip" title="Работа с папкой доступна в приложении">
-                    <svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg><span>мой-проект</span>
-                  </span>
-                  <details class="model-picker" id="model-picker">
-                    <summary aria-labelledby="demo-model model-picker-label"><span id="demo-model">Kimi K3.1 Pro</span><span id="model-picker-label" hidden>выбор модели</span><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></summary>
-                    <ul class="demo-model-options" id="demo-model-options"></ul>
-                  </details>
-                  <button class="send-button" id="send" type="submit" aria-label="Отправить сообщение" disabled><svg class="icon" aria-hidden="true"><use href="#i-up"/></svg></button>
-                  <button class="stop-button" id="stop" type="button" hidden>Стоп</button>
-                </div>
-                <div id="turnstile-widget"></div>
-              </form>
-              <p class="demo-status" id="demo-status" role="status">Пример работы агента</p>
-            </div>
-          </div>
-        </section>
-      </div>
-    </section>
-
-    <section class="section wrap" id="models" aria-labelledby="models-title" data-reveal>
-      <div class="section-heading">
-        <h2 id="models-title">Бесплатно прямо сейчас</h2>
-        <a class="section-link" href="/catalog.json">Каталог JSON <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-      </div>
-      <ul class="model-list" id="model-list" aria-label="Активные предложения топовых моделей" aria-busy="true">
-        <li class="model-row skeleton-row" aria-hidden="true"><span></span><span></span></li>
-        <li class="model-row skeleton-row" aria-hidden="true"><span></span><span></span></li>
-        <li class="model-row skeleton-row" aria-hidden="true"><span></span><span></span></li>
-      </ul>
-      <p class="catalog-note" id="catalog-note" role="status" hidden></p>
-      <noscript><p class="catalog-note">Включи JavaScript или <a href="/catalog.json">открой каталог</a>.</p></noscript>
-    </section>
-
-    <section class="section wrap" id="how" aria-labelledby="how-title" data-reveal>
-      <h2 id="how-title">Как это работает</h2>
-      <ol class="steps" role="list">
-        <li>
-          <div class="step-visual step-download" aria-hidden="true">
-            <div class="step-object"><svg class="icon"><use href="#i-download"/></svg><span>vsemkod</span><i></i></div>
-          </div>
-          <h3>Скачай</h3>
-          <p>Открой vsemkod на Windows, macOS или Linux.</p>
-        </li>
-        <li>
-          <div class="step-visual step-folder" aria-hidden="true">
-            <div class="step-object"><svg class="icon"><use href="#i-folder"/></svg><span>мой-проект</span><svg class="icon step-mark"><use href="#i-check"/></svg></div>
-          </div>
-          <h3>Выбери папку</h3>
-          <p>Укажи свой проект или начни с пустой папки.</p>
-        </li>
-        <li>
-          <div class="step-visual step-compose" aria-hidden="true">
-            <div class="step-object"><span>Добавь тёмную тему<i></i></span><svg class="icon step-mark"><use href="#i-up"/></svg></div>
-          </div>
-          <h3>Пиши задачу</h3>
-          <p>Агент изучит файлы, предложит правки и запустит проверки.</p>
-        </li>
-      </ol>
-    </section>
-
-    <section class="section feature-section" id="features" aria-labelledby="features-title" data-reveal>
-      <div class="wrap feature-heading">
-        <h2 id="features-title">Возможности</h2>
-        <div class="feature-tabs" role="group" aria-label="Выбор возможности">
-          <button type="button" aria-controls="feature-folder" aria-pressed="true">Агент в папке</button>
-          <button type="button" aria-controls="feature-diff" aria-pressed="false">Диффы и разрешения</button>
-          <button type="button" aria-controls="feature-models" aria-pressed="false">Выбор модели</button>
-          <button type="button" aria-controls="feature-subscriptions" aria-pressed="false">Свои подписки</button>
+      <div class="hero-top">
+        <div class="hero-copy">
+          <a class="announcement" id="announcement" href="#models"><span aria-hidden="true"></span><span id="announcement-label">Открытый код · MIT</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <h1 id="hero-title">Бесплатный AI‑кодинг для всех</h1>
+          <p>Агент пишет код в твоей папке на лучших бесплатных моделях. Попробуй прямо здесь.</p>
+        </div>
+        <div class="hero-actions">
+          <a class="button button-primary" id="platform-download" data-release href="https://github.com/danielleonov1488-ship-it/vsemkod/releases/latest" aria-describedby="release-status">
+            <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg><span id="platform-label">Скачать для Windows</span>
+          </a>
+          <a class="button button-secondary" href="https://github.com/danielleonov1488-ship-it/vsemkod/releases">Все загрузки</a>
+          <span class="release-status" id="release-status">Скоро первая версия</span>
         </div>
       </div>
-      <div class="feature-track" id="feature-track" role="region" aria-label="Карточки возможностей" tabindex="0">
-        <article class="feature-card" id="feature-folder">
-          <div class="feature-copy"><span class="feature-chip">Рабочая папка</span><h3>Агент видит весь проект</h3><p>Выбери папку один раз. Агент найдёт нужные файлы, поймёт связи и внесёт правки.</p></div>
-          <div class="feature-visual"><img src="/assets/app-home.webp" width="1440" height="900" loading="lazy" decoding="async" alt="Главный экран vsemkod с выбором папки проекта"></div>
-        </article>
-        <article class="feature-card" id="feature-diff">
-          <div class="feature-copy"><span class="feature-chip">Проверка изменений</span><h3>Каждую правку видно</h3><p>Смотри, какие строки изменились, и решай, какие команды агент может запустить.</p></div>
-          <div class="feature-visual"><img src="/assets/app-chat.webp" width="1440" height="900" loading="lazy" decoding="async" alt="Дифф строк и действия агента в чате vsemkod"></div>
-        </article>
-        <article class="feature-card" id="feature-models">
-          <div class="feature-copy"><span class="feature-chip">Каталог моделей</span><h3>Модель под твою задачу</h3><p>Выбери бесплатную модель сам или включи автовыбор на случай, если закончится квота.</p></div>
-          <div class="feature-visual"><img src="/assets/app-models.webp" width="1440" height="900" loading="lazy" decoding="async" alt="Выбор бесплатных моделей и настройка автовыбора"></div>
-        </article>
-        <article class="feature-card" id="feature-subscriptions">
-          <div class="feature-copy"><span class="feature-chip">Подключения</span><h3>Твои подписки в одном окне</h3><p>Подключи подписки провайдеров, которыми уже пользуешься, и переключайся между их моделями.</p></div>
-          <div class="feature-visual"><img src="/assets/app-subscriptions.webp" width="1400" height="900" loading="lazy" decoding="async" alt="Экран подключения подписок в приложении vsemkod"></div>
-        </article>
+
+      <figure class="hero-demo" id="demo">
+        <div class="app-window hero-window" data-preview>
+          <div class="themed-shot">
+            <img class="show-dark" src="/assets/d-dark-home.webp" width="1400" height="900" decoding="async" fetchpriority="high" alt="Стартовый экран приложения vsemkod">
+            <img class="show-light" src="/assets/d-light-home.webp" width="1400" height="900" decoding="async" alt="Стартовый экран приложения vsemkod">
+          </div>
+        </div>
+      </figure>
+    </section>
+
+    <template id="harness-frame">
+      <iframe src="/harness/" title="Приложение vsemkod в браузере" loading="eager" allow="clipboard-write"></iframe>
+    </template>
+
+    <section class="section models-section" id="models" aria-labelledby="models-title">
+      <div class="section-heading wrap" data-reveal>
+        <h2 id="models-title">Бесплатно прямо сейчас</h2>
+        <a class="section-link" href="/catalog.json">Весь каталог <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
-      <div class="wrap feature-controls">
-        <button class="icon-button previous-feature" id="previous-feature" type="button" aria-label="Предыдущая возможность" aria-controls="feature-track" disabled><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-        <button class="icon-button" id="next-feature" type="button" aria-label="Следующая возможность" aria-controls="feature-track"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <div class="model-rails" id="model-rails" aria-busy="true"></div>
+      <p class="wrap catalog-note" id="catalog-note" role="status" hidden></p>
+      <noscript><p class="wrap catalog-note"><a href="/catalog.json">Открыть каталог моделей</a></p></noscript>
+    </section>
+
+    <section class="section wrap" id="how" aria-labelledby="how-title">
+      <div class="section-heading" data-reveal>
+        <h2 id="how-title">Скачай и работай<span>как в Claude Code, только бесплатно</span></h2>
+      </div>
+
+      <div class="story" id="story" data-reveal>
+        <div class="story-stage" id="story-stage" data-scene="0" aria-hidden="true">
+          <div class="scene scene-download">
+            <div class="mini-browser">
+              <div class="mb-bar"><i></i><i></i><i></i><span class="mb-url">vsemkod.ru</span></div>
+              <div class="mb-body">
+                <div class="mb-brand"><img src="/assets/logo.svg" width="34" height="34" alt=""><span>vsem<b>kod</b></span></div>
+                <p class="mb-title">Бесплатный AI‑кодинг для всех</p>
+                <div class="mb-button"><svg class="icon"><use href="#i-download"/></svg><span>Скачать для Windows</span><i class="mb-progress"></i></div>
+              </div>
+              <div class="mb-download">
+                <svg class="icon"><use href="#i-file"/></svg>
+                <span><b>vsemkod-windows-x64.exe</b><small><i class="mb-file-progress"></i></small></span>
+                <svg class="icon mb-done"><use href="#i-check"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="scene scene-app">
+            <div class="mini-app">
+              <div class="ma-titlebar"><img src="/assets/logo.svg" width="14" height="14" alt=""><span>vsemkod</span></div>
+              <aside class="ma-side">
+                <div class="ma-brand">vsem<b>kod</b></div>
+                <div class="ma-row ma-new"><svg class="icon"><use href="#i-chat"/></svg>Новый чат</div>
+                <div class="ma-group">Проекты<span class="ma-plus"><svg class="icon"><use href="#i-plus"/></svg></span></div>
+                <div class="ma-row ma-project">telegram-bot</div>
+                <div class="ma-row ma-project ma-coffee"><svg class="icon"><use href="#i-folder"/></svg>coffee-site</div>
+                <div class="ma-row ma-chat">Сайт для кофейни</div>
+                <div class="ma-menu">
+                  <div class="ma-menu-item"><svg class="icon"><use href="#i-plus"/></svg>Новая папка</div>
+                  <div class="ma-menu-item ma-open"><svg class="icon"><use href="#i-folder"/></svg>Открыть папку…</div>
+                </div>
+              </aside>
+              <div class="ma-main">
+                <div class="ma-empty">Чем займёмся?</div>
+                <div class="ma-thread">
+                  <div class="ma-bubble">Сделай сайт для кофейни: меню, цены и форма заказа</div>
+                  <div class="ma-steps">
+                    <div class="ma-step ma-think"><i class="ma-dot"></i>Думает · 2 с</div>
+                    <div class="ma-step"><svg class="icon"><use href="#i-file"/></svg>Создал <code>index.html</code><b>+86</b></div>
+                    <div class="ma-step"><svg class="icon"><use href="#i-file"/></svg>Создал <code>style.css</code><b>+142</b></div>
+                    <div class="ma-diff">
+                      <span>+ &lt;section class="menu"&gt;</span>
+                      <span>+   &lt;h2&gt;Наше меню&lt;/h2&gt;</span>
+                      <span>+   &lt;li&gt;Капучино — 190 ₽&lt;/li&gt;</span>
+                      <span>+   &lt;form id="order"&gt;…</span>
+                    </div>
+                    <div class="ma-step"><svg class="icon"><use href="#i-term"/></svg>Запустил <code>npm run dev</code></div>
+                  </div>
+                  <p class="ma-answer">Готово: сайт кофейни с меню и формой заказа открыт на <code>localhost:5173</code>.</p>
+                </div>
+                <div class="ma-composer">
+                  <div class="ma-input"><span class="ma-typed"></span><i class="ma-caret"></i><span class="ma-placeholder">Опиши задачу — агент напишет код</span></div>
+                  <div class="ma-tools">
+                    <span class="ma-chip"><svg class="icon"><use href="#i-folder"/></svg><span class="ma-folder">vsemkod Projects</span></span>
+                    <span class="ma-model">Nemotron 3.5 Lightning</span>
+                    <span class="ma-send"><svg class="icon"><use href="#i-up"/></svg></span>
+                  </div>
+                </div>
+              </div>
+              <div class="ma-dialog">
+                <div class="ma-dialog-title">Выбор папки</div>
+                <div class="ma-dialog-path">Документы › Проекты</div>
+                <div class="ma-dialog-row"><svg class="icon"><use href="#i-folder"/></svg>landing</div>
+                <div class="ma-dialog-row ma-pick"><svg class="icon"><use href="#i-folder"/></svg>coffee-site</div>
+                <div class="ma-dialog-row"><svg class="icon"><use href="#i-folder"/></svg>notes</div>
+                <div class="ma-dialog-actions"><span>Отмена</span><span class="ma-dialog-ok">Выбрать папку</span></div>
+              </div>
+            </div>
+          </div>
+          <svg class="story-cursor" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 8-6 1.6L10 19z"/></svg>
+        </div>
+
+        <ol class="story-steps" role="list">
+          <li><button type="button" data-goto="0"><i></i><b>1</b><span><strong>Скачай</strong>Windows, macOS, Linux</span></button></li>
+          <li><button type="button" data-goto="1"><i></i><b>2</b><span><strong>Выбери папку</strong>Нажми «+» и открой проект</span></button></li>
+          <li><button type="button" data-goto="2"><i></i><b>3</b><span><strong>Напиши задачу</strong>Обычными словами</span></button></li>
+          <li><button type="button" data-goto="3"><i></i><b>4</b><span><strong>Работай</strong>Агент пишет и проверяет код</span></button></li>
+        </ol>
+        <div class="story-cta">
+          <a class="button button-primary step-cta" id="step-download" data-release href="https://github.com/danielleonov1488-ship-it/vsemkod/releases/latest">
+            <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
+            <span class="step-cta-label"><span id="step-download-label">Скачать для Windows</span><span aria-hidden="true">Открываем…</span></span>
+          </a>
+          <span class="visually-hidden" id="step-download-status" role="status"></span>
+        </div>
       </div>
     </section>
 
-    <section class="section wrap" id="source" aria-labelledby="source-title" data-reveal>
-      <div class="source-row">
-        <div><h2 id="source-title">Открытый код</h2><p>MIT · Каталог обновляется ботом каждые 30 минут</p><time id="catalog-updated" hidden></time></div>
-        <a class="button button-secondary" href="https://github.com/danielleonov1488-ship-it/vsemkod">Смотреть на GitHub <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+    <section class="features" id="features" aria-labelledby="features-title">
+      <div class="features-sticky">
+        <div class="wrap features-grid">
+          <div class="features-copy">
+            <h2 id="features-title">Всё, что умеют платные. <span>Бесплатно.</span></h2>
+            <ol class="feature-list" role="list">
+              <li class="feature-item" data-scenario="edit"><h3>Агент правит файлы</h3><p>Каждая правка — с диффом: видно, что добавлено и удалено.</p></li>
+              <li class="feature-item" data-scenario="revert"><h3>Откат одним кликом</h3><p>«Откатить сюда» вернёт файлы и чат к нужному моменту.</p></li>
+              <li class="feature-item" data-scenario="modes"><h3>План и режимы доступа</h3><p>Только чтение, вопросы перед правками или полный доступ.</p></li>
+              <li class="feature-item" data-scenario="failover"><h3>Модель сменится сама</h3><p>Кончилась квота — vsemkod тихо переключит на другую.</p></li>
+              <li class="feature-item" data-scenario="subscriptions"><h3>Свои подписки и ключи</h3><p>ChatGPT, Copilot, OpenRouter и любые API — в одном меню.</p></li>
+              <li class="feature-item" data-scenario="mcp"><h3>MCP, навыки, правила</h3><p>Подключай инструменты и задавай правила для агента.</p></li>
+            </ol>
+          </div>
+          <div class="app-window feature-preview" data-preview>
+            <div class="themed-shot">
+              <img class="show-dark" src="/assets/d-dark-panel-changes.webp" width="1400" height="900" loading="lazy" decoding="async" alt="">
+              <img class="show-light" src="/assets/d-light-panel-changes.webp" width="1400" height="900" loading="lazy" decoding="async" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap mission" id="mission" aria-labelledby="mission-title">
+      <div class="mission-copy" data-reveal>
+        <h2 id="mission-title">Кодинг должен быть <span>бесплатным.</span></h2>
+        <p>Хватит платить за курсы и «секретные промпты». Лучшие модели уже раздают бесплатно — мы просто собрали их в одном приложении.</p>
+        <ul class="mission-facts" role="list">
+          <li><svg class="icon" aria-hidden="true"><use href="#i-bot"/></svg>Бот находит раздачи каждые 30 минут</li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-bolt"/></svg>Ничего не нужно настраивать</li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-code"/></svg>Весь код открыт</li>
+        </ul>
+        <div class="source-actions">
+          <a class="button button-secondary" href="https://github.com/danielleonov1488-ship-it/vsemkod">Код на GitHub <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <time id="catalog-updated" hidden></time>
+        </div>
+      </div>
+      <div class="receipt" id="receipt" role="img" aria-label="Чек: курсы и подписки зачёркнуты, итого 0 рублей">
+        <div class="receipt-head"><span>ЧЕК № 0001</span><span>vsemkod.ru</span></div>
+        <div class="receipt-row"><span>Курс «Нейросети для разработчика»</span><b>49 900 ₽</b></div>
+        <div class="receipt-row"><span>Подписка на AI‑ассистента</span><b>2 000 ₽</b></div>
+        <div class="receipt-row"><span>«Секретные промпты»</span><b>4 990 ₽</b></div>
+        <div class="receipt-row"><span>Марафон «Вайб‑кодинг за 7 дней»</span><b>9 990 ₽</b></div>
+        <div class="receipt-total"><span>ИТОГО</span><b id="receipt-total">66 880 ₽</b></div>
+        <div class="receipt-stamp">БЕСПЛАТНО</div>
       </div>
     </section>
 
@@ -253,7 +279,7 @@
         <details><summary>Где хранятся мои ключи и код?</summary><p>Только на твоём компьютере. Запросы идут напрямую к провайдеру. Бесплатные провайдеры могут логировать запросы, поэтому не отправляй секреты.</p></details>
         <details><summary>Что будет, когда раздача закончится?</summary><p>Каталог обновится, и приложение переключится на другую бесплатную модель.</p></details>
         <details><summary>Нужна ли регистрация в vsemkod?</summary><p>Нет, аккаунта у нас нет.</p></details>
-        <details><summary>Что за демо-чат на сайте и что вы сохраняете?</summary><p>Сайт не сохраняет переписку. Она живёт только в памяти вкладки и сгорает через 10 минут после последнего сообщения или по кнопке «Сжечь». Для ответа последние сообщения передаются демо-API.</p></details>
+        <details><summary>Что за демо-чат на сайте и что вы сохраняете?</summary><p>Демо позволяет попробовать vsemkod в браузере. Чаты живут только в памяти вкладки и исчезают при перезагрузке или закрытии страницы. Для ответа последние сообщения передаются демо-API.</p></details>
       </div>
     </section>
   </main>

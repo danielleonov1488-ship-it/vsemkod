@@ -140,7 +140,8 @@ async function staticPage(req, res, path) {
     return;
   }
 
-  const file = resolve(root, "." + (path === "/" ? "/index.html" : path));
+  const documentPath = path === "/" || path === "/harness/" ? `${path}index.html` : path;
+  const file = resolve(root, "." + documentPath);
   if (!file.startsWith(resolve(root) + sep) || path.split("/").some((part) => part.startsWith("."))) {
     res.writeHead(404).end();
     return;
@@ -155,8 +156,8 @@ async function staticPage(req, res, path) {
     : await readFile(file);
   const body = serveDemo && path === "/app.js"
     ? data.toString("utf8")
-      .replace('const DEMO_API = "";', 'const DEMO_API = "/demo";')
-      .replace('const TURNSTILE_SITEKEY = "";', 'const TURNSTILE_SITEKEY = "1x00000000000000000000BB";')
+      .replace(/const DEMO_API = "[^"]*";/, 'const DEMO_API = "/demo";')
+      .replace(/const TURNSTILE_SITEKEY = "[^"]*";/, 'const TURNSTILE_SITEKEY = "1x00000000000000000000BB";')
     : data;
   res.writeHead(200, { "Content-Type": types[extname(file)] || "application/octet-stream" });
   res.end(req.method === "HEAD" ? undefined : body);

@@ -1,13 +1,30 @@
-const DEMO_API = "";
-const TURNSTILE_SITEKEY = "0x4AAAAAAGSiofqewQIBBTcx";
+export const DEMO_API = "https://vsemkod-demo.vsemkod.workers.dev";
+export const TURNSTILE_SITEKEY = "0x4AAAAAAGSiofqewQIBBTcx";
 const RELEASE_URL = "https://github.com/danielleonov1488-ship-it/vsemkod/releases/latest";
 const RELEASED = false;
-
-import { configureDemo } from "./demo.js";
 
 const CATALOG_URL = "/catalog.json";
 const CHANGES_URL = "/changes.json";
 const FALLBACK_DATA_URL = "https://raw.githubusercontent.com/danielleonov1488-ship-it/vsemkod/main/catalog-bot/data/";
+const THEME_KEY = "vsemkod-theme";
+const LOGOS = {
+  "Moonshot AI": "kimi",
+  "DeepSeek": "deepseek",
+  "Z.ai": "zai",
+  "Alibaba": "qwen",
+  "MiniMax": "minimax",
+  "Xiaomi": "xiaomimimo",
+  "NVIDIA": "nvidia",
+  "OpenAI": "openai",
+  "Google": "gemma",
+};
+
+function sendTheme(frame) {
+  frame.contentWindow?.postMessage({
+    type: "vsemkod:theme",
+    theme: document.documentElement.dataset.theme,
+  }, location.origin);
+}
 
 function configureTheme() {
   const root = document.documentElement;
@@ -20,14 +37,25 @@ function configureTheme() {
     toggle.title = label;
   }
 
+  function setTheme(theme) {
+    if (!["dark", "light"].includes(theme) || root.dataset.theme === theme) return;
+    root.dataset.theme = theme;
+    themeColor.content = theme === "light" ? "#F5F4F0" : "#0F1112";
+    try { localStorage.setItem(THEME_KEY, theme); } catch {}
+    updateLabel();
+    document.querySelectorAll("[data-preview] iframe").forEach(sendTheme);
+  }
+
   toggle.hidden = false;
   updateLabel();
-  toggle.addEventListener("click", () => {
-    const theme = root.dataset.theme === "light" ? "dark" : "light";
-    root.dataset.theme = theme;
-    themeColor.content = getComputedStyle(root).getPropertyValue("--bg").trim();
-    try { localStorage.setItem("vsemkod-theme", theme); } catch {}
-    updateLabel();
+  toggle.addEventListener("click", () => setTheme(root.dataset.theme === "light" ? "dark" : "light"));
+  window.addEventListener("storage", (event) => {
+    if (event.key === THEME_KEY) setTheme(event.newValue);
+  });
+  window.addEventListener("message", (event) => {
+    if (event.origin !== location.origin || event.data?.type !== "vsemkod:theme") return;
+    const frames = [...document.querySelectorAll("[data-preview] iframe")];
+    if (frames.some((frame) => frame.contentWindow === event.source)) setTheme(event.data.theme);
   });
 }
 
@@ -72,114 +100,151 @@ function configureHeader() {
 
 function configureReveal(motion) {
   if (motion.matches || !("IntersectionObserver" in window)) return;
+
   const observer = new IntersectionObserver((entries) => {
-    for (const [index, entry] of entries.entries()) {
-      if (!entry.isIntersecting) {
-        if (!entry.target.matches(":target")) entry.target.classList.add("awaiting-reveal");
-        continue;
-      }
-      entry.target.style.transitionDelay = `${Math.min(index, 3) * 45}ms`;
-      entry.target.classList.remove("awaiting-reveal");
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add("reveal-in");
       observer.unobserve(entry.target);
     }
-  }, { rootMargin: "0px 0px -5% 0px" });
+  }, { rootMargin: "0px 0px -16px 0px" });
 
-  for (const section of document.querySelectorAll("[data-reveal]")) {
-    observer.observe(section);
-  }
-
-  motion.addEventListener("change", () => {
-    if (!motion.matches) return;
-    observer.disconnect();
-    document.querySelectorAll(".awaiting-reveal").forEach((section) => section.classList.remove("awaiting-reveal"));
-  }, { once: true });
+  document.querySelectorAll("[data-reveal]").forEach((item) => observer.observe(item));
 }
 
-function configureFeatures(motion) {
-  const track = document.getElementById("feature-track");
-  const cards = [...track.children];
-  const tabs = [...document.querySelectorAll(".feature-tabs button")];
-  const previous = document.getElementById("previous-feature");
-  const next = document.getElementById("next-feature");
-  let active = 0;
-  let settleTimer;
-
-  function markActive(index) {
-    active = index;
-    tabs.forEach((tab, position) => tab.setAttribute("aria-pressed", String(position === index)));
-    previous.disabled = index === 0;
-    next.disabled = index === cards.length - 1;
-  }
-
-  function select(index) {
-    const card = cards[index];
-    if (!card) return;
-    markActive(index);
-    const offset = card.getBoundingClientRect().left - track.getBoundingClientRect().left;
-    track.scrollTo({
-      left: track.scrollLeft + offset - (track.clientWidth - card.offsetWidth) / 2,
-      behavior: motion.matches ? "instant" : "smooth",
-    });
-  }
-
-  function syncActiveCard() {
-    const center = track.getBoundingClientRect().left + track.clientWidth / 2;
-    const distances = cards.map((card) => Math.abs(card.getBoundingClientRect().left + card.offsetWidth / 2 - center));
-    markActive(distances.indexOf(Math.min(...distances)));
-  }
-
-  if ("onscrollend" in track) {
-    track.addEventListener("scrollend", syncActiveCard);
-  } else {
-    track.addEventListener("scroll", () => {
-      clearTimeout(settleTimer);
-      settleTimer = setTimeout(syncActiveCard, 250);
-    }, { passive: true });
-  }
-
-  tabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => select(index));
-    tab.addEventListener("keydown", (event) => {
-      const jump = { ArrowLeft: -1, ArrowRight: 1 }[event.key];
-      if (!jump) return;
-      event.preventDefault();
-      const picked = (index + jump + tabs.length) % tabs.length;
-      tabs[picked].focus();
-      select(picked);
-    });
-  });
-  track.addEventListener("keydown", (event) => {
-    const jump = { ArrowLeft: -1, ArrowRight: 1 }[event.key];
-    if (!jump) return;
-    event.preventDefault();
-    select(active + jump);
-  });
-  previous.addEventListener("click", () => select(active - 1));
-  next.addEventListener("click", () => select(active + 1));
-  document.getElementById("demo-settings").addEventListener("click", () => select(3));
-}
-
-
-function configureDownload() {
+function configureDownload(motion) {
   const agent = navigator.userAgent;
   const mobile = /Android|iPhone|iPad|iPod/i.test(agent) ||
     (/Macintosh/i.test(agent) && navigator.maxTouchPoints > 1);
-  let platform = "Windows";
+  const platform = /Macintosh|Mac OS X/i.test(agent) ? "macOS" : /Linux/i.test(agent) ? "Linux" : "Windows";
+  const label = mobile ? "Скачать на компьютер" : `Скачать для ${platform}`;
+  const download = document.getElementById("step-download");
+  const status = document.getElementById("step-download-status");
 
-  if (!mobile && /Macintosh|Mac OS X/i.test(agent)) {
-    platform = "macOS";
-  } else if (!mobile && /Linux/i.test(agent)) {
-    platform = "Linux";
-  }
-
-  document.querySelectorAll("[data-release]").forEach((link) => {
-    link.href = RELEASE_URL;
-  });
-  document.getElementById("platform-label").textContent = `Скачать для ${platform}`;
+  document.querySelectorAll("[data-release]").forEach((link) => { link.href = RELEASE_URL; });
+  document.getElementById("platform-label").textContent = label;
+  document.getElementById("step-download-label").textContent = label;
   document.getElementById("release-status").hidden = RELEASED;
-  if (RELEASED) {
-    document.getElementById("platform-download").removeAttribute("aria-describedby");
+  if (RELEASED) document.getElementById("platform-download").removeAttribute("aria-describedby");
+
+  download.addEventListener("click", (event) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || motion.matches) return;
+    event.preventDefault();
+    if (download.classList.contains("is-opening")) return;
+    download.classList.add("is-opening");
+    status.textContent = "Открываем страницу релиза.";
+    setTimeout(() => {
+      download.classList.remove("is-opening");
+      status.textContent = "";
+      location.assign(download.href);
+    }, 500);
+  });
+}
+
+function configureStory(motion) {
+  const hero = document.querySelector(".hero-window");
+  const section = document.getElementById("features");
+  const preview = section.querySelector(".feature-preview");
+  const items = [...section.querySelectorAll(".feature-item")];
+  const mobile = matchMedia("(max-width: 760px)");
+  const frameTemplate = document.getElementById("harness-frame").content.firstElementChild;
+  const harnessPath = frameTemplate.getAttribute("src");
+  const SHOTS = { edit: "panel-changes", revert: "chat", modes: "home", failover: "settings-models", subscriptions: "settings-models", mcp: "settings-mcp" };
+  let available = false;
+  let active = -1;
+  let queued = false;
+
+  const sendScenario = (frame, id) => frame.contentWindow?.postMessage({ type: "vsemkod:scenario", id }, location.origin);
+
+  function syncFrame(frame) {
+    sendTheme(frame);
+    const id = frame.parentElement.dataset.scenario;
+    if (id) sendScenario(frame, id);
   }
+
+  function mountFrame(host, scenario) {
+    if (!available || host.querySelector("iframe")) return;
+    const frame = frameTemplate.cloneNode();
+    if (scenario) {
+      frame.src = `${harnessPath}?scenario=${scenario}`;
+      frame.loading = "lazy";
+      frame.tabIndex = -1;
+      frame.inert = true;
+      frame.title = "Сценарий в приложении vsemkod";
+      frame.setAttribute("aria-hidden", "true");
+    }
+    frame.addEventListener("load", () => {
+      host.classList.remove("is-live");
+      try {
+        if (!frame.contentWindow.location.pathname.startsWith(harnessPath) || frame.contentDocument.querySelector(".not-found")) return;
+        syncFrame(frame);
+        host.classList.add("is-live");
+      } catch {
+        // Навигация за пределы копии оставляет картинку на месте.
+      }
+    });
+    host.append(frame);
+  }
+
+  function select(index, progress) {
+    if (index !== active) {
+      items[active]?.removeAttribute("aria-current");
+      items[index].setAttribute("aria-current", "true");
+      active = index;
+      const id = items[index].dataset.scenario;
+      preview.dataset.scenario = id;
+      preview.querySelectorAll(".themed-shot img").forEach((img) => {
+        img.src = `/assets/d-${img.classList.contains("show-light") ? "light" : "dark"}-${SHOTS[id]}.webp`;
+      });
+      const frame = preview.querySelector("iframe");
+      if (frame && preview.classList.contains("is-live")) sendScenario(frame, id);
+    }
+    items.forEach((item, i) => item.style.setProperty("--progress", i === index ? (motion.matches ? "1" : progress.toFixed(3)) : "0"));
+  }
+
+  const clamp = (value) => Math.min(1, Math.max(0, value));
+
+  function update() {
+    const rect = section.getBoundingClientRect();
+    if (rect.bottom > 0 && rect.top < window.innerHeight) mountFrame(preview, items[Math.max(0, active)].dataset.scenario);
+    if (mobile.matches) { if (active < 0) select(0, 1); return; }
+    const header = document.getElementById("site-header").offsetHeight;
+    const travel = rect.height - (window.innerHeight - header);
+    const progress = clamp((header - rect.top) / Math.max(1, travel)) * items.length;
+    const index = Math.min(items.length - 1, Math.floor(progress));
+    select(index, clamp(progress - index));
+  }
+
+  function schedule() {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => { queued = false; update(); });
+  }
+
+  items.forEach((item, index) => item.addEventListener("click", () => {
+    if (mobile.matches) { select(index, 1); return; }
+    const header = document.getElementById("site-header").offsetHeight;
+    const top = section.getBoundingClientRect().top + window.scrollY;
+    const travel = section.offsetHeight - (window.innerHeight - header);
+    window.scrollTo({ top: top - header + travel * (index + 0.5) / items.length, behavior: motion.matches ? "auto" : "smooth" });
+  }));
+
+  window.addEventListener("scroll", schedule, { passive: true });
+  window.addEventListener("resize", schedule);
+  window.addEventListener("message", (event) => {
+    if (event.origin !== location.origin || event.data?.type !== "vsemkod:ready") return;
+    const frame = [...document.querySelectorAll("[data-preview] iframe")].find((candidate) => candidate.contentWindow === event.source);
+    if (frame) syncFrame(frame);
+  });
+  schedule();
+
+  fetch(harnessPath, { method: "HEAD", signal: AbortSignal.timeout(5000) })
+    .then((response) => {
+      available = response.ok && response.headers.get("content-type")?.includes("text/html") && new URL(response.url).pathname.startsWith(harnessPath);
+      mountFrame(hero);
+      schedule();
+    })
+    .catch(() => {});
 }
 
 async function fetchJson(url) {
@@ -210,64 +275,84 @@ async function fetchCatalog(url) {
 
 function groupActiveModels(catalog) {
   const providers = new Map(catalog.providers.map((provider) => [provider.id, provider.name]));
-  const topModels = catalog.models
-    .filter((model) => model.tier === "top")
+  const available = catalog.models
+    .filter((model) => ["top", "good", "new"].includes(model.tier))
     .sort((first, second) => first.rank - second.rank);
-  const grouped = new Map(topModels.map((model) => [model.id, { model, providers: new Map(), activeProviderIds: new Set() }]));
+  const grouped = new Map(available.map((model) => [model.id, { model, providers: new Set(), activeProviderIds: new Set() }]));
 
   for (const offer of catalog.offers) {
     const group = grouped.get(offer.modelId);
     const providerName = providers.get(offer.providerId);
     if (offer.status !== "active" || !group || !providerName) continue;
-
     group.activeProviderIds.add(offer.providerId);
-    if (!group.providers.has(providerName)) {
-      group.providers.set(providerName, new Set());
-    }
-    if (offer.expiresAt && Number.isFinite(Date.parse(offer.expiresAt))) {
-      group.providers.get(providerName).add(offer.expiresAt);
-    }
+    group.providers.add(providerName);
   }
 
   return [...grouped.values()].filter((group) => group.providers.size > 0);
 }
 
-function makeModelRow({ model, providers }) {
-  const row = document.createElement("li");
-  row.className = "model-row";
-
-  const info = document.createElement("div");
-  const heading = document.createElement("h3");
-  heading.textContent = model.name;
-  const description = document.createElement("p");
-  description.textContent = model.description;
-  info.append(heading, description);
-
-  const chips = document.createElement("div");
-  chips.className = "provider-chips";
-  const dateFormat = new Intl.DateTimeFormat("ru-RU", {
-    day: "2-digit",
-    month: "2-digit",
-    timeZone: "UTC",
-  });
-
-  for (const [name, expirations] of providers) {
-    const chip = document.createElement("span");
-    chip.className = "provider-chip";
-    chip.textContent = name;
-
-    for (const expiration of expirations) {
-      const date = document.createElement("time");
-      date.className = "offer-expiry";
-      date.dateTime = expiration;
-      date.textContent = `акция до ${dateFormat.format(new Date(expiration))}`;
-      chip.append(" ", date);
-    }
-    chips.append(chip);
+function makeModelCard({ model, providers }) {
+  const card = document.createElement("li");
+  card.className = "model-card";
+  const logoName = Object.hasOwn(LOGOS, model.vendor)
+    ? LOGOS[model.vendor]
+    : /^(xiaomi-)?mimo/i.test(model.id) ? "xiaomimimo" : "";
+  if (logoName) {
+    const logo = document.createElement("img");
+    logo.className = ["kimi", "zai", "xiaomimimo", "openai"].includes(logoName) ? "model-logo mono-logo" : "model-logo";
+    logo.src = `/assets/logos/${logoName}.svg`;
+    logo.alt = "";
+    logo.width = logo.height = 28;
+    card.append(logo);
   }
 
-  row.append(info, chips);
-  return row;
+  const copy = document.createElement("div");
+  const title = document.createElement("h3");
+  title.textContent = model.name;
+  const description = document.createElement("p");
+  description.textContent = `Бесплатно у ${[...providers].join(", ")}`;
+  copy.append(title, description);
+  card.append(copy);
+  return card;
+}
+
+function makeNewCard(count) {
+  const card = document.createElement("li");
+  card.className = "model-card new-models";
+  const title = document.createElement("h3");
+  title.textContent = `+${count} новых`;
+  const caption = document.createElement("p");
+  caption.textContent = "Модели в каталоге";
+  card.append(title, caption);
+  return card;
+}
+
+function renderRails(rails, cards) {
+  for (const offset of [0, 1]) {
+    const items = cards.filter((_, index) => index % 2 === offset);
+    if (!items.length) continue;
+    const rail = document.createElement("div");
+    rail.className = "model-rail";
+    const track = document.createElement("div");
+    track.className = "rail-track";
+    const group = document.createElement("ul");
+    group.className = "rail-group";
+    group.setAttribute("role", "list");
+    group.append(...items);
+    const clone = group.cloneNode(true);
+    clone.classList.add("rail-clone");
+    clone.setAttribute("aria-hidden", "true");
+    track.append(group, clone);
+    rail.append(track);
+    rails.append(rail);
+  }
+}
+
+function configureRails(rails) {
+  const observer = new IntersectionObserver(([entry]) => {
+    rails.classList.toggle("is-visible", entry.isIntersecting);
+  });
+  observer.observe(rails);
 }
 
 async function renderAnnouncement(models) {
@@ -288,44 +373,49 @@ async function renderAnnouncement(models) {
   document.getElementById("announcement").href = "#models";
 }
 
-async function renderCatalog(setCatalogModels) {
-  const list = document.getElementById("model-list");
+async function renderCatalog() {
+  const rails = document.getElementById("model-rails");
   const note = document.getElementById("catalog-note");
   const fallback = FALLBACK_DATA_URL + "catalog.json";
 
   try {
     const catalog = await fetchCatalog(CATALOG_URL).catch(() => fetchCatalog(fallback));
     const models = groupActiveModels(catalog);
-    list.replaceChildren(...models.map(makeModelRow));
+    const cards = models.filter(({ model }) => model.tier !== "new").map(makeModelCard);
+    const newCount = models.filter(({ model }) => model.tier === "new").length;
+    if (newCount) cards.push(makeNewCard(newCount));
+    if (cards.length) {
+      renderRails(rails, cards);
+      configureRails(rails);
+    } else {
+      note.textContent = "Сейчас в каталоге нет активных раздач.";
+    }
 
     const updated = document.getElementById("catalog-updated");
-    const dateFormat = new Intl.DateTimeFormat("ru-RU", {
-      dateStyle: "medium", timeStyle: "short",
-    });
+    const dateFormat = new Intl.DateTimeFormat("ru-RU", { dateStyle: "medium", timeStyle: "short" });
     updated.dateTime = catalog.generatedAt;
-    updated.textContent = `Последнее обновление · ${dateFormat.format(new Date(catalog.generatedAt))}`;
+    updated.textContent = `Каталог обновлён ${dateFormat.format(new Date(catalog.generatedAt))}`;
     updated.hidden = false;
 
-    if (models.length === 0) note.textContent = "Сейчас нет активных предложений для топовых моделей.";
-    setCatalogModels(catalog.models.filter((model) => model.tier === "top").sort((first, second) => first.rank - second.rank));
-    renderAnnouncement(models).catch(() => {});
+    renderAnnouncement(models.filter(({ model }) => model.tier === "top")).catch(() => {});
   } catch {
-    list.replaceChildren();
+    rails.replaceChildren();
     const link = document.createElement("a");
     link.href = fallback;
     link.textContent = "Открыть JSON";
     note.replaceChildren("Не удалось загрузить каталог. ", link);
   } finally {
-    list.removeAttribute("aria-busy");
+    rails.removeAttribute("aria-busy");
     note.hidden = !note.textContent;
   }
 }
 
-const motion = matchMedia("(prefers-reduced-motion: reduce)");
-configureTheme();
-configureHeader();
-configureDownload();
-configureReveal(motion);
-configureFeatures(motion);
-const setCatalogModels = configureDemo(DEMO_API, TURNSTILE_SITEKEY, motion);
-renderCatalog(setCatalogModels);
+if (document.getElementById("site-header")) {
+  const motion = matchMedia("(prefers-reduced-motion: reduce)");
+  configureTheme();
+  configureHeader();
+  configureDownload(motion);
+  configureReveal(motion);
+  configureStory(motion);
+  renderCatalog();
+}
