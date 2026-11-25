@@ -56,7 +56,7 @@ export function preloadTurnstile() {
     const failed = () => {
       clearTimeout(timeout);
       element.remove();
-      reject(new DemoError("upstream", "Не удалось загрузить проверку Turnstile."));
+      reject(new DemoError("upstream", "Не загрузилась защита от ботов. Проверьте блокировщик рекламы или обновите страницу."));
     };
     const timeout = setTimeout(failed, 12_000);
     element.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
@@ -76,7 +76,7 @@ export function preloadTurnstile() {
 
 async function turnstileToken(sitekey: string, signal: AbortSignal) {
   const turnstile = await preloadTurnstile();
-  const challenge = AbortSignal.any([signal, AbortSignal.timeout(15_000)]);
+  const challenge = AbortSignal.any([signal, AbortSignal.timeout(60_000)]);
   challenge.throwIfAborted();
   const host = document.createElement("div");
   host.className = "harness-turnstile";
@@ -85,7 +85,7 @@ async function turnstileToken(sitekey: string, signal: AbortSignal) {
   let abort: () => void = () => {};
   try {
     return await new Promise<string>((resolve, reject) => {
-      const failed = () => reject(new DemoError("upstream", "Проверка Turnstile не пройдена."));
+      const failed = () => reject(new DemoError("upstream", "Не получилось подтвердить, что вы человек. Обновите страницу или откройте сайт в обычном браузере."));
       abort = () => signal.aborted ? reject(signal.reason) : failed();
       challenge.addEventListener("abort", abort, { once: true });
       id = turnstile.render(host, {

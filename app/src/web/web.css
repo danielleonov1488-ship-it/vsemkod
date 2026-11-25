@@ -33,7 +33,7 @@
 .model-picker [data-app-only]::after { content: "В приложении"; font-size: 11px; color: var(--secondary); }
 .model-picker .auto-model { display: none; }
 .provider-note { display: none; }
-.harness-turnstile { position: fixed; z-index: 20; bottom: 12px; left: 50%; transform: translateX(-50%); }
+.harness-turnstile { position: fixed; z-index: 20; bottom: 104px; left: 50%; transform: translateX(-50%); }
 .toast { inset: 48px auto auto 50%; transform: translateX(-50%); width: max-content; pointer-events: none; }
 .toast button { pointer-events: auto; }
 [data-demo-closed] .composer .send { display: none; }
