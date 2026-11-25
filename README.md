@@ -25,7 +25,7 @@
 |---|---|---|
 | [`catalog-bot/`](catalog-bot) | Бот, который собирает каталог бесплатных моделей → [`catalog-bot/data/catalog.json`](catalog-bot/data/catalog.json) | ✅ работает, обновляется каждые 30 минут через GitHub Actions |
 | `app/` | Десктоп-приложение (Electron + движок OpenCode) | 🚧 в разработке |
-| `site/` | Лендинг vsemkod.ru | 🚧 в разработке |
+| [`site/`](site) | Лендинг [vsemkod.ru](https://vsemkod.ru) | ✅ GitHub Pages, пересобирается после каждого обновления каталога |
 | [`brand/`](brand) | Логотип и аватар | ✅ |
 
 ## Каталог бесплатных моделей
