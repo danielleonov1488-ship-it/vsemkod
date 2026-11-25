@@ -361,6 +361,21 @@ summary::-webkit-details-marker { display: none; }
 .receipt-stamp { position: absolute; right: 22px; bottom: 58px; padding: 6px 12px; border: 2.5px solid var(--accent-text); border-radius: 8px; color: var(--accent-text); font: 800 20px/1 var(--font); letter-spacing: .08em; transform: rotate(-12deg) scale(1.6); opacity: 0; transition: transform 380ms cubic-bezier(.3, 1.6, .5, 1), opacity 200ms ease; }
 .receipt.is-stamped .receipt-stamp { transform: rotate(-12deg) scale(1); opacity: .9; }
 
+/* Сообщество */
+.community-link { gap: 7px; border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); color: var(--accent-text); background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.community-link:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 13%, transparent); }
+.community-link .icon { width: 16px; height: 16px; }
+.community-card {
+  position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 20px 28px; overflow: clip;
+  padding: clamp(26px, 3.4vw, 44px); border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line)); border-radius: 22px;
+  background: radial-gradient(90% 140% at 0% 0%, color-mix(in srgb, var(--accent) 14%, var(--surface)), var(--surface) 62%);
+}
+.community-mark { display: grid; place-items: center; width: 68px; height: 68px; border-radius: 20px; color: var(--on-accent); background: var(--accent); box-shadow: 0 14px 34px -10px color-mix(in srgb, var(--accent) 60%, transparent); }
+.community-mark .icon { width: 32px; height: 32px; stroke-width: 1.8; }
+.community h2 { font-size: clamp(26px, 3vw, 40px); }
+.community-copy p { max-width: 36em; margin-top: 8px; color: var(--muted); font-size: clamp(15px, 1.2vw, 17px); }
+.community-card .button-primary { min-height: 50px; padding-inline: 24px; font-size: 15px; }
+
 /* FAQ и подвал */
 .faq { display: grid; grid-template-columns: minmax(110px, .32fr) minmax(0, 1fr); gap: 17px 32px; }
 .faq-list { border-top: 1px solid var(--line); }
@@ -420,7 +435,13 @@ summary::-webkit-details-marker { display: none; }
   .faq { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 760px) {
+  .community-card { grid-template-columns: 1fr; justify-items: start; }
+}
+
 @media (max-width: 540px) {
+  .community-link span { display: none; }
+  .community-link { width: 36px; padding: 0; }
   .header-inner .brand { font-size: 19px; }
   .header-actions { gap: 3px; }
   .story-steps { grid-template-columns: 1fr; }

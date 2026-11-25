@@ -200,6 +200,7 @@ export function Settings({ prefs, version, directory, choose, update, open, chec
           <div className="settings-actions">
             <button className="text-link" type="button" onClick={() => open("https://github.com/danielleonov1488-ship-it/vsemkod")}>GitHub</button>
             <button className="text-link" type="button" onClick={() => open("https://vsemkod.ru")}>vsemkod.ru</button>
+            <button className="text-link" type="button" onClick={() => open("https://t.me/leonovlabs")}>Сообщество в Telegram</button>
           </div></Group></>}
       </div>
     </div>

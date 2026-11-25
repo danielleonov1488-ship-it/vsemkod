@@ -428,3 +428,7 @@ select.field-control { cursor: pointer; }
 .voice-progress-copy { color: var(--secondary); font-variant-numeric: tabular-nums; }
 .voice-progress progress { flex: 1 1 70px; max-width: 260px; height: 6px; accent-color: var(--mint); }
 @media (prefers-reduced-motion: reduce) { .voice-wave i { transition: none; } }
+
+.community-row { color: var(--mint); }
+.community-row .icon { color: var(--mint); }
+.community-row:hover { color: var(--mint); background: color-mix(in srgb, var(--mint) 9%, transparent); }

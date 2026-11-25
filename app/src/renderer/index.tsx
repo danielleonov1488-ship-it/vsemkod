@@ -16,6 +16,8 @@ import { Icon } from "./icons";
 import { ModelPicker, modelOptions } from "./models";
 import logo from "./assets/logo.svg";
 
+export const COMMUNITY_URL = "https://t.me/leonovlabs";
+
 declare global {
   interface Window { vsemkod: DesktopApi }
 }
@@ -676,6 +678,8 @@ function App() {
           errors={Object.keys(failures)} addProject={() => void chooseDirectory()}
           disabled={busy || loadingChat} start={startChat} open={session => void openChat(session)} perform={changeChat} />
         <div className="sidebar-end">
+          <button type="button" className="sidebar-row community-row" title="Telegram-канал сообщества: раздачи моделей, промпты и помощь"
+            onClick={() => void api.openExternal(COMMUNITY_URL).catch(showError)}><Icon name="telegram" />Сообщество вайб‑кодеров</button>
           <button type="button" className="sidebar-row" aria-current={settings || subscriptions ? "page" : undefined} disabled={loadingChat}
             onClick={() => { setSettingsModels(false); setSettings(subscriptions || !settings); setSubscriptions(false); }}><Icon name="settings" />Настройки</button>
           <p className="catalog-note">{catalogAge(catalog?.catalog.generatedAt)}</p>
