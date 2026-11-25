@@ -8,9 +8,10 @@ import { z } from "zod";
 import { rankedModels } from "../../shared/catalog";
 import type { Catalog } from "../../shared/catalog-schema";
 import type { ChatEvent, Permission, PermissionDecision } from "../../shared/api";
+import type { PersonalModel } from "../../shared/providers";
 import type { Router } from "../router";
 import { readJson, writeJson } from "../storage";
-import { EngineAdapter, mergeChanges } from "./adapter";
+import { EngineAdapter, mergeChanges, type EngineModel } from "./adapter";
 
 const diffsSchema = z.record(z.string(), z.object({
   file: z.string(), patch: z.string(), additions: z.number(), deletions: z.number(),
@@ -43,6 +44,8 @@ export function engineBinary(resources: string): string {
     process.platform === "win32" ? "opencode.exe" : "opencode");
 }
 
+export const enableOpenCodeZenFree = process.env.ENABLE_OPENCODE_ZEN_FREE === "true";
+
 const filePermissions = [
   { action: "*", resource: "*", effect: "deny" },
   ...["read", "glob", "grep", "list"].map(action => ({ action, resource: "*", effect: "allow" })),
@@ -58,6 +61,7 @@ export class EngineService {
   private active?: string;
   private stopRequested = false;
   private catalogVersion?: string;
+  private authorizing = 0;
   private pendingPermissions = new Map<string, Permission>();
   private approvals: Approval[] = [];
 
@@ -66,17 +70,25 @@ export class EngineService {
     private readonly data: string,
     private readonly catalog: () => Catalog,
     private readonly router: Router,
-    private readonly emit: (event: ChatEvent) => void
+    private readonly emit: (event: ChatEvent) => void,
+    private readonly personalModels: () => PersonalModel[] = () => []
   ) {}
 
   async ready(): Promise<EngineAdapter> {
-    if (this.client && (this.active || this.catalogVersion === this.catalog().generatedAt)) return this.client;
+    if (this.client && (this.active || this.authorizing || this.catalogVersion === this.configVersion(this.catalog(), this.personalModels()))) return this.client;
     if (this.starting) return this.starting;
     this.starting = this.launch().finally(() => { this.starting = undefined; });
     return this.starting;
   }
 
-  async send(sessionId: string, directory: string, text: string, modelId: string, auto: boolean, files: string[]) {
+  async withAuth<T>(run: (client: EngineAdapter) => Promise<T>): Promise<T> {
+    const client = await this.ready();
+    this.authorizing++;
+    try { return await run(client); }
+    finally { this.authorizing--; }
+  }
+
+  async send(sessionId: string, directory: string, text: string, modelId: string, auto: boolean, files: string[], native?: EngineModel) {
     if (this.active) throw new Error("Агент уже отвечает в другом запросе.");
     const client = await this.ready();
     if (this.active) throw new Error("Агент уже отвечает в другом запросе.");
@@ -91,7 +103,7 @@ export class EngineService {
     this.approvals = approvals ?? [];
     let changed = false;
     try {
-      const result = await client.send(sessionId, directory, text, modelId, files, event => {
+      const result = await client.send(sessionId, directory, text, native ?? { id: modelId, providerID: "vsemkod" }, files, event => {
         if (event.type === "permission") {
           const permission = event.permission;
           this.pendingPermissions.set(permission.id, permission);
@@ -164,11 +176,13 @@ export class EngineService {
   private async launch(): Promise<EngineAdapter> {
     await this.close();
     await access(this.executable).catch(() => { throw new Error("Бинарник OpenCode отсутствует. Выполните npm run fetch:engine."); });
-    await mkdir(this.data, { recursive: true });
+    const temp = join(this.data, "tmp");
+    await mkdir(temp, { recursive: true });
     const catalog = this.catalog();
+    const personal = this.personalModels();
     const password = randomBytes(32).toString("base64url");
     const env: NodeJS.ProcessEnv = {};
-    for (const name of ["PATH", "Path", "SystemRoot", "WINDIR", "ComSpec", "PATHEXT", "TEMP", "TMP", "TMPDIR", "SHELL", "LANG", "LC_ALL"]) {
+    for (const name of ["PATH", "Path", "SystemRoot", "WINDIR", "ComSpec", "PATHEXT", "SHELL", "LANG", "LC_ALL"]) {
       if (process.env[name]) env[name] = process.env[name];
     }
     Object.assign(env, {
@@ -176,6 +190,7 @@ export class EngineService {
       XDG_CONFIG_HOME: join(this.data, "config"),
       XDG_STATE_HOME: join(this.data, "state"),
       XDG_CACHE_HOME: join(this.data, "cache"),
+      TEMP: temp, TMP: temp, TMPDIR: temp,
       OPENCODE_PASSWORD: password,
       OPENCODE_PURE: "true",
       OPENCODE_DISABLE_PROJECT_CONFIG: "true",
@@ -186,7 +201,8 @@ export class EngineService {
       OPENCODE_DISABLE_AUTOUPDATE: "true",
       OPENCODE_DISABLE_TELEMETRY: "true",
       DO_NOT_TRACK: "1",
-      OPENCODE_CONFIG_CONTENT: JSON.stringify(this.config(catalog))
+      OPENCODE_DISABLE_FREE_MODELS: enableOpenCodeZenFree ? "false" : "true",
+      OPENCODE_CONFIG_CONTENT: JSON.stringify(this.config(catalog, personal))
     });
     const child = spawn(this.executable, ["serve", "--hostname", "127.0.0.1", "--port", "0"], {
       cwd: this.data, env, windowsHide: true, stdio: ["ignore", "pipe", "pipe"]
@@ -213,7 +229,7 @@ export class EngineService {
       });
       const client = new EngineAdapter(url, "Basic " + Buffer.from("opencode:" + password).toString("base64"));
       await client.info();
-      this.catalogVersion = catalog.generatedAt;
+      this.catalogVersion = this.configVersion(catalog, personal);
       this.client = client;
       return client;
     } catch (error) {
@@ -226,12 +242,21 @@ export class EngineService {
     }
   }
 
-  private config(catalog: Catalog) {
+  private configVersion(catalog: Catalog, personal: PersonalModel[]) {
+    return JSON.stringify([catalog.generatedAt, personal]);
+  }
+
+  private config(catalog: Catalog, personal: PersonalModel[]) {
     const models = rankedModels(catalog);
     const entries = models.map(model => [model.id, {
       name: model.name,
       limit: { context: model.contextWindow, output: Math.min(8192, Math.floor(model.contextWindow / 4)) },
       capabilities: { tools: model.capabilities.includes("tools"), input: ["text", ...(model.capabilities.includes("vision") ? ["image"] : [])], output: ["text"] }
+    }]);
+    const personalEntries = personal.map(model => [model.id, {
+      name: model.name,
+      limit: { context: model.context ?? 32_768, output: Math.min(8192, Math.floor((model.context ?? 32_768) / 4)) },
+      capabilities: { tools: true, input: ["text", ...(model.vision ? ["image"] : [])], output: ["text"] }
     }]);
     return {
       model: "vsemkod/auto",
@@ -245,7 +270,10 @@ export class EngineService {
         ...Object.fromEntries(["build", "plan", "general"].map(agent => [agent, { permissions: filePermissions }])),
         title: { disabled: true }
       },
-      plugins: ["-opencode.models.dev", "-opencode.provider.opencode", "-opencode.provider.kilo"],
+      plugins: [
+        "-opencode.provider.kilo", "-opencode.provider.claude-agent",
+        ...(enableOpenCodeZenFree ? [] : ["-opencode.provider.opencode"])
+      ],
       providers: {
         vsemkod: {
           name: "vsemkod",
@@ -255,7 +283,7 @@ export class EngineService {
             name: "Автовыбор",
             limit: { context: Math.min(...models.filter(model => model.tier !== "basic").map(model => model.contextWindow), 128_000), output: 8192 },
             capabilities: { tools: true, input: ["text"], output: ["text"] }
-          }], ...entries])
+          }], ...entries, ...personalEntries])
         }
       }
     };

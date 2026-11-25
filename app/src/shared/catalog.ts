@@ -1,6 +1,6 @@
 import type { Catalog, Model, Offer, Provider } from "./catalog-schema";
 
-const tierOrder = { top: 0, good: 1, basic: 2 };
+const tierOrder = { top: 0, good: 1, new: 2, basic: 3 };
 
 export function rankedModels(catalog: Catalog): Model[] {
   return [...catalog.models].sort((a, b) => tierOrder[a.tier] - tierOrder[b.tier] || a.rank - b.rank);

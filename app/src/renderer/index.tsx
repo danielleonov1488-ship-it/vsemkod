@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import type { CatalogState, ChatEvent, ChatPart, Conversation, DesktopApi, FileChange, InitialState, Notice, Permission, Preferences } from "../shared/api";
+import type { CatalogState, ChatEvent, ChatPart, ConnectionId, Conversation, DesktopApi, FileChange, InitialState, Notice, Permission, Preferences } from "../shared/api";
 import { Chat } from "./chat";
+import { catalogConnection, ConnectDialog, ConnectionsPage, readableError, SettingsPage, type Connection } from "./connections";
 import { Icon } from "./icons";
-import { AutoSwitch, ConnectDialog, ModelPicker, modelOptions, type Connection } from "./models";
+import { ModelPicker, modelOptions } from "./models";
 import logo from "./assets/logo.svg";
 
 declare global {
@@ -13,7 +14,6 @@ declare global {
 const api = window.vsemkod;
 const suggestions = ["Создать лендинг", "Найти баг", "Объяснить код", "Написать тесты"];
 const folderName = (path: string) => path.split(/[\\/]/).filter(Boolean).at(-1) ?? path;
-const readableError = (error: unknown) => error instanceof Error ? error.message.replace(/^Error invoking remote method '[^']+': (?:Error: )?/, "") : "Не удалось выполнить действие.";
 
 function catalogAge(date?: string) {
   if (!date) return "Загружаем каталог моделей";
@@ -38,6 +38,7 @@ function App() {
   const [sessions, setSessions] = useState<Conversation[]>([]);
   const [chat, setChat] = useState<Conversation>();
   const [settings, setSettings] = useState(false);
+  const [subscriptions, setSubscriptions] = useState(false);
   const [query, setQuery] = useState("");
   const [draft, setDraft] = useState("");
   const [files, setFiles] = useState<string[]>([]);
@@ -53,6 +54,7 @@ function App() {
   const draftInput = useRef<HTMLTextAreaElement>(null);
   const activeChat = useRef<string | undefined>(undefined);
   const requestPending = useRef(false);
+  const preferenceRevision = useRef(0);
   const noticeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const liveCatalog = useRef(catalog);
   const lastRoute = useRef<string | undefined>(undefined);
@@ -63,7 +65,7 @@ function App() {
     clearTimeout(noticeTimer.current);
     noticeTimer.current = setTimeout(() => setNotice(undefined), next.connect ? 12_000 : 6500);
   }, []);
-  const showError = useCallback((error: unknown) => notify({ text: readableError(error) }), [notify]);
+  const showError = useCallback((error: unknown) => notify({ text: readableError(error), tone: "error" }), [notify]);
 
   useEffect(() => {
     let mounted = true;
@@ -95,7 +97,8 @@ function App() {
         const names = liveCatalog.current?.catalog.models;
         const next = names?.find(model => model.id === event.modelId)?.name ?? event.modelId;
         const previous = names?.find(model => model.id === event.previousModelId)?.name ?? event.previousModelId;
-        notify({ text: "Переключился на " + next + " — " + previous + " временно недоступна" });
+        notify({ text: "Переключился на " + next + (event.reason === "quota"
+          ? " — у модели " + previous + " кончилась квота" : " — модель " + previous + " временно недоступна") });
       }
       lastRoute.current = event.modelId;
     }
@@ -113,8 +116,13 @@ function App() {
   }, [directory, showError]);
 
   const options = catalog ? modelOptions(catalog) : [];
-  const selected = options.find(item => item.model.id === model && item.available.length) ?? options.find(item => item.available.length);
-  const modelId = selected?.model.id;
+  const personal = catalog?.personalModels ?? [];
+  const zen = catalog?.zenModels ?? [];
+  const ownModels = [...personal, ...zen];
+  const available = options.filter(item => item.available.length);
+  const ownModel = ownModels.find(item => item.id === model);
+  const selected = available.find(item => item.model.id === model) ?? available.find(item => item.model.tier !== "new");
+  const modelId = ownModel?.id ?? selected?.model.id;
   const provider = routeProvider
     ? catalog?.catalog.providers.find(provider => provider.id === routeProvider)
     : selected?.available[0]?.provider;
@@ -123,6 +131,7 @@ function App() {
     activeChat.current = undefined;
     setChat(undefined);
     setSettings(false);
+    setSubscriptions(false);
     setParts([]);
     setChanges([]);
     setPermissions([]);
@@ -213,7 +222,23 @@ function App() {
   }
 
   function updatePrefs(patch: Partial<Preferences>) {
-    void api.preferences(patch).then(setPrefs).catch(showError);
+    const revision = ++preferenceRevision.current;
+    setPrefs(current => current && { ...current, ...patch });
+    void api.preferences(patch).then(saved => {
+      if (revision === preferenceRevision.current) setPrefs(saved);
+    }).catch(error => {
+      showError(error);
+      void api.initial().then(info => {
+        if (revision === preferenceRevision.current) setPrefs(info.preferences);
+      }).catch(() => {});
+    });
+  }
+
+  async function disconnect(id: ConnectionId) {
+    try {
+      setCatalog(await api.disconnect(id));
+      setRouteProvider(undefined);
+    } catch (error) { showError(error); }
   }
 
   function connectFromNotice() {
@@ -222,8 +247,11 @@ function App() {
     const model = catalog.catalog.models.find(model => model.id === modelId);
     const provider = catalog.catalog.providers.find(provider => provider.id === providerId);
     if (model && provider) {
-      if (catalog.connected.includes(provider.id)) setModel(model.id);
-      else setConnection({ model, provider });
+      if (catalog.connected.includes(provider.id)) {
+        setModel(model.id);
+        setRouteProvider(undefined);
+      }
+      else setConnection(catalogConnection(provider, model));
       setNotice(undefined);
     }
   }
@@ -248,8 +276,9 @@ function App() {
         </button>
       </div>
       <div className="composer-controls composer-controls--right">
-        <ModelPicker selected={modelId} options={options} auto={prefs?.auto ?? true}
-          onSelect={id => { setModel(id); setRouteProvider(undefined); }} onAuto={auto => updatePrefs({ auto })} onConnect={setConnection} />
+        <ModelPicker selected={modelId} options={options} personal={personal} zen={zen} auto={prefs?.auto ?? true}
+          onSelect={id => { setModel(id); setRouteProvider(undefined); }} onAuto={auto => updatePrefs({ auto })} onConnect={setConnection}
+          onSubscriptions={() => setSubscriptions(true)} />
         {busy ? <button className="send" type="button" title="Стоп" aria-label="Стоп"
           disabled={!chat} onClick={() => { if (chat) void api.stop(chat.id).catch(showError); }}><Icon name="stop" /></button>
           : <button className="send" type="submit" title="Отправить" aria-label="Отправить" disabled={!modelId || !directory || loadingChat}><Icon name="send" /></button>}
@@ -278,42 +307,23 @@ function App() {
         <nav className="recent" aria-label="Недавние чаты">
           <h2>Недавние</h2>
           <ul>{sessions.filter(item => item.title.toLocaleLowerCase("ru").includes(query.trim().toLocaleLowerCase("ru"))).map(item =>
-            <li key={item.id}><button className="sidebar-row conversation" type="button" aria-current={!settings && chat?.id === item.id ? "page" : undefined}
+            <li key={item.id}><button className="sidebar-row conversation" type="button" aria-current={!settings && !subscriptions && chat?.id === item.id ? "page" : undefined}
               title={item.title} disabled={busy || loadingChat} onClick={() => void openChat(item)}><span>{item.title}</span></button></li>)}</ul>
         </nav>
         <div className="sidebar-end">
-          <button type="button" className="sidebar-row" aria-current={settings ? "page" : undefined} disabled={loadingChat}
-            onClick={() => setSettings(value => !value)}><Icon name="settings" />Настройки</button>
+          <button type="button" className="sidebar-row" aria-current={settings || subscriptions ? "page" : undefined} disabled={loadingChat}
+            onClick={() => { setSettings(subscriptions || !settings); setSubscriptions(false); }}><Icon name="settings" />Настройки</button>
           <p className="catalog-note">{catalogAge(catalog?.catalog.generatedAt)}</p>
         </div>
       </aside>
-      {settings ? <main className="workspace">
-        <header className="chat-header"><h1>Настройки</h1></header>
-        <div className="settings-panel">
-          <section><h2>Подключённые провайдеры</h2>
-            {catalog?.catalog.providers.filter(provider => catalog.connected.includes(provider.id)).map(provider => <div className="settings-row" key={provider.id}>
-              <span>{provider.name}</span>
-              {provider.auth.type === "none" ? <span className="subtle">Доступен без ключа</span>
-                : <button className="composer-control" type="button" onClick={() => void api.disconnect(provider.id).then(setCatalog).catch(showError)}>Отключить</button>}
-            </div>)}
-          </section>
-          <section><h2>Папка по умолчанию</h2>
-            <div className="settings-row"><span className="folder-path">{prefs?.directory}</span>
-              <button className="composer-control folder-chip" type="button" onClick={() => void chooseDirectory(true)}>Выбрать</button></div>
-          </section>
-          <section><AutoSwitch auto={prefs?.auto ?? true} onAuto={auto => updatePrefs({ auto })} />
-            <label className="settings-row clipboard-setting"><span>Ловить ключ из буфера</span><input className="switch" type="checkbox" role="switch" disabled checked={false} /></label>
-          </section>
-          <div className="settings-row subtle"><span>Версия {initial?.version}</span>
-            <a href="https://github.com/danielleonov1488-ship-it/vsemkod" className="text-link" onClick={event => {
-              event.preventDefault();
-              void api.openExternal(event.currentTarget.href).catch(showError);
-            }}>GitHub</a>
-          </div>
-        </div>
-      </main> : chat ? <Chat key={chat.id} title={chat.title} parts={parts} permissions={permissions} changes={changes} busy={busy}
+      {subscriptions ? <ConnectionsPage state={catalog} close={() => setSubscriptions(false)} connect={setConnection} />
+        : settings ? <SettingsPage state={catalog} prefs={prefs} version={initial?.version} choose={() => void chooseDirectory(true)}
+          update={updatePrefs} subscriptionsPage={() => setSubscriptions(true)} connect={setConnection} disconnect={disconnect}
+          open={url => void api.openExternal(url).catch(showError)} />
+        : chat ? <Chat key={chat.id} title={chat.title} parts={parts} permissions={permissions} changes={changes} busy={busy}
         answer={(id, decision) => api.answer(chat.id, id, decision)}>
-        {composer}{provider && <p className="provider-note">Бесплатно · модель от {provider.name}</p>}
+        {composer}{ownModel ? <p className="provider-note">{ownModel.providerId === "opencode" ? "Бесплатно · " : ""}{ownModel.providerName}</p>
+          : provider && <p className="provider-note">Бесплатно · модель от {provider.name}</p>}
       </Chat> : <main className="workspace workspace--home">
         <div className="home">
           <h1>Чем займёмся?</h1>
@@ -327,8 +337,16 @@ function App() {
         </div>
       </main>}
     </div>
-    {connection && <ConnectDialog key={connection.model.id + "/" + connection.provider.id} connection={connection} close={() => setConnection(undefined)} />}
-    {notice && <div className="toast" role="status"><span className="status-dot" /><span>{notice.text}</span>
+    {connection && <ConnectDialog key={connection.id + "/" + (connection.model?.id ?? "")} connection={connection}
+      clipboard={prefs?.clipboard ?? false} close={() => setConnection(undefined)} connected={state => {
+        setCatalog(state);
+        if (connection.model) setModel(connection.model.id);
+        setRouteProvider(undefined);
+        setConnection(undefined);
+        notify({ text: "Подключено: " + connection.name });
+      }} />}
+    {notice && <div className={"toast" + (notice.tone === "error" ? " toast--error" : "")}
+      role={notice.tone === "error" ? "alert" : "status"}><span className="status-dot" /><span>{notice.text}</span>
       {notice.connect && <button type="button" className="connect-label" onClick={connectFromNotice}>Подключить</button>}
       <button className="composer-control attach" type="button" aria-label="Закрыть уведомление" onClick={() => setNotice(undefined)}><Icon name="close" /></button>
     </div>}

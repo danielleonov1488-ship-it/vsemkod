@@ -1,16 +1,19 @@
-import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
+import { app, BrowserWindow, clipboard, dialog, ipcMain, shell } from "electron";
 import { mkdirSync } from "node:fs";
 import { mkdir, realpath, stat } from "node:fs/promises";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { setTimeout as delay } from "node:timers/promises";
 import { z } from "zod";
 import { activeOffers, rankedModels } from "../shared/catalog";
-import { providerIdSchema } from "../shared/catalog-schema";
-import type { ChatEvent, Conversation, Notice, Preferences } from "../shared/api";
+import { keyIdSchema, personalProviders } from "../shared/providers";
+import type { ChatEvent, ConnectEvent, Conversation, Notice, Preferences, SubscriptionId } from "../shared/api";
 import { CatalogService } from "./catalog-service";
+import { ClipboardWatch } from "./clipboard-watch";
 import { ConnectService } from "./connect-service";
+import type { NativeModel } from "./engine/adapter";
 import { inside } from "./engine/diff-tracker";
-import { EngineService, engineBinary } from "./engine/service";
+import { EngineService, enableOpenCodeZenFree, engineBinary } from "./engine/service";
 import { KeyStore } from "./key-store";
 import { Router } from "./router";
 import { ProviderHealth } from "./router/health";
@@ -26,11 +29,17 @@ if (dataOverride) {
   app.setPath("userData", dataOverride);
 }
 
-const preferencesSchema = z.object({ directory: z.string().min(1), auto: z.boolean(), clipboard: z.boolean() }).strict();
+const preferencesSchema = z.object({
+  directory: z.string().min(1), auto: z.boolean(), clipboard: z.boolean(), catalogUpdates: z.boolean()
+}).strict();
+const subscriptionId = z.enum(["github-copilot", "openai"]);
+const connectionId = z.union([keyIdSchema, subscriptionId]);
+const dialogId = z.uuid();
 const id = z.string().min(1).max(250);
 const localPath = z.string().min(1).max(32_768).refine(isAbsolute);
 let window: BrowserWindow | undefined;
 let teardown: (() => Promise<void>) | undefined;
+let cancelConnections: (() => void) | undefined;
 let quitting = false;
 
 async function openExternal(raw: string): Promise<void> {
@@ -70,7 +79,8 @@ function createWindow() {
     if (url !== rendererUrl) void openExternal(url).catch(() => {});
   });
   window.once("ready-to-show", () => window?.show());
-  window.on("closed", () => { window = undefined; });
+  contents.on("did-navigate", () => cancelConnections?.());
+  window.on("closed", () => { cancelConnections?.(); window = undefined; });
   if (devUrl) void window.loadURL(devUrl);
   else void window.loadFile(rendererFile);
 }
@@ -80,8 +90,10 @@ async function start() {
   const resources = app.isPackaged ? process.resourcesPath : join(here, "../../resources");
   const defaultDirectory = join(dataOverride ?? app.getPath("documents"), "vsemkod Projects");
   const settingsPath = join(data, "preferences.json");
-  let preferences: Preferences = await readJson(settingsPath, preferencesSchema) ??
-    { directory: defaultDirectory, auto: true, clipboard: false };
+  let preferences: Preferences = {
+    directory: defaultDirectory, auto: true, clipboard: false, catalogUpdates: true,
+    ...await readJson(settingsPath, preferencesSchema.partial())
+  };
   try {
     await mkdir(preferences.directory, { recursive: true });
     preferences.directory = await realpath(preferences.directory);
@@ -95,16 +107,29 @@ async function start() {
   const keys = new KeyStore(join(data, "keys.json"));
   await keys.load();
   const connections = new ConnectService(keys);
-  const state = () => ({ catalog: catalog.current, connected: connections.connected(catalog.current) });
+  let subscriptions: SubscriptionId[] = [];
+  let nativeModels: NativeModel[] = [];
+  const personalModels = () => connections.personalRoutes().map(({ model }) => model);
+  const state = () => ({
+    catalog: catalog.current, connected: connections.connected(catalog.current), personal: connections.connectedPersonal(), subscriptions,
+    personalModels: [...personalModels(), ...nativeModels.filter(({ model }) => model.providerId !== "opencode").map(({ model }) => model)],
+    zenModels: nativeModels.filter(({ model }) => model.providerId === "opencode").map(({ model }) => model)
+  });
+  const publishState = () => {
+    const next = state();
+    broadcast("catalog:update", next);
+    return next;
+  };
   const catalog = new CatalogService(data, join(resources, "catalog.json"), (current, news) => {
-    broadcast("catalog:update", state());
+    publishState();
+    if (!preferences.catalogUpdates) return;
     for (const change of news) {
       const model = current.models.find(model => model.id === change.modelId);
       const provider = current.providers.find(provider => provider.id === change.providerId);
       if (!model || !provider) continue;
       const notice: Notice = {
         text: "Новая раздача: " + model.name + " бесплатно у " + provider.name,
-        connect: { modelId: model.id, providerId: provider.id }
+        connect: provider.auth.type === "none" ? undefined : { modelId: model.id, providerId: provider.id }
       };
       broadcast("notice", notice);
     }
@@ -115,13 +140,49 @@ async function start() {
   const router = new Router({
     catalog: () => catalog.current,
     key: providerId => connections.key(providerId),
+    personal: () => connections.personalRoutes(),
     health,
     onRoute: route => broadcast("chat:event", { type: "route", ...route } satisfies ChatEvent)
   });
   await router.start();
   const engine = new EngineService(engineBinary(resources), join(data, "opencode"), () => catalog.current, router,
-    event => broadcast("chat:event", event));
+    event => broadcast("chat:event", event), personalModels);
+  const attempts = new Map<string, { provider: z.infer<typeof connectionId>; controller: AbortController; done: Promise<unknown> }>();
+  let watching: { id: string; watch: ClipboardWatch } | undefined;
+  let nativeQueue = Promise.resolve();
+  function refreshNative(waitFor?: SubscriptionId) {
+    const refresh = nativeQueue.then(() => engine.withAuth(async client => {
+      const active = (await client.nativeConnections(preferences.directory)).flatMap(entry => {
+        const parsed = subscriptionId.safeParse(entry.id);
+        return parsed.success && entry.connections.some(item => item.type === "credential" && !item.status) ? [parsed.data] : [];
+      });
+      let models: NativeModel[] = [];
+      if (active.length || enableOpenCodeZenFree) {
+        for (let retry = 0; retry < 8; retry++) {
+          models = await client.nativeModels(preferences.directory, active, enableOpenCodeZenFree);
+          if ((!waitFor || models.some(({ model }) => model.providerId === waitFor)) &&
+            (!enableOpenCodeZenFree || models.some(({ model }) => model.providerId === "opencode"))) break;
+          await delay(350);
+        }
+      }
+      subscriptions = active;
+      nativeModels = models;
+      return publishState();
+    }));
+    nativeQueue = refresh.then(() => {}, () => {});
+    return refresh;
+  }
+  const providerFor = (provider: z.infer<typeof keyIdSchema>) =>
+    personalProviders.find(item => item.id === provider) ?? catalog.current.providers.find(item => item.id === provider);
+  const signalConnect = (event: ConnectEvent) => broadcast("connect:event", event);
+  const cancelAll = () => {
+    watching?.watch.close();
+    watching = undefined;
+    for (const { controller } of attempts.values()) controller.abort();
+  };
+  cancelConnections = cancelAll;
   teardown = async () => {
+    cancelAll();
     catalog.stop();
     await engine.close();
     await router.close();
@@ -172,14 +233,87 @@ async function start() {
       const next = { ...preferences, ...patch };
       await writeJson(settingsPath, next);
       preferences = next;
+      if (patch.catalogUpdates === true) catalog.start();
+      if (patch.catalogUpdates === false) catalog.stop();
       return preferences;
     });
     settingsQueue = write.then(() => {}, () => {});
     return write;
   });
-  handle("catalog:disconnect", z.tuple([providerIdSchema]), async ([provider]) => {
+  handle("connect:clipboard", z.tuple([dialogId, keyIdSchema, z.boolean()]), ([token, providerId, enabled]) => {
+    const provider = providerFor(providerId);
+    if (!provider?.keyPattern || ("auth" in provider && provider.auth.type !== "manual_key")) return;
+    if (!enabled) {
+      if (watching?.id === token) watching.watch.pause();
+      return;
+    }
+    if (watching?.id !== token) {
+      watching?.watch.close();
+      watching = { id: token, watch: new ClipboardWatch(() => clipboard.readText()) };
+    }
+    watching.watch.enable(provider.keyPattern, key => signalConnect({ id: token, type: "clipboard", key }),
+      () => signalConnect({ id: token, type: "clipboard-expired" }));
+  });
+  handle("connect:cancel", z.tuple([dialogId]), ([token]) => {
+    const running = attempts.get(token);
+    running?.controller.abort();
+    if (watching?.id === token) {
+      watching.watch.close();
+      watching = undefined;
+    }
+  });
+  const keyInput = z.object({ key: z.string().trim().min(1).max(4096), baseUrl: z.string().trim().max(4096).optional() }).strict();
+  handle("connect:start", z.tuple([dialogId, connectionId, keyInput.optional()]), ([token, providerId, input]) => {
+    if (attempts.has(token) || [...attempts.values()].some(attempt => attempt.provider === providerId && !attempt.controller.signal.aborted)) {
+      throw new Error("Подключение уже запущено.");
+    }
+    const controller = new AbortController();
+    const { signal } = controller;
+    const done = Promise.resolve().then(async () => {
+      if (watching?.id === token) watching.watch.pause();
+      const subscription = subscriptionId.safeParse(providerId);
+      if (subscription.success) {
+        const provider = subscription.data;
+        await engine.withAuth(client => client.signIn(preferences.directory, provider, async (url, code) => {
+          if (!code) {
+            try { await openExternal(url); }
+            catch { throw new Error("Не удалось открыть системный браузер."); }
+          }
+          signalConnect({ id: token, type: "waiting", code, url: code ? url : undefined });
+        }, signal));
+        return refreshNative(provider);
+      }
+      const provider = providerFor(keyIdSchema.parse(providerId));
+      if (!provider) throw new Error("Провайдер недоступен.");
+      if ("auth" in provider && provider.auth.type === "oauth_pkce") {
+        await connections.oauth(provider, async url => {
+          try { await openExternal(url); }
+          catch { throw new Error("Не удалось открыть системный браузер."); }
+          signalConnect({ id: token, type: "waiting" });
+        }, signal);
+      } else if (input && (!("auth" in provider) || provider.auth.type === "manual_key")) {
+        await connections.manual(provider, input.key, input.baseUrl, signal);
+      } else throw new Error("Введите ключ провайдера.");
+      health.reset(provider.id);
+      return publishState();
+    }).catch(error => {
+      if (signal.aborted) throw new Error("Подключение отменено.");
+      throw error;
+    }).finally(() => { attempts.delete(token); });
+    attempts.set(token, { provider: providerId, controller, done });
+    return done;
+  });
+  handle("connect:disconnect", z.tuple([connectionId]), async ([provider]) => {
+    const pending = [...attempts.values()].filter(attempt => attempt.provider === provider);
+    for (const attempt of pending) attempt.controller.abort();
+    await Promise.allSettled(pending.map(attempt => attempt.done));
+    if (provider === "openai" || provider === "github-copilot") {
+      await engine.withAuth(client => client.disconnect(preferences.directory, provider));
+      return refreshNative();
+    }
     await connections.disconnect(provider);
-    return state();
+    health.reset(provider);
+    return publishState();
   });
   handle("chat:list", z.tuple([localPath]), async ([directory]) => {
     project(directory);
@@ -201,15 +335,17 @@ async function start() {
     const connected = connections.connected(catalog.current);
     const available = rankedModels(catalog.current).filter(entry =>
       entry.tier !== "basic" && activeOffers(catalog.current, entry.id).some(({ offer, provider }) => offer.supportsTools && connected.includes(provider.id)));
-    if (!available.length || (model !== "auto" && !available.some(entry => entry.id === model))) {
-      throw new Error("Нет подключённой бесплатной модели с инструментами.");
+    const native = nativeModels.find(entry => entry.model.id === model);
+    if (!native && !personalModels().some(entry => entry.id === model) &&
+      !(model === "auto" ? available.length : available.some(entry => entry.id === model))) {
+      throw new Error("Эта модель недоступна. Выберите другую или подключите провайдера.");
     }
     for (const file of files) {
       if (!attachments.has(file) || !inside(chat.directory, await realpath(file)) || (await stat(file)).size > 2 * 1024 * 1024) {
         throw new Error("Можно прикрепить файлы из проекта размером до 2 МБ.");
       }
     }
-    return engine.send(session, chat.directory, text, model, preferences.auto, files);
+    return engine.send(session, chat.directory, text, model, preferences.auto, files, native?.upstream);
   });
   handle("chat:stop", z.tuple([id]), ([session]) => engine.stop(session));
   handle("chat:answer", z.tuple([id, id, z.enum(["once", "always", "reject"])]), ([session, permission, decision]) =>
@@ -224,7 +360,8 @@ async function start() {
     if (action === "close") window?.close();
   });
   createWindow();
-  catalog.start();
+  if (preferences.catalogUpdates) catalog.start();
+  void refreshNative().catch(() => {});
 }
 
 if (!dataOverride && !app.requestSingleInstanceLock()) app.quit();

@@ -1,4 +1,5 @@
 import type { Catalog, ProviderId } from "./catalog-schema";
+import type { KeyId, NativeId, PersonalId, PersonalModel } from "./providers";
 
 export type Conversation = { id: string; title: string; directory: string; updatedAt: number; modelId?: string };
 export type PermissionDecision = "once" | "always" | "reject";
@@ -13,11 +14,20 @@ export type ChatEvent =
   | { type: "delta"; sessionId: string; partId: string; delta: string }
   | { type: "permission"; sessionId: string; permission: Permission }
   | { type: "permission-resolved"; sessionId: string; id: string }
-  | { type: "route"; sessionId: string; modelId: string; previousModelId?: string; providerId: ProviderId };
+  | { type: "route"; sessionId: string; modelId: string; previousModelId?: string; providerId: KeyId; reason?: "quota" | "unavailable" };
 
-export type Preferences = { directory: string; auto: boolean; clipboard: boolean };
-export type CatalogState = { catalog: Catalog; connected: ProviderId[] };
-export type Notice = { text: string; connect?: { modelId: string; providerId: ProviderId } };
+export type Preferences = { directory: string; auto: boolean; clipboard: boolean; catalogUpdates: boolean };
+export type SubscriptionId = Exclude<NativeId, "opencode">;
+export type ConnectionId = KeyId | SubscriptionId;
+export type ConnectEvent = { id: string } & (
+  { type: "clipboard"; key: string } | { type: "clipboard-expired" } |
+  { type: "waiting"; code?: string; url?: string }
+);
+export type CatalogState = {
+  catalog: Catalog; connected: ProviderId[]; personal: PersonalId[]; subscriptions: SubscriptionId[];
+  personalModels: PersonalModel[]; zenModels: PersonalModel[];
+};
+export type Notice = { text: string; tone?: "error"; connect?: { modelId: string; providerId: ProviderId } };
 export type InitialState = CatalogState & { preferences: Preferences; version: string };
 
 export interface DesktopApi {
@@ -31,10 +41,14 @@ export interface DesktopApi {
   chooseDirectory(): Promise<string | null>;
   chooseFiles(directory: string): Promise<string[]>;
   preferences(patch: Partial<Preferences>): Promise<Preferences>;
-  disconnect(id: ProviderId): Promise<CatalogState>;
+  connect(id: string, provider: ConnectionId, input?: { key: string; baseUrl?: string }): Promise<CatalogState>;
+  cancelConnection(id: string): Promise<void>;
+  watchClipboard(id: string, provider: KeyId, enabled: boolean): Promise<void>;
+  disconnect(id: ConnectionId): Promise<CatalogState>;
   openExternal(url: string): Promise<void>;
   windowAction(action: "minimize" | "maximize" | "close"): Promise<void>;
   onChat(listener: (event: ChatEvent) => void): () => void;
   onCatalog(listener: (catalog: CatalogState) => void): () => void;
   onNotice(listener: (notice: Notice) => void): () => void;
+  onConnect(listener: (event: ConnectEvent) => void): () => void;
 }

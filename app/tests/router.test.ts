@@ -157,7 +157,7 @@ describe("Router", () => {
     const top = await upstream();
     const good = await upstream();
     let auto = false;
-    const routes: { modelId: string; previousModelId?: string }[] = [];
+    const routes: { modelId: string; previousModelId?: string; reason?: string }[] = [];
     const { send } = await fixture(
       [provider("kilo", failure.url), provider("numes", top.url), provider("groq", good.url)],
       [offer("first", "kilo"), offer("second", "numes"), offer("third", "groq")],
@@ -169,7 +169,7 @@ describe("Router", () => {
     const replaced = await send("first");
     expect(replaced.headers.get("x-vsemkod-model")).toBe("second");
     expect(replaced.headers.get("x-vsemkod-fallback-from")).toBe("first");
-    expect(routes[0]).toMatchObject({ modelId: "second", previousModelId: "first" });
+    expect(routes[0]).toMatchObject({ modelId: "second", previousModelId: "first", reason: "unavailable" });
     expect(good.calls).toHaveLength(0);
     auto = false;
     expect((await send("auto")).headers.get("x-vsemkod-model")).toBe("second");

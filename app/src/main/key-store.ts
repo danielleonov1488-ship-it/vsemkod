@@ -1,9 +1,14 @@
 import { safeStorage } from "electron";
 import { z } from "zod";
-import { providerIdSchema, type ProviderId } from "../shared/catalog-schema";
+import { keyIdSchema, remoteModelsSchema, type KeyId } from "../shared/providers";
 import { readJson, writeJson } from "./storage";
 
-const storedKeys = z.partialRecord(providerIdSchema, z.string().min(1));
+const profileSchema = z.object({ baseUrl: z.url(), models: remoteModelsSchema });
+type Profile = z.infer<typeof profileSchema>;
+const storedKeys = z.partialRecord(keyIdSchema, z.union([
+  z.string().min(1),
+  profileSchema.extend({ encrypted: z.string().min(1) })
+]));
 
 export class KeyStore {
   private keys: z.infer<typeof storedKeys> = {};
@@ -15,20 +20,27 @@ export class KeyStore {
     this.keys = await readJson(this.path, storedKeys) ?? {};
   }
 
-  get(id: ProviderId): string | undefined {
-    const encrypted = this.keys[id];
+  get(id: KeyId): string | undefined {
+    const entry = this.keys[id];
+    const encrypted = typeof entry === "string" ? entry : entry?.encrypted;
     if (!encrypted || !this.encryptionAvailable()) return;
     try {
       return safeStorage.decryptString(Buffer.from(encrypted, "base64"));
     } catch { return undefined; }
   }
 
-  set(id: ProviderId, key: string): Promise<void> {
-    if (!this.encryptionAvailable()) throw new Error("Системное хранилище ключей недоступно.");
-    return this.update(id, safeStorage.encryptString(key).toString("base64"));
+  profile(id: KeyId): Profile | undefined {
+    const entry = this.keys[id];
+    if (entry && typeof entry !== "string") return { baseUrl: entry.baseUrl, models: entry.models };
   }
 
-  remove(id: ProviderId): Promise<void> {
+  set(id: KeyId, key: string, profile?: Profile): Promise<void> {
+    if (!this.encryptionAvailable()) throw new Error("Системное хранилище ключей недоступно.");
+    const encrypted = safeStorage.encryptString(key).toString("base64");
+    return this.update(id, profile ? { ...profile, encrypted } : encrypted);
+  }
+
+  remove(id: KeyId): Promise<void> {
     return this.update(id);
   }
 
@@ -37,10 +49,10 @@ export class KeyStore {
       (process.platform !== "linux" || safeStorage.getSelectedStorageBackend() !== "basic_text");
   }
 
-  private update(id: ProviderId, encrypted?: string): Promise<void> {
+  private update(id: KeyId, entry?: (typeof this.keys)[KeyId]): Promise<void> {
     const write = this.writes.then(async () => {
       const next = { ...this.keys };
-      if (encrypted) next[id] = encrypted;
+      if (entry) next[id] = entry;
       else delete next[id];
       await writeJson(this.path, next);
       this.keys = next;

@@ -12,8 +12,8 @@ function external(event: React.MouseEvent<HTMLAnchorElement>, href?: string) {
 
 function Diff({ change }: { change: FileChange }) {
   return <pre className="diff" aria-label={"Изменения в " + change.file}>
-    {change.patch.split("\n").filter(line => !/^(Index:|===|--- |\+\+\+ )/.test(line)).slice(0, 1500).map((line, index) => {
-      if (line === "\\ No newline at end of file") line = "Нет перевода строки в конце файла";
+    {change.patch.split("\n").filter(line => line.trimEnd() !== "\\ No newline at end of file" &&
+      !/^(Index:|===|--- |\+\+\+ )/.test(line)).slice(0, 1500).map((line, index) => {
       const sign = line[0];
       const tone = sign === "+" ? "add" : sign === "-" ? "remove" : "";
       return <span key={index} className={"diff-line" + (tone ? " diff-line--" + tone : "")}>

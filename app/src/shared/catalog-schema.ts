@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const providerIdSchema = z.enum(["openrouter", "kilo", "numes", "runcrate", "zai", "modelscope", "groq"]);
-export const tierSchema = z.enum(["top", "good", "basic"]);
+export const tierSchema = z.enum(["top", "good", "new", "basic"]);
 export const confidenceSchema = z.enum(["structured", "page", "news"]);
 export const dateSchema = z.iso.datetime({ offset: true });
 

@@ -4,15 +4,18 @@ import { once } from "node:events";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { activeOffers, rankedModels } from "../../shared/catalog";
-import type { Catalog, ProviderId } from "../../shared/catalog-schema";
+import type { Catalog } from "../../shared/catalog-schema";
+import type { KeyId } from "../../shared/providers";
+import type { ConnectService } from "../connect-service";
 import { ProviderHealth } from "./health";
 
-type Route = { sessionId: string; modelId: string; providerId: ProviderId; previousModelId?: string };
+type Route = { sessionId: string; modelId: string; providerId: KeyId; previousModelId?: string; reason?: "quota" | "unavailable" };
 type Completion = Record<string, unknown> & { model: string; messages: unknown[] };
 
 interface RouterOptions {
   catalog: () => Catalog;
-  key: (id: ProviderId) => string | undefined;
+  key: (id: KeyId) => string | undefined;
+  personal?: ConnectService["personalRoutes"];
   health: ProviderHealth;
   auto?: () => boolean;
   firstByteMs?: number;
@@ -49,7 +52,7 @@ export class Router {
   readonly token = randomBytes(32).toString("base64url");
   private endpoint?: string;
   private context?: { sessionId: string; auto: boolean };
-  private sticky = new Map<string, ProviderId>();
+  private sticky = new Map<string, KeyId>();
   private lastModels = new Map<string, string>();
   private server = createServer((req, res) => {
     void this.handle(req, res).catch((error: unknown) => {
@@ -101,7 +104,8 @@ export class Router {
     if (req.method === "GET" && req.url === "/v1/models") {
       json(res, 200, {
         object: "list",
-        data: [{ id: "auto", vendor: "vsemkod" }, ...rankedModels(catalog)].map(model => ({
+        data: [{ id: "auto", vendor: "vsemkod" }, ...rankedModels(catalog),
+          ...(this.options.personal?.().map(({ model }) => ({ id: model.id, vendor: model.providerName })) ?? [])].map(model => ({
           id: model.id, object: "model", created: Math.floor(Date.parse(catalog.generatedAt) / 1000), owned_by: model.vendor
         }))
       });
@@ -118,33 +122,36 @@ export class Router {
   private async complete(req: IncomingMessage, res: ServerResponse, catalog: Catalog, body: Completion, signal: AbortSignal) {
     const models = rankedModels(catalog);
     const explicit = models.find(model => model.id === body.model);
-    if (!explicit && body.model !== "auto") throw new RequestError(404, "Модель отсутствует в каталоге.");
+    const personal = this.options.personal?.().find(route => route.model.id === body.model);
+    if (!explicit && !personal && body.model !== "auto") throw new RequestError(404, "Модель недоступна.");
     const header = req.headers["x-vsemkod-session"];
     const sessionId = this.context?.sessionId ?? (typeof header === "string" ? header.slice(0, 200) : undefined);
     const allowFallback = !explicit || (this.context?.auto ?? this.options.auto?.() ?? false);
-    const alternatives = models.filter(model => model.tier !== "basic" && model.id !== explicit?.id);
-    const ordered = explicit ? [explicit, ...(allowFallback ? alternatives : [])] : alternatives;
+    const alternatives = models.filter(model => (model.tier === "top" || model.tier === "good") && model.id !== explicit?.id);
+    const ordered = personal ? [personal.model] : explicit ? [explicit, ...(allowFallback ? alternatives : [])] : alternatives;
     const health = this.options.health;
     const requiresTools = Array.isArray(body.tools) && body.tools.length > 0;
-    let rateLimited = false;
+    const rateLimited = new Set<string>();
     let attempted = false;
     let cooling = false;
 
     for (const model of ordered) {
       const stickyKey = sessionId && sessionId + "/" + model.id;
       const sticky = stickyKey ? this.sticky.get(stickyKey) : undefined;
-      const candidates = activeOffers(catalog, model.id)
+      const candidates = personal ? [{ provider: personal.provider, upstreamId: personal.upstreamId, needsKey: true }]
+        : activeOffers(catalog, model.id)
         .filter(({ offer }) => !requiresTools || offer.supportsTools)
         .sort((a, b) => Number(b.provider.id === sticky) - Number(a.provider.id === sticky) ||
-          health.failures(a.provider.id) - health.failures(b.provider.id));
+          health.failures(a.provider.id) - health.failures(b.provider.id))
+        .map(({ provider, offer }) => ({ provider, upstreamId: offer.providerModelId, needsKey: provider.auth.type !== "none" }));
 
-      for (const { offer, provider } of candidates) {
+      for (const { provider, upstreamId, needsKey } of candidates) {
         if (signal.aborted) return;
-        const key = provider.auth.type === "none" ? undefined : this.options.key(provider.id);
-        if (provider.auth.type !== "none" && !key) continue;
+        const key = needsKey ? this.options.key(provider.id) : undefined;
+        if (needsKey && !key) continue;
         if (!health.ready(provider.id)) {
           cooling = true;
-          rateLimited ||= health.limited(provider.id);
+          if (health.limited(provider.id)) rateLimited.add(model.id);
           continue;
         }
         attempted = true;
@@ -163,11 +170,11 @@ export class Router {
               accept: body.stream ? "text/event-stream" : "application/json",
               ...(key ? { authorization: "Bearer " + key } : {})
             },
-            body: JSON.stringify({ ...body, model: offer.providerModelId }),
+            body: JSON.stringify({ ...body, model: upstreamId }),
             signal: AbortSignal.any([signal, deadline.signal])
           });
           if (response.status === 429 || response.status >= 500) {
-            rateLimited ||= response.status === 429;
+            if (response.status === 429) rateLimited.add(model.id);
             health.error(provider.id, response.status === 429 ? "quota" : "unavailable", response.headers.get("retry-after"));
             void response.body?.cancel().catch(() => {});
             continue;
@@ -193,12 +200,15 @@ export class Router {
           clearTimeout(timer);
         }
 
-        const previousModelId = explicit?.id ?? (sessionId ? this.lastModels.get(sessionId) : undefined);
+        const previousModelId = personal?.model.id ?? explicit?.id ?? (sessionId ? this.lastModels.get(sessionId) : undefined);
         const switched = previousModelId !== undefined && previousModelId !== model.id;
         if (stickyKey) this.sticky.set(stickyKey, provider.id);
         if (sessionId) {
           this.lastModels.set(sessionId, model.id);
-          this.options.onRoute?.({ sessionId, modelId: model.id, providerId: provider.id, previousModelId: switched ? previousModelId : undefined });
+          this.options.onRoute?.({
+            sessionId, modelId: model.id, providerId: provider.id, previousModelId: switched ? previousModelId : undefined,
+            reason: switched ? rateLimited.has(previousModelId) ? "quota" : "unavailable" : undefined
+          });
         }
         res.writeHead(response.status, {
           "content-type": response.headers.get("content-type") ?? "application/json",
@@ -215,7 +225,7 @@ export class Router {
       }
     }
 
-    if (rateLimited) throw new RequestError(429, "Квота бесплатных моделей исчерпана. Повторите позже.");
+    if (rateLimited.size) throw new RequestError(429, personal ? "Квота этой модели исчерпана. Повторите позже." : "Квота бесплатных моделей исчерпана. Повторите позже.");
     if (attempted || cooling) throw new RequestError(502, "Провайдеры не ответили. Проверьте соединение или повторите позже.");
     throw new RequestError(503, "Для этой модели сейчас нет доступной бесплатной раздачи.");
   }

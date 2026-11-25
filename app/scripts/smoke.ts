@@ -74,6 +74,8 @@ try {
   assert(permissions > 0, "Движок не запросил разрешение.");
   assert(action, "Движок не передал действие в интерфейс.");
   assert(result.changes.some(change => change.file.endsWith("hello.txt") && change.patch.includes("+привет")), "Дифф создания файла отсутствует.");
+  const history = await engine.history(sessionId, project);
+  assert(history.parts.some(part => part.kind === "user"), "История чата OpenCode не загрузилась.");
   console.log("OpenCode → Router → Kilo: hello.txt содержит «привет». Действие, разрешение и дифф получены.");
 
   const initialPermissions = permissions;

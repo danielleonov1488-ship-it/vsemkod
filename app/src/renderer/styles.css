@@ -16,6 +16,12 @@ textarea.composer-input { field-sizing: content; height: auto; min-height: 24px;
 .model-empty { margin: 6px 8px; color: var(--muted); font-size: 12px; }
 .more-models { margin: 0 0 4px; }
 .more-models[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+.experimental { border-top: 1px solid var(--line); }
+.experimental > summary { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; color: var(--secondary); font-size: 12px; cursor: pointer; }
+.experimental summary::-webkit-details-marker { display: none; }
+.experimental[open] > summary > .chevron { transform: rotate(180deg); }
+.subscription-link { margin: 4px 0; color: var(--mint); }
+.model-copy { min-width: 0; overflow-wrap: anywhere; }
 .attachments { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; }
 .attachments .composer-control { min-height: 24px; }
 .attachments .icon { width: 12px; height: 12px; }
@@ -46,18 +52,38 @@ textarea.composer-input { field-sizing: content; height: auto; min-height: 24px;
 .small-button:hover { background: #65e5ac; }
 .changes-list .diff { max-width: 100%; }
 
-dialog.connect-dialog { margin: auto; color: var(--text); }
+dialog.connect-dialog { width: min(420px, calc(100% - 32px)); margin: auto; color: var(--text); scrollbar-width: thin; }
 dialog.connect-dialog::backdrop { background: rgb(0 0 0 / 50%); }
-.manual-field { display: grid; gap: 4px; margin-top: 8px; }
-.manual-field input { min-height: 34px; padding: 0 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--window); }
+.manual-field { display: grid; gap: 4px; margin-top: 10px; }
+.manual-field input { min-width: 0; min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--window); color: var(--text); caret-color: var(--mint); }
+.manual-field input::placeholder { color: var(--secondary); }
 .manual-clipboard { display: flex; align-items: center; gap: 8px; margin-top: 8px; color: var(--secondary); font-size: 13px; }
+.connect-submit { min-height: 38px; margin-top: 12px; }
+.connect-status { display: flex; align-items: center; gap: 8px; min-height: 36px; color: var(--mint); }
+dialog > .connect-status { margin-top: 16px; }
+.connect-feedback { margin-top: 6px; color: var(--mint); font-size: 13px; }
+.connect-error { color: #ef9c9b; }
+.device-instructions { margin-bottom: 8px; color: var(--secondary); }
+.device-instructions kbd { color: var(--text); font: 600 14px var(--mono); user-select: all; }
 .toast { max-width: min(455px, calc(100% - 48px)); padding-block: 4px; }
+.toast--error .status-dot { background: #ef9c9b; }
 .status-dot { flex: none; }
 
-.settings-panel { width: min(var(--column), calc(100% - 48px)); margin: 24px auto; overflow: auto; }
-.settings-panel section { margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
-.settings-panel h2 { margin-bottom: 8px; font-size: 15px; font-weight: 500; }
-.settings-panel .auto-model { padding-inline: 0; border: 0; }
-.settings-row { display: flex; min-height: 34px; align-items: center; justify-content: space-between; gap: 12px; }
+.settings-panel { width: min(var(--column), calc(100% - 48px)); margin-inline: auto; padding-block: 24px; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.settings-group { margin: 0 0 20px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.settings-panel h2 { margin: 0 0 8px; font-size: 15px; font-weight: 600; }
+.catalog-providers > summary { display: flex; min-height: 30px; align-items: center; justify-content: space-between; font-size: 15px; font-weight: 600; cursor: pointer; }
+.catalog-providers > summary::-webkit-details-marker { display: none; }
+.catalog-providers[open] > summary > .chevron { transform: rotate(180deg); }
+.settings-intro { margin: 0 0 20px; color: var(--secondary); }
+.settings-row { display: flex; min-height: 38px; align-items: center; justify-content: space-between; gap: 12px; }
+.settings-actions, .connection-label { display: flex; align-items: center; gap: 12px; }
+.connection-label { white-space: nowrap; gap: 8px; color: var(--mint); font-size: 13px; }
+.provider-row .composer-control { flex-shrink: 0; }
+.provider-row + .provider-row, .preference-row + .preference-row { border-top: 1px solid var(--line); }
+.preference-row { min-height: 58px; padding-block: 6px; }
+.preference-row .subtle { display: block; }
+.preference-row .switch { flex: none; }
 .folder-path { overflow-wrap: anywhere; }
-.subtle, .clipboard-setting { color: var(--secondary); font-size: 13px; }
+.subtle { color: var(--secondary); font-size: 13px; }
+.experimental .subtle { font-size: inherit; }

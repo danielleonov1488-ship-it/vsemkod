@@ -1,6 +1,6 @@
-# vsemkod · этап A
+# vsemkod · этап B
 
-Десктопное приложение для работы с кодом через бесплатные модели из каталога vsemkod. Kilo Gateway работает без ключа. Чаты, настройки и диффы хранятся на компьютере. Агент отправляет выбранному провайдеру сообщения и контекст инструментов, необходимый для ответа.
+Десктопное приложение для работы с кодом через бесплатные модели из каталога vsemkod, свои подписки и API-ключи. Kilo Gateway работает без ключа. Чаты, настройки и диффы хранятся на компьютере. Агент отправляет выбранному провайдеру сообщения и контекст инструментов, необходимый для ответа.
 
 ## Запуск
 
@@ -15,11 +15,39 @@ npm run dev
 
 При первом запуске приложение создаёт `Документы/vsemkod Projects`. Папку для нового чата можно поменять через композер и сохранить как папку по умолчанию в настройках. При работающем агенте доступна кнопка «Стоп».
 
+## Подключение моделей
+
+- **OpenRouter.** Откройте «Настройки» и нажмите «Подключить» рядом с OpenRouter. Войдите в системном браузере. Одноразовый сервер на localhost ждёт ответ до пяти минут. Вернувшись в приложение, выберите модель каталога. [OAuth PKCE OpenRouter](https://openrouter.ai/docs/guides/overview/auth/oauth)
+- **GitHub Copilot и ChatGPT Plus / Pro.** В «Своих подписках и ключах» доступны штатные подключения OpenCode 2.4.1. Для Copilot выберите «Открыть GitHub» и введите код устройства. Для ChatGPT подтвердите использование своего плана в браузере. Движок регистрирует собственный клиент при первом входе и хранит данные подключения в выделенном локальном профиле. [Copilot в OpenCode 2.4.1](https://github.com/anomalyco/opencode/blob/v2.4.1/packages/core/src/plugin/provider/github-copilot.ts), [Sign in with ChatGPT в OpenCode 2.4.1](https://github.com/anomalyco/opencode/blob/v2.4.1/packages/core/src/plugin/provider/chatgpt.ts), [документация OpenAI](https://developers.openai.com/cookbook/articles/sign-in-with-chatgpt)
+- **API-ключи.** Вставьте ключ в мастере. Приложение проверит его запросом `GET /models`. Для своего OpenAI-совместимого сервера укажите полный базовый URL, например `https://example.com/v1`. Для localhost доступен HTTP. Подхват из буфера по умолчанию выключен. Если включить его в мастере или настройках, программа проверяет буфер до пяти минут в открытом мастере и подставляет первое совпадение с форматом ключа.
+- **Выбор модели.** Подключённые модели подписок и личных ключей находятся в группе «Мои подписки». Автовыбор переключает бесплатные модели каталога. Группа «Новые» появляется при наличии экспериментальных моделей и открывается отдельно.
+- **Отключение.** В настройках кнопка «Отключить» удаляет локальный ключ или данные штатного подключения движка и убирает соответствующие модели из меню. Там же можно изменить папку, автовыбор и проверку каталога.
+
+| Провайдер | Базовый URL | Документация |
+| --- | --- | --- |
+| OpenAI | `https://api.openai.com/v1` | [Модели](https://developers.openai.com/api/reference/resources/models/methods/list) |
+| Anthropic | `https://api.anthropic.com/v1` | [Список моделей](https://platform.claude.com/docs/en/api/models/list), [OpenAI-совместимый чат](https://platform.claude.com/docs/en/cli-sdks-libraries/libraries/openai-sdk) |
+| Google AI Studio | `https://generativelanguage.googleapis.com/v1beta/openai` | [OpenAI-совместимый API](https://ai.google.dev/gemini-api/docs/openai) |
+| DeepSeek | `https://api.deepseek.com` | [Модели](https://api-docs.deepseek.com/api/list-models/) |
+| Z.ai | `https://api.z.ai/api/paas/v4` | [API](https://docs.z.ai/api-reference/llm/chat-completion) |
+| Z.ai Coding Plan | `https://api.z.ai/api/coding/paas/v4` | [Настройка OpenCode](https://docs.z.ai/devpack/tool/opencode), [совместимый эндпоинт](https://zcode.z.ai/en/docs/configuration) |
+| Moonshot / Kimi | `https://api.moonshot.ai/v1` | [Платформа Moonshot](https://platform.moonshot.ai/docs) |
+| MiniMax | `https://api.minimax.io/v1` | [OpenAI-совместимый API](https://platform.minimax.io/docs/api-reference/text-openai-api) |
+| Qwen / DashScope | `https://dashscope-intl.aliyuncs.com/compatible-mode/v1` | [Международный API](https://www.alibabacloud.com/help/en/model-studio/compatibility-of-openai-with-dashscope) |
+| Groq | `https://api.groq.com/openai/v1` | [Модели](https://console.groq.com/docs/models) |
+| Mistral | `https://api.mistral.ai/v1` | [Модели](https://docs.mistral.ai/api/endpoint/models) |
+
+### OpenCode Zen
+
+Флаг `ENABLE_OPENCODE_ZEN_FREE=true` включает бесплатные чат-модели Zen. По умолчанию флаг выключен. Условие Zen сформулировано так — “Free-tier chat models require OpenCode; use paid models or Go from other clients.” [Условия доступа к бесплатным моделям](https://opencode.ai/docs/console/models/#endpoints)
+
+Документация OpenCode допускает собственный интерфейс поверх штатного сервера и встраивание движка. По этим документам vsemkod может использовать бесплатный Zen через официальный OpenCode 2.4.1. Движок выполняет запрос через свой провайдер со своими заголовками, а vsemkod управляет сессией через SDK. Приложение показывает только модели с нулевой ценой входных и выходных токенов. [Интеграция с OpenCode](https://opencode.ai/docs/build), [условия OpenCode](https://opencode.ai/legal/terms-of-service), [реализация в движке](https://github.com/anomalyco/opencode/blob/v2.4.1/packages/core/src/plugin/provider/opencode.ts)
+
 ## Как устроено
 
 - **Electron main** загружает и валидирует каталог, обновляет его каждые 30 минут и держит локальный кэш. В ресурсах есть копия для первого запуска без сети. API-ключи хранит `KeyStore` через системное шифрование Electron.
-- **Router** слушает `127.0.0.1` на свободном порту и требует случайный bearer-токен, создаваемый при каждом запуске. Он подбирает активные бесплатные раздачи для канонических моделей, передаёт поток SSE и вызовы инструментов. При сбое до первого байта пробует другие предложения, а при включённом автовыборе также другие модели. Статистика запросов и ошибок хранится без их содержимого.
-- **EngineService** запускает OpenCode 2.4.1 в режиме `serve` с локальной аутентификацией. Адаптер использует официальный `@opencode/client` 2.4.1 и преобразует события в текст, действия и запросы разрешений. Подтверждения «всегда» сохраняются для конкретного чата. Правки текстовых файлов отображаются и в папках без Git. [Документация клиента OpenCode](https://opencode.ai/docs/build/client/)
+- **Router** слушает `127.0.0.1` на свободном порту и требует случайный bearer-токен. Он передаёт SSE и вызовы инструментов. При сбое до первого байта пробует другие бесплатные предложения, а при включённом автовыборе также другие бесплатные модели каталога. Для личного ключа запрос направляется выбранному провайдеру. Статистика хранится без содержимого запросов.
+- **EngineService** запускает OpenCode 2.4.1 в режиме `serve` с локальной аутентификацией. Адаптер использует `@opencode/client` 2.4.1 для чатов, разрешений и штатных подписок. Подтверждения «всегда» сохраняются для конкретного чата. Правки текстовых файлов отображаются и в папках без Git. [Документация клиента OpenCode](https://opencode.ai/docs/build/client/)
 - **React** рисует интерфейс по макетам из `design/`. Renderer общается с Electron через типизированный IPC. Внешние ссылки HTTP и HTTPS открывает системный браузер.
 
 ## Проверки
@@ -29,16 +57,17 @@ npm test
 npm run typecheck
 npm run build
 npm run test:live
+node scripts/verify-stage-b.mjs
 ```
 
 Для `test:live` нужны интернет и доступная анонимная квота Kilo. Скрипт проверяет SSE через Router, затем запускает реальную сессию OpenCode. Агент создаёт `hello.txt` со словом «привет». Скрипт проверяет разрешения и дифф. Каждый запуск использует отдельную директорию в `.vsemkod-dev/`.
 
-Скриншоты dev-окна лежат в [screenshots](./screenshots). Список моделей и чат на снимках взяты из рабочего приложения. Для повтора сквозной проверки интерфейса запустите `npm run dev -- --remoteDebuggingPort 9417` с переменной `VSEMKOD_DEV_DATA`, указывающей на пустой каталог внутри `app/`, затем в другом терминале выполните `node scripts/verify-ui.mjs 9417`.
+Скриншоты лежат в [screenshots](./screenshots). `verify-stage-b.mjs` запускает собранное приложение с отдельным профилем, проверяет запуск браузера и callback OpenRouter до входа пользователя, подключение ключа к локальному мок-серверу и удаление ключа. Для повтора проверки интерфейса этапа A запустите `npm run dev -- --remoteDebuggingPort 9417` с переменной `VSEMKOD_DEV_DATA`, указывающей на пустой каталог внутри `app/`, затем выполните `node scripts/verify-ui.mjs 9417`.
 
-На Windows в среде проверки для захвата окна потребовались локальные диагностические флаги `--noSandbox` и отключение аппаратного GPU из-за прав на файлы и сбоя GPU-процесса. Штатная конфигурация окна включает изоляцию контекстов и песочницу.
+В среде проверки Windows Electron 45.5.0 остановился на проверке прав доступа к файлам, а DPAPI был недоступен. Снимки и сквозной сценарий этапа B получены в диагностическом Electron 44.0.0 с тестовым хранилищем ключей в памяти. Эти опции доступны только скрипту проверки. Живой прогон Kilo создал `hello.txt` с разрешением и диффом. Нативный Zen с включённым флагом ответил через Big Pickle. Запуск Copilot вернул код устройства, а OpenCode подготовил официальный вход ChatGPT с динамической регистрацией.
 
 ## Что дальше
 
-На этапе B нужно завершить OpenRouter OAuth PKCE, проверку и сохранение ручных ключей, подключение буфера обмена только с явного согласия и полировку уведомлений. Диалоги подключения уже используют данные каталога. [Протокол OpenRouter OAuth PKCE](https://openrouter.ai/docs/guides/overview/auth/oauth)
+Для полной проверки подписок владельцу нужно завершить вход в OpenRouter, GitHub Copilot и ChatGPT с доступом к соответствующим аккаунтам и отправить тестовые запросы. Для штатного Sign in with ChatGPT регистрация отдельного клиента vsemkod не требуется.
 
 В конфигурации сборщика описано размещение бинарника и офлайн-каталога в ресурсах. Установщики, CI-релизы и автообновление приложения относятся к этапу C.

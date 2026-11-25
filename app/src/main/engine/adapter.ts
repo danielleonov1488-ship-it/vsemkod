@@ -2,10 +2,13 @@ import { basename, isAbsolute, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
 import { OpenCode, type SessionInfo, type SessionMessageAssistantTool } from "@opencode/client";
-import type { ChatEvent, ChatPart, Conversation, FileChange, PermissionDecision } from "../../shared/api";
+import type { ChatEvent, ChatPart, Conversation, FileChange, PermissionDecision, SubscriptionId } from "../../shared/api";
+import { nativeNames, type PersonalModel } from "../../shared/providers";
+import { modelReference } from "../connect-service";
 import { DiffTracker, fileTools } from "./diff-tracker";
 
 const request = () => ({ signal: AbortSignal.timeout(20_000) });
+const nativeMethods: Record<SubscriptionId, string> = { "github-copilot": "device", openai: "chatgpt-token-sharing" };
 const eventTypes = [
   "session.text.delta", "session.text.ended", "session.tool.input.started", "session.tool.called",
   "session.tool.success", "session.tool.failed", "permission.asked", "permission.replied",
@@ -15,7 +18,8 @@ const eventTypes = [
 function conversation(info: SessionInfo): Conversation {
   return {
     id: info.id, title: info.title ?? "Новый чат", directory: info.location.directory,
-    updatedAt: info.time.updated, modelId: info.model?.id
+    updatedAt: info.time.updated,
+    modelId: info.model && (info.model.providerID === "vsemkod" ? info.model.id : modelReference(info.model.providerID, info.model.id))
   };
 }
 
@@ -48,12 +52,15 @@ function toToolPart(tool: SessionMessageAssistantTool, directory: string): Extra
 }
 
 function userError(error: { message: string; status?: number }): string {
-  if (error.status === 429 || /quota|rate.limit/i.test(error.message)) return "Бесплатная квота модели исчерпана. Попробуйте позже или выберите другую модель.";
+  if (error.status === 429 || /quota|rate.limit/i.test(error.message)) return "Квота модели исчерпана. Попробуйте позже или выберите другую модель.";
   if (error.status === 401 || error.status === 403) return "Провайдер отклонил доступ к выбранной модели.";
   if (error.status === 503) return "Для этой модели сейчас нет доступной раздачи.";
   if ((error.status ?? 0) >= 500 || /fetch|network|timeout|timed out/i.test(error.message)) return "Провайдер не ответил. Проверьте соединение или повторите позже.";
   return "Агент не смог выполнить запрос. " + error.message.slice(0, 400);
 }
+
+export type EngineModel = { id: string; providerID: string };
+export type NativeModel = { model: PersonalModel; upstream: EngineModel };
 
 export class EngineAdapter {
   private readonly client;
@@ -63,6 +70,88 @@ export class EngineAdapter {
   }
 
   info() { return this.client.server.info(request()); }
+
+  async nativeConnections(directory: string) {
+    const location = { directory };
+    await this.client.model.list({ location }, request());
+    const read = async () => (await this.client.integration.list({ location }, request())).data
+      .filter(entry => entry.id === "github-copilot" || entry.id === "openai");
+    let integrations = await read();
+    const settled = () => Object.entries(nativeMethods).every(([id, methodID]) =>
+      integrations.some(entry => String(entry.id) === id &&
+        entry.methods.some(method => method.type === "oauth" && String(method.id) === methodID)));
+    for (let attempt = 0; !settled() && attempt < 30; attempt++) {
+      await delay(100);
+      integrations = await read();
+    }
+    return integrations;
+  }
+
+  async nativeModels(directory: string, subscriptions: SubscriptionId[], zen: boolean): Promise<NativeModel[]> {
+    const result = await this.client.model.list({ location: { directory } }, request());
+    return result.data.flatMap(entry => {
+      const providerId = String(entry.providerID);
+      if (providerId !== "github-copilot" && providerId !== "openai" && providerId !== "opencode") return [];
+      if (!entry.enabled || !entry.capabilities?.tools) return [];
+      if (providerId === "opencode") {
+        if (!zen || !entry.cost?.length || entry.cost.some(price => price.input !== 0 || price.output !== 0)) return [];
+      } else if (!subscriptions.includes(providerId)) return [];
+      return [{
+        model: {
+          id: modelReference(providerId, entry.id), name: entry.name, providerId, providerName: nativeNames[providerId],
+          context: entry.limit?.context, vision: entry.capabilities.input.includes("image")
+        },
+        upstream: { id: entry.id, providerID: providerId }
+      }];
+    });
+  }
+
+  async signIn(
+    directory: string, id: SubscriptionId, present: (url: string, code?: string) => Promise<void>, signal: AbortSignal
+  ) {
+    const methodID = nativeMethods[id];
+    const entry = (await this.nativeConnections(directory)).find(item => String(item.id) === id);
+    if (!entry?.methods.some(method => method.type === "oauth" && String(method.id) === methodID)) {
+      throw new Error("Штатный вход недоступен в этой сборке OpenCode.");
+    }
+    const location = { directory };
+    const attempt = await this.client.integration.oauth.connect({
+      integrationID: id, methodID, location, ...(id === "github-copilot" ? { answer: { deploymentType: "github.com" } } : {})
+    }, request()).catch(() => {
+      throw new Error("Не удалось начать вход. Проверьте соединение и попробуйте ещё раз.");
+    });
+    const input = { integrationID: id, attemptID: attempt.data.attemptID, location };
+    let complete = false;
+    try {
+      signal.throwIfAborted();
+      const code = id === "github-copilot" ? /\b[A-Z0-9]{4}-[A-Z0-9]{4}\b/i.exec(attempt.data.instructions)?.[0] : undefined;
+      if (id === "github-copilot" && !code) throw new Error("GitHub не вернул код устройства. Попробуйте ещё раз.");
+      await present(attempt.data.url, code);
+      while (!signal.aborted && Date.now() < attempt.data.time.expires) {
+        const { data } = await this.client.integration.oauth.status(input, {
+          signal: AbortSignal.any([signal, AbortSignal.timeout(10_000)])
+        }).catch(() => {
+          throw new Error("Не удалось проверить вход. Проверьте соединение и попробуйте ещё раз.");
+        });
+        if (data.status === "complete") { complete = true; return; }
+        if (data.status === "failed") throw new Error(id === "github-copilot"
+          ? "GitHub не подтвердил вход. Проверьте доступ к Copilot и повторите попытку."
+          : "ChatGPT не подтвердил вход. Проверьте доступ Plus или Pro и повторите попытку.");
+        if (data.status === "expired") break;
+        await delay(1000, undefined, { signal });
+      }
+      throw new Error("Время входа истекло. Попробуйте ещё раз.");
+    } finally {
+      if (!complete) await this.client.integration.oauth.cancel(input, request()).catch(() => {});
+    }
+  }
+
+  async disconnect(directory: string, id: SubscriptionId) {
+    const entry = (await this.nativeConnections(directory)).find(item => String(item.id) === id);
+    for (const connection of entry?.connections ?? []) {
+      if (connection.type === "credential") await this.client.credential.remove({ credentialID: connection.id }, request());
+    }
+  }
 
   async list(directory: string): Promise<Conversation[]> {
     const result = await this.client.session.list({ directory, parentID: null, limit: 100 }, request());
@@ -78,7 +167,9 @@ export class EngineAdapter {
     const parts: ChatPart[] = [];
     let cursor: string | undefined;
     do {
-      const page = await this.client.message.list({ sessionID: sessionId, limit: 100, order: "asc", cursor }, request());
+      const page = await this.client.message.list({
+        sessionID: sessionId, limit: 100, ...(cursor ? { cursor } : { order: "asc" })
+      }, request());
       for (const message of page.data) {
         if (message.type === "user") {
           parts.push({ id: message.id, kind: "user", text: message.text, files: message.files?.map(file => file.name ?? "") });
@@ -112,7 +203,7 @@ export class EngineAdapter {
     sessionId: string,
     directory: string,
     text: string,
-    modelId: string,
+    model: EngineModel,
     files: string[],
     emit: (event: ChatEvent) => void,
     interrupted: () => boolean
@@ -201,7 +292,7 @@ export class EngineAdapter {
     const stream = collect();
     void stream.catch(() => {});
     try {
-      await this.client.session.switchModel({ sessionID: sessionId, model: { id: modelId, providerID: "vsemkod" } }, request());
+      await this.client.session.switchModel({ sessionID: sessionId, model }, request());
       if (interrupted()) return { changes: await this.changes(sessionId), stopped: true };
       queued = true;
       await this.client.session.prompt({

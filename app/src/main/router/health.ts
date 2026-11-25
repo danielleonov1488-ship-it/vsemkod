@@ -1,15 +1,15 @@
 import { z } from "zod";
-import { providerIdSchema, type ProviderId } from "../../shared/catalog-schema";
+import { keyIdSchema, type KeyId } from "../../shared/providers";
 import { readJson, writeJson } from "../storage";
 
-const counters = z.partialRecord(providerIdSchema, z.object({
+const counters = z.partialRecord(keyIdSchema, z.object({
   requests: z.int().nonnegative(),
   errors: z.int().nonnegative()
 }));
 
 export class ProviderHealth {
   private counts: z.infer<typeof counters> = {};
-  private cooling = new Map<ProviderId, { failures: number; until: number; limited: boolean }>();
+  private cooling = new Map<KeyId, { failures: number; until: number; limited: boolean }>();
   private writes = Promise.resolve();
 
   constructor(private readonly path?: string, private readonly now: () => number = Date.now) {}
@@ -18,29 +18,29 @@ export class ProviderHealth {
     if (this.path) this.counts = await readJson(this.path, counters) ?? {};
   }
 
-  ready(id: ProviderId): boolean {
+  ready(id: KeyId): boolean {
     return (this.cooling.get(id)?.until ?? 0) <= this.now();
   }
 
-  failures(id: ProviderId): number {
+  failures(id: KeyId): number {
     return this.cooling.get(id)?.failures ?? 0;
   }
 
-  limited(id: ProviderId): boolean {
+  limited(id: KeyId): boolean {
     return !this.ready(id) && this.cooling.get(id)?.limited === true;
   }
 
-  request(id: ProviderId): void {
+  request(id: KeyId): void {
     (this.counts[id] ??= { requests: 0, errors: 0 }).requests++;
     this.save();
   }
 
-  success(id: ProviderId): void {
+  success(id: KeyId): void {
     const state = this.cooling.get(id);
     if (state && state.until <= this.now()) this.cooling.delete(id);
   }
 
-  error(id: ProviderId, cooldown?: "quota" | "unavailable", retryAfter?: string | null): void {
+  error(id: KeyId, cooldown?: "quota" | "unavailable", retryAfter?: string | null): void {
     (this.counts[id] ??= { requests: 0, errors: 0 }).errors++;
     if (cooldown) {
       const failures = this.failures(id) + 1;
@@ -56,6 +56,8 @@ export class ProviderHealth {
     }
     this.save();
   }
+
+  reset(id: KeyId) { this.cooling.delete(id); }
 
   flush(): Promise<void> { return this.writes; }
 

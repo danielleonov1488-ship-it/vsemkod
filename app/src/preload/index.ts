@@ -18,12 +18,16 @@ const api: DesktopApi = {
   chooseDirectory: () => ipcRenderer.invoke("projects:choose"),
   chooseFiles: directory => ipcRenderer.invoke("projects:attach", directory),
   preferences: patch => ipcRenderer.invoke("app:preferences", patch),
-  disconnect: id => ipcRenderer.invoke("catalog:disconnect", id),
+  connect: (id, provider, input) => ipcRenderer.invoke("connect:start", id, provider, input),
+  cancelConnection: id => ipcRenderer.invoke("connect:cancel", id),
+  watchClipboard: (id, provider, enabled) => ipcRenderer.invoke("connect:clipboard", id, provider, enabled),
+  disconnect: id => ipcRenderer.invoke("connect:disconnect", id),
   openExternal: url => ipcRenderer.invoke("app:external", url),
   windowAction: action => ipcRenderer.invoke("app:window", action),
   onChat: listener => subscribe("chat:event", listener),
   onCatalog: listener => subscribe("catalog:update", listener),
-  onNotice: listener => subscribe("notice", listener)
+  onNotice: listener => subscribe("notice", listener),
+  onConnect: listener => subscribe("connect:event", listener)
 };
 
 contextBridge.exposeInMainWorld("vsemkod", api);
