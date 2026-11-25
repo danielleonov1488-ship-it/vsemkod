@@ -1,6 +1,8 @@
 {
   "name": "vsemkod",
   "version": "0.1.0",
+  "description": "Десктопное приложение для работы с кодом через ИИ",
+  "author": "vsemkod",
   "private": true,
   "type": "module",
   "main": "out/main/index.js",
@@ -11,11 +13,15 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:live": "esbuild scripts/smoke.ts --bundle --platform=node --format=esm --packages=external --outfile=.vsemkod-dev/smoke.mjs && node .vsemkod-dev/smoke.mjs",
-    "fetch:engine": "node scripts/fetch-engine.mjs"
+    "fetch:engine": "node scripts/fetch-engine.mjs",
+    "dist:win": "npm run fetch:engine -- --platform win32 --arch x64 && npm run build && node scripts/package.mjs --win --x64 --publish never",
+    "dist:mac": "npm run fetch:engine -- --platform darwin --arch arm64 && npm run fetch:engine -- --platform darwin --arch x64 && npm run build && node scripts/package.mjs --mac --arm64 --x64 --publish never",
+    "dist:linux": "npm run fetch:engine -- --platform linux --arch x64 && npm run build && node scripts/package.mjs --linux --x64 --publish never"
   },
   "dependencies": {
     "@opencode/client": "2.4.1",
     "diff": "^8.0.3",
+    "electron-updater": "6.8.11",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-markdown": "^10.1.0",
@@ -28,6 +34,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "electron": "45.5.0",
+    "electron-builder": "26.18.0",
     "electron-vite": "6.0.0",
     "esbuild": "^0.28.2",
     "typescript": "~5.9.3",

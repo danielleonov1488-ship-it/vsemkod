@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { chmod, mkdir, mkdtemp, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseArgs } from "node:util";
 
 const version = "2.4.1";
 const checksums = {
@@ -13,19 +14,27 @@ const checksums = {
   "linux-x64": ["opencode-linux-x64-baseline.tar.gz", "9ddd18e3faf64eaeccf6a0fcbc96a5c7a14520ae5fd5b61e5be51d894f478b47"],
   "linux-arm64": ["opencode-linux-arm64.tar.gz", "cb28cf94541aeb62a4b2ea5997a99b5dd6bae595a772f36fbe279299f2032a4f"]
 };
-const platform = process.argv[2] ?? process.platform + "-" + process.arch;
-if (!Object.hasOwn(checksums, platform)) throw new Error("Не поддерживается платформа " + platform);
-const [archive, expected] = checksums[platform];
-const windows = platform.startsWith("win32-");
+const { values: { platform, arch } } = parseArgs({ options: {
+  platform: { type: "string", default: process.platform },
+  arch: { type: "string", default: process.arch }
+} });
+const target = platform + "-" + arch;
+if (!Object.hasOwn(checksums, target)) throw new Error("Не поддерживается платформа " + target);
+const [archive, expected] = checksums[target];
+const windows = platform === "win32";
 const binary = windows ? "opencode.exe" : "opencode";
-const destination = fileURLToPath(new URL("../resources/engine/" + platform + "/", import.meta.url));
+const destination = fileURLToPath(new URL("../resources/engine/" + target + "/", import.meta.url));
 await mkdir(destination, { recursive: true });
 
 const digest = (data) => createHash("sha256").update(data).digest("hex");
 const stamp = join(destination, "sha256");
 const executable = join(destination, binary);
 const installed = await Promise.all([readFile(stamp, "utf8"), readFile(executable)]).catch(() => undefined);
-if (installed && installed[0] === version + " " + expected + " " + digest(installed[1])) process.exit(0);
+if (installed && installed[0] === version + " " + expected + " " + digest(installed[1])) {
+  if (!windows) await chmod(executable, 0o755);
+  console.log("OpenCode " + version + " · " + target + " · SHA-256 проверен (кэш)");
+  process.exit(0);
+}
 
 const staging = await mkdtemp(join(destination, ".download-"));
 try {
@@ -33,7 +42,7 @@ try {
   const response = await fetch(url, { signal: AbortSignal.timeout(120_000) });
   if (!response.ok) throw new Error("OpenCode: HTTP " + response.status);
   const bytes = Buffer.from(await response.arrayBuffer());
-  if (digest(bytes) !== expected) throw new Error("SHA-256 OpenCode не совпал");
+  if (digest(bytes) !== expected) throw new Error("SHA-256 OpenCode не совпал: " + archive);
   const source = join(staging, archive);
   await writeFile(source, bytes);
   if (archive.endsWith(".zip") && process.platform === "win32") {
@@ -48,7 +57,7 @@ try {
   if (!windows) await chmod(extracted, 0o755);
   await rename(extracted, executable);
   await writeFile(stamp, version + " " + expected + " " + checksum);
-  console.log("OpenCode " + version + " · " + platform + " · SHA-256 проверен");
+  console.log("OpenCode " + version + " · " + target + " · SHA-256 проверен");
 } finally {
   if (dirname(resolve(staging)) === resolve(destination)) await rm(staging, { recursive: true, force: true });
 }

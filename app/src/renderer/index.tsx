@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import type { CatalogState, ChatEvent, ChatPart, ConnectionId, Conversation, DesktopApi, FileChange, InitialState, Notice, Permission, Preferences } from "../shared/api";
+import type { CatalogState, ChatEvent, ChatPart, ConnectionId, Conversation, DesktopApi, FileChange, InitialState, Notice, Permission, Preferences, UpdateReady } from "../shared/api";
 import { Chat } from "./chat";
 import { catalogConnection, ConnectDialog, ConnectionsPage, readableError, SettingsPage, type Connection } from "./connections";
 import { Icon } from "./icons";
@@ -50,6 +50,8 @@ function App() {
   const [model, setModel] = useState<string>();
   const [routeProvider, setRouteProvider] = useState<string>();
   const [notice, setNotice] = useState<Notice>();
+  const [updateReady, setUpdateReady] = useState<UpdateReady>();
+  const [checkingUpdates, setCheckingUpdates] = useState(false);
   const [connection, setConnection] = useState<Connection>();
   const draftInput = useRef<HTMLTextAreaElement>(null);
   const activeChat = useRef<string | undefined>(undefined);
@@ -70,16 +72,19 @@ function App() {
   useEffect(() => {
     let mounted = true;
     let live = false;
+    let liveUpdate = false;
     const stopCatalog = api.onCatalog(state => { live = true; setCatalog(state); });
     const stopNotice = api.onNotice(notify);
+    const stopUpdate = api.onUpdate(update => { liveUpdate = true; setUpdateReady(update); });
     void api.initial().then(info => {
       if (!mounted) return;
       setInitial(info);
       if (!live) setCatalog(info);
+      if (!liveUpdate) setUpdateReady(info.update);
       setPrefs(info.preferences);
       setDirectory(info.preferences.directory);
     }).catch(showError);
-    return () => { mounted = false; stopCatalog(); stopNotice(); clearTimeout(noticeTimer.current); };
+    return () => { mounted = false; stopCatalog(); stopNotice(); stopUpdate(); clearTimeout(noticeTimer.current); };
   }, [notify, showError]);
 
   useEffect(() => api.onChat((event: ChatEvent) => {
@@ -163,6 +168,25 @@ function App() {
       const added = await api.chooseFiles(directory);
       setFiles(current => [...new Set([...current, ...added])].slice(0, 10));
     } catch (error) { showError(error); }
+  }
+
+  async function checkUpdates() {
+    setCheckingUpdates(true);
+    try {
+      const result = await api.checkUpdates();
+      if (typeof result === "object") {
+        setNotice(undefined);
+        setUpdateReady(result);
+      } else {
+        const messages = {
+          disabled: "Проверка обновлений доступна в установленном приложении.",
+          current: "У вас последняя версия.",
+          downloading: "Обновление загружается в фоне."
+        };
+        notify({ text: messages[result] });
+      }
+    } catch { notify({ text: "Не удалось проверить обновления.", tone: "error" }); }
+    finally { setCheckingUpdates(false); }
   }
 
   async function openChat(session: Conversation) {
@@ -319,6 +343,7 @@ function App() {
       {subscriptions ? <ConnectionsPage state={catalog} close={() => setSubscriptions(false)} connect={setConnection} />
         : settings ? <SettingsPage state={catalog} prefs={prefs} version={initial?.version} choose={() => void chooseDirectory(true)}
           update={updatePrefs} subscriptionsPage={() => setSubscriptions(true)} connect={setConnection} disconnect={disconnect}
+          checkUpdates={() => void checkUpdates()} checkingUpdates={checkingUpdates}
           open={url => void api.openExternal(url).catch(showError)} />
         : chat ? <Chat key={chat.id} title={chat.title} parts={parts} permissions={permissions} changes={changes} busy={busy}
         answer={(id, decision) => api.answer(chat.id, id, decision)}>
@@ -345,10 +370,16 @@ function App() {
         setConnection(undefined);
         notify({ text: "Подключено: " + connection.name });
       }} />}
-    {notice && <div className={"toast" + (notice.tone === "error" ? " toast--error" : "")}
-      role={notice.tone === "error" ? "alert" : "status"}><span className="status-dot" /><span>{notice.text}</span>
-      {notice.connect && <button type="button" className="connect-label" onClick={connectFromNotice}>Подключить</button>}
-      <button className="composer-control attach" type="button" aria-label="Закрыть уведомление" onClick={() => setNotice(undefined)}><Icon name="close" /></button>
+    {(notice || updateReady) && <div className={"toast" + (notice?.tone === "error" ? " toast--error" : "")}
+      role={notice?.tone === "error" ? "alert" : "status"}><span className="status-dot" />
+      <span>{notice?.text ?? (updateReady?.action === "download" ? "Вышла новая версия" : "Доступна версия " + updateReady?.version)}</span>
+      {notice?.connect && <button type="button" className="connect-label" onClick={connectFromNotice}>Подключить</button>}
+      {!notice && updateReady && <button type="button" className="connect-label"
+        onClick={() => void api.applyUpdate().catch(showError)}>{updateReady.action === "download" ? "Скачать" : "Перезапустить"}</button>}
+      <button className="composer-control attach" type="button" aria-label="Закрыть уведомление" onClick={() => {
+        if (notice) setNotice(undefined);
+        else setUpdateReady(undefined);
+      }}><Icon name="close" /></button>
     </div>}
   </>;
 }

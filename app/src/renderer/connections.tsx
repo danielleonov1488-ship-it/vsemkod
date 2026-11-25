@@ -191,10 +191,11 @@ function ConnectionRow({ name, active, action }: { name: string; active?: boolea
   </div>;
 }
 
-export function SettingsPage({ state, prefs, version, choose, update, subscriptionsPage, connect, disconnect, open }: {
+export function SettingsPage({ state, prefs, version, choose, update, subscriptionsPage, connect, disconnect, open, checkUpdates, checkingUpdates }: {
   state?: CatalogState; prefs?: Preferences; version?: string;
   choose: () => void; update: (patch: Partial<Preferences>) => void; subscriptionsPage: () => void;
   connect: (value: Connection) => void; disconnect: (id: ConnectionId) => Promise<void>; open: (url: string) => void;
+  checkUpdates: () => void; checkingUpdates: boolean;
 }) {
   const [working, setWorking] = useState<ConnectionId>();
   const openRouter = state?.catalog.providers.find(provider => provider.id === "openrouter" && provider.auth.type === "oauth_pkce");
@@ -239,6 +240,9 @@ export function SettingsPage({ state, prefs, version, choose, update, subscripti
       </section>
       <div className="settings-row subtle"><span>Версия {version}</span>
         <div className="settings-actions">
+          <button className="composer-control connect-label" type="button" disabled={checkingUpdates} onClick={checkUpdates}>
+            {checkingUpdates ? "Проверяем…" : "Проверить обновления"}
+          </button>
           <button className="text-link" type="button" onClick={() => open("https://github.com/danielleonov1488-ship-it/vsemkod")}>GitHub</button>
           <button className="text-link" type="button" onClick={() => open("https://vsemkod.ru")}>vsemkod.ru</button>
         </div>

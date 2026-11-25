@@ -22,11 +22,14 @@ const api: DesktopApi = {
   cancelConnection: id => ipcRenderer.invoke("connect:cancel", id),
   watchClipboard: (id, provider, enabled) => ipcRenderer.invoke("connect:clipboard", id, provider, enabled),
   disconnect: id => ipcRenderer.invoke("connect:disconnect", id),
+  checkUpdates: () => ipcRenderer.invoke("updates:check"),
+  applyUpdate: () => ipcRenderer.invoke("updates:apply"),
   openExternal: url => ipcRenderer.invoke("app:external", url),
   windowAction: action => ipcRenderer.invoke("app:window", action),
   onChat: listener => subscribe("chat:event", listener),
   onCatalog: listener => subscribe("catalog:update", listener),
   onNotice: listener => subscribe("notice", listener),
+  onUpdate: listener => subscribe("updates:ready", listener),
   onConnect: listener => subscribe("connect:event", listener)
 };
 

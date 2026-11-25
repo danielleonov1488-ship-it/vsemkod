@@ -229,6 +229,7 @@ export class EngineService {
       });
       const client = new EngineAdapter(url, "Basic " + Buffer.from("opencode:" + password).toString("base64"));
       await client.info();
+      console.info("[engine] OpenCode запущен: " + this.executable + " · " + url);
       this.catalogVersion = this.configVersion(catalog, personal);
       this.client = client;
       return client;

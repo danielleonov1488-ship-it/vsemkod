@@ -1,5 +1,6 @@
 appId: ru.vsemkod.app
 productName: vsemkod
+icon: build/icon.png
 files:
   - out/**
   - package.json
@@ -8,17 +9,42 @@ extraResources:
     to: catalog.json
   - from: THIRD_PARTY_NOTICES.md
     to: THIRD_PARTY_NOTICES.md
+publish:
+  provider: github
+  owner: danielleonov1488-ship-it
+  repo: vsemkod
+  releaseType: draft
 win:
+  artifactName: vsemkod-windows-${arch}.${ext}
+  target:
+    - target: nsis
+      arch: [x64]
   extraResources:
     - from: resources/engine/win32-${arch}
       to: engine/win32-${arch}
       filter: [opencode.exe]
+nsis:
+  oneClick: true
+  perMachine: false
+  createDesktopShortcut: true
 mac:
+  artifactName: vsemkod-macos-${arch}.${ext}
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+  identity: null
+  hardenedRuntime: false
+  notarize: false
   extraResources:
     - from: resources/engine/darwin-${arch}
       to: engine/darwin-${arch}
       filter: [opencode]
 linux:
+  artifactName: vsemkod-linux-${arch}.${ext}
+  category: Development
+  target:
+    - target: AppImage
+      arch: [x64]
   extraResources:
     - from: resources/engine/linux-${arch}
       to: engine/linux-${arch}

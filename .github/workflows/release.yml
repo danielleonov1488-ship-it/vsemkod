@@ -1,0 +1,93 @@
+name: Build desktop release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: desktop-release-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: app
+
+jobs:
+  draft:
+    if: github.repository == 'danielleonov1488-ship-it/vsemkod'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Check release tag
+        run: |
+          node --input-type=commonjs -e '
+            const tag = "v" + require("./package.json").version;
+            if (process.env.GITHUB_REF !== "refs/tags/" + tag) {
+              console.error(`Select tag ${tag} to match app/package.json. Current ref: ${process.env.GITHUB_REF}`);
+              process.exit(1);
+            }
+          '
+      - name: Prepare the shared draft release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          draft=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases" --jq '.[] | [.tag_name, .draft] | @tsv' |
+            awk -v tag="$GITHUB_REF_NAME" '$1 == tag {print $2}')
+          case "$draft" in
+            true) ;;
+            '') gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag --draft --title "$GITHUB_REF_NAME" ;;
+            *) echo "Expected a single draft release for $GITHUB_REF_NAME. Check GitHub Releases." >&2; exit 1 ;;
+          esac
+
+  build:
+    needs: draft
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            engine: win32
+            targets: --win --x64
+          - os: macos-latest
+            engine: darwin
+            targets: --mac --arm64 --x64
+          - os: ubuntu-latest
+            engine: linux
+            targets: --linux --x64
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - uses: actions/cache@v6
+        with:
+          path: |
+            app/.npm-cache/_cacache
+            app/.electron-cache
+            app/.eb-cache
+            app/resources/engine
+          key: desktop-${{ matrix.os }}-${{ runner.arch }}-${{ hashFiles('app/package-lock.json', 'app/scripts/fetch-engine.mjs', 'app/scripts/install-electron.mjs', 'app/scripts/package.mjs') }}
+      - run: npm ci --cache ./.npm-cache
+      - run: npm run fetch:engine -- --platform ${{ matrix.engine }} --arch x64
+      - if: matrix.engine == 'darwin'
+        run: npm run fetch:engine -- --platform darwin --arch arm64
+      - run: npm run build
+      - name: Build and upload to the draft release
+        run: node scripts/package.mjs ${{ matrix.targets }} --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -28,7 +28,9 @@ export type CatalogState = {
   personalModels: PersonalModel[]; zenModels: PersonalModel[];
 };
 export type Notice = { text: string; tone?: "error"; connect?: { modelId: string; providerId: ProviderId } };
-export type InitialState = CatalogState & { preferences: Preferences; version: string };
+export type UpdateReady = { version: string; action: "restart" | "download" };
+export type UpdateCheck = UpdateReady | "disabled" | "current" | "downloading";
+export type InitialState = CatalogState & { preferences: Preferences; version: string; update?: UpdateReady };
 
 export interface DesktopApi {
   initial(): Promise<InitialState>;
@@ -45,10 +47,13 @@ export interface DesktopApi {
   cancelConnection(id: string): Promise<void>;
   watchClipboard(id: string, provider: KeyId, enabled: boolean): Promise<void>;
   disconnect(id: ConnectionId): Promise<CatalogState>;
+  checkUpdates(): Promise<UpdateCheck>;
+  applyUpdate(): Promise<void>;
   openExternal(url: string): Promise<void>;
   windowAction(action: "minimize" | "maximize" | "close"): Promise<void>;
   onChat(listener: (event: ChatEvent) => void): () => void;
   onCatalog(listener: (catalog: CatalogState) => void): () => void;
   onNotice(listener: (notice: Notice) => void): () => void;
+  onUpdate(listener: (update?: UpdateReady) => void): () => void;
   onConnect(listener: (event: ConnectEvent) => void): () => void;
 }

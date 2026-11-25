@@ -1,5 +1,6 @@
 node_modules/
 out/
+dist/
 .npm-cache/
 .electron-cache/
 .eb-cache/

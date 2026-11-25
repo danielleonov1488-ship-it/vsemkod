@@ -18,6 +18,7 @@ import { KeyStore } from "./key-store";
 import { Router } from "./router";
 import { ProviderHealth } from "./router/health";
 import { readJson, writeJson } from "./storage";
+import { createUpdates } from "./updates";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const devUrl = process.env.ELECTRON_RENDERER_URL;
@@ -145,8 +146,10 @@ async function start() {
     onRoute: route => broadcast("chat:event", { type: "route", ...route } satisfies ChatEvent)
   });
   await router.start();
+  console.info("[router] Запущен: " + router.baseUrl);
   const engine = new EngineService(engineBinary(resources), join(data, "opencode"), () => catalog.current, router,
     event => broadcast("chat:event", event), personalModels);
+  const updates = createUpdates(update => broadcast("updates:ready", update));
   const attempts = new Map<string, { provider: z.infer<typeof connectionId>; controller: AbortController; done: Promise<unknown> }>();
   let watching: { id: string; watch: ClipboardWatch } | undefined;
   let nativeQueue = Promise.resolve();
@@ -184,6 +187,7 @@ async function start() {
   teardown = async () => {
     cancelAll();
     catalog.stop();
+    updates.stop();
     await engine.close();
     await router.close();
   };
@@ -205,7 +209,9 @@ async function start() {
     return session;
   }
 
-  handle("app:initial", z.tuple([]), () => ({ ...state(), preferences, version: app.getVersion() }));
+  handle("app:initial", z.tuple([]), () => ({ ...state(), preferences, version: app.getVersion(), update: updates.ready }));
+  handle("updates:check", z.tuple([]), () => updates.check());
+  handle("updates:apply", z.tuple([]), () => updates.apply());
   handle("projects:choose", z.tuple([]), async () => {
     const choice = await dialog.showOpenDialog(window!, {
       title: "Выбрать папку проекта", defaultPath: preferences.directory, properties: ["openDirectory", "createDirectory"]
@@ -360,6 +366,7 @@ async function start() {
     if (action === "close") window?.close();
   });
   createWindow();
+  updates.start();
   if (preferences.catalogUpdates) catalog.start();
   void refreshNative().catch(() => {});
 }
