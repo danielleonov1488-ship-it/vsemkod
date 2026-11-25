@@ -7,7 +7,7 @@
   "type": "module",
   "main": "out/main/index.js",
   "scripts": {
-    "postinstall": "node scripts/install-electron.mjs && node scripts/fetch-engine.mjs",
+    "postinstall": "node scripts/install-electron.mjs && node scripts/fetch-engine.mjs && npm run fetch:voice -- --if-supported",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "build:web": "vite build --config vite.web.config.ts",
@@ -15,10 +15,12 @@
     "test": "vitest run",
     "test:live": "esbuild scripts/smoke.ts --bundle --platform=node --format=esm --packages=external --outfile=.vsemkod-dev/smoke.mjs && node .vsemkod-dev/smoke.mjs",
     "fetch:engine": "node scripts/fetch-engine.mjs",
-    "dist:win": "npm run fetch:engine -- --platform win32 --arch x64 && npm run build && node scripts/package.mjs --win --x64 --publish never",
-    "dist:mac": "npm run fetch:engine -- --platform darwin --arch arm64 && npm run fetch:engine -- --platform darwin --arch x64 && npm run build && node scripts/package.mjs --mac --arm64 --x64 --publish never",
-    "dist:linux": "npm run fetch:engine -- --platform linux --arch x64 && npm run build && node scripts/package.mjs --linux --x64 --publish never",
-    "test:live:d": "esbuild scripts/smoke-stage-d.ts --bundle --platform=node --format=esm --packages=external --outfile=.vsemkod-dev/smoke-stage-d.mjs && node .vsemkod-dev/smoke-stage-d.mjs"
+    "dist:win": "npm run fetch:engine -- --platform win32 --arch x64 && npm run fetch:voice -- --platform win32 --arch x64 && npm run build && node scripts/package.mjs --win --x64 --publish never",
+    "dist:mac": "npm run fetch:engine -- --platform darwin --arch arm64 && npm run fetch:engine -- --platform darwin --arch x64 && npm run fetch:voice -- --platform darwin --arch arm64 && npm run fetch:voice -- --platform darwin --arch x64 && npm run build && node scripts/package.mjs --mac --arm64 --x64 --publish never",
+    "dist:linux": "npm run fetch:engine -- --platform linux --arch x64 && npm run fetch:voice -- --platform linux --arch x64 && npm run build && node scripts/package.mjs --linux --x64 --publish never",
+    "test:live:d": "esbuild scripts/smoke-stage-d.ts --bundle --platform=node --format=esm --packages=external --outfile=.vsemkod-dev/smoke-stage-d.mjs && node .vsemkod-dev/smoke-stage-d.mjs",
+    "fetch:voice": "node scripts/fetch-voice.mjs",
+    "test:voice": "esbuild scripts/verify-voice.ts --bundle --platform=node --format=esm --outfile=.vsemkod-dev/verify-voice.mjs && node .vsemkod-dev/verify-voice.mjs"
   },
   "dependencies": {
     "@opencode/client": "2.4.1",

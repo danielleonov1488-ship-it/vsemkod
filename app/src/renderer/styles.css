@@ -283,3 +283,41 @@ select.field-control { cursor: pointer; }
   .composer-toolbar { flex-wrap: wrap; }
   .composer-controls--right { margin-left: auto; }
 }
+
+
+/* Dictation */
+.voice-mic[aria-pressed="true"] { color: var(--error); background: var(--hover); }
+.voice-progress, .voice-consent, .voice-recording, .voice-partial {
+  font-size: calc(12px * var(--font-scale, 1));
+  margin: 6px 0;
+}
+.voice-recording, .voice-actions, .voice-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.voice-consent {
+  display: grid;
+  justify-items: start;
+  gap: 7px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--secondary);
+}
+.voice-consent strong { color: var(--text); font-weight: 600; }
+.voice-partial {
+  color: var(--secondary);
+  padding-inline-start: 9px;
+  border-inline-start: 2px solid var(--line);
+  overflow-wrap: anywhere;
+}
+.voice-recording { color: var(--secondary); }
+.voice-recording time { color: var(--text); font-variant-numeric: tabular-nums; }
+.voice-wave { width: 41px; height: 24px; display: inline-flex; align-items: center; justify-content: center; gap: 3px; color: var(--error); }
+.voice-wave i { background: currentColor; border-radius: 2px; width: 2px; transition: height 80ms ease-out; }
+.voice-stop .icon { width: 12px; height: 12px; }
+.voice-progress-copy { color: var(--secondary); font-variant-numeric: tabular-nums; }
+.voice-progress progress { flex: 1 1 70px; max-width: 260px; height: 6px; accent-color: var(--mint); }
+@media (prefers-reduced-motion: reduce) { .voice-wave i { transition: none; } }

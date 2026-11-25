@@ -12,6 +12,7 @@ const paths = {
   folder: <path d="M1.75 5A1.25 1.25 0 0 1 3 3.75h3.1L7.4 5h5.6c.7 0 1.25.55 1.25 1.25V11.5c0 .7-.55 1.25-1.25 1.25H3c-.7 0-1.25-.55-1.25-1.25Z" />,
   chevron: <path d="m5 6.5 3 3 3-3" />,
   check: <path d="m3.5 8 3 3 6-6" />,
+  mic: <><rect x="6" y="2" width="4" height="7.5" rx="2" /><path d="M4 7.5V8a4 4 0 0 0 8 0v-.5M8 12v2m-2 0h4" /></>,
   send: <path d="M8 12.75v-9.5m-4 4 4-4 4 4" />,
   stop: <rect x="4.25" y="4.25" width="7.5" height="7.5" rx="1" fill="currentColor" />,
   read: <><path d="M5 3H3.5A1.5 1.5 0 0 0 2 4.5V11m8-8 3 3v6.5A1.5 1.5 0 0 1 11.5 14h-5A1.5 1.5 0 0 1 5 12.5v-8A1.5 1.5 0 0 1 6.5 3H10Z" /><path d="M10 3v3h3" /></>,

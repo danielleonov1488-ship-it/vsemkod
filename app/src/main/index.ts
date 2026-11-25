@@ -1,3 +1,5 @@
+import { voiceChunk, voiceModels } from "../shared/voice";
+import { VoiceService } from "./voice-service";
 import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeTheme, Notification, powerSaveBlocker, shell, Menu } from "electron";
 import { mkdirSync } from "node:fs";
 import { mkdir, readFile, realpath, stat, writeFile } from "node:fs/promises";
@@ -87,8 +89,12 @@ function createWindow() {
   nativeTheme.on("updated", applyTheme);
   created.on("closed", () => nativeTheme.off("updated", applyTheme));
   const contents = window.webContents;
-  contents.session.setPermissionCheckHandler(() => false);
-  contents.session.setPermissionRequestHandler((_page, _permission, callback) => callback(false));
+  contents.session.setPermissionCheckHandler((page, permission, _origin, details) =>
+    page === contents && contents.getURL() === rendererUrl && permission === "media" &&
+    details.isMainFrame && details.mediaType === "audio");
+  contents.session.setPermissionRequestHandler((page, permission, callback, details) =>
+    callback(page === contents && permission === "media" && contents.getURL() === rendererUrl &&
+      details.isMainFrame && details.requestingUrl === rendererUrl && "mediaTypes" in details && details.mediaTypes?.length === 1 && details.mediaTypes[0] === "audio"));
   contents.setWindowOpenHandler(({ url }) => {
     void openExternal(url).catch(() => {});
     return { action: "deny" };
@@ -100,6 +106,7 @@ function createWindow() {
   });
   window.once("ready-to-show", () => window?.show());
   contents.on("did-navigate", () => cancelConnections?.());
+  contents.on("render-process-gone", () => cancelConnections?.());
   window.on("closed", () => { cancelConnections?.(); window = undefined; });
   if (devUrl) void window.loadURL(devUrl);
   else void window.loadFile(rendererFile);
@@ -143,6 +150,9 @@ async function start() {
   const conversations = new Map<string, Conversation>();
   const keys = new KeyStore(join(data, "keys.json"));
   await keys.load();
+  const voice = new VoiceService(data, join(resources, "voice", process.platform + "-" + process.arch),
+    join(here, "voice-worker.js"), app.isPackaged ? join(resources, "voice-benchmark.wav") : join(resources, "../tests/fixtures/voice-en.wav"),
+    () => keys.get("groq-api"), event => broadcast("voice:event", event));
   const connections = new ConnectService(keys);
   let subscriptions: SubscriptionId[] = [];
   let nativeModels: NativeModel[] = [];
@@ -220,6 +230,7 @@ async function start() {
     personalProviders.find(item => item.id === provider) ?? catalog.current.providers.find(item => item.id === provider);
   const signalConnect = (event: ConnectEvent) => broadcast("connect:event", event);
   const cancelAll = () => {
+    voice.cancel();
     watching?.watch.close();
     watching = undefined;
     for (const { controller } of attempts.values()) controller.abort();
@@ -227,6 +238,7 @@ async function start() {
   cancelConnections = cancelAll;
   teardown = async () => {
     cancelAll();
+    voice.pause();
     catalog.stop();
     updates.stop();
     activeSession = undefined;
@@ -281,7 +293,7 @@ async function start() {
     return Promise.all(choice.filePaths.slice(0, 10).map(path => attachments.add(directory, { path, name: basename(path), mime: "" })));
   });
   let settingsQueue = Promise.resolve();
-  handle("app:preferences", z.tuple([preferencesSchema.partial()]), ([patch]) => {
+  function savePreferences(patch: Partial<Preferences>) {
     if (patch.directory) project(patch.directory);
     const write = settingsQueue.then(async () => {
       const next = { ...preferences, ...patch };
@@ -296,7 +308,21 @@ async function start() {
     });
     settingsQueue = write.then(() => {}, () => {});
     return write;
+  }
+  handle("app:preferences", z.tuple([preferencesSchema.partial()]), ([patch]) => {
+    if (patch.voiceGroq && !keys.get("groq-api")) throw new Error("Сначала подключите Groq.");
+    return savePreferences(patch);
   });
+  handle("voice:status", z.tuple([]), () => voice.status());
+  handle("voice:download", z.tuple([z.enum(voiceModels), z.boolean(), z.boolean()]), ([model, consent, vadOnly]) =>
+    voice.download(model, consent, vadOnly));
+  handle("voice:pause", z.tuple([]), () => voice.pause());
+  handle("voice:remove", z.tuple([z.enum(voiceModels)]), ([model]) => voice.remove(model));
+  handle("voice:start", z.tuple([dialogId]), ([id]) => voice.start(id, preferences));
+  handle("voice:audio", z.tuple([dialogId, z.instanceof(ArrayBuffer).refine(pcm =>
+    pcm.byteLength > 0 && pcm.byteLength <= voiceChunk * 2 && pcm.byteLength % 2 === 0)]), ([id, pcm]) => voice.audio(id, pcm));
+  handle("voice:stop", z.tuple([dialogId]), ([id]) => voice.stop(id));
+  handle("voice:cancel", z.tuple([dialogId]), ([id]) => voice.cancel(id));
   handle("connect:clipboard", z.tuple([dialogId, keyIdSchema, z.boolean()]), ([token, providerId, enabled]) => {
     const provider = providerFor(providerId);
     if (!provider?.keyPattern || ("auth" in provider && provider.auth.type !== "manual_key")) return;
@@ -369,6 +395,7 @@ async function start() {
       return refreshNative();
     }
     await connections.disconnect(provider);
+    if (provider === "groq-api") { voice.cancel(); await savePreferences({ voiceGroq: false }); }
     health.reset(provider);
     return publishState();
   });

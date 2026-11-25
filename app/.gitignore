@@ -6,3 +6,4 @@ dist/
 .eb-cache/
 .vsemkod-dev/
 resources/engine/
+resources/voice/

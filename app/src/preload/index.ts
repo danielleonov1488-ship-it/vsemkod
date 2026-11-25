@@ -8,6 +8,17 @@ function subscribe<T>(channel: string, listener: (data: T) => void) {
 }
 
 const api: DesktopApi = {
+  voice: {
+    status: () => ipcRenderer.invoke("voice:status"),
+    download: (model, consent, vadOnly = false) => ipcRenderer.invoke("voice:download", model, consent, vadOnly),
+    pause: () => ipcRenderer.invoke("voice:pause"),
+    remove: model => ipcRenderer.invoke("voice:remove", model),
+    start: id => ipcRenderer.invoke("voice:start", id),
+    audio: (id, pcm) => ipcRenderer.invoke("voice:audio", id, pcm),
+    stop: id => ipcRenderer.invoke("voice:stop", id),
+    cancel: id => ipcRenderer.invoke("voice:cancel", id),
+    subscribe: listener => subscribe("voice:event", listener)
+  },
   initial: () => ipcRenderer.invoke("app:initial"),
   sessions: directory => ipcRenderer.invoke("chat:list", directory),
   create: (directory, title) => ipcRenderer.invoke("chat:create", directory, title),

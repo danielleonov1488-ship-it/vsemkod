@@ -3,12 +3,14 @@ import type { CatalogState, McpConfig, McpEntry, Preferences, SkillSummary } fro
 import { accessLabels } from "../shared/workspace";
 import { ModelSettings, PreferenceSwitch } from "./connections";
 import { Icon } from "./icons";
+import { VoiceSettings } from "./voice-settings";
 
 const api = window.vsemkod;
-const sections = ["Общие", "Модели и подключения", "Агент", "MCP-серверы", "Навыки", "Горячие клавиши", "Данные", "О программе"];
+const sections = ["Общие", "Модели и подключения", "Агент", "MCP-серверы", "Навыки", "Горячие клавиши", "Данные", "О программе", "Голос"];
 const hotkeys = [
   ["Ctrl+N", "Новый чат"], ["Ctrl+K", "Поиск чатов"], ["Ctrl+B", "Правая панель"], ["Ctrl+J", "Терминал"],
   ["Ctrl+,", "Настройки"], ["Shift+Tab", "Режим доступа"], ["Esc Esc", "Остановить агента"], ["Ctrl+Enter", "Вмешаться"],
+  ["Ctrl+Space", "Нажать для записи или удерживать для диктовки"],
   ["Enter", "Отправить сообщение"], ["Shift+Enter", "Новая строка"], ["↑ / ↓ / Tab", "Выбрать команду или упоминание"]
 ];
 
@@ -193,6 +195,7 @@ export function Settings({ prefs, version, directory, choose, update, open, chec
             <button className="composer-control folder-chip" type="button" onClick={() => void api.clearCatalog().then(() => onNotice("Кэш каталога очищен")).catch(onError)}>Очистить кэш каталога</button>
           </div>
         </>}
+        {section === 8 && prefs && <VoiceSettings prefs={prefs} update={update} onError={onError} connected={models.state?.personal.includes("groq-api") ?? false} />}
         {section === 7 && <><Group title="vsemkod"><p className="subtle settings-detail">Версия {version} · лицензия MIT</p>
           <div className="settings-actions">
             <button className="text-link" type="button" onClick={() => open("https://github.com/danielleonov1488-ship-it/vsemkod")}>GitHub</button>

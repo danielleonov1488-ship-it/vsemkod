@@ -1,3 +1,4 @@
+import type { VoiceApi } from "./voice";
 import type { z } from "zod";
 import type { FormInfo } from "@opencode/client";
 import type { preferencesSchema } from "../main/preferences";
@@ -65,6 +66,7 @@ export type UpdateCheck = UpdateReady | "disabled" | "current" | "downloading";
 export type InitialState = CatalogState & { projects?: string[]; preferences: Preferences; version: string; update?: UpdateReady };
 
 export interface DesktopApi {
+  voice?: VoiceApi;
   initial(): Promise<InitialState>;
   sessions(directory?: string): Promise<Conversation[]>;
   create(directory: string, title: string): Promise<Conversation>;

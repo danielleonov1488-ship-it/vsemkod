@@ -7,6 +7,8 @@ files:
 extraResources:
   - from: resources/catalog.json
     to: catalog.json
+  - from: tests/fixtures/voice-en.wav
+    to: voice-benchmark.wav
   - from: THIRD_PARTY_NOTICES.md
     to: THIRD_PARTY_NOTICES.md
 publish:
@@ -23,6 +25,9 @@ win:
     - from: resources/engine/win32-${arch}
       to: engine/win32-${arch}
       filter: [opencode.exe]
+    - from: resources/voice/win32-${arch}
+      to: voice/win32-${arch}
+      filter: ["*.node", "cli/**", "!cli/sha256.json"]
 nsis:
   oneClick: true
   perMachine: false
@@ -34,11 +39,16 @@ mac:
       arch: [arm64, x64]
   identity: null
   hardenedRuntime: false
+  extendInfo:
+    NSMicrophoneUsageDescription: vsemkod использует микрофон для диктовки сообщений.
   notarize: false
   extraResources:
     - from: resources/engine/darwin-${arch}
       to: engine/darwin-${arch}
       filter: [opencode]
+    - from: resources/voice/darwin-${arch}
+      to: voice/darwin-${arch}
+      filter: ["*.node"]
 linux:
   artifactName: vsemkod-linux-${arch}.${ext}
   category: Development
@@ -49,3 +59,6 @@ linux:
     - from: resources/engine/linux-${arch}
       to: engine/linux-${arch}
       filter: [opencode]
+    - from: resources/voice/linux-${arch}
+      to: voice/linux-${arch}
+      filter: ["*.node", "cli/**", "!cli/sha256.json"]

@@ -1,19 +1,23 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
-import type { Attachment, ProjectTools } from "../shared/api";
+import type { Attachment, Preferences, ProjectTools } from "../shared/api";
 import { accessLabels, builtInCommands, folderName, imageFile, suggestionAt, type AccessMode } from "../shared/workspace";
 import { Icon } from "./icons";
+import { useVoiceComposer } from "./voice-composer";
 
 const api = window.vsemkod;
 type Suggestion = { key: string; text: string; detail?: string; folder?: boolean };
 
 export function Composer({ active, input, draft, change, directory, busy, canSend, attachments, remove, add, pick, choose,
-  projects, switchProject, access, cycle, submit, stop, selectCommand, tools, modelControls, vision, onError }: {
+  projects, switchProject, access, cycle, submit, stop, selectCommand, tools, modelControls, vision, onError, preferences, updatePreferences }: {
+  preferences?: Preferences; updatePreferences: (patch: Partial<Preferences>) => void;
   active: boolean; input: RefObject<HTMLTextAreaElement | null>; draft: string; change: (value: string) => void;
   directory: string; projects: string[]; switchProject: (path: string) => void; busy: boolean; canSend: boolean; attachments: Attachment[]; remove: (id: string) => void;
   add: (files: File[]) => void; pick: () => void; choose: () => void; access: AccessMode; cycle: () => void;
   submit: (intervene?: boolean) => void; stop: () => void; selectCommand: (name: string) => boolean;
   tools?: ProjectTools; modelControls: ReactNode; vision: boolean; onError: (text: string) => void;
 }) {
+  const voice = useVoiceComposer({ draft, input, change, preferences, update: updatePreferences,
+    onError: error => onError(error instanceof Error ? error.message : String(error)) });
   const [cursor, setCursor] = useState(0);
   const [dismissed, setDismissed] = useState(false);
   const [index, setIndex] = useState(0);
@@ -23,7 +27,7 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
   const [menu, setMenu] = useState<"add" | "project">();
   const popupTrigger = useRef<HTMLButtonElement>(null);
   const [commands, setCommands] = useState(false);
-  const token = dismissed ? undefined : commands ? { kind: "command" as const, query: "", start: 0, end: 0 }
+  const token = voice.busy || dismissed ? undefined : commands ? { kind: "command" as const, query: "", start: 0, end: 0 }
     : suggestionAt(draft, cursor);
   useEffect(() => {
     if (!menu) return;
@@ -72,7 +76,7 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
     requestAnimationFrame(() => { input.current?.focus(); input.current?.setSelectionRange(position, position); });
   }
   function keydown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.nativeEvent.isComposing) return;
+    if (event.nativeEvent.isComposing || voice.busy) return;
     if (event.shiftKey && event.key === "Tab") {
       event.preventDefault();
       cycle();
@@ -131,7 +135,7 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
     if (supported.length) add(supported);
   }
   return <form className={"composer" + (active ? "" : " composer--home") + (dragging ? " composer--dragging" : "")}
-    onSubmit={event => { event.preventDefault(); submit(); }} onDragEnter={event => {
+    onSubmit={event => { event.preventDefault(); if (!voice.busy) submit(); }} onDragEnter={event => {
       if (!event.dataTransfer.types.includes("Files")) return;
       event.preventDefault(); dragDepth.current++; setDragging(true);
     }} onDragOver={event => { if (event.dataTransfer.types.includes("Files")) event.preventDefault(); }}
@@ -145,7 +149,7 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
           {item.detail && <span className="model-description">{item.detail}</span>}</span>
       </button>)}
     </div>}
-    <textarea ref={input} className="composer-input" value={draft} rows={1} aria-label="Сообщение агенту" maxLength={100_000}
+    <textarea ref={input} className="composer-input" value={draft} readOnly={voice.busy} rows={1} aria-label="Сообщение агенту" maxLength={100_000}
       placeholder={active ? "Что сделать дальше?" : "Опиши задачу — агент сам напишет код"}
       onChange={event => { change(event.target.value); setCursor(event.target.selectionStart); setIndex(0); setDismissed(false); setCommands(false); }}
       onSelect={event => setCursor(event.currentTarget.selectionStart)}
@@ -153,6 +157,7 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
         const files = Array.from(event.clipboardData.files);
         if (files.length) { event.preventDefault(); receive(files); }
       }} />
+    {voice.controls}
     {attachments.length > 0 && <ul className="attachments" aria-label="Прикреплённые файлы">
       {attachments.map(file => <li key={file.id}><button type="button" className="composer-control folder-chip" aria-label={"Убрать " + file.name}
         onClick={() => remove(file.id)}>{file.preview && <img className="attachment-preview" src={file.preview} alt="" />}
@@ -167,10 +172,10 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
             <button className="model-option" type="button" disabled={!directory} onClick={() => { setMenu(undefined); pick(); }}>
               <Icon name="paperclip" />Прикрепить файлы или картинки
             </button>
-            <button className="model-option" type="button" disabled={!directory} onClick={() => openSuggestions("path")}>
+            <button className="model-option" type="button" disabled={!directory || voice.busy} onClick={() => openSuggestions("path")}>
               <Icon name="file" />Упомянуть файл (@)
             </button>
-            <button className="model-option" type="button" onClick={() => openSuggestions("command")}>
+            <button className="model-option" type="button" disabled={voice.busy} onClick={() => openSuggestions("command")}>
               <Icon name="terminal" />Команды (/)
             </button>
           </div>}
@@ -199,8 +204,9 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
       <div className="composer-controls composer-controls--right">
         {modelControls}
         {busy && <button className="send stop-button" type="button" title="Стоп · Esc Esc" aria-label="Стоп" onClick={stop}><Icon name="stop" /></button>}
+        {voice.button}
         {(!busy || draft.trim() || attachments.length > 0) && <button className="send" type="submit" title={busy ? "Отправить во время работы" : "Отправить"}
-          aria-label="Отправить" disabled={!canSend}><Icon name="send" /></button>}
+          aria-label="Отправить" disabled={!canSend || voice.busy}><Icon name="send" /></button>}
       </div>
     </div>
   </form>;

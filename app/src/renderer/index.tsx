@@ -560,6 +560,7 @@ function App() {
   async function disconnect(id: ConnectionId) {
     try {
       setCatalog(await api.disconnect(id));
+      if (id === "groq-api") setPrefs(current => current && { ...current, voiceGroq: false });
       setRouteProvider(undefined);
     } catch (error) { showError(error); }
   }
@@ -595,7 +596,7 @@ function App() {
           <Icon name="close" />
         </button></li>)}
     </ul>}
-    <Composer active={!!chat} input={draftInput} draft={draft} change={setDraft} directory={directory} busy={busy}
+    <Composer key={chat?.id ?? directory} preferences={prefs} updatePreferences={updatePrefs} active={!!chat} input={draftInput} draft={draft} change={setDraft} directory={directory} busy={busy}
       projects={projectDirectories} switchProject={path => { if (path !== directory) startChat(path); }}
       canSend={!!modelId && !!directory && !loadingChat} attachments={files} remove={id => setFiles(items => items.filter(file => file.id !== id))}
       add={value => void captureFiles(value)} pick={() => void chooseFiles()} choose={() => void chooseDirectory()}
