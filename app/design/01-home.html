@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Новый чат</title>
+  <link rel="icon" type="image/svg+xml" href="../brand/logo.svg">
+  <link rel="stylesheet" href="free-ai.css">
+  <script src="free-ai.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <header class="titlebar">
+      <span class="window-name"><img src="../brand/logo.svg" width="14" height="14" alt="">vsemkod</span>
+      <div class="window-controls" aria-hidden="true">
+        <span class="window-control"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10"/></svg></span>
+        <span class="window-control"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="3.5" y="3.5" width="9" height="9" rx=".5"/></svg></span>
+        <span class="window-control"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="m4.5 4.5 7 7m0-7-7 7"/></svg></span>
+      </div>
+    </header>
+
+    <aside class="sidebar" aria-label="Чаты и настройки">
+      <a class="wordmark" href="01-home.html"><img src="../brand/logo.svg" width="18" height="18" alt=""><span>vsem<span class="wordmark-suffix">kod</span></span></a>
+      <a class="sidebar-row sidebar-row--new" href="01-home.html"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M7 3H4a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 4 13h7a1.5 1.5 0 0 0 1.5-1.5V9M7 9l.4-2.2 4.4-4.4a1.25 1.25 0 0 1 1.8 1.8L9.2 8.6 7 9Z"/></svg>Новый чат</a>
+      <label class="sidebar-row search">
+        <svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="6.75" cy="6.75" r="4"/><path d="m9.75 9.75 3 3"/></svg>
+        <input type="search" aria-label="Поиск чатов" placeholder="Поиск чатов" data-chat-search>
+      </label>
+
+      <nav class="recent" aria-label="Недавние чаты">
+        <h2>Недавние</h2>
+        <ul>
+          <li><a class="sidebar-row conversation" href="02-chat.html">Лендинг для кофейни</a></li>
+          <li><span class="sidebar-row conversation">Форма заказа</span></li>
+          <li><span class="sidebar-row conversation">Починить мобильную версию</span></li>
+          <li><span class="sidebar-row conversation">Подключить оплату</span></li>
+          <li><span class="sidebar-row conversation">Бот для Telegram</span></li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-end">
+        <button class="sidebar-row" type="button"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6.5 2.3h3l.4 1.5 1 .6 1.5-.4 1.5 2.6-1.1 1.1v1.1l1.1 1.1-1.5 2.6-1.5-.4-1 .6-.4 1.5h-3l-.4-1.5-1-.6-1.5.4-1.5-2.6 1.1-1.1V7.7L2.1 6.6 3.6 4l1.5.4 1-.6.4-1.5Z"/><circle cx="8" cy="8.25" r="2"/></svg>Настройки</button>
+        <p class="catalog-note">Каталог моделей обновлён 5&nbsp;мин&nbsp;назад</p>
+      </div>
+    </aside>
+    <main class="workspace workspace--home">
+      <div class="home">
+        <h1>Чем займёмся?</h1>
+        <form class="composer composer--home" action="02-chat.html">
+          <input class="composer-input" type="text" aria-label="Сообщение агенту" placeholder="Опиши задачу — агент сам напишет код" required>
+          <div class="composer-toolbar">
+            <div class="composer-controls">
+              <button class="composer-control attach" type="button" aria-label="Прикрепить файл" title="Прикрепить файл" data-pick-file><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 3v10M3 8h10"/></svg></button>
+              <input type="file" data-file-input hidden>
+              <button class="composer-control folder-chip" type="button" title="Выбрать папку проекта" data-pick-folder>
+                <svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M1.75 5A1.25 1.25 0 0 1 3 3.75h3.1L7.4 5h5.6c.7 0 1.25.55 1.25 1.25V11.5c0 .7-.55 1.25-1.25 1.25H3c-.7 0-1.25-.55-1.25-1.25Z"/></svg><span>coffee-landing</span><svg class="icon chevron" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="m5 6.5 3 3 3-3"/></svg>
+              </button>
+              <input type="file" webkitdirectory data-folder-input hidden>
+            </div>
+            <div class="composer-controls composer-controls--right">
+              <details class="model-picker">
+                <summary class="composer-control"><span data-selected-model>Kimi K3.1 Pro</span><svg class="icon chevron" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="m5 6.5 3 3 3-3"/></svg></summary>
+              <div class="model-panel" role="region" aria-label="Выбор модели">
+                <section class="model-section">
+                  <h2>Подключены</h2>
+                  <ul class="model-list">
+                  <li>
+                    <button class="model-option" type="button" data-model="Kimi K3.1 Pro" aria-pressed="true">
+                      <span class="model-copy">
+                        <span class="model-name">Kimi K3.1 Pro</span>
+                        <span class="model-description">Лучшая для сложных задач</span>
+                        <span class="model-expiry">бесплатно до 30 ноября</span>
+                      </span>
+                      <span class="model-check"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="m3.5 8 3 3 6-6"/></svg></span>
+                    </button>
+                  </li>
+                  <li>
+                    <button class="model-option" type="button" data-model="GLM 5.3" aria-pressed="false">
+                      <span class="model-copy">
+                        <span class="model-name">GLM 5.3</span>
+                        <span class="model-description">Быстрая и точная в коде</span>
+                      </span>
+                      <span class="model-check" hidden><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="m3.5 8 3 3 6-6"/></svg></span>
+                    </button>
+                  </li>
+                  <li>
+                    <button class="model-option" type="button" data-model="DeepSeek V4.1 Flash" aria-pressed="false">
+                      <span class="model-copy">
+                        <span class="model-name">DeepSeek V4.1 Flash</span>
+                        <span class="model-description">Самая быстрая</span>
+                      </span>
+                      <span class="model-check" hidden><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="m3.5 8 3 3 6-6"/></svg></span>
+                    </button>
+                  </li>
+                  </ul>
+                </section>
+
+                <section class="model-section">
+                  <h2><span class="free-label">Бесплатно</span> — подключить в один клик</h2>
+                  <ul class="model-list">
+                  <li>
+                    <a class="model-option" href="04-connect.html" aria-label="Подключить Nemotron 3 Ultra">
+                      <span class="model-copy">
+                        <span class="model-name">Nemotron 3 Ultra</span>
+                        <span class="model-description">Большая модель от NVIDIA</span>
+                      </span>
+                      <span class="connect-label">Подключить</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a class="model-option" href="04-connect.html?model=qwen" aria-label="Подключить Qwen3.8">
+                      <span class="model-copy">
+                        <span class="model-name">Qwen3.8</span>
+                        <span class="model-description">Сильна в коде и анализе</span>
+                      </span>
+                      <span class="connect-label">Подключить</span>
+                    </a>
+                  </li>
+                  </ul>
+                </section>
+
+                <label class="auto-model">
+                  <span class="model-copy">
+                    <span class="model-name">Автовыбор</span>
+                    <span class="model-description" id="auto-description">Если модель недоступна, переключусь на лучшую из подключённых</span>
+                  </span>
+                  <input class="switch" type="checkbox" role="switch" aria-label="Автовыбор модели" aria-describedby="auto-description" checked>
+                </label>
+              </div>
+              </details>
+              <button class="send" type="submit" title="Отправить" aria-label="Отправить"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 12.75v-9.5m-4 4 4-4 4 4"/></svg></button>
+            </div>
+          </div>
+        </form>
+        <div class="suggestions" aria-label="Подсказки">
+          <button class="suggestion" type="button">Создать лендинг</button>
+          <button class="suggestion" type="button">Найти баг</button>
+          <button class="suggestion" type="button">Объяснить код</button>
+          <button class="suggestion" type="button">Написать тесты</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

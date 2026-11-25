@@ -1,0 +1,37 @@
+{
+  "name": "vsemkod",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "out/main/index.js",
+  "scripts": {
+    "postinstall": "node scripts/install-electron.mjs && node scripts/fetch-engine.mjs",
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:live": "esbuild scripts/smoke.ts --bundle --platform=node --format=esm --packages=external --outfile=.vsemkod-dev/smoke.mjs && node .vsemkod-dev/smoke.mjs",
+    "fetch:engine": "node scripts/fetch-engine.mjs"
+  },
+  "dependencies": {
+    "@opencode/client": "2.4.1",
+    "diff": "^8.0.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "electron": "45.5.0",
+    "electron-vite": "6.0.0",
+    "esbuild": "^0.28.2",
+    "typescript": "~5.9.3",
+    "vite": "8.3.8",
+    "vitest": "^4.0.0"
+  }
+}

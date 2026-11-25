@@ -1,0 +1,25 @@
+appId: ru.vsemkod.app
+productName: vsemkod
+files:
+  - out/**
+  - package.json
+extraResources:
+  - from: resources/catalog.json
+    to: catalog.json
+  - from: THIRD_PARTY_NOTICES.md
+    to: THIRD_PARTY_NOTICES.md
+win:
+  extraResources:
+    - from: resources/engine/win32-${arch}
+      to: engine/win32-${arch}
+      filter: [opencode.exe]
+mac:
+  extraResources:
+    - from: resources/engine/darwin-${arch}
+      to: engine/darwin-${arch}
+      filter: [opencode]
+linux:
+  extraResources:
+    - from: resources/engine/linux-${arch}
+      to: engine/linux-${arch}
+      filter: [opencode]

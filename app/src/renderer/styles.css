@@ -1,0 +1,63 @@
+@import "../../design/free-ai.css";
+
+.titlebar { -webkit-app-region: drag; }
+.window-controls { -webkit-app-region: no-drag; }
+.window-close:hover { background: #a52c32; }
+button:disabled { cursor: default; opacity: .58; }
+textarea { color: inherit; font: inherit; }
+textarea.composer-input { field-sizing: content; height: auto; min-height: 24px; max-height: 132px; resize: none; }
+.conversation > span, .chat-header h1 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-header { gap: 12px; }
+.changes { flex: none; }
+.sidebar-end [aria-current="page"] { background: var(--hover); color: var(--text); }
+.model-picker > summary span { max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
+.model-panel { scrollbar-width: thin; }
+.model-panel .auto-model { position: sticky; bottom: -8px; margin-bottom: -8px; padding-bottom: 12px; background: var(--menu); }
+.model-empty { margin: 6px 8px; color: var(--muted); font-size: 12px; }
+.more-models { margin: 0 0 4px; }
+.more-models[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+.attachments { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; }
+.attachments .composer-control { min-height: 24px; }
+.attachments .icon { width: 12px; height: 12px; }
+
+.turn + .turn { margin-top: 24px; }
+.user-message { white-space: pre-wrap; overflow-wrap: anywhere; }
+.message-files { display: block; margin-top: 6px; color: var(--secondary); font-size: 12px; }
+.agent-text { max-width: 660px; overflow-wrap: anywhere; }
+.agent-text + .agent-text, .agent-text > * + * { margin-top: 8px; }
+.agent-text + :is(.action, .diff-toggle), :is(.action, .diff-toggle) + .agent-text { margin-top: 8px; }
+.agent-text :is(ul, ol) { margin: 6px 0; padding-left: 22px; }
+.agent-text ul { list-style-type: disc; }
+.agent-text pre, .tool-output { overflow: auto; padding: 8px 12px; border-radius: 8px; background: #141617; }
+.agent-text table { display: block; overflow-x: auto; border-collapse: collapse; }
+.agent-text th, .agent-text td { padding: 4px 8px; border: 1px solid var(--line); text-align: left; }
+.agent-text :is(h1, h2, h3) { font-size: 16px; font-weight: 600; }
+.agent-text :not(pre) > code { padding: 1px 3px; border-radius: 3px; background: var(--hover); font-size: 13px; }
+.action-label { flex-wrap: wrap; overflow-wrap: anywhere; }
+.diff { max-height: 400px; }
+
+.working { display: flex; align-items: center; gap: 8px; margin-top: 16px; color: var(--secondary); font-size: 13px; }
+.approval { margin-top: 14px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--composer); }
+.approval h2 { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; }
+.approval h2 .icon { color: var(--mint); }
+.approval pre { margin: 8px 0; padding: 6px 8px; overflow: auto; border-radius: 6px; background: var(--window); font: 12px/18px var(--mono); }
+.approval-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.small-button { min-height: 30px; padding: 0 10px; border-radius: 6px; background: var(--mint); color: #0b1913; font-size: 13px; }
+.small-button:hover { background: #65e5ac; }
+.changes-list .diff { max-width: 100%; }
+
+dialog.connect-dialog { margin: auto; color: var(--text); }
+dialog.connect-dialog::backdrop { background: rgb(0 0 0 / 50%); }
+.manual-field { display: grid; gap: 4px; margin-top: 8px; }
+.manual-field input { min-height: 34px; padding: 0 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--window); }
+.manual-clipboard { display: flex; align-items: center; gap: 8px; margin-top: 8px; color: var(--secondary); font-size: 13px; }
+.toast { max-width: min(455px, calc(100% - 48px)); padding-block: 4px; }
+.status-dot { flex: none; }
+
+.settings-panel { width: min(var(--column), calc(100% - 48px)); margin: 24px auto; overflow: auto; }
+.settings-panel section { margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.settings-panel h2 { margin-bottom: 8px; font-size: 15px; font-weight: 500; }
+.settings-panel .auto-model { padding-inline: 0; border: 0; }
+.settings-row { display: flex; min-height: 34px; align-items: center; justify-content: space-between; gap: 12px; }
+.folder-path { overflow-wrap: anywhere; }
+.subtle, .clipboard-setting { color: var(--secondary); font-size: 13px; }

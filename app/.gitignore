@@ -1,0 +1,7 @@
+node_modules/
+out/
+.npm-cache/
+.electron-cache/
+.eb-cache/
+.vsemkod-dev/
+resources/engine/
