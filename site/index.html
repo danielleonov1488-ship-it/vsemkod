@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>vsemkod — бесплатный AI‑кодинг для всех</title>
+  <meta name="description" content="Топовые нейронки, которые прямо сейчас раздают бесплатно, в одном приложении. Выбери папку проекта, напиши задачу, и агент напишет код.">
+  <meta name="theme-color" content="#0F1112">
+  <link rel="canonical" href="https://vsemkod.ru/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:site_name" content="vsemkod">
+  <meta property="og:title" content="vsemkod — бесплатный AI‑кодинг для всех">
+  <meta property="og:description" content="Бесплатные топовые модели в одном приложении. Выбери папку, напиши задачу, и агент напишет код.">
+  <meta property="og:url" content="https://vsemkod.ru/">
+  <meta property="og:image" content="https://vsemkod.ru/assets/og-image.png">
+  <meta property="og:image:width" content="2560">
+  <meta property="og:image:height" content="1440">
+  <meta property="og:image:alt" content="vsemkod — бесплатный AI‑кодинг для всех">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="vsemkod — бесплатный AI‑кодинг для всех">
+  <meta name="twitter:description" content="Бесплатные топовые модели в одном приложении для Windows, macOS и Linux.">
+  <meta name="twitter:image" content="https://vsemkod.ru/assets/og-image.png">
+  <meta name="twitter:image:alt" content="vsemkod — бесплатный AI‑кодинг для всех">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">К содержимому</a>
+  <header class="site-header" id="top">
+    <div class="wrap header-inner">
+      <a class="brand" href="#top" aria-label="vsemkod, главная">
+        <img src="/assets/logo.svg" width="33" height="33" alt="">
+        <span>vsem<span class="brand-accent">kod</span></span>
+      </a>
+      <nav class="site-nav" aria-label="Основная навигация">
+        <a href="#models">Модели</a>
+        <a href="#how">Как это работает</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://github.com/danielleonov1488-ship-it/vsemkod">GitHub</a>
+      </nav>
+      <a class="button button-small header-download" data-release href="https://github.com/danielleonov1488-ship-it/vsemkod/releases/latest">Скачать</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <h1 id="hero-title">Бесплатный AI‑кодинг для всех</h1>
+      <p class="hero-description">Топовые нейронки, которые прямо сейчас раздают бесплатно, — в одном приложении. Выбрал папку, написал задачу — агент сам пишет код.</p>
+      <div class="hero-actions">
+        <a class="button button-primary" id="platform-download" data-release href="https://github.com/danielleonov1488-ship-it/vsemkod/releases/latest" aria-describedby="release-status">
+          <span class="download-icon" aria-hidden="true"></span>
+          <span id="platform-label">Скачать для Windows</span>
+        </a>
+        <a class="button" href="https://github.com/danielleonov1488-ship-it/vsemkod">
+          Исходный код на GitHub
+          <span class="outbound-icon" aria-hidden="true"></span>
+        </a>
+      </div>
+      <div class="hero-meta">
+        <span class="release-status" id="release-status">Скоро первая версия</span>
+        <p>Бесплатно и с открытым кодом · Windows, macOS, Linux</p>
+      </div>
+      <figure class="app-frame hero-frame">
+        <img src="/assets/app-models.png" width="3200" height="2000" fetchpriority="high" alt="Окно vsemkod с открытым списком моделей и настройкой автовыбора">
+      </figure>
+    </section>
+
+    <section class="section wrap" id="models" aria-labelledby="models-title">
+      <h2 id="models-title">Бесплатно прямо сейчас</h2>
+      <div class="catalog">
+        <ul class="model-list" id="model-list" role="list" aria-label="Активные предложения топовых моделей"></ul>
+        <p class="catalog-note" id="catalog-note" role="status" hidden></p>
+        <noscript>
+          <p class="catalog-note">Включи JavaScript или <a href="/catalog.json">открой каталог (JSON)</a>.</p>
+        </noscript>
+        <template id="catalog-skeleton">
+          <li class="model-row skeleton-row" aria-hidden="true"><span></span><span></span></li>
+          <li class="model-row skeleton-row" aria-hidden="true"><span></span><span></span></li>
+          <li class="model-row skeleton-row" aria-hidden="true"><span></span><span></span></li>
+        </template>
+      </div>
+    </section>
+
+    <section class="section wrap" id="how" aria-labelledby="how-title">
+      <h2 id="how-title">Как это работает</h2>
+      <div class="how-layout">
+        <ol class="steps" role="list">
+          <li>
+            <span class="step-number" aria-hidden="true">01</span>
+            <div>
+              <h3>Скачай и открой</h3>
+              <p>Выбери папку проекта или оставь папку по умолчанию.</p>
+            </div>
+          </li>
+          <li>
+            <span class="step-number" aria-hidden="true">02</span>
+            <div>
+              <h3>Подключи модели в один клик</h3>
+              <p>Войди через Google или GitHub у провайдера, без подписок и API‑ключей.</p>
+            </div>
+          </li>
+          <li>
+            <span class="step-number" aria-hidden="true">03</span>
+            <div>
+              <h3>Пиши задачу</h3>
+              <p>Агент читает проект, пишет и запускает код. Если модель упёрлась в лимит, vsemkod сам переключится на другую.</p>
+            </div>
+          </li>
+        </ol>
+        <figure class="app-frame how-frame">
+          <img src="/assets/app-home.png" width="3200" height="2000" loading="lazy" alt="Главный экран vsemkod с полем для задачи и выбором папки проекта">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section wrap" aria-labelledby="benefits-title">
+      <h2 id="benefits-title">Преимущества</h2>
+      <ul class="benefits" role="list">
+        <li>Только топовые модели</li>
+        <li>Каталог обновляется сам</li>
+        <li>Ключи и чаты — только на твоём компьютере</li>
+        <li>Открытый код (MIT)</li>
+      </ul>
+    </section>
+
+    <section class="section wrap faq" id="faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">FAQ</h2>
+      <div class="faq-list">
+        <details>
+          <summary>Это правда бесплатно?</summary>
+          <p>Да. Модели раздают сами провайдеры. Приложение работает на твоих бесплатных квотах, мы ничего не продаём.</p>
+        </details>
+        <details>
+          <summary>Откуда бесплатные модели?</summary>
+          <p>Бот круглосуточно собирает раздачи у OpenRouter, Kilo, Numes, Runcrate, Z.ai и других провайдеров.</p>
+        </details>
+        <details>
+          <summary>Где хранятся мои ключи и код?</summary>
+          <p>Только на твоём компьютере. Запросы идут напрямую к провайдеру. Бесплатные провайдеры могут логировать запросы, поэтому не отправляй секреты.</p>
+        </details>
+        <details>
+          <summary>Что будет, когда раздача закончится?</summary>
+          <p>Каталог обновится, и приложение переключится на другую бесплатную модель.</p>
+        </details>
+        <details>
+          <summary>Нужна ли регистрация в vsemkod?</summary>
+          <p>Нет, аккаунта у нас нет.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="#top" aria-label="vsemkod, наверх">
+          <img src="/assets/logo.svg" width="33" height="33" alt="">
+          <span>vsem<span class="brand-accent">kod</span></span>
+        </a>
+        <p>© 2026 vsemkod · MIT</p>
+      </div>
+      <nav class="footer-nav" aria-label="Ссылки проекта">
+        <a href="https://github.com/danielleonov1488-ship-it/vsemkod">GitHub</a>
+        <a href="/catalog.json">Каталог моделей (JSON)</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

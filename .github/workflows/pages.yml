@@ -1,0 +1,59 @@
+name: Deploy Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'catalog-bot/data/catalog.json'
+      - '.github/workflows/pages.yml'
+  workflow_run:
+    workflows: ['Update catalog']
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Assemble static site
+        run: |
+          mkdir -p _site
+          for item in site/*; do
+            if [ "$item" != "site/BRIEF.md" ]; then
+              cp -R -- "$item" _site/
+            fi
+          done
+          cp catalog-bot/data/catalog.json catalog-bot/data/changes.json _site/
+          printf '%s\n' 'vsemkod.ru' > _site/CNAME
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+          include-hidden-files: true
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
