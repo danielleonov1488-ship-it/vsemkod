@@ -52,6 +52,7 @@ async function modelsFor(provider: Provider | PersonalProvider, baseUrl: string,
     if (typeof item?.id !== "string" || !chatModel(provider.id, item.id, item.capabilities)) continue;
     const result = remoteModelsSchema.element.safeParse({
       id: item.id, name: item.display_name || item.name || item.id,
+      output: [item.max_output_tokens, item.max_completion_tokens].find(value => Number.isSafeInteger(value) && value > 0),
       context: [item.context_window, item.context_length, item.max_context_window].find(value => Number.isSafeInteger(value) && value > 0),
       vision: typeof item.capabilities?.vision === "boolean" ? item.capabilities.vision : undefined
     });
@@ -79,7 +80,7 @@ export class ConnectService {
       const profile = this.keys.profile(provider.id);
       if (!profile || !this.keys.get(provider.id)) return [];
       return profile.models.map(model => ({
-        model: { ...model, id: modelReference(provider.id, model.id), providerId: provider.id, providerName: provider.name },
+        model: { ...model, id: modelReference(provider.id, model.id), providerId: provider.id, providerName: provider.name, upstreamId: model.id },
         provider: { id: provider.id, name: provider.name, baseUrl: profile.baseUrl },
         upstreamId: model.id
       }));
@@ -90,13 +91,39 @@ export class ConnectService {
     return personalProviders.filter(provider => this.keys.profile(provider.id) && this.keys.get(provider.id)).map(provider => provider.id);
   }
 
-  async manual(provider: Provider | PersonalProvider, key: string, customUrl: string | undefined, signal: AbortSignal) {
+  async manual(provider: Provider | PersonalProvider, key: string, customUrl: string | undefined, signal: AbortSignal, selection?: RemoteModel[]) {
     if (!/^[!-~]+$/.test(key)) throw new Error("Ключ не подошёл. Вставьте ключ целиком.");
     const baseUrl = endpoint(provider.baseUrl ?? customUrl ?? "");
     const models = await modelsFor(provider, baseUrl, key, signal);
     if (signal.aborted) throw new Error("Подключение отменено.");
     if (!("auth" in provider) && !models.length) throw new Error("У этого ключа нет доступных моделей для чата.");
-    await this.keys.set(provider.id, key, "auth" in provider ? undefined : { baseUrl, models });
+    const chosen = provider.id === "custom-api" && selection ? this.validateSelection(selection, models) : models;
+    await this.keys.set(provider.id, key, "auth" in provider ? undefined : { baseUrl, models: chosen });
+  }
+
+  private validateSelection(selection: RemoteModel[], available: RemoteModel[]) {
+    if (!selection.length || new Set(selection.map(model => model.id)).size !== selection.length ||
+      selection.some(model => !available.some(entry => entry.id === model.id) || (model.output && model.output > (model.context ?? 32_768)))) {
+      throw new Error("Выберите доступные модели и проверьте лимиты токенов.");
+    }
+    return selection;
+  }
+
+  async customModels(input?: { baseUrl: string; key: string }) {
+    const provider = personalProviders.find(item => item.id === "custom-api")!;
+    const profile = this.keys.profile("custom-api");
+    const baseUrl = input ? endpoint(input.baseUrl) : profile?.baseUrl;
+    const key = input?.key ?? this.keys.get("custom-api");
+    if (!baseUrl || !key) throw new Error("Укажите адрес API и ключ.");
+    const models = await modelsFor(provider, baseUrl, key, AbortSignal.timeout(15_000));
+    return models.map(model => ({ ...model, ...profile?.models.find(saved => saved.id === model.id) }));
+  }
+
+  async saveCustomModels(selection: RemoteModel[]) {
+    const key = this.keys.get("custom-api");
+    const profile = this.keys.profile("custom-api");
+    if (!key || !profile) throw new Error("Сначала подключите сервер.");
+    await this.keys.set("custom-api", key, { ...profile, models: this.validateSelection(selection, await this.customModels()) });
   }
 
   async oauth(provider: Provider, open: (url: string) => Promise<void>, signal: AbortSignal) {

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CatalogState, ConnectionId, Preferences, SubscriptionId } from "../shared/api";
 import type { Model, Provider } from "../shared/catalog-schema";
-import { nativeNames, personalProviders, type KeyId } from "../shared/providers";
+import { nativeNames, personalProviders, type KeyId, type RemoteModel } from "../shared/providers";
 import { Icon } from "./icons";
 
 export type Connection =
@@ -19,7 +19,7 @@ export function catalogConnection(provider: Provider, model?: Model): Connection
 }
 
 export function readableError(error: unknown) {
-  return error instanceof Error ? error.message.replace(/^Error invoking remote method '[^']+': (?:Error: )?/, "") : "Не удалось выполнить действие.";
+  return typeof error === "string" ? error : error instanceof Error ? error.message.replace(/^Error invoking remote method '[^']+': (?:Error: )?/, "") : "Не удалось выполнить действие.";
 }
 
 export function ConnectDialog({ connection, clipboard, close, connected }: {
@@ -32,6 +32,8 @@ export function ConnectDialog({ connection, clipboard, close, connected }: {
   const [device, setDevice] = useState<{ code: string; url: string }>();
   const [key, setKey] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
+  const [choices, setChoices] = useState<ModelChoice[]>();
+  const [loadingModels, setLoadingModels] = useState(false);
   const [catchKey, setCatchKey] = useState(clipboard && connection.kind === "manual" && !!connection.keyPattern);
   const [clipboardStatus, setClipboardStatus] = useState("");
   const [error, setError] = useState("");
@@ -86,7 +88,7 @@ export function ConnectDialog({ connection, clipboard, close, connected }: {
     setCatchKey(false);
     setPhase("starting");
     try {
-      const state = await api.connect(token, connection.id, manual ? { key: key.trim(), baseUrl: custom ? baseUrl.trim() : undefined } : undefined);
+      const state = await api.connect(token, connection.id, manual ? { key: key.trim(), baseUrl: custom ? baseUrl.trim() : undefined, models: custom ? choices?.filter(item => item.checked) : undefined } : undefined);
       if (!active.current) return;
       setKey("");
       setPhase("done");
@@ -122,12 +124,23 @@ export function ConnectDialog({ connection, clipboard, close, connected }: {
           {connection.keyPageUrl && <button className="google-button" type="button"
             onClick={() => open(connection.keyPageUrl!)}>Открыть страницу ключей</button>}
           {custom && <label className="manual-field">Базовый URL<input type="url" value={baseUrl} required maxLength={4096}
-            placeholder="https://example.com/v1" onChange={event => setBaseUrl(event.target.value)} disabled={pending} /></label>}
+            placeholder="https://example.com/v1" onChange={event => { setBaseUrl(event.target.value); setChoices(undefined); }} disabled={pending} /></label>}
           <label className="manual-field">Вставь ключ<input type="password" value={key} required maxLength={4096}
             autoComplete="off" spellCheck={false} placeholder="Ключ API" onChange={event => {
               setKey(event.target.value);
+              setChoices(undefined);
               setClipboardStatus("");
             }} disabled={pending} /></label>
+          {custom && <div className="custom-models">
+            <button className="composer-control" type="button" disabled={pending || loadingModels || !key.trim() || !baseUrl.trim()} onClick={() => {
+              setLoadingModels(true);
+              setError("");
+              void api.customModels({ key: key.trim(), baseUrl: baseUrl.trim() }).then(list => {
+                if (active.current) setChoices(list.map(item => ({ ...item, checked: true })));
+              }).catch(error => setError(readableError(error))).finally(() => setLoadingModels(false));
+            }}>{loadingModels ? "Загружаем…" : "Загрузить список моделей"}</button>
+            {choices?.length ? <CustomModelList choices={choices} update={setChoices} /> : choices && <p className="subtle">Сервер не вернул доступных моделей.</p>}
+          </div>}
           {connection.keyPattern && <label className="manual-clipboard">
             <input className="switch" type="checkbox" role="switch" checked={catchKey} disabled={pending}
               onChange={event => { setCatchKey(event.target.checked); setClipboardStatus(""); }} />
@@ -135,7 +148,7 @@ export function ConnectDialog({ connection, clipboard, close, connected }: {
           </label>}
           {clipboardStatus && <p className="connect-feedback" role="status">{clipboardStatus}</p>}
         </>}
-        {phase === "idle" && <button className={manual ? "small-button connect-submit" : "google-button"} type="submit">
+        {phase === "idle" && <button className={manual ? "small-button connect-submit" : "google-button"} type="submit" disabled={loadingModels || (choices !== undefined && !choices.some(item => item.checked))}>
           {manual || copilot ? "Подключить" : connection.id === "openai" ? "Войти через ChatGPT" : "Продолжить в браузере"}
         </button>}
         {pending && <>
@@ -191,13 +204,52 @@ function ConnectionRow({ name, active, action }: { name: string; active?: boolea
   </div>;
 }
 
-export function SettingsPage({ state, prefs, version, choose, update, subscriptionsPage, connect, disconnect, open, checkUpdates, checkingUpdates }: {
-  state?: CatalogState; prefs?: Preferences; version?: string;
-  choose: () => void; update: (patch: Partial<Preferences>) => void; subscriptionsPage: () => void;
-  connect: (value: Connection) => void; disconnect: (id: ConnectionId) => Promise<void>; open: (url: string) => void;
-  checkUpdates: () => void; checkingUpdates: boolean;
+type ModelChoice = RemoteModel & { checked: boolean };
+
+function CustomModelList({ choices, update }: { choices: ModelChoice[]; update: (next: ModelChoice[]) => void }) {
+  const change = (id: string, patch: Partial<ModelChoice>) => update(choices.map(item => item.id === id ? { ...item, ...patch } : item));
+  return <div className="custom-model-list">
+    <div className="custom-model-head"><span>Модель</span><span>Контекст</span><span>Макс. вывод</span></div>
+    {choices.map(item => <div className="custom-model-row" key={item.id}>
+      <label title={item.id}><input type="checkbox" checked={item.checked} onChange={event => change(item.id, { checked: event.target.checked })} />{item.name}</label>
+      {(["context", "output"] as const).map(field => <input className="field-control" type="number" min={1} max={100_000_000} step={1}
+        key={field} aria-label={(field === "context" ? "Контекст " : "Макс. вывод ") + item.name}
+        disabled={!item.checked} placeholder={field === "context" ? "32768" : "8192"} value={item[field] ?? ""}
+        onChange={event => change(item.id, { [field]: event.target.value ? Number(event.target.value) : undefined })} />)}
+    </div>)}
+  </div>;
+}
+
+function CustomProviderModels({ enabled, onCatalog, onError }: { enabled: string[]; onCatalog: (state: CatalogState) => void; onError: (error: unknown) => void }) {
+  const [choices, setChoices] = useState<ModelChoice[]>();
+  const [pending, setPending] = useState(false);
+  const submit = (run: () => Promise<unknown>) => {
+    setPending(true);
+    void run().catch(onError).finally(() => setPending(false));
+  };
+  return <div className="custom-models">
+    <button type="button" className="composer-control" disabled={pending} onClick={() => submit(async () => {
+      const list = await window.vsemkod.customModels();
+      setChoices(list.map(item => ({ ...item, checked: enabled.includes(item.id) })));
+    })}>Загрузить список моделей</button>
+    {choices?.length ? <>
+      <CustomModelList choices={choices} update={setChoices} />
+      <button type="button" className="small-button" disabled={pending || !choices.some(item => item.checked)} onClick={() => submit(async () => {
+        onCatalog(await window.vsemkod.saveCustomModels(choices.filter(item => item.checked)));
+        setChoices(undefined);
+      })}>Сохранить модели</button>
+    </> : choices && <p className="subtle">Сервер не вернул доступных моделей.</p>}
+  </div>;
+}
+
+export function ModelSettings({ state, prefs, update, subscriptionsPage, connect, disconnect, onCatalog, onError }: {
+  state?: CatalogState; prefs?: Preferences;
+  update: (patch: Partial<Preferences>) => void; subscriptionsPage: () => void;
+  connect: (value: Connection) => void; disconnect: (id: ConnectionId) => Promise<void>;
+  onCatalog: (state: CatalogState) => void; onError: (error: unknown) => void;
 }) {
   const [working, setWorking] = useState<ConnectionId>();
+  const [refreshing, setRefreshing] = useState(false);
   const openRouter = state?.catalog.providers.find(provider => provider.id === "openrouter" && provider.auth.type === "oauth_pkce");
   const providers = [
     ...state?.catalog.providers.filter(provider => state.connected.includes(provider.id)).map(provider =>
@@ -205,9 +257,7 @@ export function SettingsPage({ state, prefs, version, choose, update, subscripti
     ...personalProviders.filter(provider => state?.personal.includes(provider.id)),
     ...subscriptions.filter(id => state?.subscriptions.includes(id)).map(id => ({ id, name: nativeNames[id] }))
   ];
-  return <main className="workspace">
-    <header className="chat-header"><h1>Настройки</h1></header>
-    <div className="settings-panel">
+  return <>
       <section className="settings-group"><h2>Провайдеры и подписки</h2>
         {providers.length === 0 && <p className="settings-intro">Нет подключённых провайдеров.</p>}
         {providers.map(provider => <div className="settings-row provider-row" key={provider.id}>
@@ -227,31 +277,23 @@ export function SettingsPage({ state, prefs, version, choose, update, subscripti
           action={() => connect(catalogConnection(openRouter))} />}
         <button className="composer-control subscription-link" type="button" onClick={subscriptionsPage}><Icon name="plus" />Свои подписки и ключи</button>
       </section>
-      <section className="settings-group"><h2>Папка по умолчанию</h2>
-        <div className="settings-row"><span className="folder-path" title={prefs?.directory}>
-          {prefs?.directory.split(/[\\/]/).filter(Boolean).at(-1) ?? prefs?.directory}
-        </span>
-          <button className="composer-control folder-chip" type="button" onClick={choose}><Icon name="folder" />Выбрать</button></div>
-      </section>
+      {state?.personal.includes("custom-api") && <section className="settings-group"><h2>Свой OpenAI-совместимый</h2>
+        <CustomProviderModels enabled={state.personalModels.filter(model => model.providerId === "custom-api").map(model => model.upstreamId ?? model.id)}
+          onCatalog={onCatalog} onError={onError} />
+      </section>}
       <section className="settings-group"><h2>Поведение приложения</h2>
         <PreferenceSwitch title="Автовыбор модели" detail="Переключаться на другую бесплатную модель при сбое" value={prefs?.auto ?? true} toggle={auto => update({ auto })} />
         <PreferenceSwitch title="Ловить ключ из буфера" detail="Искать ключ только в открытом мастере подключения, до 5 минут" value={prefs?.clipboard ?? false} toggle={clipboard => update({ clipboard })} />
         <PreferenceSwitch title="Проверять обновления каталога" detail="Проверять новые раздачи каждые 30 минут" value={prefs?.catalogUpdates ?? true} toggle={catalogUpdates => update({ catalogUpdates })} />
+        <button type="button" className="composer-control" disabled={refreshing} onClick={() => {
+          setRefreshing(true);
+          void window.vsemkod.refreshCatalog().then(onCatalog).catch(onError).finally(() => setRefreshing(false));
+        }}>{refreshing ? "Обновляем…" : "Обновить каталог"}</button>
       </section>
-      <div className="settings-row subtle"><span>Версия {version}</span>
-        <div className="settings-actions">
-          <button className="composer-control connect-label" type="button" disabled={checkingUpdates} onClick={checkUpdates}>
-            {checkingUpdates ? "Проверяем…" : "Проверить обновления"}
-          </button>
-          <button className="text-link" type="button" onClick={() => open("https://github.com/danielleonov1488-ship-it/vsemkod")}>GitHub</button>
-          <button className="text-link" type="button" onClick={() => open("https://vsemkod.ru")}>vsemkod.ru</button>
-        </div>
-      </div>
-    </div>
-  </main>;
+  </>;
 }
 
-function PreferenceSwitch({ title, detail, value, toggle }: {
+export function PreferenceSwitch({ title, detail, value, toggle }: {
   title: string; detail: string; value: boolean; toggle: (value: boolean) => void;
 }) {
   return <label className="settings-row preference-row">

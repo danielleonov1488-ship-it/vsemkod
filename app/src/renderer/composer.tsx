@@ -1,0 +1,138 @@
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
+import type { Attachment, ProjectTools } from "../shared/api";
+import { accessLabels, builtInCommands, imageFile, suggestionAt, type AccessMode } from "../shared/workspace";
+import { Icon } from "./icons";
+
+const api = window.vsemkod;
+type Suggestion = { key: string; text: string; detail?: string; folder?: boolean };
+
+export function Composer({ active, input, draft, change, directory, busy, canSend, attachments, remove, add, pick, choose,
+  access, cycle, submit, stop, selectCommand, tools, modelControls, vision, onError }: {
+  active: boolean; input: RefObject<HTMLTextAreaElement | null>; draft: string; change: (value: string) => void;
+  directory: string; busy: boolean; canSend: boolean; attachments: Attachment[]; remove: (id: string) => void;
+  add: (files: File[]) => void; pick: () => void; choose: () => void; access: AccessMode; cycle: () => void;
+  submit: (intervene?: boolean) => void; stop: () => void; selectCommand: (name: string) => boolean;
+  tools?: ProjectTools; modelControls: ReactNode; vision: boolean; onError: (text: string) => void;
+}) {
+  const [cursor, setCursor] = useState(0);
+  const [dismissed, setDismissed] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [paths, setPaths] = useState<Suggestion[]>([]);
+  const [dragging, setDragging] = useState(false);
+  const dragDepth = useRef(0);
+  const token = dismissed ? undefined : suggestionAt(draft, cursor);
+  const search = token?.kind === "path" ? token.query : undefined;
+  useEffect(() => {
+    setPaths([]);
+    if (search === undefined || !directory) return;
+    let current = true;
+    const timer = setTimeout(() => void api.findFiles(directory, search).then(items => {
+      if (current) setPaths(items.map(item => ({ key: item.path, text: item.path, folder: item.type === "directory" })));
+    }).catch(() => {}), 100);
+    return () => { current = false; clearTimeout(timer); };
+  }, [directory, search]);
+  const suggestions: Suggestion[] = token?.kind === "command" ? [
+    ...builtInCommands.map(item => ({ key: item.name, text: "/" + item.name, detail: item.description })),
+    ...tools?.commands.filter(item => !builtInCommands.some(built => built.name === item.name))
+      .map(item => ({ key: item.name, text: "/" + item.name, detail: item.description })) ?? [],
+    ...tools?.skills.map(item => ({ key: "skill." + item.name, text: "/skill." + item.name, detail: item.description })) ?? []
+  ].filter(item => item.key.toLowerCase().startsWith(token.query.toLowerCase())).slice(0, 10) : paths;
+  const selected = suggestions[Math.min(index, suggestions.length - 1)];
+  function pickSuggestion(item: Suggestion) {
+    if (!token) return;
+    if (token.kind === "command" && selectCommand(item.key)) {
+      setDismissed(true);
+      return;
+    }
+    const path = item.key.replaceAll("\\", "/");
+    const replacement = token.kind === "command" ? item.text : (/\s|[.,;:!?)\]}]$/.test(path) ? '@"' + path + '"' : "@" + path);
+    change(draft.slice(0, token.start) + replacement + " " + draft.slice(token.end));
+    setDismissed(true);
+    const position = token.start + replacement.length + 1;
+    requestAnimationFrame(() => { input.current?.focus(); input.current?.setSelectionRange(position, position); });
+  }
+  function keydown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.nativeEvent.isComposing) return;
+    if (event.shiftKey && event.key === "Tab") {
+      event.preventDefault();
+      cycle();
+      return;
+    }
+    if (token && event.key === "Escape" && !busy) {
+      event.preventDefault();
+      setDismissed(true);
+      return;
+    }
+    if (token && selected && !event.ctrlKey) {
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        event.preventDefault();
+        setIndex((Math.min(index, suggestions.length - 1) + (event.key === "ArrowDown" ? 1 : -1) + suggestions.length) % suggestions.length);
+        return;
+      }
+      if (event.key === "Tab" || (event.key === "Enter" && !event.shiftKey)) {
+        event.preventDefault();
+        pickSuggestion(selected);
+        return;
+      }
+    }
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      setDismissed(true);
+      submit(event.ctrlKey || event.metaKey);
+    }
+  }
+  function receive(files: File[]) {
+    const images = files.filter(file => file.type.startsWith("image/") || imageFile(file.name));
+    if (!vision && images.length) onError("Выбранная модель не принимает изображения. Выберите модель с поддержкой изображений.");
+    const supported = vision ? files : files.filter(file => !images.includes(file));
+    if (supported.length) add(supported);
+  }
+  return <form className={"composer" + (active ? "" : " composer--home") + (dragging ? " composer--dragging" : "")}
+    onSubmit={event => { event.preventDefault(); submit(); }} onDragEnter={event => {
+      if (!event.dataTransfer.types.includes("Files")) return;
+      event.preventDefault(); dragDepth.current++; setDragging(true);
+    }} onDragOver={event => { if (event.dataTransfer.types.includes("Files")) event.preventDefault(); }}
+    onDragLeave={() => { if (--dragDepth.current <= 0) { dragDepth.current = 0; setDragging(false); } }}
+    onDrop={event => { event.preventDefault(); dragDepth.current = 0; setDragging(false); receive(Array.from(event.dataTransfer.files)); }}>
+    {token && suggestions.length > 0 && <div className="model-panel composer-menu" aria-label={token.kind === "command" ? "Список команд" : "Упоминания файлов"} role="listbox">
+      {suggestions.map(item => <button type="button" key={item.key} role="option" aria-selected={selected === item} className="model-option"
+        onMouseDown={event => event.preventDefault()} onClick={() => pickSuggestion(item)}>
+        {token.kind === "path" && <Icon name={item.folder ? "folder" : "file"} />}
+        <span className="model-copy"><span className="model-name">{item.text}</span>
+          {item.detail && <span className="model-description">{item.detail}</span>}</span>
+      </button>)}
+    </div>}
+    <textarea ref={input} className="composer-input" value={draft} rows={1} aria-label="Сообщение агенту" maxLength={100_000}
+      placeholder={active ? "Что сделать дальше?" : "Опиши задачу — агент сам напишет код"}
+      onChange={event => { change(event.target.value); setCursor(event.target.selectionStart); setIndex(0); setDismissed(false); }}
+      onSelect={event => setCursor(event.currentTarget.selectionStart)}
+      onKeyDown={keydown} onPaste={event => {
+        const files = Array.from(event.clipboardData.files);
+        if (files.length) { event.preventDefault(); receive(files); }
+      }} />
+    {attachments.length > 0 && <ul className="attachments" aria-label="Прикреплённые файлы">
+      {attachments.map(file => <li key={file.id}><button type="button" className="composer-control folder-chip" aria-label={"Убрать " + file.name}
+        onClick={() => remove(file.id)}>{file.preview && <img className="attachment-preview" src={file.preview} alt="" />}
+        <span>{file.name}</span><Icon name="close" /></button></li>)}
+    </ul>}
+    <div className="composer-toolbar">
+      <div className="composer-controls">
+        <button className="composer-control attach" type="button" aria-label="Прикрепить файл" title="Прикрепить файл" disabled={!directory}
+          onClick={pick}><Icon name="paperclip" /></button>
+        <button className="composer-control folder-chip" type="button" title={directory || "Выбрать папку проекта"}
+          disabled={busy} onClick={choose}><Icon name="folder" />
+          <span>{directory.split(/[\\/]/).filter(Boolean).at(-1) ?? "Папка проекта"}</span><Icon name="chevron" className="chevron" />
+        </button>
+        <button type="button" className="composer-control folder-chip access-chip" onClick={cycle} title="Изменить режим доступа · Shift+Tab">
+          <Icon name="lock" /><span>{accessLabels[access]}</span>
+        </button>
+      </div>
+      <div className="composer-controls composer-controls--right">
+        {modelControls}
+        {busy && <button className="send stop-button" type="button" title="Стоп · Esc Esc" aria-label="Стоп" onClick={stop}><Icon name="stop" /></button>}
+        {(!busy || draft.trim() || attachments.length > 0) && <button className="send" type="submit" title={busy ? "Отправить во время работы" : "Отправить"}
+          aria-label="Отправить" disabled={!canSend}><Icon name="send" /></button>}
+      </div>
+    </div>
+  </form>;
+}

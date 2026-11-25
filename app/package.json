@@ -16,10 +16,12 @@
     "fetch:engine": "node scripts/fetch-engine.mjs",
     "dist:win": "npm run fetch:engine -- --platform win32 --arch x64 && npm run build && node scripts/package.mjs --win --x64 --publish never",
     "dist:mac": "npm run fetch:engine -- --platform darwin --arch arm64 && npm run fetch:engine -- --platform darwin --arch x64 && npm run build && node scripts/package.mjs --mac --arm64 --x64 --publish never",
-    "dist:linux": "npm run fetch:engine -- --platform linux --arch x64 && npm run build && node scripts/package.mjs --linux --x64 --publish never"
+    "dist:linux": "npm run fetch:engine -- --platform linux --arch x64 && npm run build && node scripts/package.mjs --linux --x64 --publish never",
+    "test:live:d": "esbuild scripts/smoke-stage-d.ts --bundle --platform=node --format=esm --packages=external --outfile=.vsemkod-dev/smoke-stage-d.mjs && node .vsemkod-dev/smoke-stage-d.mjs"
   },
   "dependencies": {
     "@opencode/client": "2.4.1",
+    "@xterm/xterm": "^6.0.0",
     "diff": "^8.0.3",
     "electron-updater": "6.8.11",
     "react": "^19.2.0",

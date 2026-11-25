@@ -51,7 +51,7 @@ try {
   await page.screenshot({ path: join(screenshots, "04-connect.png") });
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Настройки" }).click();
-  await waitFor(page.getByRole("heading", { name: "Папка по умолчанию" }));
+  await waitFor(page.getByText("Папка по умолчанию", { exact: true }));
   const preferences = await page.evaluate(async () => (await window.vsemkod.initial()).preferences);
   assert.equal((await readFile(join(preferences.directory, "hello.txt"), "utf8")).trim(), "привет");
   console.log("Окно Electron: каталог, чат Kilo, разрешение, hello.txt, дифф, меню и настройки.");

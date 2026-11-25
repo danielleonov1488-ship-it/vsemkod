@@ -1,8 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import type { CatalogState, ChatEvent, ChatPart, ConnectionId, Conversation, DesktopApi, FileChange, InitialState, Notice, Permission, Preferences, UpdateReady } from "../shared/api";
+import type { Attachment, ChatAction, ChatHistory, ProjectTools, Question, TurnOptions, Usage, CatalogState, ChatEvent, ChatPart, ConnectionId, Conversation, DesktopApi, FileChange, InitialState, Notice, Permission, Preferences, UpdateReady } from "../shared/api";
 import { Chat } from "./chat";
-import { catalogConnection, ConnectDialog, ConnectionsPage, readableError, SettingsPage, type Connection } from "./connections";
+import { catalogConnection, ConnectDialog, ConnectionsPage, readableError, type Connection } from "./connections";
+import { accessModes, enqueue, dequeue, slashCommand, type AccessMode } from "../shared/workspace";
+import { ChatGroups } from "./chat-groups";
+import { Composer } from "./composer";
+import { Settings } from "./settings";
+import { WorkspacePanel, type PanelTab } from "./workspace-panel";
 import { Icon } from "./icons";
 import { ModelPicker, modelOptions } from "./models";
 import logo from "./assets/logo.svg";
@@ -13,7 +18,7 @@ declare global {
 
 const api = window.vsemkod;
 const suggestions = ["Создать лендинг", "Найти баг", "Объяснить код", "Написать тесты"];
-const folderName = (path: string) => path.split(/[\\/]/).filter(Boolean).at(-1) ?? path;
+type PendingTurn = { id: string; text: string; modelId: string; files: Attachment[]; options: TurnOptions; target?: string };
 
 function catalogAge(date?: string) {
   if (!date) return "Загружаем каталог моделей";
@@ -41,10 +46,29 @@ function App() {
   const [subscriptions, setSubscriptions] = useState(false);
   const [query, setQuery] = useState("");
   const [draft, setDraft] = useState("");
-  const [files, setFiles] = useState<string[]>([]);
+  const [replayId, setReplayId] = useState<string>();
+  const [files, setFiles] = useState<Attachment[]>([]);
   const [parts, setParts] = useState<ChatPart[]>([]);
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [changes, setChanges] = useState<FileChange[]>([]);
+  const [queue, setQueue] = useState<PendingTurn[]>([]);
+  const [access, setAccess] = useState<AccessMode>("ask");
+  const [variant, setVariant] = useState("");
+  const [variants, setVariants] = useState<string[]>([]);
+  const [tools, setTools] = useState<ProjectTools>();
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [usage, setUsage] = useState<Usage>();
+  const [reverted, setReverted] = useState(false);
+  const [planReady, setPlanReady] = useState(false);
+  const [panel, setPanel] = useState(false);
+  const [panelTab, setPanelTab] = useState<PanelTab>("changes");
+  const [panelWidth, setPanelWidth] = useState<number>();
+  const [modelMenu, setModelMenu] = useState(0);
+  const [systemTheme, setSystemTheme] = useState(() => matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const searchInput = useRef<HTMLInputElement>(null);
+  const lastEscape = useRef(0);
+  const stopping = useRef<Promise<void> | undefined>(undefined);
+  const stopPending = useRef(false);
   const [busy, setBusy] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
   const [model, setModel] = useState<string>();
@@ -54,6 +78,8 @@ function App() {
   const [checkingUpdates, setCheckingUpdates] = useState(false);
   const [connection, setConnection] = useState<Connection>();
   const draftInput = useRef<HTMLTextAreaElement>(null);
+  const currentDirectory = useRef(directory);
+  currentDirectory.current = directory;
   const activeChat = useRef<string | undefined>(undefined);
   const requestPending = useRef(false);
   const preferenceRevision = useRef(0);
@@ -82,6 +108,7 @@ function App() {
       if (!live) setCatalog(info);
       if (!liveUpdate) setUpdateReady(info.update);
       setPrefs(info.preferences);
+      setAccess(info.preferences.defaultAccess);
       setDirectory(info.preferences.directory);
     }).catch(showError);
     return () => { mounted = false; stopCatalog(); stopNotice(); stopUpdate(); clearTimeout(noticeTimer.current); };
@@ -96,6 +123,9 @@ function App() {
     });
     if (event.type === "permission") setPermissions(value => [...value.filter(item => item.id !== event.permission.id), event.permission]);
     if (event.type === "permission-resolved") setPermissions(value => value.filter(item => item.id !== event.id));
+    if (event.type === "question") setQuestions(current => [...current.filter(item => item.id !== event.question.id), event.question]);
+    if (event.type === "question-resolved") setQuestions(current => current.filter(item => item.id !== event.id));
+    if (event.type === "usage") setUsage(event.usage);
     if (event.type === "route") {
       setRouteProvider(event.providerId);
       if (event.previousModelId && lastRoute.current !== event.modelId) {
@@ -110,15 +140,32 @@ function App() {
   }), [notify]);
 
   useEffect(() => {
-    if (!directory) return;
+    if (!initial) return;
     let current = true;
-    setSessions([]);
-    void api.sessions(directory).then(list => {
-      if (current) setSessions(previous => [...new Map([...list, ...previous].map(item => [item.id, item])).values()]
-        .sort((a, b) => b.updatedAt - a.updatedAt));
+    void api.sessions().then(list => {
+      if (current) setSessions(previous => [...new Map([...list, ...previous].map(item => [item.id, item])).values()]);
     }).catch(error => { if (current) showError(error); });
     return () => { current = false; };
-  }, [directory, showError]);
+  }, [initial, showError]);
+
+  useEffect(() => {
+    const media = matchMedia("(prefers-color-scheme: dark)");
+    const update = () => setSystemTheme(media.matches ? "dark" : "light");
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+  const theme = prefs?.theme && prefs.theme !== "system" ? prefs.theme : systemTheme;
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.dataset.fontSize = prefs?.fontSize ?? "normal";
+  }, [theme, prefs?.fontSize]);
+  useEffect(() => {
+    if (!directory) return;
+    let current = true;
+    setTools(undefined);
+    void api.tools(directory).then(value => { if (current) setTools(value); }).catch(() => {});
+    return () => { current = false; };
+  }, [directory]);
 
   const options = catalog ? modelOptions(catalog) : [];
   const personal = catalog?.personalModels ?? [];
@@ -132,6 +179,17 @@ function App() {
     ? catalog?.catalog.providers.find(provider => provider.id === routeProvider)
     : selected?.available[0]?.provider;
 
+  const vision = ownModel?.vision ?? selected?.model.capabilities.includes("vision") ?? false;
+  const contextWindow = ownModel?.context ?? selected?.model.contextWindow;
+  useEffect(() => {
+    let current = true;
+    setVariants([]);
+    if (directory && modelId) void api.modelVariants(directory, modelId).then(items => {
+      if (current) { setVariants(items); setVariant(value => items.includes(value) ? value : ""); }
+    }).catch(() => {});
+    return () => { current = false; };
+  }, [directory, modelId]);
+
   function resetChat() {
     activeChat.current = undefined;
     setChat(undefined);
@@ -143,6 +201,13 @@ function App() {
     setFiles([]);
     setDraft("");
     setRouteProvider(undefined);
+    setQuestions([]);
+    setUsage(undefined);
+    setReverted(false);
+    setPlanReady(false);
+    setAccess(prefs?.defaultAccess ?? "ask");
+    setQueue([]);
+    setReplayId(undefined);
   }
 
   async function chooseDirectory(asDefault = false) {
@@ -163,10 +228,25 @@ function App() {
     } catch (error) { showError(error); }
   }
 
+  function acceptAttachments(added: Attachment[], target: string) {
+    if (currentDirectory.current !== target) return;
+    if (!vision && added.some(file => file.image)) showError("Выбранная модель не принимает изображения.");
+    setFiles(current => [...current, ...added.filter(file => vision || !file.image)].slice(0, 10));
+  }
+
   async function chooseFiles() {
+    try { acceptAttachments(await api.chooseFiles(directory), directory); }
+    catch (error) { showError(error); }
+  }
+
+  async function captureFiles(added: File[]) {
     try {
-      const added = await api.chooseFiles(directory);
-      setFiles(current => [...new Set([...current, ...added])].slice(0, 10));
+      const data = await Promise.all(added.slice(0, 10).map(async file => {
+        if (file.size > 2 * 1024 * 1024) throw new Error("Можно прикрепить файлы размером до 2 МБ.");
+        const path = api.filePath(file);
+        return { path: path || undefined, data: path ? undefined : new Uint8Array(await file.arrayBuffer()), name: file.name, mime: file.type };
+      }));
+      acceptAttachments(await api.captureFiles(directory, data), directory);
     } catch (error) { showError(error); }
   }
 
@@ -197,53 +277,217 @@ function App() {
       resetChat();
       activeChat.current = session.id;
       setChat(session);
+      setDirectory(session.directory);
+      setAccess(session.access ?? prefs?.defaultAccess ?? "ask");
+      setPlanReady(session.access === "read" && history.parts.at(-1)?.kind === "text");
       setModel(session.modelId);
-      setParts(history.parts);
-      setChanges(history.changes);
+      setVariant(session.variant ?? "");
+      showHistory(history);
     } catch (error) { showError(error); }
     finally { setLoadingChat(false); }
   }
 
-  async function send() {
-    const message = draft.trim();
-    if (!message || !modelId || !directory || requestPending.current) return;
+  function showHistory(history: ChatHistory) {
+    setParts(history.parts);
+    setChanges(history.changes);
+    setReverted(Boolean(history.reverted));
+    setUsage(history.usage);
+  }
+
+  async function runTurn(turn: PendingTurn) {
     requestPending.current = true;
+    stopPending.current = false;
     setBusy(true);
-    setDraft("");
-    setFiles([]);
+    setPlanReady(false);
     lastRoute.current = undefined;
     let session = chat;
     try {
+      if (turn.target && turn.target !== chat?.id) throw new Error("Чат для сообщения уже закрыт.");
       if (!session) {
-        const title = message.replace(/\s+/g, " ").split(/(?<=[.!?])\s/, 1)[0].slice(0, 72);
+        const title = turn.text.replace(/\s+/g, " ").split(/(?<=[.!?])\s/, 1)[0].slice(0, 72) || turn.files[0]?.name.slice(0, 72) || "Новый чат";
         session = await api.create(directory, title);
         activeChat.current = session.id;
         setChat(session);
       }
-      const current = { ...session, modelId, updatedAt: Date.now() };
+      if (stopPending.current) {
+        notify({ text: "Ответ остановлен" });
+        return;
+      }
+      const current = { ...session, access: turn.options.access, variant: turn.options.variant, modelId: turn.modelId, updatedAt: Date.now() };
       setChat(current);
       setSessions(list => [current, ...list.filter(item => item.id !== current.id)]);
-      setParts(list => [...list, { id: crypto.randomUUID(), kind: "user", text: message, files: files.map(folderName) }]);
-      const result = await api.send(session.id, message, modelId, files);
+      if (!turn.options.compact) setParts(list => [...list, { id: "local:" + turn.id, kind: "user", text: turn.text, files: turn.files.map(file => file.name) }]);
+      const result = await api.send(session.id, turn.text, turn.modelId, turn.files.map(file => file.id), turn.options);
       setChanges(result.changes);
+      const history = await api.history(session.id);
+      showHistory(history);
+      setPlanReady(!result.stopped && !turn.options.compact && turn.options.access === "read" && history.parts.at(-1)?.kind === "text");
       if (result.stopped) notify({ text: "Ответ остановлен" });
     } catch (error) {
       showError(error);
-      if (!session) { setDraft(value => value || message); setFiles(files); }
-      else {
-        try {
-          const history = await api.history(session.id);
-          setChanges(history.changes);
-          const sent = history.parts.some(part => part.kind === "user" && part.text === message);
-          if (!sent) { setParts(history.parts); setDraft(value => value || message); setFiles(files); }
-        } catch { /* Keep the visible conversation if the engine is offline. */ }
+      if (session) {
+        const history = await api.history(session.id).catch(() => undefined);
+        if (history) showHistory(history);
       }
+      if (!turn.options.compact) { setDraft(value => value || turn.text); setFiles(value => value.length ? value : turn.files); }
     } finally {
+      await stopping.current;
       setPermissions([]);
-      setBusy(false);
+      setQuestions([]);
       requestPending.current = false;
+      setBusy(false);
     }
   }
+
+  function stop() {
+    if (!requestPending.current || stopping.current) return;
+    stopPending.current = true;
+    if (!activeChat.current) return;
+    const task = api.stop(activeChat.current).catch(showError).finally(() => { stopping.current = undefined; });
+    stopping.current = task;
+  }
+
+  async function exportChats(sessionId?: string) {
+    try {
+      const saved = await api.exportChats(sessionId);
+      if (saved) notify({ text: sessionId ? "Чат экспортирован" : "Сохранено чатов: " + saved });
+    } catch (error) { showError(error); }
+  }
+
+  function startChat(folder?: string) {
+    if (requestPending.current || loadingChat) return;
+    resetChat();
+    setDirectory(folder ?? prefs?.directory ?? directory);
+    requestAnimationFrame(() => draftInput.current?.focus());
+  }
+
+  function quickCommand(name: string) {
+    if (name === "new") {
+      if (requestPending.current) { showError("Дождитесь окончания работы агента."); return true; }
+      startChat(directory);
+    } else if (name === "plan") setAccess("read");
+    else if (name === "model") setModelMenu(value => value + 1);
+    else if (name === "export") {
+      if (chat) void exportChats(chat.id);
+      else showError("Сначала откройте чат.");
+    } else return false;
+    setDraft("");
+    return true;
+  }
+
+  function submit(intervene = false, text = draft, readyFiles = files, mode = access, replayMessageId: string | null | undefined = replayId) {
+    if ((!text.trim() && !readyFiles.length && !replayMessageId) || !directory || loadingChat) return;
+    const message = text.trim();
+    const command = slashCommand(message);
+    if (command && quickCommand(command.name)) return;
+    if (!modelId) return;
+    if (!vision && readyFiles.some(file => file.image)) {
+      showError("Выбранная модель не принимает изображения.");
+      return;
+    }
+    if (command?.name === "compact" && !chat) { showError("Сначала откройте чат."); return; }
+    const skill = command && tools?.skills.find(item => command.name === "skill." + item.name);
+    const custom = command && tools?.commands.find(item => item.name === command.name);
+    const turn: PendingTurn = {
+      id: crypto.randomUUID(), modelId, files: readyFiles, target: chat?.id,
+      text: skill ? command?.args.trim() || "Примени навык «" + skill.name + "» к текущей задаче." : message,
+      options: { access: mode, replayMessageId: replayMessageId ?? undefined, variant: variant || undefined, compact: command?.name === "compact",
+        command: command && custom && command.name !== "compact" ? { name: command.name, args: command.args } : undefined,
+        skill: skill ? skill.id : undefined }
+    };
+    setDraft("");
+    setFiles([]);
+    setReplayId(undefined);
+    if (requestPending.current || queue.length) {
+      const interrupt = intervene || prefs?.busyEnter === "interrupt";
+      setQueue(value => enqueue(value, turn, interrupt));
+      if (interrupt) stop();
+    } else void runTurn(turn);
+  }
+
+  useEffect(() => {
+    if (busy || requestPending.current || !queue.length) return;
+    const [next, rest] = dequeue(queue);
+    setQueue(rest);
+    if (next) void runTurn(next);
+  }, [busy, queue]);
+
+  function confirmFull() {
+    return prefs?.fullAccessConfirmed || window.confirm("Включить полный доступ? Агент сможет изменять файлы и выполнять команды без подтверждения, в том числе за пределами проекта.");
+  }
+
+  function cycleAccess() {
+    const next = accessModes[(accessModes.indexOf(access) + 1) % accessModes.length];
+    if (next === "full" && !prefs?.fullAccessConfirmed) {
+      if (!confirmFull()) return;
+      void api.preferences({ fullAccessConfirmed: true }).then(saved => { setPrefs(saved); setAccess(next); }).catch(showError);
+    } else setAccess(next);
+  }
+
+  async function changeChat(session: Conversation, action: ChatAction) {
+    try {
+      const next = await api.chatAction(session.id, action);
+      setSessions(list => next ? [next, ...list.filter(item => item.id !== next.id)] : list.filter(item => item.id !== session.id));
+      if (action.type === "fork" && next) await openChat(next);
+      else if (chat?.id === session.id) {
+        if (!next || next.archived) startChat(session.directory);
+        else setChat(next);
+      }
+    } catch (error) { showError(error); }
+  }
+
+  async function revertMessage(message?: string) {
+    if (!chat || requestPending.current || (message && !window.confirm("Откатить чат и вернуть файлы к состоянию перед этим сообщением?"))) return;
+    setLoadingChat(true);
+    try {
+      showHistory(await api.revert(chat.id, message));
+      setPlanReady(false);
+    } catch (error) { showError(error); }
+    finally { setLoadingChat(false); }
+  }
+
+  async function editMessage(part: Extract<ChatPart, { kind: "user" | "text" }>) {
+    if (!chat || requestPending.current || !window.confirm("Вернуть историю и файлы к этому сообщению, чтобы отредактировать его?")) return;
+    setLoadingChat(true);
+    try {
+      showHistory(await api.revert(chat.id, part.id));
+      setDraft(part.text);
+      setReplayId(part.files?.length ? part.id : undefined);
+      setPlanReady(false);
+      requestAnimationFrame(() => draftInput.current?.focus());
+    } catch (error) { showError(error); }
+    finally { setLoadingChat(false); }
+  }
+
+  async function revertFile(file: string) {
+    if (!chat || requestPending.current || !window.confirm("Отменить изменения файла «" + file + "»?")) return;
+    setLoadingChat(true);
+    try { showHistory(await api.revertFile(chat.id, file)); }
+    catch (error) { showError(error); }
+    finally { setLoadingChat(false); }
+  }
+
+  useEffect(() => {
+    const keydown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.isComposing || event.repeat) return;
+      if (event.key === "Escape" && busy) {
+        const time = Date.now();
+        if (time - lastEscape.current < 900) { stop(); lastEscape.current = 0; }
+        else lastEscape.current = time;
+      }
+      if (!(event.ctrlKey || event.metaKey) || event.altKey || event.shiftKey) return;
+      const key = event.code;
+      if (!["KeyN", "KeyK", "KeyB", "KeyJ", "Comma"].includes(key)) return;
+      event.preventDefault();
+      if (key === "KeyN") startChat();
+      if (key === "KeyK") searchInput.current?.focus();
+      if (key === "KeyB") setPanel(value => !value);
+      if (key === "KeyJ") { setSettings(false); setSubscriptions(false); setPanelTab("terminal"); setPanel(true); }
+      if (key === "Comma") { setSettings(value => subscriptions || !value); setSubscriptions(false); }
+    };
+    window.addEventListener("keydown", keydown);
+    return () => window.removeEventListener("keydown", keydown);
+  });
 
   function updatePrefs(patch: Partial<Preferences>) {
     const revision = ++preferenceRevision.current;
@@ -280,35 +524,43 @@ function App() {
     }
   }
 
-  const composer = <form className={"composer" + (chat ? "" : " composer--home")} onSubmit={event => { event.preventDefault(); void send(); }}>
-    <textarea ref={draftInput} className="composer-input" value={draft} rows={1} aria-label="Сообщение агенту" maxLength={100_000}
-      placeholder={chat ? "Что сделать дальше?" : "Опиши задачу — агент сам напишет код"}
-      onChange={event => setDraft(event.target.value)} onKeyDown={event => {
-        if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void send(); }
-      }} />
-    {files.length > 0 && <ul className="attachments" aria-label="Прикреплённые файлы">
-      {files.map(file => <li key={file}><button type="button" className="composer-control folder-chip" title={"Убрать " + folderName(file)}
-        onClick={() => setFiles(list => list.filter(item => item !== file))}><span>{folderName(file)}</span><Icon name="close" /></button></li>)}
+  const consumed = usage ? usage.input + usage.output + usage.reasoning + usage.cache.read + usage.cache.write : 0;
+  const capacity = usage?.context ?? contextWindow;
+  const percent = usage && capacity ? Math.min(100, Math.round(consumed / capacity * 100)) : undefined;
+  const formatted = (value: number) => value.toLocaleString("ru-RU");
+  const usageLabel = percent === undefined || !usage ? "" : [
+    formatted(consumed) + " / " + formatted(capacity!) + " токенов",
+    "Вход " + formatted(usage.input), "Выход " + formatted(usage.output), "Рассуждения " + formatted(usage.reasoning),
+    "Кэш " + formatted(usage.cache.read) + " чтение, " + formatted(usage.cache.write) + " запись"
+  ].join("\n");
+  const composer = <>
+    {queue.length > 0 && <ul className="message-queue" aria-label="Очередь сообщений">
+      {queue.map(item => <li key={item.id}><span className="subtle">В очереди</span><span>{item.text || item.files.map(file => file.name).join(", ")}</span>
+        <button className="composer-control attach" type="button" aria-label="Убрать из очереди" onClick={() => setQueue(value => value.filter(turn => turn.id !== item.id))}>
+          <Icon name="close" />
+        </button></li>)}
     </ul>}
-    <div className="composer-toolbar">
-      <div className="composer-controls">
-        <button className="composer-control attach" type="button" aria-label="Прикрепить файл" title="Прикрепить файл" disabled={!directory || busy}
-          onClick={() => void chooseFiles()}><Icon name="plus" /></button>
-        <button className="composer-control folder-chip" type="button" title={directory || "Выбрать папку проекта"}
-          disabled={!prefs || busy} onClick={() => void chooseDirectory()}>
-          <Icon name="folder" /><span>{directory ? folderName(directory) : "Папка проекта"}</span><Icon name="chevron" className="chevron" />
-        </button>
-      </div>
-      <div className="composer-controls composer-controls--right">
+    <Composer active={!!chat} input={draftInput} draft={draft} change={setDraft} directory={directory} busy={busy}
+      canSend={!!modelId && !!directory && !loadingChat} attachments={files} remove={id => setFiles(items => items.filter(file => file.id !== id))}
+      add={value => void captureFiles(value)} pick={() => void chooseFiles()} choose={() => void chooseDirectory()}
+      access={access} cycle={cycleAccess} submit={submit} stop={stop} selectCommand={quickCommand} tools={tools} vision={vision} onError={showError}
+      modelControls={<>
+        {percent !== undefined && <span className="context-usage" title={usageLabel} aria-label={"Контекст " + percent + "%"}>
+          <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12" pathLength="100" />
+            <circle cx="14" cy="14" r="12" pathLength="100" strokeDasharray={percent + " 100"} /></svg>
+          <span>{percent}%</span>
+        </span>}
+        {variants.length > 0 && <select className="composer-control variant-select" aria-label="Уровень рассуждений"
+          value={variant} onChange={event => setVariant(event.target.value)}>
+          <option value="">По умолчанию</option>{variants.map(id => <option key={id} value={id}>
+            {({ minimal: "Минимум", low: "Низкий", medium: "Средний", high: "Высокий", max: "Максимум", xhigh: "Очень высокий" } as Record<string, string>)[id] ?? id}
+          </option>)}
+        </select>}
         <ModelPicker selected={modelId} options={options} personal={personal} zen={zen} auto={prefs?.auto ?? true}
-          onSelect={id => { setModel(id); setRouteProvider(undefined); }} onAuto={auto => updatePrefs({ auto })} onConnect={setConnection}
-          onSubscriptions={() => setSubscriptions(true)} />
-        {busy ? <button className="send" type="button" title="Стоп" aria-label="Стоп"
-          disabled={!chat} onClick={() => { if (chat) void api.stop(chat.id).catch(showError); }}><Icon name="stop" /></button>
-          : <button className="send" type="submit" title="Отправить" aria-label="Отправить" disabled={!modelId || !directory || loadingChat}><Icon name="send" /></button>}
-      </div>
-    </div>
-  </form>;
+          openSignal={modelMenu} onSelect={id => { setModel(id); setVariant(""); setRouteProvider(undefined); }}
+          onAuto={auto => updatePrefs({ auto })} onConnect={setConnection} onSubscriptions={() => setSubscriptions(true)} />
+      </>} />
+  </>;
 
   return <>
     <div className="app">
@@ -321,46 +573,69 @@ function App() {
         </div>
       </header>
       <aside className="sidebar" aria-label="Чаты и настройки">
-        <button type="button" className="wordmark" disabled={busy || loadingChat} onClick={resetChat}>
+        <button type="button" className="wordmark" disabled={busy || loadingChat} onClick={() => startChat()}>
           <img src={logo} width="18" height="18" alt="" /><span>vsem<span className="wordmark-suffix">kod</span></span>
         </button>
         <button className="sidebar-row sidebar-row--new" type="button" disabled={busy || loadingChat} onClick={resetChat}><Icon name="newChat" />Новый чат</button>
         <label className="sidebar-row search">
-          <Icon name="search" /><input type="search" value={query} aria-label="Поиск чатов" placeholder="Поиск чатов" onChange={event => setQuery(event.target.value)} />
+          <Icon name="search" /><input ref={searchInput} type="search" value={query} aria-label="Поиск чатов" placeholder="Поиск чатов" onChange={event => setQuery(event.target.value)} />
         </label>
-        <nav className="recent" aria-label="Недавние чаты">
-          <h2>Недавние</h2>
-          <ul>{sessions.filter(item => item.title.toLocaleLowerCase("ru").includes(query.trim().toLocaleLowerCase("ru"))).map(item =>
-            <li key={item.id}><button className="sidebar-row conversation" type="button" aria-current={!settings && !subscriptions && chat?.id === item.id ? "page" : undefined}
-              title={item.title} disabled={busy || loadingChat} onClick={() => void openChat(item)}><span>{item.title}</span></button></li>)}</ul>
-        </nav>
+        <ChatGroups sessions={sessions} query={query} active={!settings && !subscriptions ? chat?.id : undefined}
+          disabled={busy || loadingChat} start={startChat} open={session => void openChat(session)} perform={changeChat} />
         <div className="sidebar-end">
           <button type="button" className="sidebar-row" aria-current={settings || subscriptions ? "page" : undefined} disabled={loadingChat}
             onClick={() => { setSettings(subscriptions || !settings); setSubscriptions(false); }}><Icon name="settings" />Настройки</button>
           <p className="catalog-note">{catalogAge(catalog?.catalog.generatedAt)}</p>
         </div>
       </aside>
-      {subscriptions ? <ConnectionsPage state={catalog} close={() => setSubscriptions(false)} connect={setConnection} />
-        : settings ? <SettingsPage state={catalog} prefs={prefs} version={initial?.version} choose={() => void chooseDirectory(true)}
-          update={updatePrefs} subscriptionsPage={() => setSubscriptions(true)} connect={setConnection} disconnect={disconnect}
-          checkUpdates={() => void checkUpdates()} checkingUpdates={checkingUpdates}
-          open={url => void api.openExternal(url).catch(showError)} />
-        : chat ? <Chat key={chat.id} title={chat.title} parts={parts} permissions={permissions} changes={changes} busy={busy}
-        answer={(id, decision) => api.answer(chat.id, id, decision)}>
-        {composer}{ownModel ? <p className="provider-note">{ownModel.providerId === "opencode" ? "Бесплатно · " : ""}{ownModel.providerName}</p>
-          : provider && <p className="provider-note">Бесплатно · модель от {provider.name}</p>}
-      </Chat> : <main className="workspace workspace--home">
-        <div className="home">
-          <h1>Чем займёмся?</h1>
-          {composer}
-          <div className="suggestions" aria-label="Подсказки">
-            {suggestions.map(suggestion => <button type="button" className="suggestion" key={suggestion} onClick={() => {
-              setDraft(suggestion);
-              draftInput.current?.focus();
-            }}>{suggestion}</button>)}
-          </div>
-        </div>
-      </main>}
+      <div className="workspace-layout">
+        {subscriptions ? <ConnectionsPage state={catalog} close={() => setSubscriptions(false)} connect={setConnection} />
+          : settings ? <Settings state={catalog} prefs={prefs} version={initial?.version} directory={directory} choose={() => void chooseDirectory(true)}
+            update={patch => {
+              if (patch.defaultAccess === "full") {
+                if (!confirmFull()) return;
+                patch = { ...patch, fullAccessConfirmed: true };
+              }
+              updatePrefs(patch);
+              if (!chat && patch.defaultAccess) setAccess(patch.defaultAccess);
+            }} subscriptionsPage={() => setSubscriptions(true)} connect={setConnection} disconnect={disconnect}
+            checkUpdates={() => void checkUpdates()} checkingUpdates={checkingUpdates}
+            open={url => void api.openExternal(url).catch(showError)} onError={showError} onNotice={text => notify({ text })}
+            onCatalog={setCatalog} exportAll={() => void exportChats()} />
+          : chat ? <Chat key={chat.id} title={chat.title} parts={parts} permissions={permissions} questions={questions} changeCount={changes.length}
+            busy={busy || loadingChat} panel={panel} openPanel={() => { if (!panel) setPanelTab("changes"); setPanel(value => !value); }}
+            answer={(id, decision) => api.answer(chat.id, id, decision)} answerQuestion={(id, value) => api.answerQuestion(chat.id, id, value)}
+            copy={text => void api.copyText(text).then(() => notify({ text: "Скопировано" })).catch(showError)}
+            edit={part => void editMessage(part)} revert={message => void revertMessage(message)} retry={part => submit(false, part.text, [], access, part.files?.length ? part.id : null)}
+            reverted={reverted} executePlan={planReady ? () => {
+              const mode = prefs?.defaultAccess === "edit" ? "edit" : "ask";
+              setAccess(mode);
+              submit(false, "Выполни план", [], mode, null);
+            } : undefined}>
+            {composer}{ownModel ? <p className="provider-note">{ownModel.providerId === "opencode" ? "Бесплатно · " : ""}{ownModel.providerName}</p>
+              : provider && <p className="provider-note">Бесплатно · модель от {provider.name}</p>}
+          </Chat> : <main className="workspace workspace--home">
+            <button className="composer-control home-panel-toggle" type="button" aria-label="Правая панель" aria-expanded={panel}
+              title="Правая панель · Ctrl+B" onClick={() => setPanel(value => !value)}><Icon name="panel" /></button>
+            <div className="home">
+              <h1>Чем займёмся?</h1>
+              {composer}
+              <div className="suggestions" aria-label="Подсказки">
+                {suggestions.map(suggestion => <button type="button" className="suggestion" key={suggestion} onClick={() => {
+                  setDraft(suggestion);
+                  draftInput.current?.focus();
+                }}>{suggestion}</button>)}
+              </div>
+            </div>
+          </main>}
+        {directory && <WorkspacePanel key={directory} directory={directory} tab={panelTab} setTab={setPanelTab} visible={panel && !settings && !subscriptions}
+          width={panelWidth ?? prefs?.panelWidth ?? 360} resize={(width, final) => {
+            const next = Math.max(260, Math.min(700, window.innerWidth - 490, Math.round(width)));
+            if (final) { updatePrefs({ panelWidth: next }); setPanelWidth(undefined); }
+            else setPanelWidth(next);
+          }} close={() => setPanel(false)} parts={parts} changes={changes} revert={file => void revertFile(file)} busy={busy || loadingChat}
+          theme={theme} onError={showError} />}
+      </div>
     </div>
     {connection && <ConnectDialog key={connection.id + "/" + (connection.model?.id ?? "")} connection={connection}
       clipboard={prefs?.clipboard ?? false} close={() => setConnection(undefined)} connected={state => {

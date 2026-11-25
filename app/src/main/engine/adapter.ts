@@ -1,24 +1,29 @@
-import { basename, isAbsolute, relative } from "node:path";
+import { basename, isAbsolute, relative, resolve } from "node:path";
+import { realpath } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
 import { OpenCode, type SessionInfo, type SessionMessageAssistantTool } from "@opencode/client";
-import type { ChatEvent, ChatPart, Conversation, FileChange, PermissionDecision, SubscriptionId } from "../../shared/api";
+import type { ChatAction, ChatEvent, ChatHistory, ChatPart, Conversation, FileChange, McpConfig, PermissionDecision, ProjectTools, QuestionAnswer, SubscriptionId, TurnOptions, Usage } from "../../shared/api";
 import { nativeNames, type PersonalModel } from "../../shared/providers";
 import { modelReference } from "../connect-service";
-import { DiffTracker, fileTools } from "./diff-tracker";
+import { accessModes, imageFile, pathMentions } from "../../shared/workspace";
+import { sessionAccess } from "./access";
+import { DiffTracker, fileTools, inside } from "./diff-tracker";
 
 const request = () => ({ signal: AbortSignal.timeout(20_000) });
 const nativeMethods: Record<SubscriptionId, string> = { "github-copilot": "device", openai: "chatgpt-token-sharing" };
 const eventTypes = [
   "session.text.delta", "session.text.ended", "session.tool.input.started", "session.tool.called",
   "session.tool.success", "session.tool.failed", "permission.asked", "permission.replied",
-  "session.execution.failed", "session.execution.interrupted", "session.execution.succeeded"
+  "session.reasoning.started", "session.reasoning.ended", "session.compaction.ended", "session.compaction.failed", "session.step.ended",
+  "form.created", "form.replied", "form.cancelled", "session.execution.failed", "session.execution.interrupted", "session.execution.succeeded"
 ] as const;
 
 function conversation(info: SessionInfo): Conversation {
   return {
     id: info.id, title: info.title ?? "Новый чат", directory: info.location.directory,
-    updatedAt: info.time.updated,
+    updatedAt: info.time.updated, archived: Boolean(info.time.archived), pinned: info.metadata?.vsemkodPinned === true,
+    variant: info.model?.variant, access: accessModes.find(mode => mode === info.metadata?.vsemkodAccess),
     modelId: info.model && (info.model.providerID === "vsemkod" ? info.model.id : modelReference(info.model.providerID, info.model.id))
   };
 }
@@ -36,6 +41,15 @@ function target(input: Record<string, unknown>, directory: string): string {
   return "";
 }
 
+function mutationTargets(input: Record<string, unknown>, fallback: string): string[] {
+  const patch = input.patchText ?? input.patch_text ?? input.patch;
+  if (typeof patch === "string") {
+    const paths = Array.from(patch.matchAll(/^\*\*\* (?:Add File|Update File|Delete File|Move to): (.+)\r?$/gm), match => match[1].trim());
+    if (paths.length) return [...new Set(paths)];
+  }
+  return fallback ? [fallback] : [];
+}
+
 function outputText(content: readonly ({ type: "text"; text: string } | { type: "file" })[] | undefined) {
   const text = content?.flatMap(item => item.type === "text" ? [item.text] : []).join("\n").slice(0, 12_000);
   return text || undefined;
@@ -47,8 +61,18 @@ function toToolPart(tool: SessionMessageAssistantTool, directory: string): Extra
     id: tool.id, kind: "tool", tool: tool.name,
     target: typeof state.input === "string" ? "" : target(state.input, directory),
     status: state.status === "completed" ? "completed" : state.status === "error" ? "error" : "running",
+    todos: state.status === "completed" && tool.name === "todowrite" ? readTodos(state.input.todos) : undefined,
     output: state.status === "completed" ? outputText(state.content) : state.status === "error" ? state.error.message : undefined
   };
+}
+
+function readTodos(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item: unknown) => {
+    if (!item || typeof item !== "object" || !("content" in item) || typeof item.content !== "string") return [];
+    const status = "status" in item && typeof item.status === "string" ? item.status : "pending";
+    return [{ content: item.content, status }];
+  });
 }
 
 function userError(error: { message: string; status?: number }): string {
@@ -65,7 +89,7 @@ export type NativeModel = { model: PersonalModel; upstream: EngineModel };
 export class EngineAdapter {
   private readonly client;
 
-  constructor(url: string, auth: string) {
+  constructor(private readonly url: string, auth: string) {
     this.client = OpenCode.make({ baseUrl: url, headers: { authorization: auth } });
   }
 
@@ -99,7 +123,7 @@ export class EngineAdapter {
       return [{
         model: {
           id: modelReference(providerId, entry.id), name: entry.name, providerId, providerName: nativeNames[providerId],
-          context: entry.limit?.context, vision: entry.capabilities.input.includes("image")
+          context: entry.limit?.context, output: entry.limit?.output, vision: entry.capabilities.input.includes("image")
         },
         upstream: { id: entry.id, providerID: providerId }
       }];
@@ -153,36 +177,158 @@ export class EngineAdapter {
     }
   }
 
-  async list(directory: string): Promise<Conversation[]> {
-    const result = await this.client.session.list({ directory, parentID: null, limit: 100 }, request());
-    return result.data.map(conversation);
+  async list(directory?: string): Promise<Conversation[]> {
+    const chats: Conversation[] = [];
+    for (const archived of [false, true]) {
+      let cursor: string | undefined;
+      do {
+        const page = await this.client.session.list({ directory, archived, limit: 100, cursor }, request());
+        chats.push(...page.data.map(conversation));
+        cursor = page.cursor?.next ?? undefined;
+      } while (cursor);
+    }
+    return chats;
   }
 
   async create(directory: string, title: string): Promise<Conversation> {
-    const info = await this.client.session.create({ location: { directory }, title }, request());
-    return conversation(info);
+    return conversation(await this.client.session.create({ location: { directory }, title }, request()));
   }
 
-  async history(sessionId: string, directory: string, toolDiffs: Record<string, FileChange> = {}) {
+  async chatAction(sessionId: string, action: ChatAction) {
+    const sessionID = sessionId;
+    if (action.type === "delete") {
+      await this.client.session.remove({ sessionID }, request());
+      return null;
+    }
+    if (action.type === "fork") return conversation(await this.client.session.fork({ sessionID }, request()));
+    const info = await this.client.session.get({ sessionID }, request());
+    await this.client.session.update({
+      sessionID,
+      ...(action.type === "rename" ? { title: action.title } : action.type === "archive" ? { archived: action.value }
+        : action.type === "pin" ? { metadata: { ...info.metadata, vsemkodPinned: action.value } } : {})
+    }, request());
+    return conversation(await this.client.session.get({ sessionID }, request()));
+  }
+
+  async revert(sessionID: string, messageID?: string) {
+    if (messageID) await this.client.session.revert.stage({ sessionID, messageID, files: true }, request());
+    else await this.client.session.revert.clear({ sessionID }, request());
+  }
+
+  async isGit(directory: string) {
+    const info = await this.client.location.get({ location: { directory } }, request());
+    return (await this.client.project.list({}, request())).some(project => project.id === info.project.id && project.vcs === "git");
+  }
+
+  async tools(directory: string): Promise<ProjectTools> {
+    const location = { directory };
+    const [commands, skills] = await Promise.all([
+      this.client.command.list({ location }, request()), this.client.skill.list({ location }, request())
+    ]);
+    return { commands: commands.data, skills: skills.data.map(({ id, name, description, path }) => ({ id, name, description, path })) };
+  }
+
+  async findFiles(directory: string, query: string) {
+    return (await this.client.file.find({ location: { directory }, query, limit: 12 }, request())).data;
+  }
+
+  async listFiles(directory: string, path?: string) {
+    return (await this.client.file.list({ location: { directory }, path }, request())).data;
+  }
+
+  async readFile(directory: string, path: string) {
+    const content = await this.client.file.read({ location: { directory }, path }, request());
+    if (content.includes(0)) throw new Error("Для двоичного файла нет текстового просмотра.");
+    return new TextDecoder("utf-8", { fatal: true }).decode(content);
+  }
+
+  async answerQuestion(sessionID: string, formID: string, answer?: QuestionAnswer) {
+    if (answer) await this.client.session.form.reply({ sessionID, formID, answer }, request());
+    else await this.client.session.form.cancel({ sessionID, formID }, request());
+  }
+
+  async modelInfo(directory: string, model: EngineModel) {
+    const { data } = await this.client.model.list({ location: { directory } }, request());
+    return data.find(item => item.id === model.id && item.providerID === model.providerID);
+  }
+
+  async mcpList(directory: string) {
+    return (await this.client.mcp.list({ location: { directory } }, request())).data;
+  }
+
+  async mcpCheck(directory: string, server: string, config?: McpConfig) {
+    const location = { directory };
+    if (config?.disabled) return;
+    await this.client.experimental.mcp.disconnect({ location, server }, request());
+    await this.client.experimental.mcp.connect({ location, server }, request());
+  }
+
+  async openTerminal(directory: string, onData: (text: string) => void, onClose: () => void) {
+    const location = { directory };
+    const { data } = await this.client.pty.create({ location, cwd: directory }, request());
+    const ptyID = data.id;
+    const input = { location, ptyID };
+    const remove = () => this.client.pty.remove(input, request()).catch(() => {});
+    try {
+      const { data: { ticket } } = await this.client.pty.connect.token({ ...input, "x-opencode-ticket": "1" }, request());
+      const endpoint = new URL("/api/pty/" + encodeURIComponent(ptyID) + "/connect", this.url);
+      endpoint.protocol = "ws:";
+      endpoint.search = new URLSearchParams({ "location[directory]": directory, ticket, cursor: "0" }).toString();
+      const socket = new WebSocket(endpoint);
+      socket.addEventListener("message", event => { if (typeof event.data === "string") onData(event.data); });
+      socket.addEventListener("close", () => { onClose(); void remove(); });
+      await new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(() => { socket.close(); reject(new Error("Терминал не ответил.")); }, 7000);
+        socket.addEventListener("open", () => { clearTimeout(timer); resolve(); }, { once: true });
+        socket.addEventListener("error", () => { clearTimeout(timer); reject(new Error("Не удалось подключить терминал.")); }, { once: true });
+      });
+      return {
+        input: (text: string) => { if (socket.readyState === WebSocket.OPEN) socket.send(text); },
+        resize: (cols: number, rows: number) => this.client.pty.update({ ...input, size: { cols, rows } }, request()).then(() => {}),
+        close: () => { socket.close(); return remove(); }
+      };
+    } catch (error) {
+      await remove();
+      throw error;
+    }
+  }
+
+  async history(sessionId: string, directory: string, toolDiffs: Record<string, FileChange[]> = {}, includeReverted = false): Promise<ChatHistory> {
     const parts: ChatPart[] = [];
+    const session = await this.client.session.get({ sessionID: sessionId }, request());
     let cursor: string | undefined;
+    let tokens: Usage | undefined;
+    let hidden = false;
     do {
       const page = await this.client.message.list({
         sessionID: sessionId, limit: 100, ...(cursor ? { cursor } : { order: "asc" })
       }, request());
       for (const message of page.data) {
+        if (!includeReverted && message.id === session.revert?.messageID) hidden = true;
+        if (hidden) break;
         if (message.type === "user") {
           parts.push({ id: message.id, kind: "user", text: message.text, files: message.files?.map(file => file.name ?? "") });
         } else if (message.type === "assistant") {
+          tokens = message.tokens ?? tokens;
           for (const [index, item] of message.content.entries()) {
-            if (item.type === "text") parts.push({ id: message.id + "/" + index, kind: "text", text: item.text });
-            if (item.type === "tool") parts.push({ ...toToolPart(item, directory), diff: toolDiffs[item.id] });
+            const id = message.id + "/" + index;
+            if (item.type === "text") parts.push({ id, kind: "text", text: item.text });
+            if (item.type === "tool") {
+              const diffs = toolDiffs[item.id];
+              parts.push({ ...toToolPart(item, directory), diff: diffs?.[0], diffs });
+            }
+            if (item.type === "reasoning") parts.push({ id, kind: "reasoning", text: item.text,
+              seconds: item.time && Math.round((item.time.completed ?? item.time.created) - item.time.created) / 1000 });
           }
+        } else if (message.type === "compaction" && message.status === "completed") {
+          parts.push({ id: message.id, kind: "note", text: "Контекст сжат" });
+          tokens = message.tokens ?? tokens;
         }
       }
-      cursor = page.cursor?.next ?? undefined;
+      cursor = hidden ? undefined : page.cursor?.next ?? undefined;
     } while (cursor);
-    return { parts, changes: mergeChanges(Object.values(toolDiffs), await this.changes(sessionId)) };
+    const visibleDiffs = parts.flatMap(part => part.kind === "tool" ? part.diffs ?? [] : []);
+    return { parts, reverted: Boolean(session.revert), usage: tokens, changes: mergeChanges(visibleDiffs, await this.changes(sessionId)) };
   }
 
   async changes(sessionId: string) {
@@ -206,12 +352,16 @@ export class EngineAdapter {
     model: EngineModel,
     files: string[],
     emit: (event: ChatEvent) => void,
-    interrupted: () => boolean
+    interrupted: () => boolean,
+    options: TurnOptions & { webSearch?: boolean } = {}
   ) {
     const signal = new AbortController();
     const events = this.client.event.subscribe({ types: eventTypes, signal: signal.signal })[Symbol.asyncIterator]();
     const tools = new Map<string, Extract<ChatPart, { kind: "tool" }>>();
+    const toolTodos = new Map<string, ReturnType<typeof readTodos>>();
     const tracker = new DiffTracker(directory);
+    const reasoning = new Map<string, number>();
+    let context: number | undefined;
     const update = (part: ChatPart) => emit({ type: "part", sessionId, part });
     let queued = false;
     let error: string | undefined;
@@ -230,8 +380,37 @@ export class EngineAdapter {
         const next = await events.next();
         if (next.done) throw new Error("Поток событий OpenCode прервался.");
         const event = next.value;
+        if (event.type === "form.created") {
+          const { form } = event.data;
+          if (form.sessionID === sessionId) emit({ type: "question", sessionId, question: form });
+          continue;
+        }
         if (!("sessionID" in event.data) || event.data.sessionID !== sessionId) continue;
         switch (event.type) {
+          case "form.replied":
+          case "form.cancelled":
+            emit({ type: "question-resolved", sessionId, id: event.data.id });
+            break;
+          case "session.reasoning.started":
+            reasoning.set(event.data.assistantMessageID + "/" + event.data.ordinal, event.created);
+            break;
+          case "session.reasoning.ended": {
+            const id = event.data.assistantMessageID + "/" + event.data.ordinal;
+            update({ id, kind: "reasoning", text: event.data.text,
+              seconds: Math.max(0, Math.round((event.created - (reasoning.get(id) ?? event.created)) / 1000)) });
+            break;
+          }
+          case "session.step.ended":
+            emit({ type: "usage", sessionId, usage: { ...event.data.tokens, context } });
+            break;
+          case "session.compaction.ended":
+            update({ id: event.id, kind: "note", text: "Контекст сжат" });
+            if (event.data.tokens) emit({ type: "usage", sessionId, usage: { ...event.data.tokens, context } });
+            if (options.compact) return;
+            break;
+          case "session.compaction.failed":
+            if (options.compact) { error = "Не удалось сжать контекст."; return; }
+            break;
           case "session.text.delta":
           case "session.text.ended": {
             const id = event.data.assistantMessageID + "/" + event.data.ordinal;
@@ -251,8 +430,9 @@ export class EngineAdapter {
             const tool = tools.get(id);
             if (tool) {
               tool.target = target(input, directory);
+              if (tool.tool === "todowrite") toolTodos.set(id, readTodos(input.todos));
               update({ ...tool });
-              if (fileTools.has(tool.tool) && tool.target) await tracker.capture(id, [tool.target]);
+              if (fileTools.has(tool.tool)) await tracker.capture(id, mutationTargets(input, tool.target));
             }
             break;
           }
@@ -261,9 +441,11 @@ export class EngineAdapter {
             const tool = tools.get(event.data.id);
             if (tool) {
               tool.status = event.type === "session.tool.success" ? "completed" : "error";
+              if (tool.status === "completed" && tool.tool === "todowrite") tool.todos = toolTodos.get(tool.id);
               tool.output = event.type === "session.tool.success" ? outputText(event.data.content) : event.data.error.message;
               if (tool.status === "completed" && fileTools.has(tool.tool)) {
-                tool.diff = await tracker.finish(tool.id, tool.target, tool.output);
+                tool.diffs = await tracker.finish(tool.id, tool.target, tool.output);
+                tool.diff = tool.diffs[0];
               }
               update({ ...tool });
             }
@@ -292,13 +474,42 @@ export class EngineAdapter {
     const stream = collect();
     void stream.catch(() => {});
     try {
-      await this.client.session.switchModel({ sessionID: sessionId, model }, request());
+      const info = await this.client.session.get({ sessionID: sessionId }, request());
+      const access = options.access ?? "ask";
+      const { agent, permissions } = sessionAccess(access, options.webSearch);
+      await this.client.session.update({
+        sessionID: sessionId, permissions, metadata: { ...info.metadata, vsemkodAccess: access }
+      }, request());
+      if (info.agent !== agent) await this.client.session.switchAgent({ sessionID: sessionId, agent }, request());
+      const selection = await this.modelInfo(directory, model).catch(() => undefined);
+      context = selection?.limit.context;
+      await this.client.session.switchModel({ sessionID: sessionId, model: { ...model, variant: options.variant } }, request());
       if (interrupted()) return { changes: await this.changes(sessionId), stopped: true };
       queued = true;
-      await this.client.session.prompt({
-        sessionID: sessionId, text,
-        files: files.map(path => ({ uri: pathToFileURL(path).href, name: basename(path) }))
+      const replay = options.replayMessageId
+        ? await this.client.session.message.get({ sessionID: sessionId, messageID: options.replayMessageId }, request()) : undefined;
+      const originalFiles = replay?.type === "user" ? replay.files?.filter(file => !file.mention) ?? [] : [];
+      if (originalFiles.some(file => file.mime.startsWith("image/")) && !selection?.capabilities.input.includes("image")) {
+        throw new Error("Выбранная модель не принимает изображения.");
+      }
+      const attachments = [
+        ...originalFiles.map(file => ({ uri: "data:" + file.mime + ";base64," + file.data, name: file.name, description: file.description })),
+        ...files.map(path => ({ uri: pathToFileURL(path).href, name: basename(path) })),
+        ...await Promise.all(pathMentions(text).map(async ({ path, ...mention }) => {
+          const target = await realpath(resolve(directory, path)).catch(() => undefined);
+          if (!target || !inside(directory, target)) throw new Error("Файл или папка из упоминания недоступны: " + path);
+          if (imageFile(target) && !selection?.capabilities.input.includes("image")) throw new Error("Выбранная модель не принимает изображения.");
+          return { uri: pathToFileURL(target).href, name: basename(target), mention };
+        }))
+      ];
+      if (options.compact) await this.client.session.compact({ sessionID: sessionId }, request());
+      else if (options.command) await this.client.session.command({
+        sessionID: sessionId, name: options.command.name, text: options.command.args, files: attachments
       }, request());
+      else {
+        if (options.skill) await this.client.experimental.session.skill({ sessionID: sessionId, id: options.skill, resume: false }, request());
+        await this.client.session.prompt({ sessionID: sessionId, text, files: attachments }, request());
+      }
       if (interrupted()) {
         await this.stop(sessionId);
         return { changes: await this.changes(sessionId), stopped: true };

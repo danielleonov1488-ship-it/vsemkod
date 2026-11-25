@@ -1,3 +1,4 @@
+import { rm } from "node:fs/promises";
 import { join } from "node:path";
 import type { ZodType } from "zod";
 import { catalogSchema, changesSchema, type Catalog, type Change } from "../shared/catalog-schema";
@@ -49,6 +50,12 @@ export class CatalogService {
     clearInterval(this.interval);
     this.interval = undefined;
     this.refreshAbort?.abort();
+  }
+
+  async clearCache() {
+    this.refreshAbort?.abort();
+    await this.refreshing;
+    await rm(join(this.data, "catalog.json"), { force: true });
   }
 
   refresh(): Promise<void> {

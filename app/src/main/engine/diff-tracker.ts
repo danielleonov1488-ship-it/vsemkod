@@ -22,13 +22,16 @@ export class DiffTracker {
   async capture(id: string, targets: string[]) {
     if (!targets.length) return;
     const files = await Promise.all(targets.map(target => this.read(target)));
-    this.before.set(id, files.filter((file): file is TextFile => file !== undefined));
+    const captured = this.before.get(id) ?? [];
+    const entries = new Map(files.flatMap(file => file ? [[resolve(this.directory, file.path), file] as const] : []));
+    for (const file of captured) entries.set(resolve(this.directory, file.path), file);
+    this.before.set(id, [...entries.values()]);
   }
 
-  async finish(id: string, target: string, output?: string): Promise<FileChange | undefined> {
+  async finish(id: string, target: string, output?: string): Promise<FileChange[]> {
     const files = this.before.get(id) ?? [];
     if (!files.length && target && output?.startsWith("Created file successfully:")) files.push({ path: target, value: null });
-    let first;
+    const completed: FileChange[] = [];
     for (const file of files) {
       const next = await this.read(file.path);
       if (!next || file.value === next.value) continue;
@@ -44,10 +47,10 @@ export class DiffTracker {
         status: file.value === null ? "added" : next.value === null ? "deleted" : "modified"
       };
       this.changes.set(path, change);
-      first ??= change;
+      completed.push(change);
     }
     this.before.delete(id);
-    return first;
+    return completed;
   }
 
   results() { return [...this.changes.values()]; }

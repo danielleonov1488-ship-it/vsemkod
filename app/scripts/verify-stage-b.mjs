@@ -63,6 +63,7 @@ try {
   const dialog = () => page.getByRole("dialog");
   await page.getByRole("heading", { name: "Чем займёмся?" }).waitFor();
   await page.getByRole("button", { name: "Настройки" }).click();
+    await page.getByRole("button", { name: "Модели и подключения", exact: true }).click();
   const clipboard = page.getByRole("switch", { name: "Ловить ключ из буфера" });
   assert.equal(await clipboard.isChecked(), false);
   const updates = page.getByRole("switch", { name: "Проверять обновления каталога" });
@@ -127,6 +128,7 @@ try {
   await page.getByText("STAGE_B_OK", { exact: true }).waitFor();
   await page.getByRole("button", { name: "Отправить", exact: true }).waitFor();
   await page.getByRole("button", { name: "Настройки" }).click();
+    await page.getByRole("button", { name: "Модели и подключения", exact: true }).click();
   await page.getByRole("button", { name: "Отключить Свой OpenAI-совместимый" }).click();
   await page.getByRole("button", { name: "Отключить Свой OpenAI-совместимый" }).waitFor({ state: "hidden" });
   assert.deepEqual(JSON.parse(await readFile(join(data, "keys.json"), "utf8")), {});

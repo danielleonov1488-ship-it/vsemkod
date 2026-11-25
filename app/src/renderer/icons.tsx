@@ -1,4 +1,7 @@
 const paths = {
+  paperclip: <path d="M6.5 10.5 11 6a2 2 0 0 0-2.8-2.8L3.6 7.8a3 3 0 0 0 4.2 4.2l4.7-4.7M5 9.3l4-4" />,
+  more: <path d="M3 8h.1M8 8h.1M13 8h.1" strokeWidth="2.5" />,
+  panel: <><rect x="2" y="3" width="12" height="10" rx="1.5" /><path d="M10 3v10" /></>,
   minus: <path d="M3 8h10" />,
   maximize: <rect x="3.5" y="3.5" width="9" height="9" rx=".5" />,
   close: <path d="m4.5 4.5 7 7m0-7-7 7" />,

@@ -7,16 +7,19 @@ import { setTimeout as delay } from "node:timers/promises";
 import { z } from "zod";
 import { rankedModels } from "../../shared/catalog";
 import type { Catalog } from "../../shared/catalog-schema";
-import type { ChatEvent, Permission, PermissionDecision } from "../../shared/api";
+import type { ChatEvent, ChatPart, FileChange, Permission, PermissionDecision, TurnOptions } from "../../shared/api";
 import type { PersonalModel } from "../../shared/providers";
 import type { Router } from "../router";
 import { readJson, writeJson } from "../storage";
-import { EngineAdapter, mergeChanges, type EngineModel } from "./adapter";
+import { applyFileChanges } from "./revert-files";
+import { sessionAccess } from "./access";
+import { EngineAdapter, type EngineModel } from "./adapter";
 
-const diffsSchema = z.record(z.string(), z.object({
+const changeSchema = z.object({
   file: z.string(), patch: z.string(), additions: z.number(), deletions: z.number(),
   status: z.enum(["added", "deleted", "modified"])
-}));
+});
+const diffsSchema = z.record(z.string(), z.union([changeSchema, z.array(changeSchema)]).transform(value => Array.isArray(value) ? value : [value]));
 const approvalsSchema = z.array(z.object({ action: z.string(), patterns: z.array(z.string()) }));
 type Approval = z.infer<typeof approvalsSchema>[number];
 
@@ -46,13 +49,7 @@ export function engineBinary(resources: string): string {
 
 export const enableOpenCodeZenFree = process.env.ENABLE_OPENCODE_ZEN_FREE === "true";
 
-const filePermissions = [
-  { action: "*", resource: "*", effect: "deny" },
-  ...["read", "glob", "grep", "list"].map(action => ({ action, resource: "*", effect: "allow" })),
-  { action: "edit", resource: "*", effect: "ask" },
-  { action: "shell", resource: "*", effect: "ask" },
-  { action: "external_directory", resource: "*", effect: "deny" }
-] as const;
+const filePermissions = sessionAccess("ask").permissions;
 
 export class EngineService {
   private child?: ChildProcess;
@@ -71,7 +68,8 @@ export class EngineService {
     private readonly catalog: () => Catalog,
     private readonly router: Router,
     private readonly emit: (event: ChatEvent) => void,
-    private readonly personalModels: () => PersonalModel[] = () => []
+    private readonly personalModels: () => PersonalModel[] = () => [],
+    private readonly settings: () => { agentSteps: number; webSearch: boolean; mcp: object } = () => ({ agentSteps: 0, webSearch: false, mcp: {} })
   ) {}
 
   async ready(): Promise<EngineAdapter> {
@@ -88,21 +86,21 @@ export class EngineService {
     finally { this.authorizing--; }
   }
 
-  async send(sessionId: string, directory: string, text: string, modelId: string, auto: boolean, files: string[], native?: EngineModel) {
+  async send(sessionId: string, directory: string, text: string, modelId: string, auto: boolean, files: string[], native?: EngineModel, options: TurnOptions = {}) {
     if (this.active) throw new Error("Агент уже отвечает в другом запросе.");
-    const client = await this.ready();
-    if (this.active) throw new Error("Агент уже отвечает в другом запросе.");
+    const startup = this.ready();
     this.active = sessionId;
     this.stopRequested = false;
     this.router.setTurn({ sessionId, auto });
     const path = this.sessionFile(sessionId, "diffs");
-    const [previousDiffs, approvals] = await Promise.all([
-      readJson(path, diffsSchema), readJson(this.sessionFile(sessionId, "approvals"), approvalsSchema)
-    ]);
-    const diffs = previousDiffs ?? {};
-    this.approvals = approvals ?? [];
+    let diffs: Record<string, FileChange[]> = {};
     let changed = false;
     try {
+      const [client, previousDiffs, approvals] = await Promise.all([startup, readJson(path, diffsSchema),
+        readJson(this.sessionFile(sessionId, "approvals"), approvalsSchema)]);
+      diffs = previousDiffs ?? {};
+      this.approvals = approvals ?? [];
+      if (this.stopRequested) return { changes: (await this.history(sessionId, directory)).changes, stopped: true };
       const result = await client.send(sessionId, directory, text, native ?? { id: modelId, providerID: "vsemkod" }, files, event => {
         if (event.type === "permission") {
           const permission = event.permission;
@@ -118,12 +116,14 @@ export class EngineService {
         }
         if (event.type === "permission-resolved") this.pendingPermissions.delete(event.id);
         if (event.type === "part" && event.part.kind === "tool" && event.part.diff) {
-          diffs[event.part.id] = event.part.diff;
+          diffs[event.part.id] = event.part.diffs ?? [event.part.diff];
           changed = true;
         }
         this.emit(event);
-      }, () => this.stopRequested);
-      return { changes: mergeChanges(Object.values(diffs), result.changes), stopped: result.stopped };
+      }, () => this.stopRequested, { ...options, webSearch: this.settings().webSearch });
+      if (changed) { await writeJson(path, diffs); changed = false; }
+      const history = await this.history(sessionId, directory);
+      return { changes: history.changes, stopped: result.stopped };
     } finally {
       if (changed) await writeJson(path, diffs).catch(() => {});
       this.active = undefined;
@@ -134,10 +134,62 @@ export class EngineService {
 
   async history(sessionId: string, directory: string) {
     const client = await this.ready();
-    return client.history(sessionId, directory, await readJson(this.sessionFile(sessionId, "diffs"), diffsSchema));
+    const [diffs, reverted] = await Promise.all([readJson(this.sessionFile(sessionId, "diffs"), diffsSchema),
+      readJson(this.sessionFile(sessionId, "file-reverts"), z.record(z.string(), z.string()))]);
+    const result = await client.history(sessionId, directory, diffs);
+    if (reverted) result.changes = result.changes.filter(change => reverted[change.file] !== change.patch);
+    return result;
   }
 
-  private sessionFile(sessionId: string, folder: "diffs" | "approvals") {
+  get configDirectory() { return join(this.data, "config", "opencode"); }
+
+  async openTerminal(directory: string, emit: (text: string) => void, close: () => void) {
+    return (await this.ready()).openTerminal(directory, emit, close);
+  }
+
+  async revert(sessionId: string, directory: string, messageId?: string) {
+    if (this.active === sessionId) throw new Error("Сначала остановите агента.");
+    const client = await this.ready();
+    const diffs = await readJson(this.sessionFile(sessionId, "diffs"), diffsSchema);
+    const visible = await client.history(sessionId, directory, diffs);
+    const boundary = messageId ? visible.parts.findIndex(part => part.id === messageId && part.kind === "user") : -1;
+    if (messageId && boundary < 0) throw new Error("Сообщение для отката не найдено.");
+    const git = await client.isGit(directory);
+    if (git) await client.revert(sessionId, messageId);
+    else {
+      const full = await client.history(sessionId, directory, diffs, true);
+      const previous = visible.reverted ? full.parts.slice(visible.parts.length) : [];
+      const next = messageId ? full.parts.slice(boundary) : [];
+      const changes = (parts: ChatPart[]) => parts.flatMap(part => part.kind === "tool" ? part.diffs ?? [] : []);
+      await applyFileChanges(directory, [...changes(previous).map(change => ({ change, reverse: false })),
+        ...changes(next).reverse().map(change => ({ change, reverse: true }))], () => client.revert(sessionId, messageId));
+    }
+    return client.history(sessionId, directory, diffs);
+  }
+
+  async revertFile(sessionId: string, directory: string, file: string) {
+    if (this.active === sessionId) throw new Error("Сначала остановите агента.");
+    const client = await this.ready();
+    const path = this.sessionFile(sessionId, "diffs");
+    const diffs = await readJson(path, diffsSchema) ?? {};
+    const history = await client.history(sessionId, directory, diffs);
+    const changes = history.parts.flatMap(part => part.kind === "tool" ? part.diffs?.filter(change => change.file === file) ?? [] : []);
+    if (!(await this.history(sessionId, directory)).changes.some(change => change.file === file)) throw new Error("Изменение файла не найдено.");
+    const native = (await client.changes(sessionId)).find(item => item.file === file);
+    const patches = native ? [native] : changes.reverse();
+    if (!patches.length) throw new Error("Изменение файла не найдено.");
+    await applyFileChanges(directory, patches.map(change => ({ change, reverse: true })), async () => {
+      await writeJson(path, Object.fromEntries(Object.entries(diffs).map(([id, changes]) => [id, changes.filter(change => change.file !== file)])));
+      if (native) {
+        const reverted = this.sessionFile(sessionId, "file-reverts");
+        const previous = await readJson(reverted, z.record(z.string(), z.string()));
+        await writeJson(reverted, { ...previous, [file]: native.patch }).catch(async error => { await writeJson(path, diffs); throw error; });
+      }
+    });
+    return this.history(sessionId, directory);
+  }
+
+  private sessionFile(sessionId: string, folder: "diffs" | "approvals" | "file-reverts") {
     return join(this.data, folder, createHash("sha256").update(sessionId).digest("hex") + ".json");
   }
 
@@ -244,7 +296,7 @@ export class EngineService {
   }
 
   private configVersion(catalog: Catalog, personal: PersonalModel[]) {
-    return JSON.stringify([catalog.generatedAt, personal]);
+    return JSON.stringify([catalog.generatedAt, personal, this.settings()]);
   }
 
   private config(catalog: Catalog, personal: PersonalModel[]) {
@@ -256,7 +308,7 @@ export class EngineService {
     }]);
     const personalEntries = personal.map(model => [model.id, {
       name: model.name,
-      limit: { context: model.context ?? 32_768, output: Math.min(8192, Math.floor((model.context ?? 32_768) / 4)) },
+      limit: { context: model.context ?? 32_768, output: model.output ?? Math.min(8192, Math.floor((model.context ?? 32_768) / 4)) },
       capabilities: { tools: true, input: ["text", ...(model.vision ? ["image"] : [])], output: ["text"] }
     }]);
     return {
@@ -266,9 +318,15 @@ export class EngineService {
       formatter: false,
       lsp: false,
       snapshots: true,
+      instructions: ["AGENTS.md"],
+      todo: true,
+      websearch: this.settings().webSearch ? { provider: "tinyfish" } : false,
+      compaction: { auto: true },
+      policies: this.settings().webSearch ? [] : [{ action: "websearch.use", resource: "*", effect: "deny" }],
+      mcp: this.settings().mcp,
       permissions: filePermissions,
       agents: {
-        ...Object.fromEntries(["build", "plan", "general"].map(agent => [agent, { permissions: filePermissions }])),
+        ...Object.fromEntries(["build", "plan", "general"].map(agent => [agent, { ...(this.settings().agentSteps ? { steps: this.settings().agentSteps } : {}), ...(agent === "plan" ? { permissions: sessionAccess("read").permissions } : {}) }])),
         title: { disabled: true }
       },
       plugins: [

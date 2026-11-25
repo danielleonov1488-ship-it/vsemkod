@@ -40,7 +40,7 @@ export const nativeNames: Record<NativeId, string> = {
 
 export const remoteModelsSchema = z.array(z.object({
   id: z.string().min(1).max(512), name: z.string().min(1).max(512),
-  context: z.int().positive().optional(), vision: z.boolean().optional()
+  context: z.int().positive().optional(), output: z.int().positive().optional(), vision: z.boolean().optional()
 })).max(1000);
 export type RemoteModel = z.infer<typeof remoteModelsSchema>[number];
-export type PersonalModel = RemoteModel & { providerId: PersonalId | NativeId; providerName: string };
+export type PersonalModel = RemoteModel & { providerId: PersonalId | NativeId; providerName: string; upstreamId?: string };

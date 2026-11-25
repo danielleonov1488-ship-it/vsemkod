@@ -37,14 +37,19 @@ export function AutoSwitch({ auto, onAuto }: { auto: boolean; onAuto: (auto: boo
   </label>;
 }
 
-export function ModelPicker({ selected, options, personal, zen, auto, onSelect, onAuto, onConnect, onSubscriptions }: {
-  selected?: string; options: ReturnType<typeof modelOptions>; auto: boolean;
+export function ModelPicker({ selected, options, personal, zen, auto, openSignal, onSelect, onAuto, onConnect, onSubscriptions }: {
+  selected?: string; openSignal?: number; options: ReturnType<typeof modelOptions>; auto: boolean;
   personal: PersonalModel[]; zen: PersonalModel[];
   onSelect: (id: string) => void; onAuto: (auto: boolean) => void; onConnect: (connection: Connection) => void;
   onSubscriptions: () => void;
 }) {
   const picker = useRef<HTMLDetailsElement>(null);
   const summary = useRef<HTMLElement>(null);
+  const lastSignal = useRef(0);
+  useEffect(() => {
+    if (openSignal && openSignal !== lastSignal.current && picker.current) { picker.current.open = true; summary.current?.focus(); }
+    lastSignal.current = openSignal ?? 0;
+  }, [openSignal]);
   const [showGood, setShowGood] = useState(false);
   useEffect(() => {
     const closeOutside = (event: PointerEvent) => {
