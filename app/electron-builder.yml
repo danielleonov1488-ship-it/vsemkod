@@ -37,6 +37,9 @@ mac:
   target:
     - target: dmg
       arch: [arm64, x64]
+    # zip нужен electron-updater для latest-mac.yml (проверка новых версий).
+    - target: zip
+      arch: [arm64, x64]
   identity: null
   hardenedRuntime: false
   extendInfo:

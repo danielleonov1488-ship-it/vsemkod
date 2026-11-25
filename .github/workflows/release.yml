@@ -86,6 +86,9 @@ jobs:
       - run: npm run fetch:engine -- --platform ${{ matrix.engine }} --arch x64
       - if: matrix.engine == 'darwin'
         run: npm run fetch:engine -- --platform darwin --arch arm64
+      - run: npm run fetch:voice -- --platform ${{ matrix.engine }} --arch x64
+      - if: matrix.engine == 'darwin'
+        run: npm run fetch:voice -- --platform darwin --arch arm64
       - run: npm run build
       - name: Build and upload to the draft release
         run: node scripts/package.mjs ${{ matrix.targets }} --publish always
