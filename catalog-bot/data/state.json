@@ -1,4 +1,87 @@
 {
+  "freeListCheckedAt": "2026-11-26T07:15:32.656Z",
+  "freeListProviders": [
+    {
+      "name": "Aion Labs",
+      "section": "provider_api",
+      "url": "https://www.aionlabs.ai/app/api-keys/"
+    },
+    {
+      "name": "Cohere",
+      "section": "provider_api",
+      "url": "https://dashboard.cohere.com/api-keys"
+    },
+    {
+      "name": "Google Gemini",
+      "section": "provider_api",
+      "url": "https://aistudio.google.com/app/apikey"
+    },
+    {
+      "name": "Z AI (Zhipu AI)",
+      "section": "provider_api",
+      "url": "https://open.bigmodel.cn/usercenter/apikeys"
+    },
+    {
+      "name": "AxForge",
+      "section": "inference_provider",
+      "url": "https://console.axforge.ai/"
+    },
+    {
+      "name": "Cloudflare Workers AI",
+      "section": "inference_provider",
+      "url": "https://dash.cloudflare.com/profile/api-tokens"
+    },
+    {
+      "name": "Gonka Broker",
+      "section": "inference_provider",
+      "url": "https://app.gonkabroker.com/signup"
+    },
+    {
+      "name": "Groq",
+      "section": "inference_provider",
+      "url": "https://console.groq.com/keys"
+    },
+    {
+      "name": "Kilo Code",
+      "section": "inference_provider",
+      "url": "https://app.kilo.ai/profile"
+    },
+    {
+      "name": "LLM7.io",
+      "section": "inference_provider",
+      "url": "https://token.llm7.io"
+    },
+    {
+      "name": "ModelScope",
+      "section": "inference_provider",
+      "url": "https://modelscope.cn/my/myaccesstoken"
+    },
+    {
+      "name": "NVIDIA NIM",
+      "section": "inference_provider",
+      "url": "https://build.nvidia.com/explore/discover"
+    },
+    {
+      "name": "OpenRouter",
+      "section": "inference_provider",
+      "url": "https://openrouter.ai/keys"
+    },
+    {
+      "name": "OVHcloud AI Endpoints",
+      "section": "inference_provider",
+      "url": "https://www.ovhcloud.com/en/public-cloud/ai-endpoints/catalog/"
+    },
+    {
+      "name": "Runcrate",
+      "section": "inference_provider",
+      "url": "https://www.runcrate.ai/dashboard/api-keys"
+    },
+    {
+      "name": "SiliconFlow",
+      "section": "inference_provider",
+      "url": "https://cloud.siliconflow.cn/account/ak"
+    }
+  ],
   "llmCache": {
     "04c106978467cd03200624da5ce46c62b2ac588465528917940b397e5625237a": {
       "observations": [
@@ -281,6 +364,10 @@
     "2e1a36f8e89408a029f632f0926de97021df155b7d5828f0e9c6915398f8cb3b": {
       "observations": [],
       "savedAt": "2026-11-25T20:09:57.184Z"
+    },
+    "2e50b07e6fd2bda467d9e1c881a835b761759f4c92d95abd6b9fd709f6623127": {
+      "observations": [],
+      "savedAt": "2026-11-26T07:15:32.656Z"
     },
     "319602025645ffb679bc729517bbf91ef2756da7278ca0072d152f0ea447ff31": {
       "observations": [],
@@ -1765,6 +1852,10 @@
     "hn:50650694": {
       "observations": [],
       "savedAt": "2026-11-26T03:04:04.312Z"
+    },
+    "hn:50651099": {
+      "observations": [],
+      "savedAt": "2026-11-26T07:15:32.656Z"
     }
   },
   "tracks": {
@@ -1809,7 +1900,7 @@
     "groq:qwen/qwen3.8-27b": {
       "evidence": {
         "github": {
-          "missedRuns": 3,
+          "missedRuns": 4,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -1864,7 +1955,7 @@
     "kilo:dots-studio/dots-3-note-preview:free": {
       "evidence": {
         "kilo": {
-          "missedRuns": 4,
+          "missedRuns": 5,
           "observation": {
             "confidence": "structured",
             "contextWindow": 512000,
@@ -2243,7 +2334,7 @@
     "modelscope:API-Inference": {
       "evidence": {
         "github": {
-          "missedRuns": 3,
+          "missedRuns": 4,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -2620,7 +2711,7 @@
     "openrouter:dots-studio/dots-3-note-preview:free": {
       "evidence": {
         "openrouter": {
-          "missedRuns": 4,
+          "missedRuns": 5,
           "observation": {
             "confidence": "structured",
             "contextWindow": 512000,
@@ -3029,7 +3120,7 @@
     "runcrate:five open models": {
       "evidence": {
         "github": {
-          "missedRuns": 3,
+          "missedRuns": 4,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -3176,7 +3267,7 @@
     "zai:free models": {
       "evidence": {
         "github": {
-          "missedRuns": 3,
+          "missedRuns": 4,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
