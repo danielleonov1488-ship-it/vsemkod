@@ -17,7 +17,7 @@ export type ChatPart =
   | { id: string; kind: "user" | "text"; text: string; files?: string[] }
   | { id: string; kind: "reasoning" | "note"; text: string; seconds?: number }
   | { id: string; kind: "turn"; seconds: number; stopped?: boolean; files?: FileChange[] }
-  | { id: string; kind: "tool"; tool: string; target: string; status: "running" | "completed" | "error"; diffs?: FileChange[]; output?: string; todos?: { content: string; status: string }[]; diff?: FileChange };
+  | { id: string; kind: "tool"; tool: string; target: string; status: "running" | "completed" | "error"; diffs?: FileChange[]; output?: string; background?: boolean; todos?: { content: string; status: string }[]; diff?: FileChange };
 
 export type ChatEvent =
   | { type: "turn-status"; sessionId: string; status: "queued" | "working" }
@@ -31,6 +31,7 @@ export type ChatEvent =
   | { type: "question-resolved"; sessionId: string; id: string }
   | { type: "usage"; sessionId: string; usage: Usage; speed?: ReplySpeed; nativeCachePercent?: number | null }
   | { type: "reply-cache"; sessionId: string; cachePercent?: number }
+  | { type: "route-exhausted"; sessionId: string; modelId: string; providerId: KeyId }
   | { type: "route"; sessionId: string; modelId: string; previousModelId?: string; previousProviderId?: KeyId;
     providerId: KeyId; averageMs: number; reason?: "quota" | "unavailable" };
 
@@ -62,6 +63,11 @@ export type McpConfig = {
   type: "remote"; url: string; headers?: Record<string, string>; disabled?: boolean;
 };
 export type McpEntry = { name: string; status: "connected" | "disabled" | "failed" | "pending" | "needs_auth"; error?: string; managed: boolean };
+export type BackgroundTask = {
+  id: string; directory: string; sessionId?: string; command: string; started: number;
+  ended?: number; exitCode?: number; output: string;
+};
+export type SideReply = { text: string; sessionId: string };
 export type TerminalEvent = { id: string; text?: string; closed?: boolean };
 export type ChatAction = { type: "rename"; title: string } | { type: "pin" | "archive"; value: boolean } | { type: "fork" | "delete" };
 
@@ -77,7 +83,7 @@ export type CatalogState = {
   catalog: Catalog; connected: ProviderId[]; personal: PersonalId[]; subscriptions: SubscriptionId[];
   personalModels: PersonalModel[]; zenModels: PersonalModel[]; latencies?: ModelLatency[]; speeds?: ModelSpeed[]; benchmarks?: Benchmarks; customProviderUrl?: string;
 };
-export type Notice = { text: string; tone?: "error"; connect?: { modelId: string; providerId: ProviderId }; open?: string };
+export type Notice = { text: string; tone?: "error"; connect?: { modelId: string; providerId: ProviderId }; open?: string; download?: string };
 export type UpdateReady = { version: string; action: "restart" | "download" };
 export type UpdateProgress = { version: string; percent?: number };
 export type UpdateCheck = UpdateReady | "disabled" | "current" | "downloading";
@@ -85,6 +91,17 @@ export type InitialState = CatalogState & { projects?: string[]; hiddenProjects?
 
 export interface DesktopApi {
   voice?: VoiceApi;
+  projectBranch?(directory: string): Promise<string | null>;
+  tasks?(): Promise<BackgroundTask[]>;
+  startTask?(directory: string, command: string, sessionId?: string): Promise<void>;
+  stopTask?(id: string): Promise<void>;
+  onTasks?(listener: (tasks: BackgroundTask[]) => void): () => void;
+  askSide?(id: string, directory: string, parent: string | undefined, text: string, model: string, variant?: string): Promise<SideReply>;
+  closeSide?(id: string): Promise<void>;
+  testNotification?(): Promise<void>;
+  onNotificationSound?(listener: () => void): () => void;
+  setVisibleChat?(id?: string): Promise<void>;
+  clipboardKey?(provider: KeyId): Promise<string | undefined>;
   fileStat?(directory: string, path: string): Promise<FileInfo | null>;
   filePreview?(directory: string, path: string): Promise<FilePreview>;
   fileAction?(directory: string, path: string, action: FileAction): Promise<void>;

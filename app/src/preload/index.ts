@@ -8,6 +8,17 @@ function subscribe<T>(channel: string, listener: (data: T) => void) {
 }
 
 const api: DesktopApi = {
+  projectBranch: directory => ipcRenderer.invoke("projects:branch", directory),
+  tasks: () => ipcRenderer.invoke("tasks:list"),
+  startTask: (directory, command, sessionId) => ipcRenderer.invoke("tasks:start", directory, command, sessionId),
+  stopTask: id => ipcRenderer.invoke("tasks:stop", id),
+  onTasks: listener => subscribe("tasks:update", listener),
+  askSide: (id, directory, parent, text, model, variant) => ipcRenderer.invoke("side:ask", id, directory, parent, text, model, variant),
+  closeSide: id => ipcRenderer.invoke("side:close", id),
+  testNotification: () => ipcRenderer.invoke("notification:test"),
+  onNotificationSound: listener => subscribe("notification:sound", listener),
+  setVisibleChat: id => ipcRenderer.invoke("chat:visible", id),
+  clipboardKey: provider => ipcRenderer.invoke("connect:clipboard-key", provider),
   voice: {
     status: () => ipcRenderer.invoke("voice:status"),
     download: (model, consent, vadOnly = false) => ipcRenderer.invoke("voice:download", model, consent, vadOnly),

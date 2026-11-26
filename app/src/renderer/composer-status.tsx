@@ -33,7 +33,7 @@ function Metric({ children, tip, kind, panel, expanded, toggle }: {
   </div>;
 }
 
-function Ring({ percent }: { percent: number }) {
+export function Ring({ percent }: { percent: number }) {
   return <svg className="icon context-ring" viewBox="0 0 16 16" aria-hidden="true">
     <circle cx="8" cy="8" r="6.5" />
     {percent > 0 && <circle cx="8" cy="8" r="6.5" pathLength="100" strokeDasharray={percent + " 100"} />}
@@ -54,7 +54,7 @@ function ContextPanel({ id, usage, used, capacity, percent, compactContext }: {
   ];
   return <section id={id} className="model-panel status-panel context-panel" aria-label="Контекст">
     <div className="status-panel-heading"><h2>Контекст · {percent}%</h2><span>{compact.format(used)} / {compact.format(capacity)}</span></div>
-    <div className="status-meter" aria-hidden="true"><span data-tone="mint" style={{ width: width(used / capacity * 100) }} /></div>
+    <div className="status-meter" aria-hidden="true"><span data-tone="mint" style={{ width: width(capacity ? used / capacity * 100 : 0) }} /></div>
     <dl className="context-breakdown">{rows.map(([label, value, color]) => <div key={label}>
       <dt><span className="quota-dot" data-tone={color} />{label}</dt>
       <dd>{typeof value === "number" ? numbers.format(value) : value}</dd>
@@ -138,10 +138,10 @@ function suggestions(state: CatalogState) {
   return order.sort((a, b) => (a.clicksToConnect ?? 9) - (b.clicksToConnect ?? 9) || order.indexOf(a) - order.indexOf(b)).slice(0, 3);
 }
 
-function LimitsPanel({ id, state, providers, stats, now, onConnect, onDisconnect, onOpen, onSettings }: {
+function LimitsPanel({ id, state, providers, stats, now, onConnect, onDisconnect, onOpen, onSettings, onWizard }: {
   id: string; state?: CatalogState; providers: ProviderRow[]; stats?: RouterStats; now: number;
   onConnect: (connection: Connection) => void; onDisconnect: (id: ConnectionId) => Promise<void>;
-  onOpen: (url: string) => void; onSettings: () => void;
+  onOpen: (url: string) => void; onSettings: () => void; onWizard?: () => void;
 }) {
   const [menu, setMenu] = useState<ProviderRow["id"]>();
   const [pending, setPending] = useState<ConnectionId>();
@@ -207,14 +207,15 @@ function LimitsPanel({ id, state, providers, stats, now, onConnect, onDisconnect
           onClick={() => onConnect(catalogConnection(provider))}>Подключить</button>
       </li>)}</ul>
     </section>}
+    {onWizard && <button type="button" className="small-button" onClick={onWizard}>Подключить всё за пару минут</button>}
     <button className="text-link quota-settings" type="button" onClick={onSettings}>Все подключения в настройках</button>
   </section>;
 }
 
 export function ComposerStatus({ state, providerId, usage, capacity, speed, typical, cache, stats, demo, demoRemaining,
-  onCompact, onConnect, onDisconnect, onOpen, onSettings }: {
+  onCompact, onConnect, onDisconnect, onOpen, onSettings, contextSignal, routeSwitch, onWizard }: {
   state?: CatalogState; providerId?: string; usage?: Usage; capacity?: number; speed?: ReplySpeed; typical?: { value: number; estimated: boolean }; cache?: number;
-  stats?: RouterStats; demo: boolean; demoRemaining?: number;
+  stats?: RouterStats; demo: boolean; demoRemaining?: number; contextSignal?: number; routeSwitch?: string; onWizard?: () => void;
   onCompact?: () => void; onConnect: (connection: Connection) => void; onDisconnect: (id: ConnectionId) => Promise<void>;
   onOpen: (url: string) => void; onSettings: () => void;
 }) {
@@ -236,6 +237,8 @@ export function ComposerStatus({ state, providerId, usage, capacity, speed, typi
   const cacheText = cache === undefined || cache < 0.5 ? undefined : decimal.format(cache) + "%";
   const messages = demoRemaining === undefined ? "" : (plural.select(demoRemaining) === "one" ? "сообщение осталось"
     : plural.select(demoRemaining) === "few" ? "сообщения осталось" : "сообщений осталось");
+
+  useEffect(() => { if (contextSignal) setOpen("context"); }, [contextSignal]);
 
   function close() {
     setOpen(undefined);
@@ -284,9 +287,10 @@ export function ComposerStatus({ state, providerId, usage, capacity, speed, typi
         toggle={button => toggle("context", button)}>
         <Ring percent={percent} /><span><span className="sr-only">Контекст </span>{percent}%</span>
       </Metric>
-      {open === "context" && <ContextPanel id={contextId} usage={usage} used={used} capacity={capacity} percent={percent}
-        compactContext={onCompact && (() => { close(); onCompact(); })} />}
     </>}
+    {open === "context" && <ContextPanel id={contextId} usage={usage ?? { input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } }}
+      used={used} capacity={capacity ?? 0} percent={percent ?? 0} compactContext={onCompact && (() => { close(); onCompact(); })} />}
+    {routeSwitch && <span className="subtle route-switch" role="status">{routeSwitch}</span>}
     {demo ? <Metric kind="limits"><span className="quota-dot" data-tone={demoRemaining === 0 ? "red" : "gray"} />
       <span>Демо{demoRemaining === undefined ? "" : " · " + demoRemaining + " " + messages}</span>
     </Metric> : <>
@@ -298,7 +302,7 @@ export function ComposerStatus({ state, providerId, usage, capacity, speed, typi
       </Metric>
       {open === "limits" && <LimitsPanel id={limitsId} state={state} providers={providers} stats={stats} now={now}
         onConnect={connection => { close(); onConnect(connection); }} onDisconnect={onDisconnect}
-        onOpen={onOpen} onSettings={() => { close(); onSettings(); }} />}
+        onOpen={onOpen} onWizard={onWizard && (() => { close(); onWizard(); })} onSettings={() => { close(); onSettings(); }} />}
     </>}
   </div>;
 }

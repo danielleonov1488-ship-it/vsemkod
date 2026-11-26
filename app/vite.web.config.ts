@@ -9,7 +9,7 @@ function lazyMarkdown(): Plugin {
     name: "harness-lazy-markdown",
     enforce: "pre",
     resolveId(source, importer) {
-      if (!importer?.replaceAll("\\", "/").endsWith("/renderer/chat.tsx")) return;
+      if (!importer || !/\/renderer\/(?:chat|side-chat)\.tsx$/.test(importer.replaceAll("\\", "/"))) return;
       if (source === "react-markdown") return facade;
       if (source === "remark-gfm") return plugin;
     },

@@ -77,7 +77,7 @@ export function isAllowedNavigation(href: string, projectRoot?: string): boolean
   return href === "about:blank";
 }
 
-const urlPattern = /\bhttps?:\/\/(?:localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])(?::\d{1,5})?(?:\/[^\s"'<>`)\]]*)?/gi;
+const urlPattern = /\bhttps?:\/\/(?:localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])(?::\d{1,5})?(?![\w.:-])(?:[/?#][^\s"'<>`)\]]*)?/gi;
 
 /** Все localhost-адреса из текста (вывод терминала, ответ агента) без дублей, в порядке появления. */
 export function findLocalUrls(text: string): string[] {
@@ -87,4 +87,10 @@ export function findLocalUrls(text: string): string[] {
     try { found.add(new URL(value).href); } catch { /* не адрес */ }
   }
   return [...found];
+}
+
+export function projectFileUrl(path: string) {
+  const clean = path.replaceAll("\\", "/");
+  const encoded = clean.split("/").map((part, index) => index === 0 && /^[a-z]:$/i.test(part) ? part : encodeURIComponent(part)).join("/");
+  return "file://" + (encoded.startsWith("/") ? encoded : "/" + encoded);
 }

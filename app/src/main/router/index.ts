@@ -25,6 +25,7 @@ interface RouterOptions {
   auto?: () => boolean;
   firstByteMs?: number;
   onRoute?: (event: Route) => void;
+  onExhausted?: (event: Extract<ChatEvent, { type: "route-exhausted" }>) => void;
   onSpeed?: (event: Extract<ChatEvent, { type: "reply-speed" }>) => void;
   onReplyCache?: (sessionId: string, cachePercent?: number) => void;
   onStats?: (stats: RouterStats) => void;
@@ -328,6 +329,9 @@ export class Router {
           health.success(provider.id);
         } catch { /* A started response cannot switch providers. */ }
         return;
+      }
+      if (sessionId && model.id === explicit?.id && firstAttempt?.modelId === model.id) {
+        this.options.onExhausted?.({ type: "route-exhausted", sessionId, modelId: model.id, providerId: firstAttempt.providerId });
       }
     }
 

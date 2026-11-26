@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { findLocalUrls } from "../shared/browser";
+import { quoteText } from "../shared/panels";
 import { createContext, memo, useCallback, useContext, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -177,15 +179,24 @@ const CodeBlock = createContext(false);
 
 function CodeText({ children, className, files }: { children: ReactNode; className?: string; files: ChatFiles }) {
   const block = useContext(CodeBlock);
+  const address = !block && typeof children === "string" ? URL.parse(children) : null;
+  const local = address && findLocalUrls(address.href).includes(address.href) ? address.href : undefined;
   const reference = !block && typeof children === "string" ? fileReference(children) : undefined;
   const fallback = <code className={className}>{children}</code>;
+  if (local && files.openBrowser) return <>{fallback}
+    <button type="button" className="local-open" onClick={() => files.openBrowser?.(local)}>Открыть в приложении</button></>;
   return reference ? <FileChip files={files} reference={reference}>{fallback}</FileChip> : fallback;
 }
 
 const AgentText = memo(function AgentText({ text, files }: { text: string; files: ChatFiles }) {
   return <div className="agent-text"><Markdown remarkPlugins={[remarkGfm]} rehypePlugins={window.vsemkod.fileStat ? [markFilePaths] : []}
     disallowedElements={["img"]} components={{
-      a: ({ href, children }) => <a className="text-link" href={href} onClick={event => external(event, href)}>{children}</a>,
+      a: ({ href, children }) => {
+        const address = href && URL.parse(href);
+        const local = address && findLocalUrls(address.href).includes(address.href) ? address.href : undefined;
+        return <><a className="text-link" href={href} onClick={event => external(event, href)}>{children}</a>
+          {local && files.openBrowser && <button type="button" className="local-open" onClick={() => files.openBrowser?.(local)}>Открыть в приложении</button>}</>;
+      },
       pre: ({ children }) => <CodeBlock.Provider value={true}><pre>{children}</pre></CodeBlock.Provider>,
       code: ({ children, className }) => <CodeText files={files} className={className}>{children}</CodeText>,
       span: ({ children, node }) => {
@@ -222,12 +233,12 @@ function Reasoning({ text }: { text: string }) {
   </div>;
 }
 
-export function Chat({ title, parts, permissions, questions, changeCount, busy, answer, answerQuestion, children, panel, openPanel,
+export function Chat({ title, parts, permissions, questions, busy, answer, answerQuestion, children, headerTools, openBrowser, insertDraft,
   copy, edit, revert, retry, reverted, executePlan, status, progress, failure, retryFailed, chooseModel, directory, preview, onError }: {
-  title: string; parts: ChatPart[]; permissions: Permission[]; questions: Question[]; changeCount: number;
+  title: string; parts: ChatPart[]; permissions: Permission[]; questions: Question[];
   busy: boolean; answer: (id: string, decision: PermissionDecision) => Promise<void>;
   answerQuestion: (id: string, answer?: QuestionAnswer) => Promise<void>; children: ReactNode;
-  panel: boolean; openPanel: () => void; copy: (text: string) => void;
+  headerTools: ReactNode; openBrowser: (url: string) => void; insertDraft: (text: string) => void; copy: (text: string) => void;
   edit: (part: UserPart) => void; revert: (id?: string) => void; retry: (part: UserPart) => void;
   reverted: boolean; executePlan?: () => void;
   status?: ChatStatus; progress?: { started: number; since: number | null }; failure?: string;
@@ -247,9 +258,27 @@ export function Chat({ title, parts, permissions, questions, changeCount, busy, 
     }
     return requested;
   }, [directory, busy, finishedWrites]);
-  const fileLinks = { directory, stat, preview, onError };
+  const fileLinks = { directory, stat, preview, onError, openBrowser };
   const scroll = useRef<HTMLDivElement>(null);
   const atBottom = useRef(true);
+  const [quote, setQuote] = useState<{ text: string; x: number; y: number }>();
+  useEffect(() => {
+    const track = () => {
+      const selection = window.getSelection();
+      const text = selection?.toString().trim();
+      const answer = selection?.anchorNode?.parentElement?.closest(".agent-text");
+      if (!selection || !text || !answer || !scroll.current?.contains(answer) || !answer.contains(selection.focusNode)) {
+        setQuote(undefined);
+        return;
+      }
+      const rect = selection.getRangeAt(0).getBoundingClientRect();
+      setQuote({ text, x: (rect.left + rect.right) / 2, y: Math.max(34, rect.top) });
+    };
+    const clear = () => setQuote(undefined);
+    document.addEventListener("selectionchange", track);
+    window.addEventListener("resize", clear);
+    return () => { document.removeEventListener("selectionchange", track); window.removeEventListener("resize", clear); };
+  }, []);
   const [clock, setClock] = useState(Date.now);
   useEffect(() => {
     if (!progress) return;
@@ -273,11 +302,12 @@ export function Chat({ title, parts, permissions, questions, changeCount, busy, 
           <span className="chat-status-dot" />{chatStatusLabel[status]}
         </span>}
       </div>
-      <button className="changes" type="button" aria-expanded={panel} aria-label="Правая панель" onClick={openPanel}>
-        <Icon name="panel" /><span>{changeCount ? "Изменения " + changeCount : "Панель"}</span>
-      </button>
+      {headerTools}
     </header>
+    {quote && <button type="button" className="model-panel selection-quote" data-overlay style={{ left: quote.x, top: quote.y }}
+      onPointerDown={event => event.preventDefault()} onClick={() => { insertDraft(quoteText(quote.text)); window.getSelection()?.removeAllRanges(); setQuote(undefined); }}>Цитировать</button>}
     <div ref={scroll} className="chat-scroll" onScroll={event => {
+      setQuote(undefined);
       const element = event.currentTarget;
       atBottom.current = element.scrollHeight - element.scrollTop - element.clientHeight < 96;
     }}>

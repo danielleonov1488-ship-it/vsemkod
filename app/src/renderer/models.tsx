@@ -41,6 +41,7 @@ export function AutoSwitch({ auto, onAuto }: { auto: boolean; onAuto: (auto: boo
 type Entry = {
   id: string; name: string; vendor: string; rank: number; model?: Model;
   providers: { id: string; name: string }[]; connect?: Provider; upstreamId?: string;
+  sources?: { connected: Provider[]; locked: Provider[] };
 };
 
 export function ModelPicker({ selected, options, personal, zen, auto, latencies, speeds, benchmarks, openSignal,
@@ -98,6 +99,7 @@ export function ModelPicker({ selected, options, personal, zen, auto, latencies,
   const entries: Entry[] = options.filter(item => item.available.length || item.locked.length).map(({ model, available, locked }) => ({
     id: model.id, name: modelDisplayName(model.name), vendor: model.vendor, rank: model.rank, model,
     providers: (available.length ? available : locked).map(({ provider }) => provider),
+    sources: { connected: available.map(({ provider }) => provider), locked: locked.map(({ provider }) => provider) },
     connect: available.length ? undefined : locked[0]?.provider
   }));
   const own: Entry[] = [...personal, ...zen].map(model => ({
@@ -110,7 +112,7 @@ export function ModelPicker({ selected, options, personal, zen, auto, latencies,
   const rest = [...entries.filter(entry => !entry.connect && !best.includes(entry)), ...own].sort(sort);
   const name = [...entries, ...own].find(entry => entry.id === selected)?.name ?? "Модель";
   const term = query.trim().toLocaleLowerCase("ru");
-  const matches = (entry: Entry) => [entry.name, entry.id, entry.upstreamId, entry.vendor, ...entry.providers.map(provider => provider.name)]
+  const matches = (entry: Entry) => [entry.name, entry.id, entry.upstreamId, entry.vendor, ...entry.providers.map(provider => provider.name), ...entry.sources?.locked.map(provider => provider.name) ?? []]
     .some(value => value?.toLocaleLowerCase("ru").includes(term));
   const bestRows = best.filter(matches);
   const lockedRows = (term ? entries.filter(entry => entry.connect).sort(sort) : locked).filter(matches);
@@ -133,13 +135,19 @@ export function ModelPicker({ selected, options, personal, zen, auto, latencies,
     const detail = [
       result?.index === undefined ? "" : "Индекс " + number.format(result.index),
       speed ? (speed.estimated ? "~" : "") + Math.round(speed.value) + " ток/с" : "",
-      provider.name + (entry.providers.length > 1 ? " +" + (entry.providers.length - 1) : "")
+      provider.name + (entry.providers.length > 1 ? " +" + (entry.providers.length - 1) : ""),
+      entry.sources ? entry.sources.connected.length + " из " + (entry.sources.connected.length + entry.sources.locked.length) + " источников" : ""
     ].filter(Boolean).join(" · ");
     const tip = [entry.model?.description, ttft === undefined ? "" : "~" + number.format(ttft) + " с до первого ответа"].filter(Boolean).join("\n");
     const uncensored = /uncensored|abliterated/i.test(entry.name + " " + (entry.upstreamId ?? entry.id));
-    return <li key={entry.id}><button className="model-option" type="button"
+    const sources = entry.sources;
+    const next = sources?.locked[0];
+    const sourceList = sources && new Intl.ListFormat("ru").format([
+      ...sources.connected.map(provider => provider.name + " (подключён)"), ...sources.locked.map(provider => provider.name)
+    ]);
+    return <li key={entry.id} className="model-source-row"><button className="model-option" type="button"
       aria-label={entry.connect ? "Подключить " + entry.name : undefined}
-      aria-pressed={entry.connect ? undefined : entry.id === selected} title={tip || undefined} onClick={() => select(entry)}>
+      aria-pressed={entry.connect ? undefined : entry.id === selected} title={sources && next && !entry.connect ? undefined : tip || undefined} onClick={() => select(entry)}>
       <span className="model-copy">
         <span className="model-name picker-model-name">{entry.name}</span>
         <span className="model-description">{detail}</span>
@@ -147,7 +155,12 @@ export function ModelPicker({ selected, options, personal, zen, auto, latencies,
       {entry.model?.tier === "new" && <span className="picker-tag">новая</span>}
       {uncensored && <span className="picker-tag">без цензуры</span>}
       {entry.connect ? <span className="connect-label">Подключить</span> : entry.id === selected && <span className="model-check"><Icon name="check" /></span>}
-    </button></li>;
+    </button>
+    {sources && next && !entry.connect && <div className="model-source-tip">
+      {tip && <div className="subtle">{tip}</div>}
+      <div>Эта модель есть у {sourceList}. Подключите ещё один источник — если {provider.name} откажет, модель продолжит работать без смены.</div>
+      <button type="button" className="composer-control" onClick={() => { close(); onConnect(catalogConnection(next, entry.model)); }}>Подключить {next.name}</button>
+    </div>}</li>;
   }
 
   return <div className="model-picker" ref={wrapper} onKeyDown={event => {

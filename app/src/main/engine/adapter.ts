@@ -93,6 +93,7 @@ export type NativeModel = { model: PersonalModel; upstream: EngineModel };
 
 export class EngineAdapter {
   private readonly client;
+  private readonly sideSessions = new Set<string>();
 
   constructor(private readonly url: string, auth: string) {
     this.client = OpenCode.make({ baseUrl: url, headers: { authorization: auth } });
@@ -188,7 +189,7 @@ export class EngineAdapter {
       let cursor: string | undefined;
       do {
         const page = await this.client.session.list({ directory, archived, limit: 100, cursor }, request());
-        chats.push(...page.data.map(conversation));
+        chats.push(...page.data.filter(info => !info.metadata?.vsemkodSide && !this.sideSessions.has(info.id)).map(conversation));
         cursor = page.cursor?.next ?? undefined;
       } while (cursor);
     }
@@ -197,6 +198,66 @@ export class EngineAdapter {
 
   async create(directory: string, title: string): Promise<Conversation> {
     return conversation(await this.client.session.create({ location: { directory }, title }, request()));
+  }
+
+  async createSide(directory: string, parent?: string) {
+    const access = sessionAccess("read");
+    const session = parent
+      ? await this.client.session.fork({ sessionID: parent }, request())
+      : await this.client.session.create({ location: { directory }, title: "Боковой чат",
+          metadata: { vsemkodSide: true }, agent: access.agent, permissions: access.permissions }, request());
+    const sessionID = session.id;
+    this.sideSessions.add(sessionID);
+    try {
+      if (parent) await this.client.session.update({ sessionID, permissions: access.permissions,
+        metadata: { ...session.metadata, vsemkodSide: true } }, request());
+      return sessionID;
+    } catch (error) {
+      await this.removeSide(sessionID).catch(() => {});
+      throw error;
+    }
+  }
+
+  async removeSide(sessionID: string) {
+    await this.client.session.remove({ sessionID }, request());
+    this.sideSessions.delete(sessionID);
+  }
+
+  async shellTasks(directory: string) {
+    return (await this.client.shell.list({ location: { directory } }, request())).data;
+  }
+
+  async backgroundJobs() {
+    return this.client.experimental.job.list({ kind: "shell" }, request());
+  }
+
+  async persistentTasks(sessionID: string) {
+    return this.client.experimental.persistentPty.list({ sessionID }, request());
+  }
+
+  async persistentOutput(ptyID: string) {
+    return (await this.client.experimental.persistentPty.snapshot({ ptyID }, request())).text;
+  }
+
+  async removePersistentTask(ptyID: string) {
+    await this.client.experimental.persistentPty.remove({ ptyID }, request());
+  }
+
+  async startBackground(directory: string, command: string) {
+    return (await this.client.shell.create({ command, cwd: directory, location: { directory } }, request())).data;
+  }
+
+  async backgroundInfo(directory: string, id: string) {
+    return (await this.client.shell.get({ id, location: { directory } }, request())).data;
+  }
+
+  async backgroundOutput(directory: string, id: string, cursor: number) {
+    return (await this.client.shell.output({ id, location: { directory }, cursor, limit: 65536 }, request())).data;
+  }
+
+  async stopBackground(directory: string, shellId: string, jobId?: string) {
+    if (jobId) await this.client.experimental.job.cancel({ id: jobId }, request());
+    else await this.client.shell.remove({ id: shellId, location: { directory } }, request());
   }
 
   async chatAction(sessionId: string, action: ChatAction) {
@@ -514,7 +575,8 @@ export class EngineAdapter {
             runningTools.add(id);
             watchdog.pause();
             const paths = mutationTargets(input, target(input, directory));
-            const tool = { id, kind: "tool", tool: name, target: paths.join(", "), status: "running" } as const;
+            const tool = { id, kind: "tool", tool: name, target: paths.join(", "), status: "running",
+              background: ["shell", "bash"].includes(name) && input.background === true || undefined } as const;
             tools.set(id, tool);
             if (tool.tool === "todowrite") toolTodos.set(id, readTodos(input.todos));
             update(tool);
@@ -570,7 +632,8 @@ export class EngineAdapter {
     try {
       const info = await this.client.session.get({ sessionID: sessionId }, request());
       const access = options.access ?? "ask";
-      const { agent, permissions } = sessionAccess(access, options.webSearch);
+      const { agent, permissions } = sessionAccess(access, options.webSearch && !info.metadata?.vsemkodSide);
+      if (info.metadata?.vsemkodSide) permissions.push({ action: "question", resource: "*", effect: "deny" });
       await this.client.session.update({
         sessionID: sessionId, permissions, metadata: { ...info.metadata, vsemkodAccess: access, ...(options.displayModelId && { vsemkodModel: options.displayModelId }) }
       }, request());

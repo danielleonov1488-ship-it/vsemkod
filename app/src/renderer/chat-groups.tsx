@@ -6,8 +6,9 @@ import { chatStatusLabel, type ChatStatus } from "./turns";
 import { folderName } from "../shared/workspace";
 
 export function ChatGroups({ sessions, projects, selectedProject, query, active, running, expand, addProject, selectProject, start,
-  openProject, removeProject, open, perform }: {
+  openProject, removeProject, open, perform, tasks }: {
   sessions: Conversation[]; projects: string[]; selectedProject: string; query: string; active?: string;
+  tasks?: string[];
   running: Record<string, ChatStatus>; expand?: { directory: string };
   addProject: () => void; selectProject: (directory: string) => void; start: (directory: string) => void;
   openProject?: (directory: string) => void; removeProject?: (directory: string) => void;
@@ -67,6 +68,7 @@ export function ChatGroups({ sessions, projects, selectedProject, query, active,
         <button type="button" className="model-option" onClick={() => { setMenu(""); setRenaming(chat.id); setTitle(chat.title); }}>Переименовать</button>
         <button type="button" className="model-option" onClick={() => action({ type: "pin", value: !chat.pinned })}>{chat.pinned ? "Открепить" : "Закрепить"}</button>
         <button type="button" className="model-option" onClick={() => action({ type: "fork" })}>Форк</button>
+        {!chat.archived && tasks?.includes(chat.id) && <p className="archive-task-warning">В чате работают фоновые задачи.</p>}
         <button type="button" className="model-option" disabled={blocked} title={blocked ? "Сначала остановите агента" : undefined} onClick={() => action({ type: "archive", value: !chat.archived })}>
           {chat.archived ? "Вернуть из архива" : "Архивировать"}
         </button>

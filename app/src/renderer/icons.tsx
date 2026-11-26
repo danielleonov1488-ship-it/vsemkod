@@ -1,4 +1,7 @@
 const paths = {
+  summary: <path d="M6 4h7M6 8h7M6 12h7M3 4h.2M3 8h.2M3 12h.2" />,
+  globe: <><circle cx="8" cy="8" r="5.5" /><ellipse cx="8" cy="8" rx="2.5" ry="5.5" /><path d="M2.5 8h11" /></>,
+  clock: <><circle cx="8" cy="8" r="5.5" /><path d="M8 4.5V8l2 1.5" /></>,
   eye: <><path d="M1.5 8S4 3.75 8 3.75 14.5 8 14.5 8 12 12.25 8 12.25 1.5 8 1.5 8Z" /><circle cx="8" cy="8" r="1.75" /></>,
   shield: <path d="M8 2 3 4v3.5c0 3.1 2 5 5 6.5 3-1.5 5-3.4 5-6.5V4L8 2Z" />,
   pencil: <path d="m3 10 6.9-6.9a1.5 1.5 0 0 1 2.1 0l.9.9a1.5 1.5 0 0 1 0 2.1L6 13l-3.5.5L3 10Zm5.5-5.5 3 3" />,

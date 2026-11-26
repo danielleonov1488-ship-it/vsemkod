@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { FileAction, FileChange, FileInfo, FilePreview } from "../shared/api";
 import { fileExtension, type FileReference } from "../shared/file-links";
+import { projectFileUrl } from "../shared/browser";
 import { Icon } from "./icons";
 
 export type ChatFiles = {
@@ -8,6 +9,7 @@ export type ChatFiles = {
   stat: (path: string) => Promise<FileInfo | null> | undefined;
   preview: (reference: FileReference) => void;
   onError: (error: unknown) => void;
+  openBrowser?: (url: string) => void;
 };
 
 const api = window.vsemkod;
@@ -23,7 +25,7 @@ function useFileInfo(files: ChatFiles, path: string) {
   return info;
 }
 
-function fileIcon(path: string, image = false) {
+export function fileIcon(path: string, image = false) {
   if (image) return "image";
   return /^(?:tsx?|jsx?|html?|css|md|json|py|sh|cpp|c|go|rs)$/.test(fileExtension(path)) ? "code" : "file";
 }
@@ -88,7 +90,10 @@ function ChangedFile({ change, files }: { change: FileChange; files: ChatFiles }
     {info && <div className="turn-file-actions">
       {info.canOpen && <button type="button" className="composer-control" onClick={open}>Открыть</button>}
       <button type="button" className="composer-control" onClick={() => perform(files, change.file, "reveal")}>Показать в папке</button>
-      {info.html && <button type="button" className="composer-control" onClick={() => perform(files, change.file, "browser")}>Открыть в браузере</button>}
+      {info.html && <>
+        {files.openBrowser && <button type="button" className="small-button" onClick={() => files.openBrowser?.(projectFileUrl(info.path))}>Открыть в браузере приложения</button>}
+        <button type="button" className="composer-control" onClick={() => perform(files, change.file, "browser")}>{files.openBrowser ? "Во внешнем" : "Открыть в браузере"}</button>
+      </>}
     </div>}
   </li>;
 }

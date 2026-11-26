@@ -1,5 +1,6 @@
-import { existsSync } from "node:fs";
+import { existsSync, realpathSync } from "node:fs";
 import { basename, extname, join } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { app, shell, WebContentsView, type BrowserWindow, type Session } from "electron";
 import { emptyBrowserState, isAllowedNavigation, normalizeAddress, type BrowserBounds, type BrowserEvent, type BrowserState } from "../shared/browser";
 
@@ -15,6 +16,7 @@ export function createBrowserHost(options: {
   let view: WebContentsView | undefined;
   let attachedTo: BrowserWindow | undefined;
   let visible = false;
+  let currentRoot: string | undefined;
   let state: BrowserState = { ...emptyBrowserState };
   let configured: Session | undefined;
 
@@ -35,6 +37,13 @@ export function createBrowserHost(options: {
       item.setSavePath(target);
       item.once("done", (_done, result) => { if (result === "completed") options.publish({ type: "download", name: basename(target), path: target }); });
     });
+  }
+
+  function allowed(url: string, project?: string) {
+    if (!isAllowedNavigation(url, project)) return false;
+    if (!url.startsWith("file:")) return true;
+    try { return isAllowedNavigation(pathToFileURL(realpathSync(fileURLToPath(url))).href, project); }
+    catch { return false; }
   }
 
   function sync() {
@@ -59,7 +68,7 @@ export function createBrowserHost(options: {
         return { action: "deny" };
       });
       const guard = (event: { preventDefault(): void }, url: string) => {
-        if (isAllowedNavigation(url, options.projectRoot())) return;
+        if (allowed(url, options.projectRoot())) return;
         event.preventDefault();
         patch({ failure: "Этот адрес нельзя открыть во встроенном браузере." });
       };
@@ -75,13 +84,14 @@ export function createBrowserHost(options: {
         patch({ loading: false, failure: "Не удалось открыть " + url + " — " + description });
       });
       contents.on("render-process-gone", () => patch({ loading: false, failure: "Страница аварийно закрылась. Нажмите «Обновить»." }));
-      contents.on("console-message", (...args: unknown[]) => {
-        const details = args[0] as { level?: string | number; message?: string; lineNumber?: number; sourceId?: string };
-        const level = details.level ?? args[1];
-        if (level !== "error" && level !== 3) return;
-        const message = String(details.message ?? args[2] ?? "").slice(0, 2000);
+      contents.on("console-message", (_event, ...args: unknown[]) => {
+        const details = typeof args[0] === "object" && args[0] !== null
+          ? args[0] as { level: string; message: string; lineNumber: number; sourceId: string }
+          : { level: args[0] === 3 ? "error" : "", message: String(args[1] ?? ""), lineNumber: Number(args[2]), sourceId: String(args[3] ?? "") };
+        if (details.level !== "error") return;
+        const message = details.message.slice(0, 2000);
         if (!message) return;
-        state.errors = [...state.errors, { message, line: Number(details.lineNumber ?? args[3]) || undefined, source: String(details.sourceId ?? args[4] ?? "") || undefined, at: Date.now() }].slice(-maxErrors);
+        state.errors = [...state.errors, { message, line: details.lineNumber || undefined, source: details.sourceId || undefined, at: Date.now() }].slice(-maxErrors);
         emit();
       });
     }
@@ -106,13 +116,22 @@ export function createBrowserHost(options: {
     },
     async navigate(input: string, directory?: string) {
       const url = normalizeAddress(input);
-      if (!url || !isAllowedNavigation(url, directory ?? options.projectRoot())) {
+      const project = directory ?? options.projectRoot();
+      const differentProject = currentRoot !== project;
+      if (differentProject) {
+        currentRoot = project;
+        host.hide();
+        view?.webContents.stop();
+        state = { ...emptyBrowserState };
+      }
+      if (!url || !allowed(url, project)) {
         patch({ failure: "Этот адрес нельзя открыть во встроенном браузере." });
         return state;
       }
       const current = ensure();
       patch({ url, failure: undefined, loading: true });
       await current.webContents.loadURL(url).catch(() => { /* причина придёт в did-fail-load */ });
+      if (differentProject && currentRoot === project) { current.webContents.navigationHistory.clear(); sync(); }
       return state;
     },
     back() { if (view?.webContents.navigationHistory.canGoBack()) view.webContents.navigationHistory.goBack(); },

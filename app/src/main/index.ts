@@ -1,6 +1,9 @@
 import { voiceChunk, voiceModels } from "../shared/voice";
 import { VoiceService } from "./voice-service";
 import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeTheme, Notification, powerSaveBlocker, shell, Menu } from "electron";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { BackgroundTasks } from "./background-tasks";
 import { mkdirSync } from "node:fs";
 import { mkdir, readFile, realpath, stat, writeFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
@@ -18,7 +21,7 @@ import { migratePreferences, preferencesSchema } from "./preferences";
 import { checkedFile, previewFile } from "./file-preview";
 import { projectPath } from "./engine/revert-files";
 import { CatalogService } from "./catalog-service";
-import { ClipboardWatch } from "./clipboard-watch";
+import { ClipboardWatch, keyFromClipboard } from "./clipboard-watch";
 import { ConnectService } from "./connect-service";
 import type { NativeModel } from "./engine/adapter";
 import { EngineService, enableOpenCodeZenFree, engineBinary } from "./engine/service";
@@ -63,6 +66,9 @@ let window: BrowserWindow | undefined;
 let teardown: (() => Promise<void>) | undefined;
 let cancelConnections: (() => void) | undefined;
 let quitting = false;
+let exitConfirmed = false;
+let approveExit: (() => boolean) | undefined;
+const exec = promisify(execFile);
 
 async function openExternal(raw: string): Promise<void> {
   const url = new URL(raw);
@@ -112,6 +118,7 @@ function createWindow() {
   contents.on("did-navigate", () => cancelConnections?.());
   contents.on("render-process-gone", () => cancelConnections?.());
   window.on("focus", () => { if (window && !window.isDestroyed()) window.flashFrame(false); });
+  window.on("close", event => { if (!quitting && approveExit && !approveExit()) event.preventDefault(); });
   window.on("closed", () => { cancelConnections?.(); window = undefined; });
   if (devUrl) void window.loadURL(devUrl);
   else void window.loadFile(rendererFile);
@@ -151,12 +158,28 @@ async function start() {
     if (activeSessions.size && preferences.keepAwake && power === undefined) power = powerSaveBlocker.start("prevent-app-suspension");
     if ((!activeSessions.size || !preferences.keepAwake) && power !== undefined) { powerSaveBlocker.stop(power); power = undefined; }
   }
-  function announce(title: string, body: string, sessionId?: string) {
-    if (!preferences.notifications || window?.isFocused()) return;
-    if (process.platform === "darwin") app.dock?.bounce("informational");
-    else window?.flashFrame(true);
-    if (!Notification.isSupported()) return;
-    const notification = new Notification({ title, body, silent: !preferences.notificationSound });
+  let visibleChat: string | undefined;
+  const notifications = new Set<Notification>();
+  function announce(title: string, body: string, sessionId?: string, test = false) {
+    const focused = window?.isFocused();
+    if (!test && (!preferences.notifications || focused && (!sessionId || visibleChat === sessionId))) return;
+    if (!focused) {
+      if (process.platform === "darwin") app.dock?.bounce("informational");
+      else window?.flashFrame(true);
+    }
+    if (!Notification.isSupported()) {
+      if (test) throw new Error("Системные уведомления недоступны.");
+      return;
+    }
+    const notification = new Notification({ title, body, silent: true });
+    notifications.add(notification);
+    const release = () => { notifications.delete(notification); };
+    const expiry = setTimeout(release, 5 * 60_000);
+    expiry.unref();
+    notification.once("close", () => { clearTimeout(expiry); release(); });
+    notification.once("show", () => {
+      if (preferences.notificationSound) broadcast("notification:sound", undefined);
+    });
     notification.on("click", () => {
       if (window?.isMinimized()) window.restore();
       window?.show();
@@ -166,6 +189,23 @@ async function start() {
     notification.show();
   }
   const conversations = new Map<string, Conversation>();
+  const sideSessions = new Map<string, {
+    parent?: string; directory: string; client?: Awaited<ReturnType<EngineService["ready"]>>;
+    session?: string; sending?: Promise<unknown>; closed?: boolean;
+  }>();
+  const sideIds = new Set<string>();
+  const tasks = new BackgroundTasks(items => broadcast("tasks:update", items));
+  approveExit = () => {
+    if (exitConfirmed) return true;
+    const count = tasks.running().length;
+    if (!count) return true;
+    const word = new Intl.PluralRules("ru").select(count);
+    const message = word === "one" ? "Остановить " + count + " фоновую задачу и выйти?" : "Остановить " + count +
+      (word === "few" ? " фоновые задачи" : " фоновых задач") + " и выйти?";
+    const options = { type: "warning" as const, message, buttons: ["Остановить и выйти", "Отмена"], defaultId: 1, cancelId: 1 };
+    const accepted = (window ? dialog.showMessageBoxSync(window, options) : dialog.showMessageBoxSync(options)) === 0;
+    return (exitConfirmed = accepted);
+  };
   const keys = new KeyStore(join(data, "keys.json"));
   await keys.load();
   const voice = new VoiceService(data, join(resources, "voice", process.platform + "-" + process.arch),
@@ -211,18 +251,28 @@ async function start() {
     key: providerId => connections.key(providerId),
     personal: () => connections.personalRoutes(catalog.current),
     health,
-    onRoute: route => broadcast("chat:event", { type: "route", ...route } satisfies ChatEvent),
-    onSpeed: event => broadcast("chat:event", event),
-    onReplyCache: (sessionId, cachePercent) => broadcast("chat:event", { type: "reply-cache", sessionId, cachePercent } satisfies ChatEvent),
+    onRoute: route => { if (!sideIds.has(route.sessionId)) broadcast("chat:event", { type: "route", ...route } satisfies ChatEvent); },
+    onExhausted: event => { if (!sideIds.has(event.sessionId)) broadcast("chat:event", event); },
+    onSpeed: event => { if (!sideIds.has(event.sessionId)) broadcast("chat:event", event); },
+    onReplyCache: (sessionId, cachePercent) => { if (!sideIds.has(sessionId)) broadcast("chat:event", { type: "reply-cache", sessionId, cachePercent } satisfies ChatEvent); },
     onStats: stats => broadcast("router:stats", stats)
   });
   await router.start();
   console.info("[router] Запущен: " + router.baseUrl);
   const engine = new EngineService(engineBinary(resources), join(data, "opencode"), () => catalog.current, router,
     event => {
+      if (sideIds.has(event.sessionId)) return;
+      if (event.type === "part" && event.part.kind === "tool" && event.part.background && event.part.status === "running") {
+        tasks.called(event.part.id, event.sessionId, event.part.target);
+      }
       broadcast("chat:event", event);
       if (event.type === "permission" || event.type === "question") announce("Агент ждёт ответа", conversations.get(event.sessionId)?.title ?? "vsemkod", event.sessionId);
     }, personalModels, () => ({ agentSteps: preferences.agentSteps, webSearch: preferences.webSearch, mcp }));
+  engine.keepBackground = () => tasks.running().length > 0 || sideSessions.size > 0 || terminals.size > 0;
+  const taskTimer = setInterval(() => {
+    if (engine.runningClient) void tasks.refresh(engine.runningClient, conversations).catch(() => {});
+  }, 1000);
+  taskTimer.unref();
   const terminals = new Map<string, Awaited<ReturnType<EngineService["openTerminal"]>>>();
   const updates = createUpdates(update => broadcast("updates:ready", update), progress => broadcast("updates:progress", progress));
   const attempts = new Map<string, { provider: z.infer<typeof connectionId>; controller: AbortController; done: Promise<unknown> }>();
@@ -263,9 +313,28 @@ async function start() {
     .then(() => { if (!providerRefresh.signal.aborted) publishState(); });
   const providerTimer = setInterval(refreshProviderModels, 6 * 60 * 60_000);
   providerTimer.unref();
-  cancelConnections = cancelAll;
+  async function closeSide(token: string) {
+    const entry = sideSessions.get(token);
+    if (!entry) return;
+    entry.closed = true;
+    if (entry.session) await engine.stop(entry.session).catch(() => {});
+    await entry.sending?.catch(() => {});
+    if (sideSessions.get(token) !== entry) return;
+    sideSessions.delete(token);
+    if (entry.session && entry.client) {
+      try { await entry.client.removeSide(entry.session); }
+      finally { sideIds.delete(entry.session); }
+    }
+  }
+  cancelConnections = () => {
+    cancelAll();
+    for (const token of sideSessions.keys()) void closeSide(token).catch(() => {});
+  };
   teardown = async () => {
     cancelAll();
+    clearInterval(taskTimer);
+    await Promise.allSettled(tasks.running().map(task => tasks.stop(task.id)));
+    await Promise.allSettled([...sideSessions.keys()].map(closeSide));
     voice.pause();
     catalog.stop();
     clearInterval(providerTimer);
@@ -299,6 +368,22 @@ async function start() {
   handle("app:initial", z.tuple([]), () => ({ ...state(), projects: recentProjects, hiddenProjects: [...hiddenProjects], preferences, version: app.getVersion(), update: updates.ready }));
   handle("router:stats", z.tuple([]), () => router.stats());
   handle("updates:check", z.tuple([]), () => updates.check());
+  handle("notification:test", z.tuple([]), () => announce("Тестовое уведомление vsemkod", "Так выглядит уведомление, когда агент закончил работу.", undefined, true));
+  handle("chat:visible", z.tuple([id.optional()]), ([session]) => { visibleChat = session; });
+  handle("tasks:list", z.tuple([]), () => tasks.list());
+  handle("tasks:start", z.tuple([localPath, z.string().trim().min(1).max(16_384), id.optional()]), async ([directory, command, session]) => {
+    project(directory);
+    if (session && conversation(session).directory !== directory) throw new Error("Чат находится в другом проекте.");
+    await engine.withAuth(client => tasks.start(client, directory, command, session));
+  });
+  handle("tasks:stop", z.tuple([id]), ([task]) => tasks.stop(task));
+  handle("projects:branch", z.tuple([localPath]), async ([directory]) => {
+    const cwd = project(directory);
+    const options = { cwd, windowsHide: true, timeout: 2500, maxBuffer: 4096 };
+    const revision = await exec("git", ["rev-parse", "--abbrev-ref", "HEAD"], options)
+      .catch(() => exec("git", ["symbolic-ref", "--quiet", "--short", "HEAD"], options)).catch(() => undefined);
+    return revision?.stdout.trim() || null;
+  });
   handle("updates:apply", z.tuple([]), () => updates.apply());
   handle("projects:choose", z.tuple([]), async () => {
     const choice = await dialog.showOpenDialog(window!, {
@@ -376,6 +461,11 @@ async function start() {
     pcm.byteLength > 0 && pcm.byteLength <= voiceChunk * 2 && pcm.byteLength % 2 === 0)]), ([id, pcm]) => voice.audio(id, pcm));
   handle("voice:stop", z.tuple([dialogId]), ([id]) => voice.stop(id));
   handle("voice:cancel", z.tuple([dialogId]), ([id]) => voice.cancel(id));
+  handle("connect:clipboard-key", z.tuple([keyIdSchema]), async ([providerId]) => {
+    const provider = providerFor(providerId);
+    if (!provider?.keyPattern || ("auth" in provider && provider.auth.type !== "manual_key")) return;
+    return keyFromClipboard(await clipboard.readText(), new RegExp("^(?:" + provider.keyPattern + ")$"));
+  });
   handle("connect:clipboard", z.tuple([dialogId, keyIdSchema, z.boolean()]), ([token, providerId, enabled]) => {
     const provider = providerFor(providerId);
     if (!provider?.keyPattern || ("auth" in provider && provider.auth.type !== "manual_key")) return;
@@ -455,7 +545,7 @@ async function start() {
   });
   handle("chat:list", z.tuple([localPath.optional()]), async ([directory]) => {
     if (directory) project(directory);
-    const list = await (await engine.ready()).list(directory);
+    const list = (await (await engine.ready()).list(directory)).filter(chat => !sideIds.has(chat.id));
     list.forEach(chat => { conversations.set(chat.id, chat); projects.add(chat.directory); });
     return list;
   });
@@ -504,6 +594,39 @@ async function start() {
     return documents.length;
   });
   const engineModel = (model: string) => nativeModels.find(entry => entry.model.id === model)?.upstream ?? { id: model, providerID: "vsemkod" };
+  handle("side:ask", z.tuple([dialogId, localPath, id.optional(), z.string().trim().min(1).max(100_000), id, id.optional()]),
+    async ([token, directory, parent, text, model, variant]) => {
+      project(directory);
+      if (parent && conversation(parent).directory !== directory) throw new Error("Чат находится в другом проекте.");
+      const knownModel = nativeModels.some(entry => entry.model.id === model) || personalModels().some(entry => entry.id === model) ||
+        activeOffers(catalog.current, model).some(({ offer, provider }) => offer.supportsTools && connections.connected(catalog.current).includes(provider.id));
+      if (!knownModel) throw new Error("Эта модель недоступна.");
+      const entry = sideSessions.get(token) ?? { directory, parent };
+      if (entry.closed || entry.directory !== directory || entry.parent !== parent || entry.sending) throw new Error("Боковой чат занят или закрыт.");
+      sideSessions.set(token, entry);
+      const sending = Promise.resolve().then(async () => {
+        if (!entry.session) {
+          entry.client = await engine.ready();
+          if (entry.closed) throw new Error("Боковой чат закрыт.");
+          entry.session = await entry.client.createSide(directory, parent);
+          sideIds.add(entry.session);
+        }
+        const session = entry.session;
+        if (entry.closed) throw new Error("Боковой чат закрыт.");
+        const native = nativeModels.find(item => item.model.id === model)?.upstream;
+        const result = await engine.send(session, directory, text, model, false, [], native, { access: "read", variant });
+        if (entry.closed || result.stopped) throw new Error("Ответ остановлен.");
+        const history = await engine.history(session, directory);
+        const lastUser = history.parts.findLastIndex(part => part.kind === "user");
+        const answer = history.parts.slice(lastUser + 1).flatMap(part => part.kind === "text" ? [part.text] : []).join("\n\n");
+        return { text: answer || "Ответ пуст.", sessionId: session };
+      });
+      entry.sending = sending;
+      try { return await sending; }
+      finally { entry.sending = undefined; }
+    });
+  handle("side:close", z.tuple([dialogId]), ([token]) => closeSide(token));
+
   handle("chat:send", z.tuple([id, z.string().trim().max(100_000), id, z.array(dialogId).max(10), turnSchema.optional()]), async ([session, text, model, files, options]) => {
     if (activeSessions.has(session)) throw new Error("Агент уже отвечает в этом чате.");
     const chat = conversation(session);
@@ -521,14 +644,25 @@ async function start() {
     if (access === "full" && !preferences.fullAccessConfirmed) throw new Error("Подтвердите полный доступ в настройках.");
     const turn = { interrupted: false };
     activeSessions.set(session, turn);
+    tasks.watch(session);
     syncPower();
     try {
       const paths = await attachments.resolve(chat.directory, files, details?.vision ?? catalogModel?.capabilities.includes("vision") ?? false);
       if (turn.interrupted) return { stopped: true, changes: (await engine.history(session, chat.directory)).changes };
       const result = await engine.send(session, chat.directory, text, model, preferences.auto, paths, native?.upstream, { ...options, access });
-      if (!result.stopped) announce("Готово: " + chat.title, "Агент закончил работу. Нажмите, чтобы открыть чат.", session);
+      if (!result.stopped && preferences.notifications && (!window?.isFocused() || visibleChat !== session)) {
+        const history = await engine.history(session, chat.directory).catch(() => undefined);
+        const answer = history?.parts.findLast(part => part.kind === "text");
+        const body = answer?.kind === "text" ? answer.text.replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[#*_~`>]/g, "").replace(/\s+/g, " ").trim().slice(0, 120) : "";
+        announce("Готово: " + chat.title, body || "Агент закончил работу.", session);
+      }
       return result;
+    } catch (error) {
+      announce("Не получилось: " + chat.title, error instanceof Error ? error.message.slice(0, 120) : "Не удалось получить ответ.", session);
+      throw error;
     } finally {
+      if (engine.runningClient) await tasks.refresh(engine.runningClient, conversations).catch(() => {});
+      tasks.unwatch(session);
       activeSessions.delete(session);
       syncPower();
     }
@@ -708,10 +842,11 @@ else {
     app.quit();
   });
   app.on("activate", () => { if (!window && teardown) createWindow(); });
-  app.on("window-all-closed", () => { if (process.platform !== "darwin") app.quit(); });
+  app.on("window-all-closed", () => { if (process.platform !== "darwin" || exitConfirmed) app.quit(); });
   app.on("before-quit", event => {
     if (!teardown || quitting) return;
     event.preventDefault();
+    if (approveExit && !approveExit()) return;
     quitting = true;
     void teardown().finally(() => app.quit());
   });

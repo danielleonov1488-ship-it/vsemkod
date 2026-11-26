@@ -206,6 +206,28 @@ describe("Router", () => {
     expect(health.failures("kilo")).toBe(0);
   });
 
+  it.each([429, 503, 401, 403, "timeout"] as const)("tries the same model with a second key before auto fallback (%s)", async failure => {
+    const primary = await upstream(res => { if (failure !== "timeout") res.writeHead(failure).end(); });
+    const backup = await upstream();
+    const alternate = await upstream();
+    const exhausted: string[] = [];
+    const routes: { providerId: string; modelId: string; previousProviderId?: string }[] = [];
+    const { send } = await fixture(
+      [provider("kilo", alternate.url), provider("numes", primary.url, false), provider("runcrate", backup.url, false)],
+      [offer("first", "numes"), offer("first", "runcrate"), offer("second", "kilo")],
+      { auto: () => true, firstByteMs: 200, key: id => id !== "kilo" ? "local-test-key" : undefined,
+        onRoute: route => routes.push(route), onExhausted: event => exhausted.push(event.modelId) }
+    );
+    const reply = await send("first");
+    expect(reply.headers.get("x-vsemkod-model")).toBe("first");
+    expect(await reply.json()).toEqual({ message: "ok" });
+    expect(primary.calls[0].body.model).toBe("numes-first");
+    expect(backup.calls[0].body.model).toBe("runcrate-first");
+    expect(alternate.calls).toHaveLength(0);
+    expect(exhausted).toEqual([]);
+    expect(routes[0]).toMatchObject({ modelId: "first", previousProviderId: "numes", providerId: "runcrate" });
+  });
+
   it("uses top before good and emits the model switch only with fallback enabled", async () => {
     const failure = await upstream(res => res.writeHead(503).end());
     const top = await upstream();

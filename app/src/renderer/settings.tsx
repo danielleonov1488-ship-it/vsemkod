@@ -3,12 +3,15 @@ import type { CatalogState, McpConfig, McpEntry, Preferences, SkillSummary } fro
 import { AccessPicker } from "./access-picker";
 import { ModelSettings, PreferenceSwitch } from "./connections";
 import { Icon } from "./icons";
+import { panelTabs } from "../shared/panels";
+import { macShortcuts } from "./panel-controls";
 import { VoiceSettings } from "./voice-settings";
 
 const api = window.vsemkod;
 const sections = ["Общие", "Модели и подключения", "Агент", "MCP-серверы", "Навыки", "Горячие клавиши", "Данные", "О программе", "Голос"];
 const hotkeys = [
-  ["Ctrl+N", "Новый чат"], ["Ctrl+K", "Поиск чатов"], ["Ctrl+B", "Правая панель"], ["Ctrl+J", "Терминал"],
+  ["Ctrl+N", "Новый чат"], ["Ctrl+K", "Поиск чатов"], ["Ctrl+B", "Правая панель"],
+  ...panelTabs.flatMap(tab => "key" in tab ? [[(macShortcuts ? "Cmd" : "Ctrl") + "+" + (tab.shift ? "Shift+" : "") + tab.key, tab.title]] : []),
   ["Ctrl+,", "Настройки"], ["Shift+Tab", "Режим доступа"], ["Esc Esc", "Остановить агента"], ["Ctrl+Enter", "Вмешаться"],
   ["Ctrl+Space", "Нажать для записи или удерживать для диктовки"],
   ["Enter", "Отправить сообщение"], ["Shift+Enter", "Новая строка"], ["↑ / ↓ / Tab", "Выбрать команду или упоминание"]
@@ -146,12 +149,12 @@ function Skills({ directory, onError }: { directory: string; onError: (error: un
 
 type SettingsProps = Omit<Parameters<typeof ModelSettings>[0], "prefs"> & {
   prefs?: Preferences; version?: string; directory: string; choose: () => void; open: (url: string) => void;
-  checkUpdates: () => void; checkingUpdates: boolean; exportAll: () => void; state?: CatalogState;
+  checkUpdates: () => void; checkingUpdates: boolean; updateStatus?: string; testNotification?: () => void; exportAll: () => void; state?: CatalogState;
   onError: (error: unknown) => void; onNotice: (text: string) => void;
 };
 
-export function Settings({ prefs, version, directory, choose, update, open, checkUpdates, checkingUpdates, exportAll, onError, onNotice, showModels, ...models }: SettingsProps & { showModels?: boolean }) {
-  const [section, setSection] = useState(showModels ? 1 : 0);
+export function Settings({ prefs, version, directory, choose, update, open, checkUpdates, checkingUpdates, exportAll, onError, onNotice, initialSection = 0, updateStatus, testNotification, ...models }: SettingsProps & { initialSection?: number }) {
+  const [section, setSection] = useState(initialSection);
   return <main className="workspace settings-workspace">
     <header className="chat-header"><h1>Настройки</h1></header>
     <div className="settings-layout">
@@ -174,12 +177,13 @@ export function Settings({ prefs, version, directory, choose, update, open, chec
             </div>
           </Group>
           <Group title="Уведомления и питание">
-            <PreferenceSwitch title="Системные уведомления" detail="Когда агент закончил или ждёт ответа, а окно не в фокусе"
+            <PreferenceSwitch title="Уведомлять, когда агент закончил" detail="Также при ожидании разрешения или ответа"
               value={prefs.notifications} toggle={notifications => update({ notifications })} />
-            <PreferenceSwitch title="Звук уведомлений" detail="" value={prefs.notificationSound} toggle={notificationSound => update({ notificationSound })} />
+            <PreferenceSwitch title="Звук" detail="" value={prefs.notificationSound} toggle={notificationSound => update({ notificationSound })} />
+            {testNotification && <button type="button" className="composer-control" onClick={testNotification}>Проверить уведомление</button>}
             <PreferenceSwitch title="Не давать компьютеру уснуть, пока агент работает" detail="" value={prefs.keepAwake} toggle={keepAwake => update({ keepAwake })} />
           </Group>
-          <Group title="Обновления"><div className="settings-row"><span className="subtle">Текущая версия {version}</span>
+          <Group title="Обновления"><div className="settings-row"><span className="subtle">{updateStatus || "Текущая версия " + (version ?? "")}</span>
             <button type="button" className="composer-control connect-label" disabled={checkingUpdates} onClick={checkUpdates}>{checkingUpdates ? "Проверяем…" : "Проверить обновления"}</button>
           </div></Group>
         </>}

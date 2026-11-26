@@ -22,8 +22,8 @@ export function readableError(error: unknown) {
   return typeof error === "string" ? error : error instanceof Error ? error.message.replace(/^Error invoking remote method '[^']+': (?:Error: )?/, "") : "Не удалось выполнить действие.";
 }
 
-export function ConnectDialog({ connection, clipboard, close, connected }: {
-  connection: Connection; clipboard: boolean; close: () => void; connected: (state: CatalogState) => void;
+export function ConnectDialog({ connection, clipboard, close, connected, guided = false }: {
+  guided?: boolean; connection: Connection; clipboard: boolean; close: () => void; connected: (state: CatalogState) => void;
 }) {
   const api = window.vsemkod;
   const dialog = useRef<HTMLDialogElement>(null);
@@ -31,13 +31,15 @@ export function ConnectDialog({ connection, clipboard, close, connected }: {
   const [phase, setPhase] = useState<"idle" | "starting" | "waiting" | "done">("idle");
   const [device, setDevice] = useState<{ code: string; url: string }>();
   const [key, setKey] = useState("");
+  const [clipboardCandidate, setClipboardCandidate] = useState<string>();
   const [baseUrl, setBaseUrl] = useState("");
   const [choices, setChoices] = useState<ModelChoice[]>();
   const [loadingModels, setLoadingModels] = useState(false);
-  const [catchKey, setCatchKey] = useState(clipboard && connection.kind === "manual" && !!connection.keyPattern);
+  const [catchKey, setCatchKey] = useState(!guided && clipboard && connection.kind === "manual" && !!connection.keyPattern);
   const [clipboardStatus, setClipboardStatus] = useState("");
   const [error, setError] = useState("");
   const active = useRef(false);
+  const connecting = useRef(false);
   const resultTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const pending = phase === "starting" || phase === "waiting";
   const manual = connection.kind === "manual";
@@ -48,6 +50,8 @@ export function ConnectDialog({ connection, clipboard, close, connected }: {
     active.current = true;
     const restoreFocus = document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
     dialog.current?.showModal();
+    if (guided && connection.kind === "manual") void api.clipboardKey?.(connection.id)
+      .then(value => { if (active.current) setClipboardCandidate(value); }).catch(() => {});
     const unsubscribe = api.onConnect(event => {
       if (event.id !== token) return;
       if (event.type === "waiting") {
@@ -57,6 +61,7 @@ export function ConnectDialog({ connection, clipboard, close, connected }: {
       if (event.type === "clipboard") {
         setKey(event.key);
         setClipboardStatus("Нашли ключ");
+        if (guided) { setClipboardCandidate(undefined); void connect(true, event.key); }
         setCatchKey(false);
       }
       if (event.type === "clipboard-expired") {
@@ -82,13 +87,14 @@ export function ConnectDialog({ connection, clipboard, close, connected }: {
     void api.openExternal(url).catch(() => setError("Не удалось открыть системный браузер."));
   }
 
-  async function connect() {
-    if (phase !== "idle") return;
+  async function connect(fromClipboard = false, providedKey = key) {
+    if (connecting.current || !fromClipboard && phase !== "idle") return;
+    connecting.current = true;
     setError("");
     setCatchKey(false);
     setPhase("starting");
     try {
-      const state = await api.connect(token, connection.id, manual ? { key: key.trim(), baseUrl: custom ? baseUrl.trim() : undefined, models: custom ? choices?.filter(item => item.checked) : undefined } : undefined);
+      const state = await api.connect(token, connection.id, manual ? { key: providedKey.trim(), baseUrl: custom ? baseUrl.trim() : undefined, models: custom ? choices?.filter(item => item.checked) : undefined } : undefined);
       if (!active.current) return;
       setKey("");
       setPhase("done");
@@ -98,7 +104,7 @@ export function ConnectDialog({ connection, clipboard, close, connected }: {
       setPhase("idle");
       setDevice(undefined);
       setError(readableError(error));
-    }
+    } finally { connecting.current = false; }
   }
 
   return <dialog ref={dialog} className="connect-dialog" aria-labelledby="connect-title" aria-describedby="connect-intro"
@@ -122,7 +128,16 @@ export function ConnectDialog({ connection, clipboard, close, connected }: {
       <form className="provider-actions" onSubmit={event => { event.preventDefault(); void connect(); }}>
         {manual && <>
           {connection.keyPageUrl && <button className="google-button" type="button"
-            onClick={() => open(connection.keyPageUrl!)}>Открыть страницу ключей</button>}
+            onClick={() => { open(connection.keyPageUrl!); if (guided && connection.keyPattern) {
+              setCatchKey(true);
+              setClipboardStatus("Жду ключ… скопируйте его, и я подставлю сам");
+            } }}>{guided ? "Открыть страницу ключа" : "Открыть страницу ключей"}</button>}
+          {guided && clipboardCandidate && <button className="composer-control" type="button" disabled={pending} onClick={() => {
+            const value = clipboardCandidate;
+            setClipboardCandidate(undefined);
+            setKey(value);
+            void connect(true, value);
+          }}>Использовать ключ из буфера</button>}
           {custom && <label className="manual-field">Базовый URL<input type="url" value={baseUrl} required maxLength={4096}
             placeholder="https://example.com/v1" onChange={event => { setBaseUrl(event.target.value); setChoices(undefined); }} disabled={pending} /></label>}
           <label className="manual-field">Вставь ключ<input type="password" value={key} required maxLength={4096}
@@ -169,14 +184,15 @@ export function ConnectDialog({ connection, clipboard, close, connected }: {
 
 const subscriptions = ["github-copilot", "openai"] as const;
 
-export function ConnectionsPage({ state, close, connect }: {
-  state?: CatalogState; close: () => void; connect: (value: Connection) => void;
+export function ConnectionsPage({ state, close, connect, openWizard }: {
+  state?: CatalogState; close: () => void; connect: (value: Connection) => void; openWizard?: () => void;
 }) {
   return <main className="workspace">
     <header className="chat-header"><h1>Свои подписки и ключи</h1>
       <button className="composer-control" type="button" onClick={close}>Назад</button>
     </header>
     <div className="settings-panel">
+      {openWizard && <button type="button" className="small-button" onClick={openWizard}>Подключить всё за пару минут</button>}
       <p className="settings-intro">Подключите свой аккаунт или ключ API. Модели появятся в разделе «Ещё модели».</p>
       <section className="settings-group"><h2>Подписки</h2>
         {subscriptions.map(id => <ConnectionRow key={id} name={nativeNames[id]} active={state?.subscriptions.includes(id)}
@@ -242,9 +258,9 @@ function CustomProviderModels({ enabled, onCatalog, onError }: { enabled: string
   </div>;
 }
 
-export function ModelSettings({ state, prefs, update, subscriptionsPage, connect, disconnect, onCatalog, onError }: {
+export function ModelSettings({ state, prefs, update, subscriptionsPage, connect, disconnect, onCatalog, onError, openWizard }: {
   state?: CatalogState; prefs?: Preferences;
-  update: (patch: Partial<Preferences>) => void; subscriptionsPage: () => void;
+  update: (patch: Partial<Preferences>) => void; subscriptionsPage: () => void; openWizard?: () => void;
   connect: (value: Connection) => void; disconnect: (id: ConnectionId) => Promise<void>;
   onCatalog: (state: CatalogState) => void; onError: (error: unknown) => void;
 }) {
@@ -259,6 +275,7 @@ export function ModelSettings({ state, prefs, update, subscriptionsPage, connect
   ];
   return <>
       <section className="settings-group"><h2>Провайдеры и подписки</h2>
+        {openWizard && <button type="button" className="small-button" onClick={openWizard}>Подключить всё за пару минут</button>}
         {providers.length === 0 && <p className="settings-intro">Нет подключённых провайдеров.</p>}
         {providers.map(provider => <div className="settings-row provider-row" key={provider.id}>
           <span>{provider.name}</span>

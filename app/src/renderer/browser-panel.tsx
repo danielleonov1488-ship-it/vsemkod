@@ -18,6 +18,8 @@ function Glyph({ name }: { name: keyof typeof glyphs }) {
 }
 
 /** Всплывающие элементы приложения, которые не должен перекрывать нативный слой браузера. */
+let currentProject: string | undefined;
+
 const overlaySelector = ".model-panel, .chat-menu, .composer-menu, dialog[open], [role=dialog], .modal, .tooltip, [data-overlay]";
 
 function overlaps(a: DOMRect, b: DOMRect) {
@@ -28,8 +30,9 @@ function shortUrl(url: string) {
   return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
 }
 
-export function BrowserPanel({ api, directory, active, quickLinks, projectIndex, initialUrl, onUrl, onSendErrors, onNotice }: {
-  api?: BrowserApi; directory: string; active: boolean; quickLinks: string[]; projectIndex?: string; initialUrl?: string;
+export function BrowserPanel({ api, directory, active, quickLinks, projectIndex, initialUrl, request, onUrl, onSendErrors, onNotice, onDownload }: {
+  api?: BrowserApi; directory: string; active: boolean; quickLinks: string[]; projectIndex?: string; initialUrl?: string; request?: { url: string };
+  onDownload?: (name: string, path: string) => void;
   onUrl?: (url: string) => void; onSendErrors: (text: string) => void; onNotice: (text: string) => void;
 }) {
   const host = useRef<HTMLDivElement>(null);
@@ -39,17 +42,19 @@ export function BrowserPanel({ api, directory, active, quickLinks, projectIndex,
   const [menu, setMenu] = useState<"" | "more" | "errors">("");
   const [covered, setCovered] = useState(false);
   const opened = useRef(false);
+  const handled = useRef<typeof request>(undefined);
 
   useEffect(() => {
     if (!api) return;
     let alive = true;
-    void api.state().then(value => { if (alive) setState(value); });
+    void api.state().then(value => { if (alive && currentProject === directory) setState(value); });
     const stop = api.subscribe(event => {
+      if (currentProject !== directory) return;
       if (event.type === "state") setState(event.state);
-      if (event.type === "download") onNotice("Файл скачан: " + event.name);
+      if (event.type === "download") onDownload?.(event.name, event.path);
     });
     return () => { alive = false; stop(); };
-  }, [api, onNotice]);
+  }, [api, directory, onDownload]);
 
   useEffect(() => { if (!editing) setAddress(state.url.startsWith("about:") ? "" : state.url); }, [state.url, editing]);
   useEffect(() => { if (state.url && !state.url.startsWith("about:")) onUrl?.(state.url); }, [state.url, onUrl]);
@@ -58,17 +63,25 @@ export function BrowserPanel({ api, directory, active, quickLinks, projectIndex,
     if (!api || !value.trim()) return;
     setEditing(false);
     setMenu("");
+    currentProject = directory;
     void api.navigate(value, directory).catch(() => onNotice("Не удалось открыть адрес."));
   }, [api, directory, onNotice]);
 
   // Восстановить последний адрес проекта при первом показе.
   useEffect(() => {
-    if (!active || opened.current || !initialUrl || state.url) return;
-    opened.current = true;
-    navigate(initialUrl);
-  }, [active, initialUrl, state.url, navigate]);
+    if (!active) return;
+    if (request && handled.current !== request) {
+      opened.current = true;
+      handled.current = request;
+      navigate(request.url);
+    } else if (!opened.current || currentProject !== directory) {
+      opened.current = true;
+      if (currentProject !== directory) setState(emptyBrowserState);
+      if (initialUrl && currentProject !== directory) navigate(initialUrl);
+    }
+  }, [active, directory, initialUrl, request, navigate]);
 
-  const showPage = Boolean(api && active && state.url && !state.url.startsWith("about:") && !menu && !covered);
+  const showPage = Boolean(api && active && currentProject === directory && state.url && !state.url.startsWith("about:") && !state.loading && !menu && !covered);
 
   // Нативный слой следует за областью вкладки; прячется, когда поверх открыт любой попап приложения.
   useLayoutEffect(() => {
@@ -122,8 +135,8 @@ export function BrowserPanel({ api, directory, active, quickLinks, projectIndex,
 
   if (!api) return <div className="browser-panel browser-panel--unavailable">
     <div className="browser-empty"><Glyph name="globe" /><h2>Встроенный браузер</h2>
-      <p>Доступен в приложении для компьютера.</p>
-      <a className="small-button" href="https://vsemkod.ru/" target="_blank" rel="noopener">Скачать vsemkod</a>
+      <p>Встроенный браузер доступен в приложении для компьютера</p>
+      <a className="small-button" href="https://vsemkod.ru/" target="_blank" rel="noopener">Скачать</a>
     </div>
   </div>;
 

@@ -61,6 +61,8 @@ export class EngineService {
   private catalogVersion?: string;
   private configuredModels = new Set<string>();
   private authorizing = 0;
+  keepBackground = () => false;
+  get runningClient() { return this.client; }
 
   constructor(
     private readonly executable: string,
@@ -73,7 +75,7 @@ export class EngineService {
   ) {}
 
   async ready(): Promise<EngineAdapter> {
-    if (this.client && (this.active.size || this.authorizing || this.catalogVersion === this.configVersion(this.catalog(), this.personalModels()))) return this.client;
+    if (this.client && (this.active.size || this.authorizing || this.keepBackground() || this.catalogVersion === this.configVersion(this.catalog(), this.personalModels()))) return this.client;
     if (this.starting) return this.starting;
     this.starting = this.launch().finally(() => { this.starting = undefined; });
     return this.starting;

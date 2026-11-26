@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import type { Attachment, ChatAction, ChatPart, CatalogState, ChatEvent, ConnectionId, Conversation, DesktopApi, InitialState, Notice, Preferences, ProjectTools, UpdateProgress, UpdateReady } from "../shared/api";
+import type { BackgroundTask, Attachment, ChatAction, ChatPart, CatalogState, ChatEvent, ConnectionId, Conversation, DesktopApi, InitialState, Notice, Preferences, ProjectTools, UpdateProgress, UpdateReady } from "../shared/api";
 import type { RouterStats } from "../shared/api";
 import { Chat } from "./chat";
 import { catalogConnection, ConnectDialog, ConnectionsPage, readableError, type Connection } from "./connections";
 import { accessModes, slashCommand, type AccessMode } from "../shared/workspace";
-import { defaultModel } from "../shared/catalog";
+import { automaticModels, defaultModel } from "../shared/catalog";
 import { applyChatEvent, applyHistory, emptyView, isRunning, useChatViews, type ChatView, type PendingTurn } from "./chat-state";
 import type { FileReference } from "../shared/file-links";
 import { modelSpeed } from "./models";
@@ -13,7 +13,12 @@ import { ChatGroups } from "./chat-groups";
 import { Composer } from "./composer";
 import { ComposerStatus } from "./composer-status";
 import { Settings } from "./settings";
-import { WorkspacePanel, type PanelTab } from "./workspace-panel";
+import { WorkspacePanel } from "./workspace-panel";
+import { HeaderTools, macShortcuts, PanelMenu, Summary, type PanelMenuAnchor } from "./panel-controls";
+import { panelShortcut, readPanels, type PanelState, type PanelTab } from "../shared/panels";
+import { ConnectWizard } from "./connect-wizard";
+import { SideChat } from "./side-chat";
+import notificationSound from "../../resources/notification.wav?url";
 import { Icon } from "./icons";
 import { UpdatePill } from "./update-pill";
 import { findSecrets, maskSecrets } from "../shared/secrets";
@@ -49,7 +54,7 @@ function App() {
   const openChatRef = useRef<(session: Conversation) => Promise<void>>(undefined);
   const [chat, setChat] = useState<Conversation>();
   const [settings, setSettings] = useState(false);
-  const [settingsModels, setSettingsModels] = useState(false);
+  const [settingsSection, setSettingsSection] = useState(0);
   const [subscriptions, setSubscriptions] = useState(false);
   const [query, setQuery] = useState("");
   const [visibleProject, setVisibleProject] = useState("");
@@ -80,7 +85,15 @@ function App() {
   const [demoRemaining, setDemoRemaining] = useState<number>();
   const [preview, setPreview] = useState<FileReference>();
   const [panel, setPanel] = useState(false);
-  const [panelTab, setPanelTab] = useState<PanelTab>("changes");
+  const [projectPanels, setProjectPanels] = useState<Record<string, PanelState>>({});
+  const panelState = projectPanels[directory] ?? readPanels(localStorage.getItem("vsemkod-panels:" + directory));
+  const [panelMenu, setPanelMenu] = useState<PanelMenuAnchor>();
+  const [summary, setSummary] = useState(false);
+  const [contextSignal, setContextSignal] = useState(0);
+  const [tasks, setTasks] = useState<BackgroundTask[]>([]);
+  const [browserRequest, setBrowserRequest] = useState<{ url: string; directory: string }>();
+  const projectTasks = tasks.filter(task => task.directory === directory);
+  const runningTasks = projectTasks.filter(task => task.ended === undefined).length;
   const [panelWidth, setPanelWidth] = useState<number>();
   const [modelMenu, setModelMenu] = useState(0);
   useEffect(() => {
@@ -99,6 +112,10 @@ function App() {
   const secretBypass = useRef(false);
   const [checkingUpdates, setCheckingUpdates] = useState(false);
   const [connection, setConnection] = useState<Connection>();
+  const [updateStatus, setUpdateStatus] = useState("");
+  const [wizard, setWizard] = useState(false);
+  const [firstWizard, setFirstWizard] = useState(false);
+  const promptedWizard = useRef(false);
   const draftInput = useRef<HTMLTextAreaElement>(null);
   const currentDirectory = useRef(directory);
   currentDirectory.current = directory;
@@ -115,6 +132,7 @@ function App() {
     clearTimeout(noticeTimer.current);
     noticeTimer.current = setTimeout(() => setNotice(undefined), next.connect ? 12_000 : 6500);
   }, []);
+  const notifyDownload = useCallback((name: string, path: string) => notify({ text: "Файл скачан · " + name, download: path }), [notify]);
   const showError = useCallback((error: unknown) => notify({ text: readableError(error), tone: "error" }), [notify]);
 
   useEffect(() => {
@@ -142,6 +160,43 @@ function App() {
     }).catch(showError);
     return () => { mounted = false; stopCatalog(); stopNotice(); stopUpdate(); stopProgress?.(); stopFocus?.(); clearTimeout(noticeTimer.current); };
   }, [notify, showError]);
+
+  useEffect(() => {
+    let active = true;
+    let received = false;
+    const stopTasks = api.onTasks?.(next => { received = true; setTasks(next); });
+    void api.tasks?.().then(next => { if (active && !received) setTasks(next); }).catch(() => {});
+    const stopSound = api.onNotificationSound?.(() => {
+      const audio = new Audio(notificationSound);
+      audio.volume = .3;
+      void audio.play().catch(() => {});
+    });
+    return () => { active = false; stopTasks?.(); stopSound?.(); };
+  }, []);
+  useEffect(() => {
+    void api.setVisibleChat?.(!settings && !subscriptions ? chat?.id : undefined).catch(() => {});
+    setPanelMenu(undefined);
+    setSummary(false);
+    setContextSignal(0);
+  }, [directory, viewId, settings, subscriptions]);
+  useEffect(() => {
+    if (!panelMenu && !summary) return;
+    const pointer = (event: PointerEvent) => {
+      if (!(event.target instanceof Element) || !event.target.closest("[data-panel-anchor]")) {
+        setPanelMenu(undefined);
+        setSummary(false);
+      }
+    };
+    const key = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      event.preventDefault();
+      setPanelMenu(undefined);
+      setSummary(false);
+    };
+    document.addEventListener("pointerdown", pointer);
+    document.addEventListener("keydown", key);
+    return () => { document.removeEventListener("pointerdown", pointer); document.removeEventListener("keydown", key); };
+  }, [panelMenu, summary]);
 
   useEffect(() => api.onChat((event: ChatEvent) => {
     const session = event.sessionId;
@@ -221,6 +276,16 @@ function App() {
     void api.tools(directory).then(value => { if (current) setTools(value); }).catch(() => {});
     return () => { current = false; };
   }, [directory]);
+
+  useEffect(() => {
+    if (!initial || !prefs || !api.clipboardKey || promptedWizard.current) return;
+    promptedWizard.current = true;
+    if (prefs.connectionWizardSeen || initial.personal.length || initial.subscriptions.length ||
+      initial.connected.length !== 1 || initial.connected[0] !== "kilo") return;
+    updatePrefs({ connectionWizardSeen: true });
+    setFirstWizard(true);
+    setWizard(true);
+  }, [initial, prefs]);
 
   const options = catalog ? modelOptions(catalog) : [];
   const personal = catalog?.personalModels ?? [];
@@ -323,20 +388,22 @@ function App() {
 
   async function checkUpdates() {
     setCheckingUpdates(true);
+    setUpdateStatus("");
     try {
       const result = await api.checkUpdates();
       if (typeof result === "object") {
         setNotice(undefined);
         setUpdateReady(result);
+        setUpdateStatus("Найдена " + result.version);
       } else {
         const messages = {
           disabled: "Проверка обновлений доступна в установленном приложении.",
-          current: "У вас последняя версия.",
+          current: "У вас последняя версия " + (initial?.version ?? "") + ".",
           downloading: "Обновление загружается в фоне."
         };
-        notify({ text: messages[result] });
+        setUpdateStatus(messages[result]);
       }
-    } catch { notify({ text: "Не удалось проверить обновления.", tone: "error" }); }
+    } catch { setUpdateStatus("Не удалось проверить обновления."); }
     finally { setCheckingUpdates(false); }
   }
 
@@ -380,7 +447,7 @@ function App() {
       setSessions(list => [current, ...list.filter(item => item.id !== sessionId)]);
       setStatus(sessionId, "working");
       updateView(sessionId, value => ({ loaded: true, failure: undefined, progress: { started, since: started },
-        planReady: false, provider: undefined, liveSpeed: undefined, parts: turn.options.compact ? value.parts : [...value.parts, {
+        planReady: false, routeIssue: undefined, routedModel: undefined, liveSpeed: undefined, parts: turn.options.compact ? value.parts : [...value.parts, {
           id: localId, kind: "user", text: turn.text, files: turn.files.map(file => file.name)
         }] }));
       const result = await api.send(sessionId, turn.text, turn.modelId, turn.files.map(file => file.id), turn.options);
@@ -397,13 +464,16 @@ function App() {
       const visible = activeChat.current === sessionId && chatVisible.current;
       setStatus(sessionId, !result.stopped && !visible ? "ready" : undefined);
       if (visible && result.stopped) notify({ text: "Ответ остановлен" });
-      if (!visible && !result.stopped && document.hasFocus()) {
+      if (!visible && !result.stopped && prefs?.notifications && document.hasFocus()) {
         const title = (session?.title ?? turn.text).slice(0, 60);
         notify({ text: "«" + title + "» — готово", open: sessionId });
       }
     } catch (error) {
       const message = readableError(error);
-      if (!session || activeChat.current === session.id && chatVisible.current) notify({ text: message, tone: "error" });
+      const exhausted = session && cached.current[session.id]?.routeIssue;
+      const hasConnectionCard = exhausted && liveCatalog.current &&
+        modelOptions(liveCatalog.current).some(entry => entry.model.id === exhausted.modelId && entry.locked.length > 0);
+      if (!hasConnectionCard && (!session || activeChat.current === session.id && chatVisible.current)) notify({ text: message, tone: "error" });
       if (session) {
         const id = session.id;
         const history = await api.history(id).catch(() => undefined);
@@ -418,15 +488,16 @@ function App() {
     }
   }
 
-  function retryFailed() {
-    if (!failed || !modelId || busy || loadingChat) return;
-    if (!vision && failed.turn.files.some(file => file.image)) {
+  function retryFailed(nextModel = modelId) {
+    if (!failed || !nextModel || busy || loadingChat) return;
+    const acceptsImages = nextModel === modelId ? vision : available.find(entry => entry.model.id === nextModel)?.model.capabilities.includes("vision");
+    if (!acceptsImages && failed.turn.files.some(file => file.image)) {
       showError("Выбранная модель не принимает изображения.");
       return;
     }
     if (draft === failed.turn.text) setDraft("");
     if (files === failed.turn.files) setFiles([]);
-    void runTurn({ ...failed.turn, modelId, options: { ...failed.turn.options, variant: variant || undefined } });
+    void runTurn({ ...failed.turn, modelId: nextModel, options: { ...failed.turn.options, variant: nextModel === modelId ? variant || undefined : undefined } });
   }
 
   function stop() {
@@ -583,6 +654,18 @@ function App() {
   useEffect(() => {
     const keydown = (event: KeyboardEvent) => {
       if (event.defaultPrevented || event.isComposing || event.repeat) return;
+      const shortcut = panelShortcut(event, macShortcuts);
+      if (shortcut && directory && !settings && !subscriptions) {
+        event.preventDefault();
+        if (panel && panelState.active === shortcut) hidePanel();
+        else selectPanel(shortcut);
+        return;
+      }
+      if (event.key === "Escape" && panel && !settings && !subscriptions && innerWidth < 1000) {
+        event.preventDefault();
+        hidePanel();
+        return;
+      }
       if (event.key === "Escape" && busy) {
         const time = Date.now();
         if (time - lastEscape.current < 900) { stop(); lastEscape.current = 0; }
@@ -594,9 +677,9 @@ function App() {
       event.preventDefault();
       if (key === "KeyN") void startChat();
       if (key === "KeyK") searchInput.current?.focus();
-      if (key === "KeyB") setPanel(value => !value);
-      if (key === "KeyJ") { setSettings(false); setSubscriptions(false); setPanelTab("terminal"); setPanel(true); }
-      if (key === "Comma") { setSettingsModels(false); setSettings(value => subscriptions || !value); setSubscriptions(false); }
+      if (key === "KeyB") { if (panel) hidePanel(); else selectPanel(panelState.active ?? "changes"); }
+      if (key === "KeyJ") { setSettings(false); setSubscriptions(false); selectPanel("terminal"); }
+      if (key === "Comma") { setSettingsSection(0); setSettings(value => subscriptions || !value); setSubscriptions(false); }
     };
     window.addEventListener("keydown", keydown);
     return () => window.removeEventListener("keydown", keydown);
@@ -640,23 +723,115 @@ function App() {
 
   function openPreview(ref: FileReference) {
     setPreview(ref);
-    setPanelTab("preview");
-    setPanel(true);
+    selectPanel("preview");
   }
+
+  function savePanels(next: PanelState) {
+    setProjectPanels(value => ({ ...value, [directory]: next }));
+    localStorage.setItem("vsemkod-panels:" + directory, JSON.stringify(next));
+  }
+
+  function hidePanel() {
+    setPanel(false);
+    setPanelMenu(undefined);
+  }
+
+  function selectPanel(tab: PanelTab) {
+    const tabs = panelState.tabs.includes(tab) ? panelState.tabs : [...panelState.tabs, tab];
+    savePanels({ tabs, active: tab });
+    setPanel(true);
+    setPanelMenu(undefined);
+    setSummary(false);
+  }
+
+  function closeTab(tab: PanelTab) {
+    const tabs = panelState.tabs.filter(value => value !== tab);
+    const active = panelState.active === tab ? tabs[Math.max(0, panelState.tabs.indexOf(tab) - 1)] ?? tabs.at(-1) : panelState.active;
+    savePanels({ tabs, active });
+    if (!tabs.length) hidePanel();
+    if (tab === "browser") setBrowserRequest(undefined);
+  }
+
+  function openBrowser(url: string) {
+    setBrowserRequest({ url, directory });
+    selectPanel("browser");
+  }
+
+  function insertDraft(text: string) {
+    setDraft((draft.trim() ? draft.trimEnd() + "\n\n" : "") + text);
+    requestAnimationFrame(() => draftInput.current?.focus());
+  }
+
+  const sideContext = panelState.tabs.includes("side") ? JSON.stringify([directory, chat?.id]) : undefined;
+  const [activeSide, setActiveSide] = useState<{ context: string; id: string }>();
+  useEffect(() => {
+    if (!sideContext) { setActiveSide(undefined); return; }
+    const entry = { context: sideContext, id: crypto.randomUUID() };
+    setActiveSide(entry);
+    return () => {
+      void api.closeSide?.(entry.id).catch(() => {});
+    };
+  }, [sideContext]);
 
   const anyRunning = Object.values(running).some(isRunning);
   useEffect(() => {
     if (applyAfterReply && updateReady && !anyRunning) { setApplyAfterReply(false); void api.applyUpdate().catch(showError); }
   }, [applyAfterReply, updateReady, anyRunning, showError]);
-  const panelShown = Boolean(directory && panel && !settings && !subscriptions);
+  const panelShown = Boolean(directory && panel && panelState.active && !settings && !subscriptions);
   const panelSize = panelWidth ?? prefs?.panelWidth ?? 360;
   useEffect(() => {
-    document.documentElement.style.setProperty("--panel-offset", panelShown ? panelSize + "px" : "0px");
-  }, [panelShown, panelSize]);
+    const style = document.documentElement.style;
+    const element = document.querySelector<HTMLElement>(".workspace-panel");
+    if (!element || !panelShown) { style.setProperty("--panel-offset", "0px"); return; }
+    const measure = () => style.setProperty("--panel-offset", element.getBoundingClientRect().width + "px");
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [panelShown, directory]);
   const capacity = usage?.context ?? contextWindow;
+  const used = usage ? usage.input + usage.output + usage.reasoning + usage.cache.read + usage.cache.write : 0;
+  const contextPercent = capacity ? Math.min(100, Math.round(used / capacity * 100)) : 0;
+  const panelChoices = <PanelMenu select={selectPanel} changes={changes} running={runningTasks} />;
+  const headerTools = <HeaderTools summary={summary} panelMenu={panelMenu === "header"}
+    showSummary={() => { setPanelMenu(undefined); setSummary(value => !value); }}
+    showPanels={() => { setSummary(false); setPanelMenu(value => value === "header" ? undefined : "header"); }}>
+    {panelMenu === "header" && panelChoices}
+    {summary && <Summary key={directory} directory={directory} percent={contextPercent} changes={changes} running={runningTasks}
+      openContext={() => { setSummary(false); setContextSignal(value => value + 1); }}
+      openSettings={() => { setSummary(false); setSettingsSection(3); setSettings(true); }}
+      openPreview={openPreview} openTasks={() => selectPanel("tasks")} onError={showError} />}
+  </HeaderTools>;
   const typical = modelId && currentProviderId ? modelSpeed(modelId, ownModel?.providerId ?? selected?.available[0]?.provider.id ?? currentProviderId, catalog?.speeds, catalog?.benchmarks) : undefined;
   const demo = !!api.onDemoQuota;
+  const issue = view.routeIssue;
+  const issueModel = options.find(entry => entry.model.id === issue?.modelId);
+  const otherSources = issueModel?.locked.map(source => source.provider) ?? [];
+  const firstSource = otherSources[0];
+  const providerName = (id: string) => catalog?.catalog.providers.find(provider => provider.id === id)?.name ?? id;
+  const answeredModel = !busy && !failed && issue && view.routedModel !== issue.modelId ? options.find(entry => entry.model.id === view.routedModel)?.model : undefined;
+  const nextModel = catalog && automaticModels(catalog.catalog).find(candidate =>
+    candidate.id !== issue?.modelId && available.some(entry => entry.model.id === candidate.id));
+  const switchInfo = view.routeSwitch;
+  const [routeVisible, setRouteVisible] = useState(false);
+  useEffect(() => {
+    if (!switchInfo) { setRouteVisible(false); return; }
+    const remaining = 10_000 - (Date.now() - switchInfo.at);
+    setRouteVisible(remaining > 0);
+    const timer = setTimeout(() => setRouteVisible(false), remaining);
+    return () => clearTimeout(timer);
+  }, [switchInfo]);
   const composer = <>
+    {issue && issueModel && (answeredModel || failed && firstSource) && <section role="status" className="route-card" data-info={!!answeredModel || undefined}>
+      <p>{answeredModel ? "Ответила " + answeredModel.name + ", потому что " + providerName(issue.providerId) + " не отвечал." :
+        providerName(issue.providerId) + " сейчас не отвечает. " + issueModel.model.name + " есть ещё у " +
+        new Intl.ListFormat("ru").format(otherSources.map(source => source.name)) + " — подключите, и модель продолжит работать."}</p>
+      {failed && firstSource && <div className="approval-actions">
+        <button type="button" className="small-button" onClick={() => setConnection(catalogConnection(firstSource, issueModel.model))}>Подключить {firstSource.name}</button>
+        {nextModel && <button type="button" className="composer-control" onClick={() => retryFailed(nextModel.id)}>Переключиться на {nextModel.name}</button>}
+        <button type="button" className="composer-control" onClick={() => retryFailed()}>Повторить</button>
+      </div>}
+    </section>}
     {secretWarning && <div className="secret-warning" role="alert">
       <span>Похоже, в сообщении ключ или пароль. Бесплатные провайдеры могут хранить запросы.</span>
       <button type="button" className="small-button" onClick={() => { setSecretWarning(false); setDraft(maskSecrets(draft)); }}>Заменить на ***</button>
@@ -672,9 +847,10 @@ function App() {
           openSignal={modelMenu} onSelect={id => editView({ model: id, variant: "", provider: undefined })}
           onAuto={auto => updatePrefs({ auto })} onConnect={setConnection} onSubscriptions={() => setSubscriptions(true)} />} />
     <ComposerStatus key={"stats:" + (chat?.id ?? directory)} state={catalog} providerId={currentProviderId} usage={usage}
-      capacity={capacity} speed={view.liveSpeed ?? view.speed} typical={!demo ? typical : undefined} cache={view.cache} stats={routerStats} demo={demo} demoRemaining={demoRemaining}
+      contextSignal={contextSignal} routeSwitch={routeVisible && switchInfo ? providerName(switchInfo.from) + " → " + providerName(switchInfo.to) : undefined}
+      onWizard={api.clipboardKey && (() => setWizard(true))} capacity={capacity} speed={view.liveSpeed ?? view.speed} typical={!demo ? typical : undefined} cache={view.cache} stats={routerStats} demo={demo} demoRemaining={demoRemaining}
       onCompact={chat && !demo && !loadingChat && !busy ? () => compactContext() : undefined} onConnect={setConnection} onDisconnect={disconnect}
-      onOpen={url => void api.openExternal(url).catch(showError)} onSettings={() => { setSettingsModels(true); setSettings(true); }} />
+      onOpen={url => void api.openExternal(url).catch(showError)} onSettings={() => { setSettingsSection(1); setSettings(true); }} />
   </>;
 
   return <>
@@ -696,7 +872,8 @@ function App() {
           <Icon name="search" /><input ref={searchInput} type="search" value={query} aria-label="Поиск чатов" placeholder="Поиск чатов" onChange={event => setQuery(event.target.value)} />
         </label>
         <ChatGroups sessions={sessions} projects={projectDirectories} selectedProject={visibleProject} query={query}
-          active={!settings && !subscriptions ? chat?.id : undefined} running={running} expand={expandProject}
+          active={!settings && !subscriptions ? chat?.id : undefined} running={running}
+          tasks={tasks.flatMap(task => task.ended === undefined && task.sessionId ? [task.sessionId] : [])} expand={expandProject}
           addProject={() => void chooseDirectory()} selectProject={path => {
             setVisibleProject(path);
             if (!activeChat.current && !cached.current[homeId]?.loading) {
@@ -711,21 +888,24 @@ function App() {
           <button type="button" className="sidebar-row community-row" title="Telegram-канал сообщества: раздачи моделей, промпты и помощь"
             onClick={() => void api.openExternal(COMMUNITY_URL).catch(showError)}><Icon name="telegram" />Сообщество вайб‑кодеров</button>
           <button type="button" className="sidebar-row" aria-current={settings || subscriptions ? "page" : undefined}
-            onClick={() => { setSettingsModels(false); setSettings(subscriptions || !settings); setSubscriptions(false); }}><Icon name="settings" />Настройки</button>
+            onClick={() => { setSettingsSection(0); setSettings(subscriptions || !settings); setSubscriptions(false); }}><Icon name="settings" />Настройки</button>
           <p className="catalog-note">{catalogAge(catalog?.catalog.generatedAt)}</p>
         </div>
       </aside>
       <div className="workspace-layout">
-        {subscriptions ? <ConnectionsPage state={catalog} close={() => setSubscriptions(false)} connect={setConnection} />
-          : settings ? <Settings state={catalog} prefs={prefs} version={initial?.version} directory={directory} choose={() => void chooseDirectory(true)} showModels={settingsModels}
+        {subscriptions ? <ConnectionsPage state={catalog} close={() => setSubscriptions(false)} connect={setConnection} openWizard={api.clipboardKey && (() => setWizard(true))} />
+          : settings ? <Settings state={catalog} prefs={prefs} version={initial?.version} directory={directory} choose={() => void chooseDirectory(true)} initialSection={settingsSection}
             update={updatePrefs} subscriptionsPage={() => setSubscriptions(true)} connect={setConnection} disconnect={disconnect}
             checkUpdates={() => void checkUpdates()} checkingUpdates={checkingUpdates}
+            updateStatus={updateProgress ? "Найдена " + updateProgress.version : updateReady ? "Найдена " + updateReady.version : updateStatus}
+            testNotification={api.testNotification && (() => void api.testNotification?.().catch(showError))}
+            openWizard={api.clipboardKey && (() => setWizard(true))}
             open={url => void api.openExternal(url).catch(showError)} onError={showError} onNotice={text => notify({ text })}
             onCatalog={setCatalog} exportAll={() => void exportChats()} />
-          : chat ? <Chat key={chat.id} title={chat.title} parts={parts} permissions={permissions} questions={questions} changeCount={changes.length}
-            busy={busy || !!loadingChat} status={status} progress={progress} failure={failed?.message}
+          : chat ? <Chat key={chat.id} title={chat.title} parts={parts} permissions={permissions} questions={questions} headerTools={headerTools} openBrowser={openBrowser} insertDraft={insertDraft}
+            busy={busy || !!loadingChat} status={status} progress={progress} failure={failed && !(issueModel && firstSource) ? failed.message : undefined}
              directory={directory} preview={openPreview} onError={showError}
-            retryFailed={retryFailed} chooseModel={() => setModelMenu(value => value + 1)} panel={panel} openPanel={() => { if (!panel) setPanelTab("changes"); setPanel(value => !value); }}
+            retryFailed={() => retryFailed()} chooseModel={() => setModelMenu(value => value + 1)}
             answer={(id, decision) => api.answer(chat.id, id, decision)} answerQuestion={(id, value) => api.answerQuestion(chat.id, id, value)}
             copy={text => void api.copyText(text).then(() => notify({ text: "Скопировано" })).catch(showError)}
             edit={part => void editMessage(part)} revert={message => void revertMessage(message)} retry={part => submit(part.text, [], access, part.files?.length ? part.id : null)}
@@ -736,8 +916,7 @@ function App() {
             } : undefined}>
             {composer}
           </Chat> : <main className="workspace workspace--home">
-            <button className="composer-control home-panel-toggle" type="button" aria-label="Правая панель" aria-expanded={panel}
-              title="Правая панель · Ctrl+B" onClick={() => setPanel(value => !value)}><Icon name="panel" /></button>
+            <div className="home-panel-toggle">{headerTools}</div>
             <div className="home">
               <h1>Чем займёмся?</h1>
               {composer}
@@ -749,18 +928,24 @@ function App() {
               </div>
             </div>
           </main>}
-        {directory && <WorkspacePanel key={directory} directory={directory} tab={panelTab} setTab={setPanelTab} preview={preview} openPreview={openPreview} visible={panel && !settings && !subscriptions}
-          width={panelWidth ?? prefs?.panelWidth ?? 360} resize={(width, final) => {
-            const next = Math.max(260, Math.min(700, window.innerWidth - 490, Math.round(width)));
+        {directory && <WorkspacePanel key={directory} directory={directory} tab={panelState.active} tabs={panelState.tabs} setTab={selectPanel} closeTab={closeTab} preview={preview}
+          menuOpen={panelMenu === "tabs"} toggleMenu={() => { setSummary(false); setPanelMenu(value => value === "tabs" ? undefined : "tabs"); }} menu={panelChoices}
+          tasks={projectTasks} openBrowser={openBrowser} browserRequest={browserRequest?.directory === directory ? browserRequest : undefined} sessionId={chat?.id}
+          side={activeSide?.context === sideContext && activeSide && <SideChat key={activeSide.id} id={activeSide.id} directory={directory}
+            parent={chat?.id} model={modelId} variant={variant} insert={insertDraft} />} openPreview={openPreview} visible={panelShown}
+          width={panelSize} resize={(width, final) => {
+            const next = Math.max(260, Math.min(700, window.innerWidth < 1000 ? window.innerWidth : window.innerWidth - 490, Math.round(width)));
             if (final) { updatePrefs({ panelWidth: next }); setPanelWidth(undefined); }
             else setPanelWidth(next);
-          }} close={() => setPanel(false)} parts={parts} changes={changes} revert={file => void revertFile(file)} busy={busy || !!loadingChat}
+          }} close={hidePanel} parts={parts} changes={changes} revert={file => void revertFile(file)} busy={busy || !!loadingChat}
           theme={theme} onError={showError}
-          insertDraft={text => { setDraft((draft.trim() ? draft.trimEnd() + "\n\n" : "") + text); draftInput.current?.focus(); }}
-          notify={text => notify({ text })} />}
+          insertDraft={insertDraft}
+          notify={text => notify({ text })} notifyDownload={notifyDownload} />}
       </div>
     </div>
-    {connection && <ConnectDialog key={connection.id + "/" + (connection.model?.id ?? "")} connection={connection}
+    {wizard && catalog && <ConnectWizard state={catalog} first={firstWizard} connect={setConnection}
+      close={() => { setWizard(false); setFirstWizard(false); }} />}
+    {connection && <ConnectDialog guided={wizard} key={connection.id + "/" + (connection.model?.id ?? "")} connection={connection}
       clipboard={prefs?.clipboard ?? false} close={() => setConnection(undefined)} connected={state => {
         setCatalog(state);
         if (connection.model) setModel(connection.model.id);
@@ -768,10 +953,13 @@ function App() {
         setConnection(undefined);
         notify({ text: "Подключено: " + connection.name });
       }} />}
-    {notice && <div className={"toast" + (notice.tone === "error" ? " toast--error" : "")}
+    {notice && <div className={"toast" + (notice.open ? " toast--background" : "") + (notice.tone === "error" ? " toast--error" : "")}
       role={notice.tone === "error" ? "alert" : "status"}><span className="status-dot" />
       <span>{notice.text}</span>
       {notice.connect && <button type="button" className="connect-label" onClick={connectFromNotice}>Подключить</button>}
+      {notice.download && <button type="button" className="connect-label" onClick={() => {
+        if (notice.download) void api.browser?.reveal(notice.download).catch(showError);
+      }}>Показать</button>}
       {notice.open && <button type="button" className="connect-label" onClick={() => {
         const target = sessions.find(item => item.id === notice.open);
         setNotice(undefined);

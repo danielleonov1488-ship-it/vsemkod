@@ -9,6 +9,8 @@ export type ChatView = {
   loaded?: boolean; loading?: boolean; reverted?: boolean; planReady?: boolean;
   draft: string; files: Attachment[]; replayId?: string; access?: AccessMode; model?: string; variant: string;
   usage?: Usage; speed?: ReplySpeed; liveSpeed?: ReplySpeed; cache?: number; provider?: string; routedModel?: string;
+  routeIssue?: { modelId: string; providerId: string };
+  routeSwitch?: { from: string; to: string; at: number };
   progress?: { started: number; since: number | null };
   failure?: { message: string; turn: PendingTurn };
 };
@@ -90,7 +92,13 @@ export function applyChatEvent(view: ChatView, event: ChatEvent): Partial<ChatVi
       return event.live ? { liveSpeed: event.speed } : { speed: event.speed, liveSpeed: undefined };
     case "reply-cache":
       return { cache: event.cachePercent };
-    case "route":
-      return { provider: event.providerId, routedModel: event.modelId };
+    case "route-exhausted":
+      return { routeIssue: { modelId: event.modelId, providerId: event.providerId } };
+    case "route": {
+      const sameModel = event.previousModelId === event.modelId && event.previousProviderId && event.previousProviderId !== event.providerId;
+      return { provider: event.providerId, routedModel: event.modelId,
+        routeIssue: view.routeIssue?.modelId === event.modelId ? undefined : view.routeIssue,
+        ...(sameModel && { routeSwitch: { from: event.previousProviderId!, to: event.providerId, at: Date.now() } }) };
+    }
   }
 }

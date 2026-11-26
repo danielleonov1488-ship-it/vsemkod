@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { findLocalUrls, isAllowedNavigation, normalizeAddress } from "../src/shared/browser";
+import { panelShortcut, quoteText, readPanels } from "../src/shared/panels";
+import { keyFromClipboard } from "../src/main/clipboard-watch";
 import { findSecrets, maskSecrets } from "../src/shared/secrets";
 
 describe("адресная строка браузера", () => {
@@ -32,6 +34,7 @@ describe("фильтр навигации", () => {
     expect(isAllowedNavigation("file:///etc/passwd")).toBe(false);
     expect(isAllowedNavigation("javascript:alert(1)")).toBe(false);
     expect(isAllowedNavigation("chrome://gpu")).toBe(false);
+    expect(isAllowedNavigation("devtools://devtools")).toBe(false);
     expect(isAllowedNavigation("https://user:pass@example.com/")).toBe(false);
   });
 });
@@ -57,5 +60,37 @@ describe("секреты в сообщении", () => {
       "const token = getToken();",
       "G:\\vsemkod\\pelican-bicycle.svg",
     ]) expect(findSecrets(text)).toEqual([]);
+  });
+});
+
+describe("горячие клавиши и вкладки", () => {
+  const keys = [
+    ["KeyD", true, "changes"], ["KeyB", true, "browser"], ["KeyF", true, "files"],
+    ["Backquote", false, "terminal"], ["Semicolon", false, "side"]
+  ] as const;
+  it.each(keys)("%s поддерживает Ctrl на Windows и Cmd на Mac", (code, shiftKey, tab) => {
+    const win = { code, shiftKey, ctrlKey: true, metaKey: false, altKey: false };
+    const mac = { ...win, ctrlKey: false, metaKey: true };
+    expect(panelShortcut(win, false)).toBe(tab);
+    expect(panelShortcut(mac, true)).toBe(tab);
+    expect(panelShortcut(win, true)).toBeUndefined();
+    expect(panelShortcut({ ...mac, shiftKey: !shiftKey }, true)).toBeUndefined();
+    expect(panelShortcut({ ...win, altKey: true }, false)).toBeUndefined();
+  });
+  it("восстанавливает только допустимые вкладки", () => {
+    expect(readPanels('{"tabs":["browser","bad","tools","terminal","browser"],"active":"bad"}'))
+      .toEqual({ tabs: ["browser", "terminal"], active: "terminal" });
+    expect(readPanels("old")).toEqual({ tabs: [] });
+    expect(quoteText("Привет\r\n\r\nЭтот текст")).toBe("> Привет\n> \n> Этот текст");
+  });
+});
+
+describe("ключ для мастера подключений", () => {
+  it("предлагает только полный ключ нужного провайдера", () => {
+    const modelScope = /^ms-[A-Za-z0-9_-]+$/;
+    expect(keyFromClipboard(" ms-example_123\n", modelScope)).toBe("ms-example_123");
+    for (const text of ["git 9daeafb9864cf43055ae93beb0afd6c7d144bfa4", "sk-example_123", "Ключ: ms-example_123", "ms-example\nms-other"]) {
+      expect(keyFromClipboard(text, modelScope)).toBeUndefined();
+    }
   });
 });
