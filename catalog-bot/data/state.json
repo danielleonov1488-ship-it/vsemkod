@@ -83,6 +83,17 @@
       "url": "https://cloud.siliconflow.cn/account/ak"
     }
   ],
+  "freeLlmCheckedAt": "2026-11-26T07:39:04.135Z",
+  "freeLlmFirstSeen": {
+    "cloudflare-workers-ai": "2026-11-26T07:39:04.135Z",
+    "freeinference": "2026-11-26T07:39:04.135Z",
+    "kiosapi": "2026-11-26T07:39:04.135Z",
+    "llm-kiwi": "2026-11-26T07:39:04.135Z",
+    "meganova": "2026-11-26T07:39:04.135Z",
+    "novai": "2026-11-26T07:39:04.135Z",
+    "requesty": "2026-11-26T07:39:04.135Z",
+    "vercel-ai-gateway": "2026-11-26T07:39:04.135Z"
+  },
   "llmCache": {
     "04c106978467cd03200624da5ce46c62b2ac588465528917940b397e5625237a": {
       "observations": [
@@ -1901,7 +1912,7 @@
     "groq:qwen/qwen3.8-27b": {
       "evidence": {
         "github": {
-          "missedRuns": 5,
+          "missedRuns": 6,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -2334,9 +2345,10 @@
       }
     },
     "modelscope:API-Inference": {
+      "endedAt": "2026-11-26T07:39:04.135Z",
       "evidence": {
         "github": {
-          "missedRuns": 5,
+          "missedRuns": 6,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -3121,9 +3133,10 @@
       }
     },
     "runcrate:five open models": {
+      "endedAt": "2026-11-26T07:39:04.135Z",
       "evidence": {
         "github": {
-          "missedRuns": 5,
+          "missedRuns": 6,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -3268,9 +3281,10 @@
       }
     },
     "zai:free models": {
+      "endedAt": "2026-11-26T07:39:04.135Z",
       "evidence": {
         "github": {
-          "missedRuns": 5,
+          "missedRuns": 6,
           "observation": {
             "confidence": "news",
             "expiresAt": null,

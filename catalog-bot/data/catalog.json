@@ -19,7 +19,7 @@
       "sources": [
         "https://github.com/mnfst/awesome-free-llm-apis"
       ],
-      "status": "unverified",
+      "status": "ended",
       "supportsTools": false
     },
     {
@@ -28,7 +28,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -61,7 +61,7 @@
       "sources": [
         "https://github.com/mnfst/awesome-free-llm-apis"
       ],
-      "status": "unverified",
+      "status": "ended",
       "supportsTools": false
     },
     {
@@ -70,7 +70,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -92,7 +92,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -126,7 +126,7 @@
       "sources": [
         "https://github.com/mnfst/awesome-free-llm-apis"
       ],
-      "status": "unverified",
+      "status": "ended",
       "supportsTools": false
     },
     {
@@ -135,7 +135,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "GLM-4.7-Flash бесплатна. Ограничение параллельных запросов смотрите в кабинете API."
@@ -156,7 +156,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "GLM-4.7-Flash бесплатна. Ограничение параллельных запросов смотрите в кабинете API."
@@ -177,7 +177,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -198,7 +198,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -219,7 +219,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -240,7 +240,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -262,7 +262,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -285,7 +285,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -307,7 +307,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -330,7 +330,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -352,7 +352,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -370,7 +370,7 @@
       "supportsTools": false
     }
   ],
-  "generatedAt": "2026-11-26T07:20:05.075Z",
+  "generatedAt": "2026-11-26T07:39:04.135Z",
   "models": [
     {
       "capabilities": [
@@ -737,7 +737,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -759,7 +759,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -781,7 +781,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
@@ -805,7 +805,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
@@ -826,7 +826,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -847,7 +847,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."
@@ -916,7 +916,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -938,7 +938,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -961,7 +961,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -983,7 +983,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1005,7 +1005,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -1029,7 +1029,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -1053,7 +1053,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -1077,7 +1077,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
@@ -1098,7 +1098,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "GLM-4.7-Flash бесплатна. Ограничение параллельных запросов смотрите в кабинете API."
@@ -1122,7 +1122,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
@@ -1146,7 +1146,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -1167,7 +1167,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."
@@ -1191,7 +1191,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -1212,7 +1212,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."
@@ -1236,7 +1236,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1259,7 +1259,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B",
@@ -1286,7 +1286,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."
@@ -1310,7 +1310,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B",
@@ -1337,7 +1337,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
@@ -1361,7 +1361,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -1382,7 +1382,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1404,7 +1404,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -1427,7 +1427,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
@@ -1451,7 +1451,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1474,7 +1474,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -1498,7 +1498,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1521,7 +1521,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -1542,7 +1542,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -1566,7 +1566,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1589,7 +1589,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -1613,7 +1613,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1636,7 +1636,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -1660,7 +1660,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1682,7 +1682,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
@@ -1705,7 +1705,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B",
@@ -1720,7 +1720,6 @@
       "providerModelId": "qwen/qwen3.8-27b",
       "reviewBy": "2026-12-08T00:00:00.000Z",
       "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis",
         "registry:groq"
       ],
       "status": "active",
@@ -1733,7 +1732,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
@@ -1754,7 +1753,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:20:05.075Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."

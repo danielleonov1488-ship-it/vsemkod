@@ -1,5 +1,183 @@
 {
-  "generatedAt": "2026-11-26T03:04:04.312Z",
+  "freeLlm": [
+    {
+      "baseUrl": "https://api.llm.kiwi/v1",
+      "firstSeen": "2026-11-26T07:39:04.135Z",
+      "keyHelpUrl": "https://free-llm.com/provider/llm-kiwi",
+      "models": [
+        {
+          "catalogModelId": "minimax-m3",
+          "id": "minimax-m3"
+        },
+        {
+          "catalogModelId": "nemotron-3-ultra",
+          "id": "nemotron-3-ultra"
+        }
+      ],
+      "provider": "LLM.kiwi",
+      "rateLimit": "Baseline rate limits (figures not published)",
+      "signup": "registration",
+      "slug": "llm-kiwi"
+    },
+    {
+      "baseUrl": "https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/v1",
+      "firstSeen": "2026-11-26T07:39:04.135Z",
+      "keyHelpUrl": "https://free-llm.com/provider/cloudflare-workers-ai",
+      "models": [
+        {
+          "catalogModelId": "gemma-4-26b-a4b-it",
+          "id": "@cf/google/gemma-4-26b-a4b-it"
+        },
+        {
+          "catalogModelId": "gpt-oss-120b",
+          "id": "@cf/openai/gpt-oss-120b"
+        },
+        {
+          "catalogModelId": "gpt-oss-20b",
+          "id": "@cf/openai/gpt-oss-20b"
+        },
+        {
+          "catalogModelId": "qwen3.8-27b",
+          "id": "@cf/qwen/qwen3.8-27b"
+        },
+        {
+          "catalogModelId": "glm-4.7-flash",
+          "id": "@cf/zai-org/glm-4.7-flash"
+        }
+      ],
+      "provider": "Cloudflare Workers AI",
+      "rateLimit": "Varies by model",
+      "signup": "no",
+      "slug": "cloudflare-workers-ai"
+    },
+    {
+      "baseUrl": "https://freeinference.org/v1",
+      "firstSeen": "2026-11-26T07:39:04.135Z",
+      "keyHelpUrl": "https://free-llm.com/provider/freeinference",
+      "models": [
+        {
+          "catalogModelId": "glm-5.3-flash",
+          "id": "glm-5.3-flash"
+        },
+        {
+          "catalogModelId": "minimax-m3",
+          "id": "minimax-m3"
+        }
+      ],
+      "provider": "FreeInference",
+      "rateLimit": "Not published (\"generous quota\"; HTTP 429 when rate-limited)",
+      "signup": "no",
+      "slug": "freeinference"
+    },
+    {
+      "baseUrl": "https://router.requesty.ai/v1",
+      "firstSeen": "2026-11-26T07:39:04.135Z",
+      "keyHelpUrl": "https://free-llm.com/provider/requesty",
+      "models": [
+        {
+          "catalogModelId": "gemma-4-31b-it",
+          "id": "google/gemma-4-31b-it"
+        },
+        {
+          "catalogModelId": "nemotron-3-nano-omni-30b-a3b-reasoning",
+          "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"
+        },
+        {
+          "catalogModelId": "nemotron-3-ultra",
+          "id": "nvidia/nemotron-3-ultra-550b-a55b"
+        }
+      ],
+      "provider": "Requesty",
+      "rateLimit": "20 RPM on free models (60 RPM for paying orgs)",
+      "signup": "no",
+      "slug": "requesty"
+    },
+    {
+      "baseUrl": "https://ai-gateway.vercel.sh/v1",
+      "firstSeen": "2026-11-26T07:39:04.135Z",
+      "keyHelpUrl": "https://free-llm.com/provider/vercel-ai-gateway",
+      "models": [
+        {
+          "catalogModelId": "ampersand-v0.1",
+          "id": "humansand/ampersand-v0.1"
+        },
+        {
+          "catalogModelId": "nemotron-3.5-lightning",
+          "id": "nvidia/nemotron-3.5-lightning-free"
+        },
+        {
+          "catalogModelId": "gpt-oss-120b",
+          "id": "openai/gpt-oss-120b"
+        },
+        {
+          "catalogModelId": "flint-v1.0",
+          "id": "recursive/flint-v1.0"
+        },
+        {
+          "catalogModelId": "beam-free",
+          "id": "reflection/beam-free"
+        },
+        {
+          "catalogModelId": "glyph-cluster",
+          "id": "stealth/glyph-cluster"
+        },
+        {
+          "catalogModelId": "glm-4.7-flash",
+          "id": "zai/glm-4.7-flash"
+        }
+      ],
+      "provider": "Vercel AI Gateway",
+      "rateLimit": "Lower per-model limits than the paid tier (429 on excess)",
+      "signup": "registration",
+      "slug": "vercel-ai-gateway"
+    },
+    {
+      "baseUrl": "https://api.kiosapi.id/v1",
+      "firstSeen": "2026-11-26T07:39:04.135Z",
+      "keyHelpUrl": "https://free-llm.com/provider/kiosapi",
+      "models": [
+        {
+          "catalogModelId": "glm-4.7-flash",
+          "id": "zai/glm-4.7-flash"
+        }
+      ],
+      "provider": "Kiosapi.id",
+      "rateLimit": "5 requests/minute (free models)",
+      "signup": "registration",
+      "slug": "kiosapi"
+    },
+    {
+      "baseUrl": "https://api.meganova.ai/v1",
+      "firstSeen": "2026-11-26T07:39:04.135Z",
+      "keyHelpUrl": "https://free-llm.com/provider/meganova",
+      "models": [
+        {
+          "catalogModelId": "glm-4.7-flash",
+          "id": "zai-org/GLM-4.7-Flash"
+        }
+      ],
+      "provider": "MegaNova AI",
+      "rateLimit": "Tier 1 (free): 20-200 RPM",
+      "signup": "no",
+      "slug": "meganova"
+    },
+    {
+      "baseUrl": "https://aiapi-pro.com/v1",
+      "firstSeen": "2026-11-26T07:39:04.135Z",
+      "keyHelpUrl": "https://free-llm.com/provider/novai",
+      "models": [
+        {
+          "catalogModelId": "glm-4.7-flash",
+          "id": "glm-4.7-flash"
+        }
+      ],
+      "provider": "NovAI",
+      "rateLimit": "5 requests/min before the first top-up",
+      "signup": "no",
+      "slug": "novai"
+    }
+  ],
+  "generatedAt": "2026-11-26T07:39:04.135Z",
   "models": [
     {
       "active": true,
@@ -8,7 +186,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "beam-free",
-      "lastSeen": "2026-11-26T03:04:04.312Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "name": "Beam Free",
       "source": "opencode-zen",
       "tools": true
@@ -20,7 +198,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "big-pickle",
-      "lastSeen": "2026-11-26T03:04:04.312Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "name": "Big Pickle",
       "source": "opencode-zen",
       "tools": true
@@ -32,7 +210,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "deepseek-v4.1-flash-free",
-      "lastSeen": "2026-11-26T03:04:04.312Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "name": "DeepSeek V4.1 Flash Free",
       "source": "opencode-zen",
       "tools": true
@@ -44,7 +222,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "flint-40b-free",
-      "lastSeen": "2026-11-26T03:04:04.312Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "name": "Flint 40B Free",
       "source": "opencode-zen",
       "tools": true
@@ -56,7 +234,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "hy4-flash-free",
-      "lastSeen": "2026-11-26T03:04:04.312Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "name": "Hy4 flash Free",
       "source": "opencode-zen",
       "tools": true
@@ -68,7 +246,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "iceman-free",
-      "lastSeen": "2026-11-26T03:04:04.312Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "name": "Iceman Free",
       "source": "opencode-zen",
       "tools": true
@@ -80,7 +258,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "jev-1.13-free",
-      "lastSeen": "2026-11-26T03:04:04.312Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "name": "Jev 1.13 Free",
       "source": "opencode-zen",
       "tools": false
@@ -92,7 +270,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "mimo-v2.6-flash-free",
-      "lastSeen": "2026-11-26T03:04:04.312Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "name": "MiMo-V2.6-Flash Free",
       "source": "opencode-zen",
       "tools": true
@@ -104,7 +282,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "nemotron-3.5-lightning-free",
-      "lastSeen": "2026-11-26T03:04:04.312Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "name": "Nemotron 3.5 Lightning Free",
       "source": "opencode-zen",
       "tools": true
@@ -116,7 +294,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "nemotron-3.5-super-vl-free",
-      "lastSeen": "2026-11-26T03:04:04.312Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "name": "Nemotron 3.5 Super VL Free",
       "source": "opencode-zen",
       "tools": true
@@ -128,7 +306,7 @@
       "firstSeen": "2026-11-26T03:04:04.312Z",
       "free": true,
       "id": "seaglass-alpha-free",
-      "lastSeen": "2026-11-26T03:04:04.312Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "name": "Seaglass Alpha Free",
       "source": "opencode-zen",
       "tools": true
