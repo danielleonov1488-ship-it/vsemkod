@@ -14,13 +14,14 @@ export const watchedPages = [
 export const feedIds = ["hn", "reddit", "github"] as const;
 export const structuredIds = ["openrouter", "kilo", "numes"] as const;
 export const sourceSelectors = [
-  ...structuredIds, "opencode-zen", "watchPages", "feeds", ...feedIds,
+  ...structuredIds, "opencode-zen", "benchmarks", "free-list", "watchPages", "feeds", ...feedIds,
   ...watchedPages.map(({ providerId }) => "page:" + providerId),
 ];
 
 export interface Config {
   llm: { baseUrl: string; key?: string; model: string; maxTokens: number };
   numesKey?: string;
+  aaKey?: string;
   missingRuns: number;
   retentionDays: number;
   healthIntervalHours: number;
@@ -65,6 +66,7 @@ export function readConfig(): Config {
       maxTokens: positiveInt("LLM_MAX_TOKENS_PER_RUN", 150000),
     },
     numesKey: env("NUMES_API_KEY"),
+    aaKey: env("AA_API_KEY"),
     missingRuns: positiveInt("OFFER_MISSING_RUNS", 6),
     retentionDays: positiveInt("OFFER_ENDED_RETENTION_DAYS", 7),
     healthIntervalHours: positiveInt("HEALTH_INTERVAL_HOURS", 6),

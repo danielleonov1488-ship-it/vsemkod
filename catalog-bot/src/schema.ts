@@ -135,10 +135,24 @@ const radarModelSchema = z.object({
   active: z.boolean(),
 }).strict();
 
+export const freeListSectionSchema = z.enum(["provider_api", "inference_provider"]);
+const providerHeadingSchema = z.object({
+  name: z.string().min(1),
+  section: freeListSectionSchema,
+});
+export const freeListProviderSchema = providerHeadingSchema.extend({
+  url: z.url({ protocol: /^https$/ }),
+}).strict();
+const radarProviderSchema = providerHeadingSchema.extend({
+  firstSeen: dateSchema,
+  source: z.literal("awesome-free-llm-apis"),
+}).strict();
+
 export const radarSchema = z.object({
   schemaVersion: z.literal(1),
   generatedAt: dateSchema,
   models: z.array(radarModelSchema),
+  providers: z.array(radarProviderSchema).optional(),
 }).strict();
 
 export type ProviderId = z.infer<typeof providerIdSchema>;
@@ -150,6 +164,8 @@ export type Catalog = z.infer<typeof catalogSchema>;
 export type Change = z.infer<typeof changeSchema>;
 export type Limits = z.infer<typeof limitsSchema>;
 export type Radar = z.infer<typeof radarSchema>;
+export type RadarProvider = z.infer<typeof radarProviderSchema>;
+export type FreeListProvider = z.infer<typeof freeListProviderSchema>;
 export type RadarModel = z.infer<typeof radarModelSchema>;
 export type RadarObservation = Omit<RadarModel, "firstSeen" | "lastSeen" | "active">;
 

@@ -2,12 +2,16 @@ import { feedIds, readConfig, sourceSelectors, structuredIds, watchedPages } fro
 import { checkOffers } from "./health.js";
 import { LlmClient } from "./llm/client.js";
 import { mergeCatalog } from "./merge.js";
-import { notifyTelegram, publish, readCatalog, readPublication, readRadar } from "./publish.js";
-import { mergeRadar, radarChanged } from "./radar.js";
+import { notifyTelegram, publish, readBenchmarks, readCatalog, readPublication, readRadar } from "./publish.js";
+import { mergeProviderRadar, mergeRadar, radarChanged } from "./radar.js";
 import { registryBatches, registryPageHash } from "./registry/offers.js";
+import type { RadarProvider } from "./schema.js";
+import { benchmarksChanged, fetchBenchmarks, shouldRefreshBenchmarks } from "./sources/artificialAnalysis.js";
+import type { Benchmarks } from "./sources/artificialAnalysis.js";
 import { describeError } from "./sources/common.js";
 import type { SourceResult } from "./sources/common.js";
 import { fetchFeed, processFeed } from "./sources/feeds.js";
+import { fetchFreeListProviders, shouldCheckFreeList } from "./sources/freeList.js";
 import { fetchKilo } from "./sources/kilo.js";
 import { fetchNumes } from "./sources/numes.js";
 import { fetchOpenCodeZen } from "./sources/opencodeZen.js";
@@ -53,11 +57,14 @@ async function update(args: string[]): Promise<void> {
   );
   const feeds = useLlm ? feedIds.filter((id) => !only || only === "feeds" || only === id) : [];
 
-  const [apiResults, pageResults, feedResults, [zenResult]] = await Promise.all([
+  const checkFreeList = (!only || only === "free-list") && shouldCheckFreeList(now, state.freeListCheckedAt);
+
+  const [apiResults, pageResults, feedResults, [zenResult], [freeListResult]] = await Promise.all([
     Promise.allSettled(structuredJobs.map(({ load }) => load())),
     Promise.allSettled(pages.map(fetchPageText)),
     Promise.allSettled(feeds.map((id) => fetchFeed[id]())),
     Promise.allSettled(!only || only === "opencode-zen" ? [fetchOpenCodeZen()] : []),
+    Promise.allSettled(checkFreeList ? [fetchFreeListProviders()] : []),
   ]);
   for (const [i, result] of apiResults.entries()) {
     if (result.status === "fulfilled") batches.push(result.value);
@@ -95,6 +102,21 @@ async function update(args: string[]): Promise<void> {
   if (zen) state.radarMissingSince = zen.missingSince;
   if (zenResult?.status === "rejected") failure("opencode-zen", zenResult.reason);
 
+  let radar = zen?.radar ?? previous.radar;
+  let providersAdded: RadarProvider[] = [];
+  if (freeListResult) {
+    state.freeListCheckedAt = now;
+    if (freeListResult.status === "fulfilled") {
+      const current = freeListResult.value;
+      const result = mergeProviderRadar(radar, state.freeListProviders, current, now);
+      state.freeListProviders = current;
+      radar = result.radar;
+      providersAdded = result.added;
+    } else {
+      failure("awesome-free-llm-apis", freeListResult.reason);
+    }
+  }
+
   const options = { now, ...config };
   let merged = mergeCatalog(previous.catalog, state, batches, options);
   if (!dryRun && !only && Object.keys(config.healthKeys).length) {
@@ -104,10 +126,25 @@ async function update(args: string[]): Promise<void> {
   }
   state.tracks = merged.tracks;
   const { catalog, changes } = merged;
-  const changed = await publish(previous, catalog, changes, state, dryRun, zen?.radar);
+  let benchmarks: Benchmarks | undefined;
+  if (!only || only === "benchmarks") {
+    if (!config.aaKey) console.log("Artificial Analysis пропущен: AA_API_KEY не задан.");
+    else if (shouldRefreshBenchmarks(now, previous.benchmarks?.generatedAt, state.benchmarksAttemptedAt)) {
+      // Дата попытки ограничивает расход квоты при ошибке и при ответе без изменений.
+      state.benchmarksAttemptedAt = now;
+      try {
+        benchmarks = await fetchBenchmarks(config.aaKey, catalog.models, now);
+      } catch (error) {
+        failure("Artificial Analysis", error);
+      }
+    }
+  }
+  const changed = await publish(previous, catalog, changes, state, dryRun, radar, benchmarks);
   if (config.telegram && !dryRun) {
     try {
-      if (await notifyTelegram(config.telegram, changes, catalog, zen?.added)) console.log("Telegram: отправлено одно сообщение.");
+      if (await notifyTelegram(config.telegram, changes, catalog, zen?.added, providersAdded)) {
+        console.log("Telegram: отправлено одно сообщение.");
+      }
     } catch (error) {
       failure("Telegram", error);
     }
@@ -124,8 +161,17 @@ async function update(args: string[]): Promise<void> {
     const active = zen.radar.models.filter((model) => model.active).length;
     console.log("Радар OpenCode Zen: " + active + " активных, " + zen.added.length + " новых.");
     for (const model of zen.added) console.log("  " + model.name + " (" + model.id + ")");
-    const updated = radarChanged(previous.radar, zen.radar);
-    if (updated) console.log(dryRun ? "Пробный запуск: радар изменился бы." : "Радар записан.");
+  }
+  if (freeListResult?.status === "fulfilled") {
+    console.log("Радар awesome-free-llm-apis: " + freeListResult.value.length + " провайдеров, " + providersAdded.length + " новых.");
+  }
+  if (radar && radarChanged(previous.radar, radar)) {
+    console.log(dryRun ? "Пробный запуск: радар изменился бы." : "Радар записан.");
+  }
+  if (benchmarks) {
+    const updated = benchmarksChanged(previous.benchmarks, benchmarks);
+    console.log("Artificial Analysis: моделей " + Object.keys(benchmarks.models).length + ". " +
+      (updated ? (dryRun ? "Пробный запуск: benchmarks.json изменился бы." : "benchmarks.json записан.") : "benchmarks.json не изменился."));
   }
   const added = changes.filter(({ type }) => type === "offer_added").length;
   const finished = changes.filter(({ type }) => type === "offer_ended").length;
@@ -143,10 +189,11 @@ async function update(args: string[]): Promise<void> {
 async function main(): Promise<void> {
   const [command, ...args] = process.argv.slice(2);
   if (command === "validate" && !args.length) {
-    const [catalog, radar] = await Promise.all([readCatalog(), readRadar()]);
+    const [catalog, radar, benchmarks] = await Promise.all([readCatalog(), readRadar(), readBenchmarks()]);
     if (!catalog) throw new Error("Отсутствует data/catalog.json");
     console.log("data/catalog.json соответствует схеме v" + catalog.schemaVersion + ".");
     if (radar) console.log("data/radar.json соответствует схеме v" + radar.schemaVersion + ".");
+    if (benchmarks) console.log("data/benchmarks.json соответствует схеме v" + benchmarks.schemaVersion + ".");
   } else if (command === "update") {
     await update(args);
   } else {

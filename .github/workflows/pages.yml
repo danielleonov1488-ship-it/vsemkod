@@ -10,6 +10,7 @@ on:
       - 'app/package*.json'
       - 'app/vite.web.config.ts'
       - 'catalog-bot/data/catalog.json'
+      - 'catalog-bot/data/benchmarks.json'
       - '.github/workflows/pages.yml'
   workflow_run:
     workflows: ['Update catalog']
@@ -53,6 +54,9 @@ jobs:
           done
           cp -R site/harness _site/harness
           cp catalog-bot/data/catalog.json catalog-bot/data/changes.json _site/
+          if [ -f catalog-bot/data/benchmarks.json ]; then
+            cp catalog-bot/data/benchmarks.json _site/
+          fi
           printf '%s\n' 'vsemkod.ru' > _site/CNAME
           touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@v5

@@ -1,5 +1,5 @@
 import { compare, stableJson } from "./merge.js";
-import type { Radar, RadarObservation } from "./schema.js";
+import type { FreeListProvider, Radar, RadarObservation, RadarProvider } from "./schema.js";
 
 const retentionMs = 30 * 24 * 60 * 60 * 1000;
 
@@ -28,14 +28,31 @@ export function mergeRadar(
     models.push({ ...model, active: false });
   }
   return {
-    radar: { schemaVersion: 1, generatedAt: now, models: models.sort((a, b) => compare(a.id, b.id)) },
+    radar: { ...previous, schemaVersion: 1, generatedAt: now, models: models.sort((a, b) => compare(a.id, b.id)) },
     added: added.sort((a, b) => compare(a.id, b.id)),
     missingSince: Object.fromEntries(missingSince),
   };
 }
 
+export function mergeProviderRadar(
+  previous: Radar | undefined, known: FreeListProvider[], current: FreeListProvider[], now: string,
+): { radar?: Radar; added: RadarProvider[] } {
+  if (!known.length) return { radar: previous, added: [] };
+  const names = new Set([...known, ...(previous?.providers ?? [])].map(({ name }) => name.toLowerCase()));
+  const added: RadarProvider[] = [];
+  for (const { name, section } of current) {
+    const key = name.toLowerCase();
+    if (names.has(key)) continue;
+    names.add(key);
+    added.push({ name, section, firstSeen: now, source: "awesome-free-llm-apis" });
+  }
+  if (!added.length) return { radar: previous, added };
+  const providers = [...(previous?.providers ?? []), ...added].sort((a, b) => compare(a.name, b.name));
+  return { radar: { schemaVersion: 1, generatedAt: now, models: previous?.models ?? [], providers }, added };
+}
+
 export function radarChanged(previous: Radar | undefined, next: Radar): boolean {
-  const details = ({ models }: Radar) =>
-    stableJson(models.map(({ lastSeen: _lastSeen, ...model }) => model));
+  const details = ({ models, providers = [] }: Radar) =>
+    stableJson({ models: models.map(({ lastSeen: _lastSeen, ...model }) => model), providers });
   return !previous || details(previous) !== details(next);
 }

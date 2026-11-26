@@ -5,11 +5,13 @@ import { z } from "zod";
 import { catalogChanged, compare, stableJson } from "./merge.js";
 import { radarChanged } from "./radar.js";
 import { catalogSchema, changesSchema, offerKey, radarSchema } from "./schema.js";
-import type { Catalog, Change, Radar, RadarObservation } from "./schema.js";
+import type { Catalog, Change, Radar, RadarObservation, RadarProvider } from "./schema.js";
 import { newState, stateSchema } from "./state.js";
 import type { State } from "./state.js";
 import type { Config } from "./config.js";
 import { providers } from "./registry/providers.js";
+import { benchmarksChanged, benchmarksSchema } from "./sources/artificialAnalysis.js";
+import type { Benchmarks } from "./sources/artificialAnalysis.js";
 import { request } from "./sources/common.js";
 
 const dataDir = "data";
@@ -17,6 +19,7 @@ const catalogFile = "catalog.json";
 const changesFile = "changes.json";
 const stateFile = "state.json";
 const radarFile = "radar.json";
+const benchmarksFile = "benchmarks.json";
 const pendingFile = ".pending.json";
 
 const pendingSchema = z.object({
@@ -24,6 +27,7 @@ const pendingSchema = z.object({
   changes: changesSchema.optional(),
   state: stateSchema.optional(),
   radar: radarSchema.optional(),
+  benchmarks: benchmarksSchema.optional(),
 });
 type Pending = z.infer<typeof pendingSchema>;
 
@@ -53,6 +57,7 @@ async function writePending(pending: Pending): Promise<void> {
   if (pending.changes) await writeAtomic(changesFile, pending.changes);
   if (pending.catalog) await writeAtomic(catalogFile, pending.catalog);
   if (pending.radar) await writeAtomic(radarFile, pending.radar);
+  if (pending.benchmarks) await writeAtomic(benchmarksFile, pending.benchmarks);
   if (pending.state) await writeAtomic(stateFile, pending.state);
 }
 
@@ -64,31 +69,39 @@ export async function readRadar(): Promise<Radar | undefined> {
   return read(radarFile, radarSchema);
 }
 
-export async function readPublication(dryRun: boolean): Promise<{ catalog?: Catalog; changes: Change[]; state: State; radar?: Radar }> {
+export async function readBenchmarks(): Promise<Benchmarks | undefined> {
+  return read(benchmarksFile, benchmarksSchema);
+}
+
+export async function readPublication(dryRun: boolean): Promise<{
+  catalog?: Catalog; changes: Change[]; state: State; radar?: Radar; benchmarks?: Benchmarks;
+}> {
   const pending = await read(pendingFile, pendingSchema);
   if (pending && !dryRun) {
     await writePending(pending);
     await unlink(join(dataDir, pendingFile));
   }
-  const [catalog, changes, state, radar] = await Promise.all([
+  const [catalog, changes, state, radar, benchmarks] = await Promise.all([
     pending?.catalog ?? readCatalog(),
     pending?.changes ?? read(changesFile, changesSchema),
     pending?.state ?? read(stateFile, stateSchema),
     pending?.radar ?? readRadar(),
+    pending?.benchmarks ?? readBenchmarks(),
   ]);
-  return { catalog, changes: changes ?? [], state: state ?? newState(), radar };
+  return { catalog, changes: changes ?? [], state: state ?? newState(), radar, benchmarks };
 }
 
 export async function publish(
   previous: Awaited<ReturnType<typeof readPublication>>,
   catalog: Catalog, events: Change[], state: State, dryRun: boolean,
-  radar?: Radar,
+  radar?: Radar, benchmarks?: Benchmarks,
 ): Promise<boolean> {
   const changed = catalogChanged(previous.catalog, catalog);
   if (dryRun) return changed;
   const pending: Pending = {};
   if (changed) pending.catalog = catalog;
   if (radar && radarChanged(previous.radar, radar)) pending.radar = radar;
+  if (benchmarks && benchmarksChanged(previous.benchmarks, benchmarks)) pending.benchmarks = benchmarks;
   if (events.length || !previous.catalog) {
     pending.changes = [...events, ...previous.changes].sort((a, b) =>
       Date.parse(b.date) - Date.parse(a.date) ||
@@ -113,7 +126,7 @@ export async function publish(
 
 export async function notifyTelegram(
   config: NonNullable<Config["telegram"]>, events: Change[], catalog: Catalog,
-  radarAdded: RadarObservation[] = [],
+  radarAdded: RadarObservation[] = [], providerAdded: RadarProvider[] = [],
 ): Promise<boolean> {
   const models = new Map(catalog.models.filter(({ tier }) => tier === "top").map(({ id, name }) => [id, name]));
   const active = new Set(catalog.offers.filter(({ status }) => status === "active").map(offerKey));
@@ -126,6 +139,9 @@ export async function notifyTelegram(
     lines.add(model + " бесплатно у " + providers[providerId].name);
   }
   const notices = radarAdded.map(({ name }) => "Радар: в OpenCode Zen появилась бесплатная модель " + name);
+  notices.push(...providerAdded.map(({ name, section }) =>
+    "Новый бесплатный провайдер в awesome-free-llm-apis: " + name +
+    (section === "provider_api" ? " (разработчик моделей)" : " (инференс-провайдер)")));
   if (lines.size) notices.unshift(lines.size === 1
     ? "🦛 Новая раздача: " + [...lines][0] + ". Подключить — в vsemkod"
     : "🦛 Новые раздачи\n" + [...lines].map((line) => "• " + line).join("\n").slice(0, 3700) + "\nПодключить — в vsemkod");

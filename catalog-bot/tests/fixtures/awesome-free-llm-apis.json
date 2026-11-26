@@ -1,0 +1,69 @@
+{
+  "lastUpdated": "2026-11-15",
+  "providers": [
+    {
+      "name": "Cohere",
+      "category": "provider_api",
+      "url": "https://dashboard.cohere.com/api-keys",
+      "baseUrl": "https://api.cohere.com/v2",
+      "models": [
+        {
+          "id": "command-a-plus-05-2026",
+          "name": "Command A+ (218B)",
+          "context": "128K",
+          "maxOutput": "64K",
+          "modality": "Text + Image",
+          "rateLimit": "20 RPM"
+        }
+      ]
+    },
+    {
+      "name": "Google Gemini",
+      "category": "provider_api",
+      "url": "https://aistudio.google.com/app/apikey",
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta",
+      "models": [
+        {
+          "id": "gemini-3.8-flash",
+          "name": "Gemini 3.8 Flash",
+          "context": "1M",
+          "maxOutput": "65K",
+          "modality": "Text + Image + Audio + Video",
+          "rateLimit": "—"
+        }
+      ]
+    },
+    {
+      "name": "Groq",
+      "category": "inference_provider",
+      "url": "https://console.groq.com/keys",
+      "baseUrl": "https://api.groq.com/openai/v1",
+      "models": [
+        {
+          "id": "openai/gpt-oss-120b",
+          "name": "openai/gpt-oss-120b",
+          "context": "131K",
+          "maxOutput": "65K",
+          "modality": "Text",
+          "rateLimit": "30 RPM, 1,000 RPD, 8,000 TPM, 200,000 TPD"
+        }
+      ]
+    },
+    {
+      "name": "OpenRouter",
+      "category": "inference_provider",
+      "url": "https://openrouter.ai/keys",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "models": [
+        {
+          "id": "google/gemma-4-26b-a4b-it:free",
+          "name": "google/gemma-4-26b-a4b-it:free",
+          "context": "262K",
+          "maxOutput": "32K",
+          "modality": "Text + Image + Video",
+          "rateLimit": "20 RPM, 50 RPD"
+        }
+      ]
+    }
+  ]
+}

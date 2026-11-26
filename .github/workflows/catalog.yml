@@ -40,6 +40,7 @@ jobs:
           LLM_MODEL: ${{ vars.LLM_MODEL }}
           LLM_MAX_TOKENS_PER_RUN: ${{ vars.LLM_MAX_TOKENS_PER_RUN }}
           NUMES_API_KEY: ${{ secrets.NUMES_API_KEY }}
+          AA_API_KEY: ${{ secrets.AA_API_KEY }}
           OFFER_MISSING_RUNS: ${{ vars.OFFER_MISSING_RUNS }}
           OFFER_ENDED_RETENTION_DAYS: ${{ vars.OFFER_ENDED_RETENTION_DAYS }}
           HEALTH_INTERVAL_HOURS: ${{ vars.HEALTH_INTERVAL_HOURS }}

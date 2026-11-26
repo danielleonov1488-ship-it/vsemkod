@@ -1,0 +1,46 @@
+{
+  "tier": "free",
+  "intelligence_index_version": 5,
+  "pagination": {
+    "page": 1,
+    "page_size": 200,
+    "total_pages": 2,
+    "has_more": true
+  },
+  "data": [
+    {
+      "id": "cd684ea4-b475-4269-b001-d469d06d8a7a",
+      "name": "GLM-5.3 (Max)",
+      "slug": "glm-5-3",
+      "release_date": "2026-08-18",
+      "model_creator": {
+        "id": "67437eb6-7dc1-4e93-befd-22c8b8ec2065",
+        "name": "Z AI"
+      },
+      "evaluations": {
+        "artificial_analysis_intelligence_index": 31.7,
+        "artificial_analysis_coding_index": null
+      },
+      "performance": {
+        "median_output_tokens_per_second": 80.07,
+        "median_time_to_first_token_seconds": 2.22
+      },
+      "performance_v3": {
+        "mean_output_tokens_per_second": 62.36,
+        "mean_time_to_first_token_seconds": 3.45,
+        "mean_time_to_first_answer_token_seconds": 79.11
+      }
+    },
+    {
+      "name": "gpt-oss-120b (low)",
+      "slug": "gpt-oss-120b-low",
+      "evaluations": {
+        "artificial_analysis_intelligence_index": 62.11
+      },
+      "performance_v3": {
+        "mean_output_tokens_per_second": 233.02,
+        "mean_time_to_first_token_seconds": 0.2
+      }
+    }
+  ]
+}

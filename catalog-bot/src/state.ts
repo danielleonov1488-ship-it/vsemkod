@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { dateSchema } from "./schema.js";
+import { dateSchema, freeListProviderSchema } from "./schema.js";
 import { observationSchema } from "./sources/common.js";
 
 export const healthStateSchema = z.object({
@@ -38,6 +38,9 @@ export const stateSchema = z.object({
   llmCache: z.record(z.string(), cachedSchema),
   tracks: z.record(z.string(), trackSchema),
   radarMissingSince: z.record(z.string(), dateSchema).default({}),
+  freeListProviders: z.array(freeListProviderSchema).default([]),
+  freeListCheckedAt: dateSchema.optional(),
+  benchmarksAttemptedAt: dateSchema.optional(),
 });
 
 export type HealthState = z.infer<typeof healthStateSchema>;
@@ -45,7 +48,10 @@ export type Track = z.infer<typeof trackSchema>;
 export type State = z.infer<typeof stateSchema>;
 
 export function newState(): State {
-  return { version: 1, pages: {}, pageChecks: {}, seenNews: {}, llmCache: {}, tracks: {}, radarMissingSince: {} };
+  return {
+    version: 1, pages: {}, pageChecks: {}, seenNews: {}, llmCache: {}, tracks: {},
+    radarMissingSince: {}, freeListProviders: [],
+  };
 }
 
 const day = 24 * 60 * 60 * 1000;
