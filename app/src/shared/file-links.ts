@@ -35,3 +35,31 @@ export function textFileReferences(text: string) {
     return ref ? [{ ...ref, start: match.index, end: match.index + token.length }] : [];
   });
 }
+
+/** Ссылка в ответе агента на локальный файл: file:///G:/…, G:\…, /home/…, src/app.ts#L12. Веб-адреса — undefined. */
+export function linkFileReference(href: string): FileReference | undefined {
+  let value = href.trim();
+  if (/^file:/i.test(value)) {
+    let url: URL;
+    try { url = new URL(value); } catch { return; }
+    if (url.host && url.host !== "localhost") return;
+    value = url.pathname + url.hash;
+  } else if (/^[a-z][a-z\d+.-]*:/i.test(value) && !/^[a-z]:(?:[\\/]|%5c)/i.test(value)) return;
+  const hash = /#L?(\d+)(?:-L?\d+)?$/i.exec(value);
+  value = value.slice(0, hash ? hash.index : undefined).replace(/[?#].*$/, "");
+  try { value = decodeURIComponent(value); } catch { return; }
+  if (/^\/[a-z]:[\\/]/i.test(value)) value = value.slice(1);
+  const reference = fileReference(value);
+  const line = hash ? Number(hash[1]) : undefined;
+  return reference && !reference.line && line && Number.isSafeInteger(line) ? { ...reference, line } : reference;
+}
+
+/** Файлы, на которые ответ ссылается обычными ссылками [текст](путь). Картинки ![…](…) показываются в тексте и сюда не входят. */
+export function linkedFiles(markdown: string): FileReference[] {
+  const found = new Map<string, FileReference>();
+  for (const match of markdown.matchAll(/(!?)\[[^\]\n]*\]\(\s*(?:<([^>\n]+)>|([^\s)]+))/g)) {
+    const reference = match[1] ? undefined : linkFileReference(match[2] ?? match[3]);
+    if (reference) found.set(reference.path.replaceAll("\\", "/").toLowerCase(), reference);
+  }
+  return [...found.values()];
+}

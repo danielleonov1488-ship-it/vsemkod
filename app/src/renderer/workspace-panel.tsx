@@ -4,7 +4,7 @@ import "@xterm/xterm/css/xterm.css";
 import type { BackgroundTask, ChatPart, FileChange, ProjectEntry } from "../shared/api";
 import { Delta, Diff } from "./chat";
 import type { FileReference } from "../shared/file-links";
-import { Preview } from "./chat-files";
+import { Preview, useFileMenu, type ChatFiles } from "./chat-files";
 import { Icon } from "./icons";
 import { BrowserPanel } from "./browser-panel";
 import { findLocalUrls, projectFileUrl } from "../shared/browser";
@@ -13,9 +13,10 @@ import { BackgroundTasks } from "./background-tasks";
 
 const api = window.vsemkod;
 
-function Files({ directory, path, select, onError }: {
-  directory: string; path?: string; select: (path: string) => void; onError: (error: unknown) => void;
+function Files({ directory, path, select, onError, files }: {
+  directory: string; path?: string; select: (path: string) => void; onError: (error: unknown) => void; files: ChatFiles;
 }) {
+  const menu = useFileMenu(files);
   const [entries, setEntries] = useState<ProjectEntry[]>();
   const [open, setOpen] = useState<string[]>([]);
   useEffect(() => {
@@ -27,18 +28,19 @@ function Files({ directory, path, select, onError }: {
   }, [directory, path, onError]);
   if (!entries) return <p className="subtle panel-empty">Загружаем файлы…</p>;
   if (!entries.length && !path) return <p className="subtle panel-empty">В папке пока нет файлов.</p>;
-  return <ul className="file-tree">{entries.map(entry => {
+  return <><ul className="file-tree">{entries.map(entry => {
     const folder = entry.type === "directory";
     const expanded = open.includes(entry.path);
     return <li key={entry.path}>
       <button className="sidebar-row tree-row" type="button" aria-expanded={folder ? expanded : undefined} title={entry.path}
-        onClick={() => folder ? setOpen(items => expanded ? items.filter(item => item !== entry.path) : [...items, entry.path]) : select(entry.path)}>
+        onClick={() => folder ? setOpen(items => expanded ? items.filter(item => item !== entry.path) : [...items, entry.path]) : select(entry.path)}
+        onContextMenu={folder ? undefined : event => menu.open(event, { path: entry.path })}>
         <Icon name={folder ? "folder" : "file"} /><span>{entry.path.split(/[\\/]/).at(-1)}</span>
         {folder && <Icon name="chevron" />}
       </button>
-      {folder && expanded && <Files directory={directory} path={entry.path} select={select} onError={onError} />}
+      {folder && expanded && <Files directory={directory} path={entry.path} select={select} onError={onError} files={files} />}
     </li>;
-  })}</ul>;
+  })}</ul>{menu.menu}</>;
 }
 
 function LocalLinks({ urls, open }: { urls: string[]; open: (url: string) => void }) {
@@ -248,7 +250,8 @@ export function WorkspacePanel({ directory, tab, tabs, setTab, closeTab, menuOpe
         <button type="button" className="composer-control" disabled={busy} onClick={() => revert(change.file)}>Отменить изменения файла</button>
       </details>) : <p className="subtle panel-empty">В этом чате пока нет изменений.</p>}
     </section>}
-    {tab === "files" && <section className="panel-body"><Files key={directory} directory={directory} select={path => api.filePreview ? openPreview({ path }) : setSelected(path)} onError={onError} />
+    {tab === "files" && <section className="panel-body"><Files key={directory} directory={directory} select={path => api.filePreview ? openPreview({ path }) : setSelected(path)} onError={onError}
+      files={{ directory, stat: path => api.fileStat?.(directory, path), preview: openPreview, onError, openBrowser }} />
       {selected && <details className="file-preview" open key={selected}><summary>{selected}</summary><pre>{fileError || content || (!fileError && content === "" ? "Пустой файл" : "Открываем файл…")}</pre></details>}
     </section>}
     {tab === "preview" && <Preview directory={directory} reference={preview} onError={onError} />}

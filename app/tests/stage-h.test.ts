@@ -95,6 +95,31 @@ describe("ключ для мастера подключений", () => {
   });
 });
 
+describe("ссылки агента на файлы", () => {
+  it("понимает file://, пути Windows, закодированные пути и номера строк", async () => {
+    const { linkFileReference } = await import("../src/shared/file-links");
+    expect(linkFileReference("file:///G:/vsemkod/pelican-bicycle-02.svg")).toEqual({ path: "G:/vsemkod/pelican-bicycle-02.svg" });
+    expect(linkFileReference("G:%5Cvsemkod%5Cpelican.svg")).toEqual({ path: "G:\\vsemkod\\pelican.svg" });
+    expect(linkFileReference("G:\\vsemkod\\pelican.svg")).toEqual({ path: "G:\\vsemkod\\pelican.svg" });
+    expect(linkFileReference("/G:/%D0%BF%D0%B5%D0%BB%D0%B8%D0%BA%D0%B0%D0%BD%202.svg")).toEqual({ path: "G:/пеликан 2.svg" });
+    expect(linkFileReference("src/app.ts#L12")).toEqual({ path: "src/app.ts", line: 12 });
+    expect(linkFileReference("src/app.ts:7")).toEqual({ path: "src/app.ts", line: 7 });
+    expect(linkFileReference("file:///home/me/site/index.html")).toEqual({ path: "/home/me/site/index.html" });
+  });
+  it("не трогает веб-адреса и якоря", async () => {
+    const { linkFileReference } = await import("../src/shared/file-links");
+    for (const href of ["https://vsemkod.ru/app.js", "http://localhost:5173/index.html", "mailto:a@b.ru", "#faq", "", "file://server/share/a.txt", "javascript:alert(1)", "sandbox:/mnt/data/a.svg"]) {
+      expect(linkFileReference(href)).toBeUndefined();
+    }
+  });
+  it("собирает ссылки для карточек, кроме картинок", async () => {
+    const { linkedFiles } = await import("../src/shared/file-links");
+    const text = "[Открыть SVG «Попутный ветер»](file:///G:/vsemkod/pelican-bicycle-02.svg) и ![превью](pelican.png), " +
+      "[сайт](https://vsemkod.ru/x.html), [ещё раз](<G:/vsemkod/pelican-bicycle-02.svg>)";
+    expect(linkedFiles(text)).toEqual([{ path: "G:/vsemkod/pelican-bicycle-02.svg" }]);
+  });
+});
+
 describe("значок в трее", () => {
   it("пишет состояние агента и фоновых задач по-русски", async () => {
     const { trayStatus } = await import("../src/main/tray-status");

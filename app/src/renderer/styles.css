@@ -496,8 +496,17 @@ select.field-control { cursor: pointer; }
 .file-chip small { max-width: 130px; font-size: 11px; }
 .file-chip-more { flex: none; padding: 0 3px; margin-left: 1px; color: var(--secondary); }
 .file-chip:hover, .file-chip-more:hover { background: var(--mint-hover); }
-.file-chip-menu.model-panel { top: calc(100% + 4px); bottom: auto; right: auto; left: 0; width: 177px; padding: 4px; z-index: 5; }
-.file-chip-menu .model-option { min-height: 29px; font-size: 12px; }
+.file-menu.model-panel { position: fixed; z-index: 40; right: auto; bottom: auto; width: max-content; min-width: 196px; max-width: min(300px, calc(100vw - 16px)); padding: 4px; }
+.file-menu .model-option { min-height: 29px; padding: 4px 9px; font-size: 12px; white-space: nowrap; }
+.file-menu .model-option:focus-visible { outline: none; background: var(--mint-hover); }
+.file-menu-separator { height: 1px; margin: 4px 2px; border: 0; background: var(--line); }
+.file-link { cursor: pointer; }
+.inline-image { display: inline-block; max-width: 100%; margin: 6px 0; padding: 0; vertical-align: top; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.inline-image img { display: block; width: auto; height: auto; max-width: min(100%, 420px); max-height: 320px; }
+.inline-image > span { display: block; padding: 24px 32px; font-size: 12px; }
+.turn-files:not(:has(.turn-file)) { display: none; }
+.turn-file-actions .turn-file-more { padding-inline: 4px; color: var(--secondary); }
+.turn-file-more .icon { width: 13px; height: 13px; }
 .turn-files { max-width: 100%; margin-top: 12px; }
 .turn-files h2 { margin: 0 0 6px; color: var(--secondary); font-size: 12px; font-weight: 500; }
 .turn-files > ul { display: grid; justify-items: start; gap: 6px; margin-bottom: 4px; }

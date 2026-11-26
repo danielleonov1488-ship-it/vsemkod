@@ -5,8 +5,8 @@ import { createContext, memo, useCallback, useContext, useEffect, useRef, useSta
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { ChatPart, FileChange, FileInfo, Permission, PermissionDecision, Question, QuestionAnswer } from "../shared/api";
-import { fileReference, textFileReferences, type FileReference } from "../shared/file-links";
-import { FileChip, TurnFiles, type ChatFiles } from "./chat-files";
+import { fileReference, linkedFiles, linkFileReference, textFileReferences, type FileReference } from "../shared/file-links";
+import { FileChip, FileLink, LocalImage, TurnFiles, type ChatFiles } from "./chat-files";
 import { Icon } from "./icons";
 import { modelWaitState } from "../shared/model-wait";
 import { chatStatusLabel, duration, groupTurns, turnContent, type ChatStatus } from "./turns";
@@ -188,10 +188,25 @@ function CodeText({ children, className, files }: { children: ReactNode; classNa
   return reference ? <FileChip files={files} reference={reference}>{fallback}</FileChip> : fallback;
 }
 
+// Как стандартный фильтр адресов react-markdown, но пропускает ссылки на файлы проекта (file:///…, G:\…, src/a.ts).
+// Свой, а не defaultUrlTransform: веб-копия подгружает react-markdown лениво и не может импортировать из него напрямую.
+function keepFileUrls(url: string) {
+  if (window.vsemkod.fileStat && linkFileReference(url)) return url;
+  const colon = url.indexOf(":");
+  const boundary = url.search(/[/?#]/);
+  return colon === -1 || (boundary !== -1 && colon > boundary) || /^(?:https?|ircs?|mailto|xmpp)$/i.test(url.slice(0, colon)) ? url : "";
+}
+
 const AgentText = memo(function AgentText({ text, files }: { text: string; files: ChatFiles }) {
   return <div className="agent-text"><Markdown remarkPlugins={[remarkGfm]} rehypePlugins={window.vsemkod.fileStat ? [markFilePaths] : []}
-    disallowedElements={["img"]} components={{
+    urlTransform={keepFileUrls} components={{
+      img: ({ src, alt }) => {
+        const reference = typeof src === "string" && window.vsemkod.fileStat ? linkFileReference(src) : undefined;
+        return reference ? <LocalImage files={files} reference={reference} alt={alt} /> : null;
+      },
       a: ({ href, children }) => {
+        const reference = href && window.vsemkod.fileStat ? linkFileReference(href) : undefined;
+        if (reference) return <FileLink files={files} reference={reference}>{children}</FileLink>;
         const address = href && URL.parse(href);
         const local = address && findLocalUrls(address.href).includes(address.href) ? address.href : undefined;
         return <><a className="text-link" href={href} onClick={event => external(event, href)}>{children}</a>
@@ -353,7 +368,7 @@ export function Chat({ title, parts, permissions, questions, busy, answer, answe
                 <button type="button" className="text-link" onClick={chooseModel}>Сменить модель</button>
               </div>}
               {content.answer.map(part => <AgentText key={part.id} text={part.text} files={fileLinks} />)}
-              {(!busy || !last) && <TurnFiles changes={turnChanges(agent, end?.files)} files={fileLinks} />}
+              {(!busy || !last) && <TurnFiles changes={turnChanges(agent, end?.files)} linked={linkedFiles(response)} files={fileLinks} />}
               {response && (!busy || !last) && <div className="message-actions">
                 <button type="button" className="composer-control" onClick={() => copy(response)}>Копировать</button>
                 {user && <button type="button" className="composer-control" disabled={busy} onClick={() => retry(user)}>Повторить</button>}
