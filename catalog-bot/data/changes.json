@@ -1,5 +1,45 @@
 [
   {
+    "date": "2026-11-26T03:04:04.312Z",
+    "modelId": "deepseek-v4.1-flash",
+    "providerId": "runcrate",
+    "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+    "text": "Условия раздачи DeepSeek V4.1 Flash у Runcrate изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-26T03:04:04.312Z",
+    "modelId": "glm-5.3",
+    "providerId": "runcrate",
+    "providerModelId": "zai-org/GLM-5.3",
+    "text": "Условия раздачи GLM 5.3 у Runcrate изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-26T03:04:04.312Z",
+    "modelId": "glm-5.3-flash",
+    "providerId": "runcrate",
+    "providerModelId": "zai-org/GLM-5.3-Flash",
+    "text": "Условия раздачи GLM 5.3 Flash у Runcrate изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-26T03:04:04.312Z",
+    "modelId": "gpt-oss-120b",
+    "providerId": "runcrate",
+    "providerModelId": "openai/gpt-oss-120b",
+    "text": "Условия раздачи gpt-oss-120b у Runcrate изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-26T03:04:04.312Z",
+    "modelId": "qwen3.8-flash",
+    "providerId": "runcrate",
+    "providerModelId": "Qwen/Qwen3.8-Flash",
+    "text": "Условия раздачи Qwen3.8 Flash у Runcrate изменились",
+    "type": "offer_changed"
+  },
+  {
     "date": "2026-11-25T14:01:23.871Z",
     "modelId": "ampersand-v0.1",
     "providerId": "kilo",
