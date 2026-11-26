@@ -1,4 +1,5 @@
 {
+  "benchmarksAttemptedAt": "2026-11-26T07:20:05.075Z",
   "freeListCheckedAt": "2026-11-26T07:15:32.656Z",
   "freeListProviders": [
     {
@@ -1900,7 +1901,7 @@
     "groq:qwen/qwen3.8-27b": {
       "evidence": {
         "github": {
-          "missedRuns": 4,
+          "missedRuns": 5,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -1953,9 +1954,10 @@
       }
     },
     "kilo:dots-studio/dots-3-note-preview:free": {
+      "endedAt": "2026-11-26T07:20:05.075Z",
       "evidence": {
         "kilo": {
-          "missedRuns": 5,
+          "missedRuns": 6,
           "observation": {
             "confidence": "structured",
             "contextWindow": 512000,
@@ -2334,7 +2336,7 @@
     "modelscope:API-Inference": {
       "evidence": {
         "github": {
-          "missedRuns": 4,
+          "missedRuns": 5,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -2709,9 +2711,10 @@
       }
     },
     "openrouter:dots-studio/dots-3-note-preview:free": {
+      "endedAt": "2026-11-26T07:20:05.075Z",
       "evidence": {
         "openrouter": {
-          "missedRuns": 5,
+          "missedRuns": 6,
           "observation": {
             "confidence": "structured",
             "contextWindow": 512000,
@@ -3120,7 +3123,7 @@
     "runcrate:five open models": {
       "evidence": {
         "github": {
-          "missedRuns": 4,
+          "missedRuns": 5,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
@@ -3267,7 +3270,7 @@
     "zai:free models": {
       "evidence": {
         "github": {
-          "missedRuns": 4,
+          "missedRuns": 5,
           "observation": {
             "confidence": "news",
             "expiresAt": null,

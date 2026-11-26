@@ -1,5 +1,21 @@
 [
   {
+    "date": "2026-11-26T07:20:05.075Z",
+    "modelId": "dots-3-note-preview",
+    "providerId": "kilo",
+    "providerModelId": "dots-studio/dots-3-note-preview:free",
+    "text": "Раздача Dots 3 Note Preview у Kilo Gateway закончилась",
+    "type": "offer_ended"
+  },
+  {
+    "date": "2026-11-26T07:20:05.075Z",
+    "modelId": "dots-3-note-preview",
+    "providerId": "openrouter",
+    "providerModelId": "dots-studio/dots-3-note-preview:free",
+    "text": "Раздача Dots 3 Note Preview у OpenRouter закончилась",
+    "type": "offer_ended"
+  },
+  {
     "date": "2026-11-26T03:04:04.312Z",
     "modelId": "deepseek-v4.1-flash",
     "providerId": "runcrate",
