@@ -1,3 +1,4 @@
+import type { Benchmarks } from "./benchmarks";
 import type { VoiceApi } from "./voice";
 import type { z } from "zod";
 import type { FormInfo } from "@opencode/client";
@@ -14,10 +15,12 @@ export type FileChange = { file: string; patch: string; additions: number; delet
 export type ChatPart =
   | { id: string; kind: "user" | "text"; text: string; files?: string[] }
   | { id: string; kind: "reasoning" | "note"; text: string; seconds?: number }
-  | { id: string; kind: "turn"; seconds: number; stopped?: boolean }
+  | { id: string; kind: "turn"; seconds: number; stopped?: boolean; files?: FileChange[] }
   | { id: string; kind: "tool"; tool: string; target: string; status: "running" | "completed" | "error"; diffs?: FileChange[]; output?: string; todos?: { content: string; status: string }[]; diff?: FileChange };
 
 export type ChatEvent =
+  | { type: "turn-status"; sessionId: string; status: "queued" | "working" }
+  | { type: "reply-speed"; sessionId: string; speed: ReplySpeed; live?: boolean; modelSpeed?: ModelSpeed }
   | { type: "part"; sessionId: string; part: ChatPart }
   | { type: "delta"; sessionId: string; partId: string; delta: string; kind?: "text" | "reasoning" }
   | { type: "model-wait"; sessionId: string; since: number | null }
@@ -33,10 +36,14 @@ export type ChatEvent =
 export type Preferences = z.infer<typeof preferencesSchema>;
 export type Attachment = { id: string; name: string; image: boolean; preview?: string };
 export type TurnOptions = { access?: AccessMode; variant?: string; compact?: boolean; replayMessageId?: string; command?: { name: string; args: string }; skill?: string };
-export type ChatHistory = { parts: ChatPart[]; changes: FileChange[]; reverted?: boolean; usage?: Usage };
+export type ChatHistory = { parts: ChatPart[]; changes: FileChange[]; reverted?: boolean; usage?: Usage; speed?: ReplySpeed };
 export type Usage = { input: number; output: number; reasoning: number; cache: { read: number; write: number }; context?: number;
   breakdown?: { system: number; tools: number; messages: number } };
-export type ReplySpeed = { tokensPerSecond: number; firstTokenMs: number };
+export type ReplySpeed = { tokensPerSecond: number; firstTokenMs: number; estimated?: boolean };
+export type ModelSpeed = { modelId: string; providerId: KeyId | NativeId; tokensPerSecond: number };
+export type FileInfo = { path: string; relativePath: string; name: string; directory: string; image: boolean; svg: boolean; html: boolean; canOpen: boolean };
+export type FilePreview = { info: FileInfo; image?: string; text?: string; truncated?: boolean };
+export type FileAction = "open" | "reveal" | "browser";
 export type QuotaPeriod = "hour" | "day" | "minute";
 export type RequestQuota = { limit: number; remaining: number; resetAt?: number; period?: QuotaPeriod; source: "headers" | "local" };
 export type KeyCredits = { usage: number; limit: number | null; remaining?: number | null; isFreeTier: boolean };
@@ -67,15 +74,20 @@ export type ModelLatency = { modelId: string; providerId: KeyId; averageMs: numb
 
 export type CatalogState = {
   catalog: Catalog; connected: ProviderId[]; personal: PersonalId[]; subscriptions: SubscriptionId[];
-  personalModels: PersonalModel[]; zenModels: PersonalModel[]; latencies?: ModelLatency[]; customProviderUrl?: string;
+  personalModels: PersonalModel[]; zenModels: PersonalModel[]; latencies?: ModelLatency[]; speeds?: ModelSpeed[]; benchmarks?: Benchmarks; customProviderUrl?: string;
 };
 export type Notice = { text: string; tone?: "error"; connect?: { modelId: string; providerId: ProviderId } };
 export type UpdateReady = { version: string; action: "restart" | "download" };
 export type UpdateCheck = UpdateReady | "disabled" | "current" | "downloading";
-export type InitialState = CatalogState & { projects?: string[]; preferences: Preferences; version: string; update?: UpdateReady };
+export type InitialState = CatalogState & { projects?: string[]; hiddenProjects?: string[]; preferences: Preferences; version: string; update?: UpdateReady };
 
 export interface DesktopApi {
   voice?: VoiceApi;
+  fileStat?(directory: string, path: string): Promise<FileInfo | null>;
+  filePreview?(directory: string, path: string): Promise<FilePreview>;
+  fileAction?(directory: string, path: string, action: FileAction): Promise<void>;
+  projectOpen?(directory: string): Promise<void>;
+  projectRemove?(directory: string): Promise<void>;
   routerStats?(): Promise<RouterStats>;
   onRouterStats?(listener: (stats: RouterStats) => void): () => void;
   onDemoQuota?(listener: (remaining?: number) => void): () => void;

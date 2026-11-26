@@ -8,12 +8,13 @@ import { z } from "zod";
 import { rankedModels } from "../../shared/catalog";
 import type { Catalog } from "../../shared/catalog-schema";
 import type { ChatEvent, ChatPart, FileChange, Permission, PermissionDecision, TurnOptions } from "../../shared/api";
-import type { PersonalModel } from "../../shared/providers";
+import { nativeIdSchema, type PersonalModel } from "../../shared/providers";
 import type { Router } from "../router";
 import { readJson, writeJson } from "../storage";
 import { applyFileChanges } from "./revert-files";
 import { sessionAccess } from "./access";
 import { EngineAdapter, type EngineModel } from "./adapter";
+import { TurnQueue } from "./turn-queue";
 
 const changeSchema = z.object({
   file: z.string(), patch: z.string(), additions: z.number(), deletions: z.number(),
@@ -55,12 +56,11 @@ export class EngineService {
   private child?: ChildProcess;
   private client?: EngineAdapter;
   private starting?: Promise<EngineAdapter>;
-  private active?: string;
-  private stopRequested = false;
+  private queue = new TurnQueue();
+  private active = new Map<string, { stopRequested: boolean; pending: Map<string, Permission>; approvals: Approval[]; saves: Promise<unknown> }>();
   private catalogVersion?: string;
+  private configuredModels = new Set<string>();
   private authorizing = 0;
-  private pendingPermissions = new Map<string, Permission>();
-  private approvals: Approval[] = [];
 
   constructor(
     private readonly executable: string,
@@ -73,7 +73,7 @@ export class EngineService {
   ) {}
 
   async ready(): Promise<EngineAdapter> {
-    if (this.client && (this.active || this.authorizing || this.catalogVersion === this.configVersion(this.catalog(), this.personalModels()))) return this.client;
+    if (this.client && (this.active.size || this.authorizing || this.catalogVersion === this.configVersion(this.catalog(), this.personalModels()))) return this.client;
     if (this.starting) return this.starting;
     this.starting = this.launch().finally(() => { this.starting = undefined; });
     return this.starting;
@@ -87,11 +87,13 @@ export class EngineService {
   }
 
   async send(sessionId: string, directory: string, text: string, modelId: string, auto: boolean, files: string[], native?: EngineModel, options: TurnOptions = {}) {
-    if (this.active) throw new Error("Агент уже отвечает в другом запросе.");
+    if (!await this.queue.acquire(sessionId, () => this.emit({ type: "turn-status", sessionId, status: "queued" }))) {
+      return { changes: (await this.history(sessionId, directory)).changes, stopped: true };
+    }
     const startup = this.ready();
-    this.active = sessionId;
-    this.stopRequested = false;
-    this.router.setTurn({ sessionId, auto });
+    const turn = { stopRequested: false, pending: new Map<string, Permission>(), approvals: [] as Approval[], saves: Promise.resolve() as Promise<unknown> };
+    this.active.set(sessionId, turn);
+    this.emit({ type: "turn-status", sessionId, status: "working" });
     const path = this.sessionFile(sessionId, "diffs");
     let diffs: Record<string, FileChange[]> = {};
     let changed = false;
@@ -99,36 +101,51 @@ export class EngineService {
       const [client, previousDiffs, approvals] = await Promise.all([startup, readJson(path, diffsSchema),
         readJson(this.sessionFile(sessionId, "approvals"), approvalsSchema)]);
       diffs = previousDiffs ?? {};
-      this.approvals = approvals ?? [];
-      if (this.stopRequested) return { changes: (await this.history(sessionId, directory)).changes, stopped: true };
-      const result = await client.send(sessionId, directory, text, native ?? { id: modelId, providerID: "vsemkod" }, files, event => {
+      turn.approvals = approvals ?? [];
+      if (turn.stopRequested) return { changes: (await this.history(sessionId, directory)).changes, stopped: true };
+      const lastUser = (await client.history(sessionId, directory, diffs)).parts.findLast(part => part.kind === "user");
+      const nativeProvider = nativeIdSchema.safeParse(native?.providerID);
+      const needsRelay = !native && modelId !== "auto" && !this.configuredModels.has(modelId);
+      this.router.setTurn({ sessionId, auto, preferredModel: needsRelay ? modelId : undefined });
+      const result = await client.send(sessionId, directory, text, native ?? { id: needsRelay ? "relay" : modelId, providerID: "vsemkod" }, files, event => {
         if (event.type === "permission") {
           const permission = event.permission;
-          this.pendingPermissions.set(permission.id, permission);
+          turn.pending.set(permission.id, permission);
           const allowed = permission.resources.length > 0 && permission.resources.every(resource =>
-            this.approvals.some(approval => approval.action === permission.action && approval.patterns.some(pattern => matches(pattern, resource))));
+            turn.approvals.some(approval => approval.action === permission.action && approval.patterns.some(pattern => matches(pattern, resource))));
           if (allowed) {
             void client.answer(sessionId, permission.id, "once").catch(() => {
-              if (this.pendingPermissions.has(permission.id)) this.emit(event);
+              if (turn.pending.has(permission.id)) this.emit(event);
             });
             return;
           }
         }
-        if (event.type === "permission-resolved") this.pendingPermissions.delete(event.id);
+        if (event.type === "permission-resolved") turn.pending.delete(event.id);
         if (event.type === "part" && event.part.kind === "tool" && event.part.diff) {
           diffs[event.part.id] = event.part.diffs ?? [event.part.diff];
           changed = true;
         }
         this.emit(event);
-      }, () => this.stopRequested, { ...options, webSearch: this.settings().webSearch, routerError: () => this.router.turnError(sessionId) });
+      }, () => turn.stopRequested, { ...options, displayModelId: needsRelay ? modelId : undefined, webSearch: this.settings().webSearch, routerError: () => this.router.turnError(sessionId),
+        nativeSpeed: nativeProvider.success ? (speed, live) => this.router.reportSpeed(sessionId, modelId, nativeProvider.data, speed, live) : undefined });
+      const history = await client.history(sessionId, directory, diffs);
+      const user = history.parts.findLast(part => part.kind === "user");
+      const end = history.parts.at(-1);
+      if (user && user.id !== lastUser?.id && end?.kind === "turn") {
+        const nativeChanges = await client.changes(sessionId, user.id);
+        const turnFiles = new Map([...result.artifacts, ...nativeChanges].map(change => [change.file.replaceAll("\\", "/"), change]));
+        if (turnFiles.size) { diffs["turn:" + user.id] = [...turnFiles.values()]; changed = true; }
+      }
       if (changed) { await writeJson(path, diffs); changed = false; }
-      const history = await this.history(sessionId, directory);
+      const reverted = await readJson(this.sessionFile(sessionId, "file-reverts"), z.record(z.string(), z.string()));
+      if (reverted) history.changes = history.changes.filter(change => reverted[change.file] !== change.patch);
       return { changes: history.changes, stopped: result.stopped };
     } finally {
       if (changed) await writeJson(path, diffs).catch(() => {});
-      this.active = undefined;
-      this.router.setTurn();
-      this.pendingPermissions.clear();
+      await turn.saves;
+      this.active.delete(sessionId);
+      this.router.clearTurn(sessionId);
+      this.queue.release(sessionId);
     }
   }
 
@@ -148,7 +165,7 @@ export class EngineService {
   }
 
   async revert(sessionId: string, directory: string, messageId?: string) {
-    if (this.active === sessionId) throw new Error("Сначала остановите агента.");
+    if (this.queue.has(sessionId)) throw new Error("Сначала остановите агента.");
     const client = await this.ready();
     const diffs = await readJson(this.sessionFile(sessionId, "diffs"), diffsSchema);
     const visible = await client.history(sessionId, directory, diffs);
@@ -168,7 +185,7 @@ export class EngineService {
   }
 
   async revertFile(sessionId: string, directory: string, file: string) {
-    if (this.active === sessionId) throw new Error("Сначала остановите агента.");
+    if (this.queue.has(sessionId)) throw new Error("Сначала остановите агента.");
     const client = await this.ready();
     const path = this.sessionFile(sessionId, "diffs");
     const diffs = await readJson(path, diffsSchema) ?? {};
@@ -194,24 +211,35 @@ export class EngineService {
   }
 
   async answer(sessionId: string, id: string, decision: PermissionDecision) {
-    const permission = this.pendingPermissions.get(id);
-    if (!this.client || this.active !== sessionId || !permission) {
+    const turn = this.active.get(sessionId);
+    const permission = turn?.pending.get(id);
+    if (!this.client || !turn || !permission) {
       throw new Error("Запрос разрешения уже закрыт.");
     }
     if (decision === "always") {
       const patterns = permission.save?.length ? permission.save : permission.resources;
-      const approvals = [...this.approvals, { action: permission.action, patterns }];
-      await writeJson(this.sessionFile(sessionId, "approvals"), approvals);
-      this.approvals = approvals;
+      const write = turn.saves.then(async () => {
+        const approvals = [...turn.approvals, { action: permission.action, patterns }];
+        await writeJson(this.sessionFile(sessionId, "approvals"), approvals);
+        turn.approvals = approvals;
+      });
+      turn.saves = write.catch(() => {});
+      await write;
     }
     await this.client.answer(sessionId, id, decision === "always" ? "once" : decision);
   }
 
   async stop(sessionId: string) {
-    if (this.active === sessionId) {
-      this.stopRequested = true;
-      await this.client?.stop(sessionId);
-    }
+    if (this.queue.cancel(sessionId)) return;
+    const turn = this.active.get(sessionId);
+    if (!turn) return;
+    turn.stopRequested = true;
+    await this.client?.stop(sessionId);
+  }
+
+  isWorking(sessionId: string) {
+    const turn = this.active.get(sessionId);
+    return !!turn && !turn.stopRequested;
   }
 
   async close() {
@@ -286,6 +314,7 @@ export class EngineService {
       await client.info();
       console.info("[engine] OpenCode запущен: " + this.executable + " · " + url);
       this.catalogVersion = this.configVersion(catalog, personal);
+      this.configuredModels = new Set([...catalog.models, ...personal].map(model => model.id));
       this.client = client;
       return client;
     } catch (error) {
@@ -346,6 +375,10 @@ export class EngineService {
             name: "Автовыбор",
             limit: { context: Math.min(...models.filter(model => model.tier !== "basic").map(model => model.contextWindow), 128_000), output: 8192 },
             capabilities: { tools: true, input: ["text"], output: ["text"] }
+          }], ["relay", {
+            name: "vsemkod",
+            limit: { context: 32_768, output: 8192 },
+            capabilities: { tools: true, input: ["text", "image"], output: ["text"] }
           }], ...entries, ...personalEntries])
         }
       }

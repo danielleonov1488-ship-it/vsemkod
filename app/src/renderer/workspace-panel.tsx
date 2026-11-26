@@ -3,10 +3,12 @@ import { Terminal } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 import type { ChatPart, FileChange, ProjectEntry } from "../shared/api";
 import { Delta, Diff } from "./chat";
+import type { FileReference } from "../shared/file-links";
+import { Preview } from "./chat-files";
 import { Icon } from "./icons";
 
 const api = window.vsemkod;
-export const panelTabs = [{ id: "changes", title: "Изменения" }, { id: "files", title: "Файлы" }, { id: "terminal", title: "Терминал" }] as const;
+export const panelTabs = [{ id: "changes", title: "Изменения" }, { id: "files", title: "Файлы" }, { id: "terminal", title: "Терминал" }, { id: "preview", title: "Просмотр" }] as const;
 export type PanelTab = typeof panelTabs[number]["id"];
 
 function Files({ directory, path, select, onError }: {
@@ -106,7 +108,8 @@ function ProjectTerminal({ directory, theme, parts }: { directory: string; theme
   </div>;
 }
 
-export function WorkspacePanel({ directory, tab, setTab, visible, width, resize, close, parts, changes, revert, busy, theme, onError }: {
+export function WorkspacePanel({ directory, tab, setTab, visible, width, resize, close, parts, changes, revert, busy, theme, onError, preview, openPreview }: {
+  preview?: FileReference; openPreview: (ref: FileReference) => void;
   directory: string; tab: PanelTab; setTab: (tab: PanelTab) => void; visible: boolean; width: number;
   resize: (width: number, final?: boolean) => void; close: () => void; parts: ChatPart[]; changes: FileChange[];
   revert: (file: string) => void; busy: boolean; theme: string; onError: (error: unknown) => void;
@@ -142,7 +145,7 @@ export function WorkspacePanel({ directory, tab, setTab, visible, width, resize,
         handle.onlostpointercapture = end;
       }} />
     <header className="panel-heading">
-      <div className="panel-tabs" role="group" aria-label="Вкладки панели">{panelTabs.map(item =>
+      <div className="panel-tabs" role="group" aria-label="Вкладки панели">{panelTabs.filter(item => item.id !== "preview" || api.filePreview).map(item =>
         <button className="composer-control" type="button" key={item.id} aria-pressed={tab === item.id} onClick={() => setTab(item.id)}>{item.title}</button>
       )}</div>
       <button className="composer-control attach" aria-label="Закрыть панель" type="button" onClick={close}><Icon name="close" /></button>
@@ -154,9 +157,10 @@ export function WorkspacePanel({ directory, tab, setTab, visible, width, resize,
         <button type="button" className="composer-control" disabled={busy} onClick={() => revert(change.file)}>Отменить изменения файла</button>
       </details>) : <p className="subtle panel-empty">В этом чате пока нет изменений.</p>}
     </section>}
-    {tab === "files" && <section className="panel-body"><Files key={directory} directory={directory} select={setSelected} onError={onError} />
+    {tab === "files" && <section className="panel-body"><Files key={directory} directory={directory} select={path => api.filePreview ? openPreview({ path }) : setSelected(path)} onError={onError} />
       {selected && <details className="file-preview" open key={selected}><summary>{selected}</summary><pre>{fileError || content || (!fileError && content === "" ? "Пустой файл" : "Открываем файл…")}</pre></details>}
     </section>}
+    {tab === "preview" && <Preview directory={directory} reference={preview} onError={onError} />}
     {terminalStarted && <section className="panel-body panel-body--terminal" hidden={tab !== "terminal"}>
       <ProjectTerminal key={directory} directory={directory} parts={parts} theme={theme} />
     </section>}

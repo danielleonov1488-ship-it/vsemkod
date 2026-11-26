@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
 import { once } from "node:events";
 import { createServer, type RequestListener } from "node:http";
-import { mkdir, mkdtemp, readFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, test, vi } from "vitest";
 import { catalogSchema } from "../src/shared/catalog-schema";
@@ -37,6 +38,42 @@ async function mockServer(handler: RequestListener) {
   cleanup.push(() => { server.close(); server.closeAllConnections(); });
   return "http://127.0.0.1:" + address.port;
 }
+
+test("catalog discovery caches only free models and maps them to the provider without storing credentials", async () => {
+  const data = await mkdtemp(join(tmpdir(), "vsemkod-g-models-"));
+  cleanup.push(() => rm(data, { recursive: true, force: true }));
+  const expectedKey = "local-fixture-secret";
+  let requests = 0;
+  const server = await mockServer((req, res) => {
+    expect(req.url).toBe("/models");
+    expect(req.headers.authorization).toBe("Bearer " + expectedKey);
+    requests++;
+    res.setHeader("content-type", "application/json");
+    res.end(JSON.stringify({ data: [
+      { id: "fixture/free-with-pricing", name: "Fixture Zero", pricing: { prompt: "0", completion: "0" } },
+      { id: "fixture/trial:free", name: "Fixture Free" },
+      { id: "fixture/paid", pricing: { prompt: "0", completion: "0.0001" } },
+      { id: "fixture/unknown" }
+    ] }));
+  });
+  const catalog = catalogSchema.parse(bundled);
+  catalog.providers.find(provider => provider.id === "openrouter")!.baseUrl = server;
+  const keys = new KeyStore(join(data, "keys.json"));
+  await keys.set("openrouter", expectedKey);
+  const cache = join(data, "provider-models.json");
+  const service = new ConnectService(keys, cache);
+  await service.refreshCatalogModels(catalog);
+  await service.refreshCatalogModels(catalog);
+  expect(requests).toBe(1);
+  expect(await readFile(cache, "utf8")).not.toContain(expectedKey);
+  const restarted = new ConnectService(keys, cache);
+  await restarted.loadCatalogModels();
+  expect(restarted.personalRoutes(catalog).map(route => [route.provider.id, route.upstreamId])).toEqual([
+    ["openrouter", "fixture/free-with-pricing"], ["openrouter", "fixture/trial:free"]
+  ]);
+  await restarted.disconnect("openrouter");
+  expect(restarted.personalRoutes(catalog)).toEqual([]);
+});
 
 test("PKCE uses an independent verifier and a base64url SHA-256 challenge", () => {
   const { verifier, challenge } = createPkce();
@@ -173,7 +210,7 @@ test("a custom key is validated, its model streams through Router, and disconnec
   const response = await send();
   expect(response.status).toBe(200);
   expect(await response.text()).toContain("[DONE]");
-  expect(completion).toEqual({ ...payload, model: "mock/chat-v1" });
+  expect(completion).toEqual({ ...payload, model: "mock/chat-v1", stream_options: { include_usage: true } });
   await service.disconnect(provider.id);
   await restarted.load();
   expect(restarted.get(provider.id)).toBeUndefined();

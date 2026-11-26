@@ -1,4 +1,5 @@
 import type { Attachment, CatalogState, ChatEvent, ChatHistory, Conversation, DesktopApi, FileChange, Notice, Preferences, ProjectEntry } from "../shared/api";
+import { canOpenFile } from "../shared/file-links";
 import type { Catalog, ProviderId } from "../shared/catalog-schema";
 import { pathMentions } from "../shared/workspace";
 import { replySpeed } from "../shared/usage";
@@ -143,7 +144,21 @@ export function createDemo({ scenario, showDesktop, setAvailability }: {
     if (parent !== window) parent.postMessage({ type: "vsemkod:theme", theme }, location.origin);
   }
 
+  function mockFile(path: string) {
+    if (!Object.hasOwn(files, path)) return null;
+    const parts = path.split("/");
+    return { path, relativePath: path, name: parts.pop()!, directory: parts.join("/"),
+      image: false, svg: false, html: false, canOpen: canOpenFile(path) };
+  }
+
   const api: DesktopApi = {
+    async fileStat(directory, path) { return directory === project ? mockFile(path) : null; },
+    async filePreview(directory, path) {
+      const info = directory === project && mockFile(path);
+      if (!info) throw new Error("В демо нет такого файла.");
+      return { info, text: files[path] };
+    },
+    async fileAction() { await desktop(); },
     async initial() {
       await (initialization ??= initialize());
       return { ...catalogState, projects: [project], preferences: { ...prefs }, version };
@@ -250,6 +265,8 @@ export function createDemo({ scenario, showDesktop, setAvailability }: {
     async preferences(patch) {
       if (patch.theme === "dark" || patch.theme === "light") applyTheme(patch.theme, prefs.theme !== patch.theme);
       if (patch.panelWidth !== undefined) prefs.panelWidth = patch.panelWidth;
+      if (patch.fullAccessConfirmed !== undefined) prefs.fullAccessConfirmed = patch.fullAccessConfirmed;
+      if (patch.defaultAccess && (patch.defaultAccess !== "full" || prefs.fullAccessConfirmed)) prefs.defaultAccess = patch.defaultAccess;
       return { ...prefs };
     },
     async connect() { await desktop(); throw new Error("Подключение доступно в приложении."); },

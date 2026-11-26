@@ -177,7 +177,7 @@ export function ConnectionsPage({ state, close, connect }: {
       <button className="composer-control" type="button" onClick={close}>Назад</button>
     </header>
     <div className="settings-panel">
-      <p className="settings-intro">Подключите свой аккаунт или ключ API. Модели появятся в меню «Мои подписки».</p>
+      <p className="settings-intro">Подключите свой аккаунт или ключ API. Модели появятся в разделе «Ещё модели».</p>
       <section className="settings-group"><h2>Подписки</h2>
         {subscriptions.map(id => <ConnectionRow key={id} name={nativeNames[id]} active={state?.subscriptions.includes(id)}
           action={() => connect({ id, name: nativeNames[id], kind: "subscription" })} />)}

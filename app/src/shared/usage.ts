@@ -6,6 +6,20 @@ export function replySpeed(output: number, reasoning: number, start: number, fir
   return { tokensPerSecond: (output + reasoning) * 1000 / (end - first), firstTokenMs: first - start };
 }
 
+export function tokenCharacters(text: string) {
+  let cyrillic = 0;
+  let other = 0;
+  for (const character of text) {
+    if (/\p{Script=Cyrillic}/u.test(character)) cyrillic++;
+    else other++;
+  }
+  return { cyrillic, other };
+}
+
+export function estimateTokens(cyrillic: number, other: number) {
+  return Math.ceil(cyrillic / 2.2 + other / 3.5);
+}
+
 export function cachePercent(input: number, read: number | undefined): number | undefined {
   if (read === undefined || !Number.isFinite(input) || !Number.isFinite(read) || input < 0 || read < 0 || input + read === 0) return;
   return read / (input + read) * 100;

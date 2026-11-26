@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import type { Attachment, ChatAction, ChatHistory, ProjectTools, Question, TurnOptions, Usage, CatalogState, ChatEvent, ChatPart, ConnectionId, Conversation, DesktopApi, FileChange, InitialState, Notice, Permission, Preferences, UpdateReady } from "../shared/api";
-import type { ReplySpeed, RouterStats } from "../shared/api";
+import type { Attachment, ChatAction, ChatPart, CatalogState, ChatEvent, ConnectionId, Conversation, DesktopApi, InitialState, Notice, Preferences, ProjectTools, UpdateReady } from "../shared/api";
+import type { RouterStats } from "../shared/api";
 import { Chat } from "./chat";
 import { catalogConnection, ConnectDialog, ConnectionsPage, readableError, type Connection } from "./connections";
-import { accessModes, enqueue, dequeue, slashCommand, type AccessMode } from "../shared/workspace";
+import { accessModes, slashCommand, type AccessMode } from "../shared/workspace";
 import { defaultModel } from "../shared/catalog";
-import type { ChatStatus } from "./turns";
+import { applyChatEvent, applyHistory, emptyView, isRunning, useChatViews, type ChatView, type PendingTurn } from "./chat-state";
+import type { FileReference } from "../shared/file-links";
+import { modelSpeed } from "./models";
 import { ChatGroups } from "./chat-groups";
 import { Composer } from "./composer";
 import { ComposerStatus } from "./composer-status";
@@ -24,8 +26,6 @@ declare global {
 
 const api = window.vsemkod;
 const suggestions = ["Создать лендинг", "Найти баг", "Объяснить код", "Написать тесты"];
-type PendingTurn = { id: string; text: string; modelId: string; files: Attachment[]; options: TurnOptions; target?: string };
-
 function catalogAge(date?: string) {
   if (!date) return "Загружаем каталог моделей";
   const minutes = Math.max(0, Math.floor((Date.now() - Date.parse(date)) / 60_000));
@@ -33,12 +33,6 @@ function catalogAge(date?: string) {
   if (minutes < 60) return "Каталог моделей обновлён " + minutes + " мин назад";
   if (minutes < 24 * 60) return "Каталог моделей обновлён " + Math.floor(minutes / 60) + " ч назад";
   return "Каталог моделей обновлён " + new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long" }).format(Date.parse(date));
-}
-
-function replacePart(parts: ChatPart[], part: ChatPart) {
-  const index = parts.findIndex(item => item.id === part.id);
-  if (index < 0) return [...parts, part];
-  return parts.map((item, position) => position === index ? part : item);
 }
 
 function App() {
@@ -53,39 +47,45 @@ function App() {
   const [settingsModels, setSettingsModels] = useState(false);
   const [subscriptions, setSubscriptions] = useState(false);
   const [query, setQuery] = useState("");
-  const [draft, setDraft] = useState("");
-  const [replayId, setReplayId] = useState<string>();
-  const [files, setFiles] = useState<Attachment[]>([]);
-  const [parts, setParts] = useState<ChatPart[]>([]);
-  const [permissions, setPermissions] = useState<Permission[]>([]);
-  const [changes, setChanges] = useState<FileChange[]>([]);
-  const [queue, setQueue] = useState<PendingTurn[]>([]);
-  const [access, setAccess] = useState<AccessMode>("ask");
-  const [variant, setVariant] = useState("");
+  const [visibleProject, setVisibleProject] = useState("");
+  const [hiddenProjects, setHiddenProjects] = useState<string[]>([]);
+  const [expandProject, setExpandProject] = useState<{ directory: string }>();
+  const chatViews = useChatViews();
+  const { current: cached, update: updateView, running, statuses, status: setStatus } = chatViews;
+  const homeId = "home";
+  const viewId = chat?.id ?? homeId;
+  const view = chatViews.views[viewId] ?? emptyView;
+  const { draft, files, parts, permissions, changes, questions, usage, reverted, planReady, progress, failure: failed,
+    model, provider: routeProvider, variant, loading: loadingChat } = view;
+  const access = view.access ?? prefs?.defaultAccess ?? "ask";
+  const status = chat && running[chat.id];
+  const busy = isRunning(status) || !!view.loading && !chat;
+  function editView(patch: Partial<ChatView>) { updateView(viewId, () => patch); }
+  const setDraft = (draft: string) => editView({ draft });
+  const setFiles = (apply: Attachment[] | ((files: Attachment[]) => Attachment[])) =>
+    updateView(viewId, state => ({ files: typeof apply === "function" ? apply(state.files) : apply }));
+  const setAccess = (access: AccessMode) => editView({ access });
+  const setVariant = (variant: string) => editView({ variant });
+  const setModel = (model?: string) => editView({ model, provider: undefined });
+  const setRouteProvider = (provider?: string) => editView({ provider });
+  const [accessMenu, setAccessMenu] = useState(0);
   const [variants, setVariants] = useState<string[]>([]);
   const [tools, setTools] = useState<ProjectTools>();
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [usage, setUsage] = useState<Usage>();
-  const [replyStats, setReplyStats] = useState<Record<string, { speed?: ReplySpeed; cache?: number }>>({});
   const [routerStats, setRouterStats] = useState<RouterStats>();
   const [demoRemaining, setDemoRemaining] = useState<number>();
-  const [reverted, setReverted] = useState(false);
-  const [planReady, setPlanReady] = useState(false);
+  const [preview, setPreview] = useState<FileReference>();
   const [panel, setPanel] = useState(false);
   const [panelTab, setPanelTab] = useState<PanelTab>("changes");
   const [panelWidth, setPanelWidth] = useState<number>();
   const [modelMenu, setModelMenu] = useState(0);
+  useEffect(() => {
+    if (!settings && !subscriptions && chat && statuses.current[chat.id] === "ready") setStatus(chat.id);
+  }, [chat?.id, settings, subscriptions]);
   const [systemTheme, setSystemTheme] = useState(() => matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
   const searchInput = useRef<HTMLInputElement>(null);
   const lastEscape = useRef(0);
-  const stopping = useRef<Promise<void> | undefined>(undefined);
-  const stopPending = useRef(false);
-  const [busy, setBusy] = useState(false);
-  const [progress, setProgress] = useState<{ started: number; since: number | null }>();
-  const [failures, setFailures] = useState<Record<string, { message: string; turn: PendingTurn }>>({});
-  const [loadingChat, setLoadingChat] = useState(false);
-  const [model, setModel] = useState<string>();
-  const [routeProvider, setRouteProvider] = useState<string>();
+  const stopping = useRef(new Set<string>());
+  const navigation = useRef(0);
   const [notice, setNotice] = useState<Notice>();
   const [updateReady, setUpdateReady] = useState<UpdateReady>();
   const [checkingUpdates, setCheckingUpdates] = useState(false);
@@ -94,11 +94,11 @@ function App() {
   const currentDirectory = useRef(directory);
   currentDirectory.current = directory;
   const activeChat = useRef<string | undefined>(undefined);
-  const requestPending = useRef(false);
   const preferenceRevision = useRef(0);
   const noticeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const liveCatalog = useRef(catalog);
-  const lastRoute = useRef<string | undefined>(undefined);
+  const chatVisible = useRef(false);
+  chatVisible.current = !settings && !subscriptions;
   liveCatalog.current = catalog;
 
   const notify = useCallback((next: Notice) => {
@@ -121,57 +121,45 @@ function App() {
       if (!live) setCatalog(info);
       if (!liveUpdate) setUpdateReady(info.update);
       setPrefs(info.preferences);
-      setAccess(info.preferences.defaultAccess);
       setDirectory(info.preferences.directory);
+      setVisibleProject(info.preferences.directory);
+      setHiddenProjects(info.hiddenProjects ?? []);
       setRecentProjects(info.projects ?? []);
     }).catch(showError);
     return () => { mounted = false; stopCatalog(); stopNotice(); stopUpdate(); clearTimeout(noticeTimer.current); };
   }, [notify, showError]);
 
   useEffect(() => api.onChat((event: ChatEvent) => {
-    if (event.sessionId !== activeChat.current) return;
-    if (event.type === "part") setParts(value => replacePart(value, event.part));
-    if (event.type === "delta") setParts(value => {
-      const kind = event.kind ?? "text";
-      const part = value.find(part => part.id === event.partId);
-      return replacePart(value, { id: event.partId, kind, text: (part?.kind === kind ? part.text : "") + event.delta });
-    });
-    if (event.type === "model-wait") setProgress(value => value && { ...value, since: event.since });
-    if (event.type === "permission") setPermissions(value => [...value.filter(item => item.id !== event.permission.id), event.permission]);
-    if (event.type === "permission-resolved") setPermissions(value => value.filter(item => item.id !== event.id));
-    if (event.type === "question") setQuestions(current => [...current.filter(item => item.id !== event.question.id), event.question]);
-    if (event.type === "question-resolved") setQuestions(current => current.filter(item => item.id !== event.id));
-    if (event.type === "usage") {
-      setUsage(event.usage);
-      if (event.speed || event.nativeCachePercent !== undefined) setReplyStats(state => {
-        const previous = state[event.sessionId];
-        return { ...state, [event.sessionId]: {
-          speed: event.speed ?? previous?.speed,
-          cache: event.nativeCachePercent === undefined ? previous?.cache : event.nativeCachePercent ?? undefined
-        } };
-      });
+    const session = event.sessionId;
+    const previous = cached.current[session];
+    updateView(session, value => applyChatEvent(value, event));
+    const updated = cached.current[session];
+    if (event.type === "turn-status") setStatus(session, event.status);
+    if (event.type === "permission" || event.type === "permission-resolved" || event.type === "question" || event.type === "question-resolved") {
+      setStatus(session, updated.permissions.length ? "permission" : updated.questions.length ? "question" : "working");
     }
-    if (event.type === "reply-cache") setReplyStats(state => ({
-      ...state, [event.sessionId]: { ...state[event.sessionId], cache: event.cachePercent }
-    }));
+    if (event.type === "reply-speed" && event.modelSpeed) {
+      const speed = event.modelSpeed;
+      setCatalog(state => state && { ...state, speeds: [
+        ...(state.speeds ?? []).filter(item => item.modelId !== speed.modelId || item.providerId !== speed.providerId), speed
+      ] });
+    }
     if (event.type === "route") {
-      setRouteProvider(event.providerId);
-      const route = event.modelId + "/" + event.providerId;
-      if (event.previousModelId && lastRoute.current !== route) {
+      if (event.previousModelId && (previous?.provider !== event.providerId || previous?.routedModel !== event.modelId) &&
+          activeChat.current === session && chatVisible.current) {
         const names = liveCatalog.current?.catalog;
         const modelName = (id: string) => names?.models.find(model => model.id === id)?.name ?? id;
         const providerName = (id: string) => names?.providers.find(provider => provider.id === id)?.name ?? id;
-        const previousProvider = event.previousModelId === event.modelId ? event.previousProviderId : undefined;
-        const next = previousProvider ? providerName(event.providerId) : modelName(event.modelId);
-        const previous = previousProvider ? providerName(previousProvider) : modelName(event.previousModelId);
+        const sameModel = event.previousModelId === event.modelId && event.previousProviderId;
+        const next = sameModel ? providerName(event.providerId) : modelName(event.modelId);
+        const prior = sameModel ? providerName(sameModel) : modelName(event.previousModelId);
         notify({ text: "Переключился на " + next + (event.reason === "quota"
-          ? " — у " + previous + " кончилась квота" : " — " + previous + " временно недоступен") });
+          ? " — у " + prior + " кончилась квота" : " — " + prior + " временно недоступен") });
       }
-      if (event.averageMs !== undefined) setCatalog(state => state && { ...state,
+      setCatalog(state => state && { ...state,
         latencies: [...(state.latencies ?? []).filter(item => item.modelId !== event.modelId || item.providerId !== event.providerId),
           { modelId: event.modelId, providerId: event.providerId, averageMs: event.averageMs }]
       });
-      lastRoute.current = route;
     }
   }), [notify]);
 
@@ -238,57 +226,67 @@ function App() {
     let current = true;
     setVariants([]);
     if (directory && modelId) void api.modelVariants(directory, modelId).then(items => {
-      if (current) { setVariants(items); setVariant(value => items.includes(value) ? value : ""); }
+      if (current) { setVariants(items); updateView(viewId, old => ({ variant: items.includes(old.variant) ? old.variant : "" })); }
     }).catch(() => {});
     return () => { current = false; };
-  }, [directory, modelId]);
+  }, [directory, modelId, viewId]);
 
-  function resetChat() {
+  function revealChat(session: Conversation) {
+    activeChat.current = session.id;
+    chatVisible.current = true;
+    setChat(session);
+    setDirectory(session.directory);
+    setVisibleProject(session.directory);
+    setSettings(false);
+    setSubscriptions(false);
+    setPreview(undefined);
+    if (statuses.current[session.id] === "ready") setStatus(session.id);
+  }
+
+  function showHome(folder = directory) {
+    navigation.current++;
     activeChat.current = undefined;
     setChat(undefined);
     setSettings(false);
     setSubscriptions(false);
-    setParts([]);
-    setChanges([]);
-    setPermissions([]);
-    setFiles([]);
-    setDraft("");
-    setRouteProvider(undefined);
-    setQuestions([]);
-    setUsage(undefined);
-    setReverted(false);
-    setPlanReady(false);
-    setAccess(prefs?.defaultAccess ?? "ask");
-    setQueue([]);
-    setReplayId(undefined);
+    setPreview(undefined);
+    setDirectory(folder);
+    setVisibleProject(folder);
+    chatViews.reset(homeId);
   }
 
   const projectDirectories = [...new Set([directory, ...recentProjects, ...sessions.map(item => item.directory), prefs?.directory]
-    .filter((path): path is string => Boolean(path)))];
-  const failed = chat && failures[chat.id];
-  const status: ChatStatus | undefined = permissions.length ? "permission" : questions.length ? "question"
-    : failed ? "error" : busy ? "working" : undefined;
+    .filter((path): path is string => !!path && !hiddenProjects.includes(path)))];
 
-  async function chooseDirectory(asDefault = false) {
+  async function chooseDirectory(asDefault = false, openForComposer = false) {
     try {
       const chosen = await api.chooseDirectory();
       if (!chosen) return;
       setRecentProjects(list => [chosen, ...list.filter(path => path !== chosen)]);
+      setHiddenProjects(list => list.filter(path => path !== chosen));
+      setExpandProject({ directory: chosen });
       if (asDefault) {
         setPrefs(await api.preferences({ directory: chosen }));
         if (!chat) {
           setDirectory(chosen);
           setFiles([]);
         }
-      } else if (chosen !== directory || settings || subscriptions) {
+      } else if (openForComposer && chosen !== currentDirectory.current) {
+        void startChat(chosen);
+      } else {
         setQuery("");
-        startChat(chosen);
+        setVisibleProject(chosen);
+        if (!chat && !cached.current[homeId]?.loading) {
+          navigation.current++;
+          setDirectory(chosen);
+          setFiles([]);
+        }
       }
     } catch (error) { showError(error); }
   }
 
   function acceptAttachments(added: Attachment[], target: string) {
-    if (currentDirectory.current !== target) return;
+    if (currentDirectory.current !== target || (activeChat.current ?? homeId) !== viewId) return;
     if (!vision && added.some(file => file.image)) showError("Выбранная модель не принимает изображения.");
     setFiles(current => [...current, ...added.filter(file => vision || !file.image)].slice(0, 10));
   }
@@ -329,110 +327,94 @@ function App() {
   }
 
   async function openChat(session: Conversation) {
-    if (busy || loadingChat) return;
-    setLoadingChat(true);
+    navigation.current++;
+    revealChat(session);
+    const id = session.id;
+    const existing = cached.current[id];
+    if (existing?.loaded || existing?.loading || isRunning(statuses.current[id])) return;
+    updateView(id, () => ({ loading: true, access: session.access, model: session.modelId, variant: session.variant ?? "" }));
     try {
-      const history = await api.history(session.id);
-      resetChat();
-      activeChat.current = session.id;
-      setChat(session);
-      setDirectory(session.directory);
-      setAccess(session.access ?? prefs?.defaultAccess ?? "ask");
-      setPlanReady(session.access === "read" && history.parts.findLast(part => part.kind !== "turn")?.kind === "text");
-      setModel(session.modelId);
-      setVariant(session.variant ?? "");
-      showHistory(history);
-    } catch (error) { showError(error); }
-    finally { setLoadingChat(false); }
-  }
-
-  function showHistory(history: ChatHistory) {
-    setParts(history.parts);
-    setChanges(history.changes);
-    setReverted(Boolean(history.reverted));
-    setUsage(history.usage);
+      const history = await api.history(id);
+      updateView(id, () => ({ ...applyHistory(history),
+        planReady: session.access === "read" && history.parts.findLast(part => part.kind !== "turn")?.kind === "text" }));
+    } catch (error) { if (activeChat.current === id) showError(error); }
+    finally { updateView(id, () => ({ loading: false })); }
   }
 
   async function runTurn(turn: PendingTurn) {
-    requestPending.current = true;
-    stopPending.current = false;
-    const started = Date.now();
-    setBusy(true);
-    setProgress({ started, since: started });
-    setPlanReady(false);
-    lastRoute.current = undefined;
     let session = chat;
+    if (session && isRunning(statuses.current[session.id])) return;
+    if (!session && cached.current[homeId]?.loading) return;
+    const nav = navigation.current;
+    const started = Date.now();
+    const localId = "local:" + crypto.randomUUID();
     try {
-      if (turn.target && turn.target !== chat?.id) throw new Error("Чат для сообщения уже закрыт.");
       if (!session) {
+        updateView(homeId, () => ({ loading: true }));
         const title = turn.text.replace(/\s+/g, " ").split(/(?<=[.!?])\s/, 1)[0].slice(0, 72) || turn.files[0]?.name.slice(0, 72) || "Новый чат";
-        session = await api.create(directory, title);
-        activeChat.current = session.id;
-        setChat(session);
-      }
-      if (stopPending.current) {
-        notify({ text: "Ответ остановлен" });
-        return;
+        try { session = await api.create(directory, title); }
+        finally {
+          if (navigation.current === nav) updateView(homeId, () => ({ loading: false }));
+        }
+        updateView(session.id, () => ({ loaded: true, model: turn.modelId, variant: turn.options.variant ?? "", access: turn.options.access }));
+        if (navigation.current === nav) revealChat(session);
       }
       const sessionId = session.id;
-      setFailures(list => {
-        if (!list[sessionId]) return list;
-        const next = { ...list };
-        delete next[sessionId];
-        return next;
-      });
       const current = { ...session, access: turn.options.access, variant: turn.options.variant, modelId: turn.modelId, updatedAt: Date.now() };
-      setChat(current);
-      setSessions(list => [current, ...list.filter(item => item.id !== current.id)]);
-      if (!turn.options.compact) setParts(list => [...list, { id: "local:" + turn.id, kind: "user", text: turn.text, files: turn.files.map(file => file.name) }]);
-      const result = await api.send(session.id, turn.text, turn.modelId, turn.files.map(file => file.id), turn.options);
-      setChanges(result.changes);
-      const history = await api.history(session.id);
-      showHistory(history);
-      if (history.parts.at(-1)?.kind !== "turn") setParts(list => [...list, {
-        id: "work:" + turn.id, kind: "turn", seconds: (Date.now() - started) / 1000, stopped: result.stopped
-      }]);
-      setPlanReady(!result.stopped && !turn.options.compact && turn.options.access === "read" &&
-        history.parts.findLast(part => part.kind !== "turn")?.kind === "text");
-      if (result.stopped) notify({ text: "Ответ остановлен" });
+      if (activeChat.current === sessionId) setChat(current);
+      setSessions(list => [current, ...list.filter(item => item.id !== sessionId)]);
+      setStatus(sessionId, "working");
+      updateView(sessionId, value => ({ loaded: true, failure: undefined, progress: { started, since: started },
+        planReady: false, provider: undefined, liveSpeed: undefined, parts: turn.options.compact ? value.parts : [...value.parts, {
+          id: localId, kind: "user", text: turn.text, files: turn.files.map(file => file.name)
+        }] }));
+      const result = await api.send(sessionId, turn.text, turn.modelId, turn.files.map(file => file.id), turn.options);
+      const history = await api.history(sessionId).catch(() => undefined);
+      const cachedParts = cached.current[sessionId]?.parts ?? [];
+      const visibleParts = !history || result.stopped && cachedParts.at(-1)?.id === localId && history.parts.length < cachedParts.length
+        ? cachedParts : history.parts;
+      const ended = visibleParts.at(-1)?.kind === "turn" ? visibleParts : [...visibleParts, {
+        id: "work:" + localId, kind: "turn" as const, seconds: (Date.now() - (cached.current[sessionId]?.progress?.started ?? started)) / 1000, stopped: result.stopped
+      }];
+      updateView(sessionId, () => ({ ...(history && applyHistory(history)), parts: ended, changes: result.changes,
+        planReady: !result.stopped && !turn.options.compact && turn.options.access === "read" &&
+          ended.findLast(part => part.kind !== "turn")?.kind === "text" }));
+      const visible = activeChat.current === sessionId && chatVisible.current;
+      setStatus(sessionId, !result.stopped && !visible ? "ready" : undefined);
+      if (visible && result.stopped) notify({ text: "Ответ остановлен" });
     } catch (error) {
       const message = readableError(error);
-      notify({ text: message, tone: "error" });
+      if (!session || activeChat.current === session.id && chatVisible.current) notify({ text: message, tone: "error" });
       if (session) {
         const id = session.id;
-        setFailures(list => ({ ...list, [id]: { message, turn: { ...turn, target: id } } }));
         const history = await api.history(id).catch(() => undefined);
-        if (history) showHistory(history);
+        updateView(id, () => ({ ...(history && applyHistory(history)), failure: { message, turn } }));
+        setStatus(id, "error");
       }
-      if (!turn.options.compact) { setDraft(value => value || turn.text); setFiles(value => value.length ? value : turn.files); }
+      if (!turn.options.compact && (session || navigation.current === nav)) updateView(session?.id ?? homeId, value => ({
+        draft: value.draft || turn.text, files: value.files.length ? value.files : turn.files
+      }));
     } finally {
-      await stopping.current;
-      setPermissions([]);
-      setQuestions([]);
-      requestPending.current = false;
-      setProgress(undefined);
-      setBusy(false);
+      if (session) updateView(session.id, () => ({ progress: undefined, permissions: [], questions: [], liveSpeed: undefined }));
     }
   }
 
   function retryFailed() {
-    if (!failed || !modelId || requestPending.current || loadingChat) return;
+    if (!failed || !modelId || busy || loadingChat) return;
     if (!vision && failed.turn.files.some(file => file.image)) {
       showError("Выбранная модель не принимает изображения.");
       return;
     }
     if (draft === failed.turn.text) setDraft("");
     if (files === failed.turn.files) setFiles([]);
-    void runTurn({ ...failed.turn, id: crypto.randomUUID(), modelId,
-      options: { ...failed.turn.options, variant: variant || undefined } });
+    void runTurn({ ...failed.turn, modelId, options: { ...failed.turn.options, variant: variant || undefined } });
   }
 
   function stop() {
-    if (!requestPending.current || stopping.current) return;
-    stopPending.current = true;
-    if (!activeChat.current) return;
-    const task = api.stop(activeChat.current).catch(showError).finally(() => { stopping.current = undefined; });
-    stopping.current = task;
+    const id = activeChat.current;
+    if (!id || !isRunning(statuses.current[id]) || stopping.current.has(id)) return;
+    stopping.current.add(id);
+    void api.stop(id).catch(showError).finally(() => stopping.current.delete(id));
   }
 
   async function exportChats(sessionId?: string) {
@@ -442,19 +424,35 @@ function App() {
     } catch (error) { showError(error); }
   }
 
-  function startChat(folder?: string) {
-    if (requestPending.current || loadingChat) return;
-    resetChat();
-    const next = folder ?? (directory || prefs?.directory || "");
-    setDirectory(next);
-    if (next) setRecentProjects(list => [next, ...list.filter(path => path !== next)]);
-    requestAnimationFrame(() => draftInput.current?.focus());
+  async function startChat(folder?: string) {
+    const next = folder || visibleProject || directory || prefs?.directory;
+    if (!next) return;
+    const nav = ++navigation.current;
+    setExpandProject({ directory: next });
+    try {
+      const session = await api.create(next, "Новый чат");
+      chatViews.reset(session.id, { loaded: true, model, variant });
+      setSessions(list => [session, ...list.filter(item => item.id !== session.id)]);
+      if (nav !== navigation.current) return;
+      revealChat(session);
+      requestAnimationFrame(() => draftInput.current?.focus());
+    } catch (error) { showError(error); }
+  }
+
+  async function removeProject(path: string) {
+    try {
+      await api.projectRemove?.(path);
+      setRecentProjects(list => list.filter(item => item !== path));
+      setHiddenProjects(list => [...list, path]);
+      const fallback = projectDirectories.find(item => item !== path) ?? "";
+      if (directory === path) showHome(fallback);
+      else if (visibleProject === path) setVisibleProject(fallback);
+    } catch (error) { showError(error); }
   }
 
   function quickCommand(name: string) {
     if (name === "new") {
-      if (requestPending.current) { showError("Дождитесь окончания работы агента."); return true; }
-      startChat(directory);
+      void startChat(directory);
     } else if (name === "plan") setAccess("read");
     else if (name === "model") setModelMenu(value => value + 1);
     else if (name === "export") {
@@ -465,13 +463,14 @@ function App() {
     return true;
   }
 
-  function submit(intervene = false, text = draft, readyFiles = files, mode = access, replayMessageId: string | null | undefined = replayId) {
+  function submit(text = draft, readyFiles = files, mode = access, replayMessageId: string | null | undefined = view.replayId) {
     if ((!text.trim() && !readyFiles.length && !replayMessageId) || !directory || loadingChat) return;
     const message = text.trim();
     const command = slashCommand(message);
     if (command && quickCommand(command.name)) return;
+    if (busy) return;
     if (command?.name === "compact") {
-      if (compactContext(intervene, mode)) setDraft("");
+      if (compactContext(mode)) setDraft("");
       return;
     }
     if (!modelId) return;
@@ -482,7 +481,7 @@ function App() {
     const skill = command && tools?.skills.find(item => command.name === "skill." + item.name);
     const custom = command && tools?.commands.find(item => item.name === command.name);
     const turn: PendingTurn = {
-      id: crypto.randomUUID(), modelId, files: readyFiles, target: chat?.id,
+      modelId, files: readyFiles,
       text: skill ? command?.args.trim() || "Примени навык «" + skill.name + "» к текущей задаче." : message,
       options: { access: mode, replayMessageId: replayMessageId ?? undefined, variant: variant || undefined,
         command: command && custom ? { name: command.name, args: command.args } : undefined,
@@ -490,42 +489,30 @@ function App() {
     };
     setDraft("");
     setFiles([]);
-    setReplayId(undefined);
-    scheduleTurn(turn, intervene);
+    editView({ replayId: undefined });
+    void runTurn(turn);
   }
 
-  function compactContext(intervene = false, mode = access) {
+  function compactContext(mode = access) {
     if (!chat) { showError("Сначала откройте чат."); return false; }
-    if (!modelId || !directory || loadingChat) return false;
-    scheduleTurn({ id: crypto.randomUUID(), modelId, files: [], target: chat.id, text: "/compact",
-      options: { compact: true, access: mode, variant: variant || undefined } }, intervene);
+    if (!modelId || !directory || loadingChat || busy) return false;
+    void runTurn({ modelId, files: [], text: "/compact", options: { compact: true, access: mode, variant: variant || undefined } });
     return true;
   }
 
-  function scheduleTurn(turn: PendingTurn, intervene: boolean) {
-    if (requestPending.current || queue.length) {
-      const interrupt = intervene || prefs?.busyEnter === "interrupt";
-      setQueue(value => enqueue(value, turn, interrupt));
-      if (interrupt) stop();
-    } else void runTurn(turn);
-  }
-
-  useEffect(() => {
-    if (busy || requestPending.current || !queue.length) return;
-    const [next, rest] = dequeue(queue);
-    setQueue(rest);
-    if (next) void runTurn(next);
-  }, [busy, queue]);
-
-  function confirmFull() {
-    return prefs?.fullAccessConfirmed || window.confirm("Включить полный доступ? Агент сможет изменять файлы и выполнять команды без подтверждения, в том числе за пределами проекта.");
+  function selectAccess(next: AccessMode, confirmed = false) {
+    if (!confirmed) { setAccess(next); return; }
+    void api.preferences({ fullAccessConfirmed: true }).then(saved => {
+      setPrefs(value => value ? { ...value, fullAccessConfirmed: saved.fullAccessConfirmed } : saved);
+      setAccess(next);
+    }).catch(showError);
   }
 
   function cycleAccess() {
     const next = accessModes[(accessModes.indexOf(access) + 1) % accessModes.length];
     if (next === "full" && !prefs?.fullAccessConfirmed) {
-      if (!confirmFull()) return;
-      void api.preferences({ fullAccessConfirmed: true }).then(saved => { setPrefs(saved); setAccess(next); }).catch(showError);
+      setAccess(accessModes[0]);
+      setAccessMenu(value => value + 1);
     } else setAccess(next);
   }
 
@@ -534,42 +521,41 @@ function App() {
       const next = await api.chatAction(session.id, action);
       setSessions(list => next ? [next, ...list.filter(item => item.id !== next.id)] : list.filter(item => item.id !== session.id));
       if (action.type === "fork" && next) await openChat(next);
-      else if (chat?.id === session.id) {
-        if (!next || next.archived) startChat(session.directory);
+      else if (activeChat.current === session.id) {
+        if (!next || next.archived) showHome(session.directory);
         else setChat(next);
       }
     } catch (error) { showError(error); }
   }
 
-  async function revertMessage(message?: string) {
-    if (!chat || requestPending.current || (message && !window.confirm("Откатить чат и вернуть файлы к состоянию перед этим сообщением?"))) return;
-    setLoadingChat(true);
+  async function restoreHistory(load: (id: string) => ReturnType<DesktopApi["history"]>, draft?: Extract<ChatPart, { kind: "user" | "text" }>) {
+    if (!chat || busy || loadingChat) return;
+    const id = chat.id;
+    updateView(id, () => ({ loading: true }));
     try {
-      showHistory(await api.revert(chat.id, message));
-      setPlanReady(false);
+      const history = await load(id);
+      updateView(id, () => ({ ...applyHistory(history), planReady: false, ...(draft && {
+        draft: draft.text, replayId: draft.files?.length ? draft.id : undefined
+      }) }));
+      if (draft && activeChat.current === id) requestAnimationFrame(() => draftInput.current?.focus());
     } catch (error) { showError(error); }
-    finally { setLoadingChat(false); }
+    finally { updateView(id, () => ({ loading: false })); }
   }
 
-  async function editMessage(part: Extract<ChatPart, { kind: "user" | "text" }>) {
-    if (!chat || requestPending.current || !window.confirm("Вернуть историю и файлы к этому сообщению, чтобы отредактировать его?")) return;
-    setLoadingChat(true);
-    try {
-      showHistory(await api.revert(chat.id, part.id));
-      setDraft(part.text);
-      setReplayId(part.files?.length ? part.id : undefined);
-      setPlanReady(false);
-      requestAnimationFrame(() => draftInput.current?.focus());
-    } catch (error) { showError(error); }
-    finally { setLoadingChat(false); }
+  function revertMessage(message?: string) {
+    if (!busy && (!message || window.confirm("Откатить чат и вернуть файлы к состоянию перед этим сообщением?"))) {
+      void restoreHistory(id => api.revert(id, message));
+    }
   }
 
-  async function revertFile(file: string) {
-    if (!chat || requestPending.current || !window.confirm("Отменить изменения файла «" + file + "»?")) return;
-    setLoadingChat(true);
-    try { showHistory(await api.revertFile(chat.id, file)); }
-    catch (error) { showError(error); }
-    finally { setLoadingChat(false); }
+  function editMessage(part: Extract<ChatPart, { kind: "user" | "text" }>) {
+    if (!busy && window.confirm("Вернуть историю и файлы к этому сообщению, чтобы отредактировать его?")) {
+      void restoreHistory(id => api.revert(id, part.id), part);
+    }
+  }
+
+  function revertFile(file: string) {
+    if (!busy && window.confirm("Отменить изменения файла «" + file + "»?")) void restoreHistory(id => api.revertFile(id, file));
   }
 
   useEffect(() => {
@@ -584,7 +570,7 @@ function App() {
       const key = event.code;
       if (!["KeyN", "KeyK", "KeyB", "KeyJ", "Comma"].includes(key)) return;
       event.preventDefault();
-      if (key === "KeyN") startChat();
+      if (key === "KeyN") void startChat();
       if (key === "KeyK") searchInput.current?.focus();
       if (key === "KeyB") setPanel(value => !value);
       if (key === "KeyJ") { setSettings(false); setSubscriptions(false); setPanelTab("terminal"); setPanel(true); }
@@ -630,28 +616,28 @@ function App() {
     }
   }
 
+  function openPreview(ref: FileReference) {
+    setPreview(ref);
+    setPanelTab("preview");
+    setPanel(true);
+  }
+
   const capacity = usage?.context ?? contextWindow;
-  const reply = chat ? replyStats[chat.id] : undefined;
+  const typical = modelId && currentProviderId ? modelSpeed(modelId, ownModel?.providerId ?? selected?.available[0]?.provider.id ?? currentProviderId, catalog?.speeds, catalog?.benchmarks) : undefined;
   const demo = !!api.onDemoQuota;
   const composer = <>
-    {queue.length > 0 && <ul className="message-queue" aria-label="Очередь сообщений">
-      {queue.map(item => <li key={item.id}><span className="subtle">В очереди</span><span>{item.text || item.files.map(file => file.name).join(", ")}</span>
-        <button className="composer-control attach" type="button" aria-label="Убрать из очереди" onClick={() => setQueue(value => value.filter(turn => turn.id !== item.id))}>
-          <Icon name="close" />
-        </button></li>)}
-    </ul>}
     <Composer key={chat?.id ?? directory} preferences={prefs} updatePreferences={updatePrefs} active={!!chat} input={draftInput} draft={draft} change={setDraft} directory={directory} busy={busy}
-      projects={projectDirectories} switchProject={path => { if (path !== directory) startChat(path); }}
+      projects={projectDirectories} switchProject={path => { if (!busy && path !== directory) void startChat(path); }}
       canSend={!!modelId && !!directory && !loadingChat} attachments={files} remove={id => setFiles(items => items.filter(file => file.id !== id))}
-      add={value => void captureFiles(value)} pick={() => void chooseFiles()} choose={() => void chooseDirectory()}
-      access={access} cycle={cycleAccess} submit={submit} stop={stop} selectCommand={quickCommand} tools={tools} vision={vision} onError={showError}
-      modelControls={<ModelPicker selected={modelId} catalog={catalog?.catalog} options={options} personal={personal} zen={zen} auto={prefs?.auto ?? true} latencies={catalog?.latencies}
+      add={value => void captureFiles(value)} pick={() => void chooseFiles()} choose={() => void chooseDirectory(false, true)}
+      access={access} accessMenu={accessMenu} selectAccess={selectAccess} cycle={cycleAccess} submit={submit} stop={stop} selectCommand={quickCommand} tools={tools} vision={vision} onError={showError}
+      modelControls={<ModelPicker selected={modelId} catalog={catalog?.catalog} options={options} personal={personal} zen={zen} auto={prefs?.auto ?? true} latencies={catalog?.latencies} speeds={catalog?.speeds} benchmarks={catalog?.benchmarks}
           variant={variant} variants={variants} onVariant={setVariant}
-          openSignal={modelMenu} onSelect={id => { setModel(id); setVariant(""); setRouteProvider(undefined); }}
+          openSignal={modelMenu} onSelect={id => editView({ model: id, variant: "", provider: undefined })}
           onAuto={auto => updatePrefs({ auto })} onConnect={setConnection} onSubscriptions={() => setSubscriptions(true)} />} />
     <ComposerStatus key={"stats:" + (chat?.id ?? directory)} state={catalog} providerId={currentProviderId} usage={usage}
-      capacity={capacity} speed={reply?.speed} cache={reply?.cache} stats={routerStats} demo={demo} demoRemaining={demoRemaining}
-      onCompact={chat && !demo && !loadingChat ? () => compactContext() : undefined} onConnect={setConnection} onDisconnect={disconnect}
+      capacity={capacity} speed={view.liveSpeed ?? view.speed} typical={!demo ? typical : undefined} cache={view.cache} stats={routerStats} demo={demo} demoRemaining={demoRemaining}
+      onCompact={chat && !demo && !loadingChat && !busy ? () => compactContext() : undefined} onConnect={setConnection} onDisconnect={disconnect}
       onOpen={url => void api.openExternal(url).catch(showError)} onSettings={() => { setSettingsModels(true); setSettings(true); }} />
   </>;
 
@@ -666,21 +652,29 @@ function App() {
         </div>
       </header>
       <aside className="sidebar" aria-label="Чаты и настройки">
-        <button type="button" className="wordmark" disabled={busy || loadingChat} onClick={() => startChat()}>
+        <button type="button" className="wordmark" onClick={() => showHome(visibleProject || directory)}>
           <img src={logo} width="18" height="18" alt="" /><span>vsem<span className="wordmark-suffix">kod</span></span>
         </button>
-        <button className="sidebar-row sidebar-row--new" type="button" disabled={busy || loadingChat} onClick={() => startChat()}><Icon name="newChat" />Новый чат</button>
+        <button className="sidebar-row sidebar-row--new" type="button" onClick={() => void startChat()}><Icon name="newChat" />Новый чат</button>
         <label className="sidebar-row search">
           <Icon name="search" /><input ref={searchInput} type="search" value={query} aria-label="Поиск чатов" placeholder="Поиск чатов" onChange={event => setQuery(event.target.value)} />
         </label>
-        <ChatGroups sessions={sessions} projects={projectDirectories} selectedProject={directory} query={query}
-          active={!settings && !subscriptions ? chat?.id : undefined} statusChat={chat?.id} status={status}
-          errors={Object.keys(failures)} addProject={() => void chooseDirectory()}
-          disabled={busy || loadingChat} start={startChat} open={session => void openChat(session)} perform={changeChat} />
+        <ChatGroups sessions={sessions} projects={projectDirectories} selectedProject={visibleProject} query={query}
+          active={!settings && !subscriptions ? chat?.id : undefined} running={running} expand={expandProject}
+          addProject={() => void chooseDirectory()} selectProject={path => {
+            setVisibleProject(path);
+            if (!activeChat.current && !cached.current[homeId]?.loading) {
+              setDirectory(path);
+              setFiles([]);
+            }
+          }} start={path => void startChat(path)}
+          openProject={api.projectOpen ? path => void api.projectOpen?.(path).catch(showError) : undefined}
+          removeProject={api.projectRemove ? path => void removeProject(path) : undefined}
+          open={session => void openChat(session)} perform={changeChat} />
         <div className="sidebar-end">
           <button type="button" className="sidebar-row community-row" title="Telegram-канал сообщества: раздачи моделей, промпты и помощь"
             onClick={() => void api.openExternal(COMMUNITY_URL).catch(showError)}><Icon name="telegram" />Сообщество вайб‑кодеров</button>
-          <button type="button" className="sidebar-row" aria-current={settings || subscriptions ? "page" : undefined} disabled={loadingChat}
+          <button type="button" className="sidebar-row" aria-current={settings || subscriptions ? "page" : undefined}
             onClick={() => { setSettingsModels(false); setSettings(subscriptions || !settings); setSubscriptions(false); }}><Icon name="settings" />Настройки</button>
           <p className="catalog-note">{catalogAge(catalog?.catalog.generatedAt)}</p>
         </div>
@@ -688,27 +682,21 @@ function App() {
       <div className="workspace-layout">
         {subscriptions ? <ConnectionsPage state={catalog} close={() => setSubscriptions(false)} connect={setConnection} />
           : settings ? <Settings state={catalog} prefs={prefs} version={initial?.version} directory={directory} choose={() => void chooseDirectory(true)} showModels={settingsModels}
-            update={patch => {
-              if (patch.defaultAccess === "full") {
-                if (!confirmFull()) return;
-                patch = { ...patch, fullAccessConfirmed: true };
-              }
-              updatePrefs(patch);
-              if (!chat && patch.defaultAccess) setAccess(patch.defaultAccess);
-            }} subscriptionsPage={() => setSubscriptions(true)} connect={setConnection} disconnect={disconnect}
+            update={updatePrefs} subscriptionsPage={() => setSubscriptions(true)} connect={setConnection} disconnect={disconnect}
             checkUpdates={() => void checkUpdates()} checkingUpdates={checkingUpdates}
             open={url => void api.openExternal(url).catch(showError)} onError={showError} onNotice={text => notify({ text })}
             onCatalog={setCatalog} exportAll={() => void exportChats()} />
           : chat ? <Chat key={chat.id} title={chat.title} parts={parts} permissions={permissions} questions={questions} changeCount={changes.length}
-            busy={busy || loadingChat} status={status} progress={progress} failure={failed?.message}
+            busy={busy || !!loadingChat} status={status} progress={progress} failure={failed?.message}
+             directory={directory} preview={openPreview} onError={showError}
             retryFailed={retryFailed} chooseModel={() => setModelMenu(value => value + 1)} panel={panel} openPanel={() => { if (!panel) setPanelTab("changes"); setPanel(value => !value); }}
             answer={(id, decision) => api.answer(chat.id, id, decision)} answerQuestion={(id, value) => api.answerQuestion(chat.id, id, value)}
             copy={text => void api.copyText(text).then(() => notify({ text: "Скопировано" })).catch(showError)}
-            edit={part => void editMessage(part)} revert={message => void revertMessage(message)} retry={part => submit(false, part.text, [], access, part.files?.length ? part.id : null)}
-            reverted={reverted} executePlan={planReady ? () => {
+            edit={part => void editMessage(part)} revert={message => void revertMessage(message)} retry={part => submit(part.text, [], access, part.files?.length ? part.id : null)}
+            reverted={!!reverted} executePlan={planReady ? () => {
               const mode = prefs?.defaultAccess === "edit" ? "edit" : "ask";
               setAccess(mode);
-              submit(false, "Выполни план", [], mode, null);
+              submit("Выполни план", [], mode, null);
             } : undefined}>
             {composer}
           </Chat> : <main className="workspace workspace--home">
@@ -725,12 +713,12 @@ function App() {
               </div>
             </div>
           </main>}
-        {directory && <WorkspacePanel key={directory} directory={directory} tab={panelTab} setTab={setPanelTab} visible={panel && !settings && !subscriptions}
+        {directory && <WorkspacePanel key={directory} directory={directory} tab={panelTab} setTab={setPanelTab} preview={preview} openPreview={openPreview} visible={panel && !settings && !subscriptions}
           width={panelWidth ?? prefs?.panelWidth ?? 360} resize={(width, final) => {
             const next = Math.max(260, Math.min(700, window.innerWidth - 490, Math.round(width)));
             if (final) { updatePrefs({ panelWidth: next }); setPanelWidth(undefined); }
             else setPanelWidth(next);
-          }} close={() => setPanel(false)} parts={parts} changes={changes} revert={file => void revertFile(file)} busy={busy || loadingChat}
+          }} close={() => setPanel(false)} parts={parts} changes={changes} revert={file => void revertFile(file)} busy={busy || !!loadingChat}
           theme={theme} onError={showError} />}
       </div>
     </div>

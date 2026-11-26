@@ -1,6 +1,7 @@
 import { rm } from "node:fs/promises";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import type { ZodType } from "zod";
+import { benchmarksSchema, type Benchmarks } from "../shared/benchmarks";
 import { catalogSchema, changesSchema, type Catalog, type Change } from "../shared/catalog-schema";
 import { readJson, writeJson } from "./storage";
 
@@ -17,6 +18,10 @@ async function download<T>(url: string, schema: ZodType<T>, signal: AbortSignal)
 
 export class CatalogService {
   private value?: Catalog;
+  benchmarks?: Benchmarks;
+
+  private get benchmarkCache() { return join(this.data, "benchmarks.json"); }
+  private get benchmarkBundle() { return join(dirname(this.bundled), "benchmarks.json"); }
   private refreshing?: Promise<void>;
   private refreshAbort?: AbortController;
   private interval?: ReturnType<typeof setInterval>;
@@ -33,9 +38,12 @@ export class CatalogService {
   }
 
   async loadInitial(): Promise<void> {
-    const [cached, bundled] = await Promise.all([
-      readJson(join(this.data, "catalog.json"), catalogSchema), readJson(this.bundled, catalogSchema)
+    const [cached, bundled, cachedBenchmarks, bundledBenchmarks] = await Promise.all([
+      readJson(join(this.data, "catalog.json"), catalogSchema), readJson(this.bundled, catalogSchema),
+      readJson(this.benchmarkCache, benchmarksSchema), readJson(this.benchmarkBundle, benchmarksSchema)
     ]);
+    this.benchmarks = [cachedBenchmarks, bundledBenchmarks].filter((item): item is Benchmarks => !!item)
+      .sort((a, b) => Date.parse(b.generatedAt) - Date.parse(a.generatedAt))[0];
     this.value = cached && (!bundled || Date.parse(cached.generatedAt) >= Date.parse(bundled.generatedAt)) ? cached : bundled;
     if (!this.value) await this.refresh();
     void this.current;
@@ -57,7 +65,8 @@ export class CatalogService {
   async clearCache() {
     this.refreshAbort?.abort();
     await this.refreshing;
-    await rm(join(this.data, "catalog.json"), { force: true });
+    await Promise.all([rm(join(this.data, "catalog.json"), { force: true }), rm(this.benchmarkCache, { force: true })]);
+    this.benchmarks = await readJson(this.benchmarkBundle, benchmarksSchema);
   }
 
   refresh(): Promise<void> {
@@ -76,10 +85,17 @@ export class CatalogService {
   private async update(signal: AbortSignal): Promise<void> {
     const previous = this.value;
     const cache = join(this.data, "catalog.json");
-    const latest = await download(publicOrigin + "/catalog.json", catalogSchema, signal) ??
-      await download(mirror + "/catalog.json", catalogSchema, signal);
+    const fromSources = async <T>(name: string, schema: ZodType<T>) =>
+      await download(publicOrigin + "/" + name, schema, signal) ?? await download(mirror + "/" + name, schema, signal);
+    const [downloaded, benchmarks] = await Promise.all([
+      fromSources("catalog.json", catalogSchema), fromSources("benchmarks.json", benchmarksSchema)
+    ]);
     if (signal.aborted) return;
-    if (latest && previous && Date.parse(latest.generatedAt) < Date.parse(previous.generatedAt)) return;
+    if (benchmarks && (!this.benchmarks || Date.parse(benchmarks.generatedAt) >= Date.parse(this.benchmarks.generatedAt))) {
+      this.benchmarks = benchmarks;
+      await writeJson(this.benchmarkCache, benchmarks).catch(() => {});
+    }
+    const latest = downloaded && (!previous || Date.parse(downloaded.generatedAt) >= Date.parse(previous.generatedAt)) ? downloaded : undefined;
     const current = latest ?? previous ?? await readJson(cache, catalogSchema) ?? await readJson(this.bundled, catalogSchema);
     if (!current) return;
     const changes = latest && previous && Date.parse(latest.generatedAt) > Date.parse(previous.generatedAt)

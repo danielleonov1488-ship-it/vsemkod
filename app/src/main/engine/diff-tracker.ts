@@ -11,11 +11,12 @@ export function inside(root: string, path: string): boolean {
   return !isAbsolute(local) && local !== ".." && !local.startsWith(".." + sep);
 }
 
-type TextFile = { path: string; value: string | null };
+type TrackedFile = { path: string; value?: string | null; stamp?: string };
 
 export class DiffTracker {
-  private before = new Map<string, TextFile[]>();
+  private before = new Map<string, TrackedFile[]>();
   private changes = new Map<string, FileChange>();
+  private otherChanges = new Map<string, FileChange>();
 
   constructor(private readonly directory: string) {}
 
@@ -34,8 +35,14 @@ export class DiffTracker {
     const completed: FileChange[] = [];
     for (const file of files) {
       const next = await this.read(file.path);
-      if (!next || file.value === next.value) continue;
+      if (!next) continue;
       const path = relative(this.directory, resolve(this.directory, file.path)).split(sep).join("/");
+      const status = file.value === null ? "added" : next.value === null ? "deleted" : "modified";
+      if (file.value === undefined || next.value === undefined) {
+        if (file.stamp !== next.stamp) this.otherChanges.set(path, { file: path, status, patch: "", additions: 0, deletions: 0 });
+        continue;
+      }
+      if (file.value === next.value) continue;
       const before = file.value ?? "";
       const after = next.value ?? "";
       const lines = diffLines(before, after);
@@ -44,7 +51,7 @@ export class DiffTracker {
         patch: createTwoFilesPatch(file.value === null ? "/dev/null" : path, next.value === null ? "/dev/null" : path, before, after, "", ""),
         additions: lines.reduce((count, line) => count + (line.added ? line.count : 0), 0),
         deletions: lines.reduce((count, line) => count + (line.removed ? line.count : 0), 0),
-        status: file.value === null ? "added" : next.value === null ? "deleted" : "modified"
+        status
       };
       this.changes.set(path, change);
       completed.push(change);
@@ -54,8 +61,9 @@ export class DiffTracker {
   }
 
   results() { return [...this.changes.values()]; }
+  artifacts() { return [...this.otherChanges.values()]; }
 
-  private async read(target: string): Promise<TextFile | undefined> {
+  private async read(target: string): Promise<TrackedFile | undefined> {
     if (!target || target.includes("\0")) return;
     const path = resolve(this.directory, target);
     if (!inside(this.directory, path)) return;
@@ -65,11 +73,15 @@ export class DiffTracker {
       const handle = await open(resolved, "r");
       try {
         const info = await handle.stat();
-        if (!info.isFile() || info.size > maxBytes) return;
+        if (!info.isFile()) return;
+        const stamp = info.size + "/" + info.mtimeMs + "/" + info.ino;
+        if (info.size > maxBytes) return { path: target, stamp };
         const buffer = Buffer.alloc(info.size + 1);
         const { bytesRead } = await handle.read(buffer, 0, buffer.length, 0);
-        if (bytesRead > info.size || buffer.subarray(0, bytesRead).includes(0)) return;
-        return { path: target, value: new TextDecoder("utf-8", { fatal: true }).decode(buffer.subarray(0, bytesRead)) };
+        const data = buffer.subarray(0, bytesRead);
+        if (bytesRead > info.size || data.includes(0)) return { path: target, stamp };
+        try { return { path: target, stamp, value: new TextDecoder("utf-8", { fatal: true }).decode(data) }; }
+        catch { return { path: target, stamp }; }
       } finally { await handle.close(); }
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") return { path: target, value: null };

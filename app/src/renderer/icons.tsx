@@ -1,4 +1,9 @@
 const paths = {
+  eye: <><path d="M1.5 8S4 3.75 8 3.75 14.5 8 14.5 8 12 12.25 8 12.25 1.5 8 1.5 8Z" /><circle cx="8" cy="8" r="1.75" /></>,
+  shield: <path d="M8 2 3 4v3.5c0 3.1 2 5 5 6.5 3-1.5 5-3.4 5-6.5V4L8 2Z" />,
+  pencil: <path d="m3 10 6.9-6.9a1.5 1.5 0 0 1 2.1 0l.9.9a1.5 1.5 0 0 1 0 2.1L6 13l-3.5.5L3 10Zm5.5-5.5 3 3" />,
+  image: <><rect x="2" y="2.5" width="12" height="11" rx="1.5" /><circle cx="6" cy="6" r="1" /><path d="m3 12 3-3 2 2 2.5-3.5L14 11" /></>,
+  code: <path d="m5 4-3 4 3 4m6-8 3 4-3 4M9.25 3 6.75 13" />,
   paperclip: <path d="M6.5 10.5 11 6a2 2 0 0 0-2.8-2.8L3.6 7.8a3 3 0 0 0 4.2 4.2l4.7-4.7M5 9.3l4-4" />,
   more: <path d="M3 8h.1M8 8h.1M13 8h.1" strokeWidth="2.5" />,
   panel: <><rect x="2" y="3" width="12" height="10" rx="1.5" /><path d="M10 3v10" /></>,

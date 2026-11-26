@@ -4,7 +4,7 @@ import { pathToFileURL } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
 import { OpenCode, type SessionInfo, type SessionMessageAssistantTool } from "@opencode/client";
 import type { ChatAction, ChatEvent, ChatHistory, ChatPart, Conversation, FileChange, McpConfig, PermissionDecision, ProjectTools, QuestionAnswer, SubscriptionId, TurnOptions, Usage } from "../../shared/api";
-import { cachePercent, replySpeed } from "../../shared/usage";
+import { cachePercent, estimateTokens, replySpeed, tokenCharacters } from "../../shared/usage";
 import { nativeNames, type PersonalModel } from "../../shared/providers";
 import { modelReference } from "../connect-service";
 import { accessModes, imageFile, pathMentions } from "../../shared/workspace";
@@ -27,7 +27,8 @@ function conversation(info: SessionInfo): Conversation {
     id: info.id, title: info.title ?? "Новый чат", directory: info.location.directory,
     updatedAt: info.time.updated, archived: Boolean(info.time.archived), pinned: info.metadata?.vsemkodPinned === true,
     variant: info.model?.variant, access: accessModes.find(mode => mode === info.metadata?.vsemkodAccess),
-    modelId: info.model && (info.model.providerID === "vsemkod" ? info.model.id : modelReference(info.model.providerID, info.model.id))
+    modelId: info.model?.id === "relay" && info.model.providerID === "vsemkod" && typeof info.metadata?.vsemkodModel === "string" ? info.metadata.vsemkodModel :
+      info.model && (info.model.providerID === "vsemkod" ? info.model.id : modelReference(info.model.providerID, info.model.id))
   };
 }
 
@@ -304,6 +305,7 @@ export class EngineAdapter {
     let tokens: Usage | undefined;
     let hidden = false;
     let turnStarted: number | undefined;
+    let userId: string | undefined;
     do {
       const page = await this.client.message.list({
         sessionID: sessionId, limit: 100, ...(cursor ? { cursor } : { order: "asc" })
@@ -313,6 +315,7 @@ export class EngineAdapter {
         if (hidden) break;
         if (message.type === "user") {
           turnStarted = message.time.created;
+          userId = message.id;
           parts.push({ id: message.id, kind: "user", text: message.text, files: message.files?.map(file => file.name ?? "") });
         } else if (message.type === "assistant") {
           turnStarted ??= message.time.created;
@@ -332,8 +335,9 @@ export class EngineAdapter {
           tokens = message.tokens ?? tokens;
         } else if (message.type === "idle" && turnStarted !== undefined) {
           parts.push({ id: message.id, kind: "turn", seconds: Math.max(0, (message.time.created - turnStarted) / 1000),
-            stopped: message.outcome === "interrupted" });
+            stopped: message.outcome === "interrupted", files: userId ? toolDiffs["turn:" + userId] : undefined });
           turnStarted = undefined;
+          userId = undefined;
         }
       }
       cursor = hidden ? undefined : page.cursor?.next ?? undefined;
@@ -342,8 +346,8 @@ export class EngineAdapter {
     return { parts, reverted: Boolean(session.revert), usage: tokens, changes: mergeChanges(visibleDiffs, await this.changes(sessionId)) };
   }
 
-  async changes(sessionId: string) {
-    return this.client.session.diff({ sessionID: sessionId }, request()).catch(() => []);
+  async changes(sessionId: string, from?: string, to?: string) {
+    return this.client.session.diff({ sessionID: sessionId, from, to }, request()).catch(() => []);
   }
 
   async providerIds(directory: string): Promise<string[]> {
@@ -364,7 +368,7 @@ export class EngineAdapter {
     files: string[],
     emit: (event: ChatEvent) => void,
     interrupted: () => boolean,
-    options: TurnOptions & { webSearch?: boolean; routerError?: () => string | undefined } = {}
+    options: TurnOptions & { webSearch?: boolean; routerError?: () => string | undefined; displayModelId?: string; nativeSpeed?: (speed: NonNullable<ReturnType<typeof replySpeed>>, live: boolean) => void } = {}
   ) {
     const signal = new AbortController();
     const events = this.client.event.subscribe({ types: eventTypes, signal: signal.signal })[Symbol.asyncIterator]();
@@ -381,7 +385,14 @@ export class EngineAdapter {
     void timeout.catch(() => {});
     const waitForModel = () => { if (!runningTools.size && !blockers.size) watchdog.wait(); };
     let context: number | undefined;
-    let step: { id: string; started: number; first?: number } | undefined;
+    let step: { id: string; started: number; first?: number; cyrillic: number; other: number } | undefined;
+    let speedTimer: ReturnType<typeof setInterval> | undefined;
+    const count = (id: string, delta: string) => {
+      if (step?.id !== id || !options.nativeSpeed) return;
+      const chars = tokenCharacters(delta);
+      step.cyrillic += chars.cyrillic;
+      step.other += chars.other;
+    };
     const firstToken = (id: string, time: number) => { if (step?.id === id) step.first ??= time; };
     const update = (part: ChatPart) => emit({ type: "part", sessionId, part });
     let queued = false;
@@ -424,6 +435,7 @@ export class EngineAdapter {
           case "session.reasoning.delta": {
             if (event.data.delta) {
               firstToken(event.data.assistantMessageID, event.created);
+              count(event.data.assistantMessageID, event.data.delta);
               waitForModel();
             }
             emit({ type: "delta", sessionId, partId: event.data.assistantMessageID + "/" + event.data.ordinal,
@@ -437,7 +449,13 @@ export class EngineAdapter {
             break;
           }
           case "session.step.started":
-            step = { id: event.data.assistantMessageID, started: event.created };
+            step = { id: event.data.assistantMessageID, started: event.created, cyrillic: 0, other: 0 };
+            clearInterval(speedTimer);
+            if (options.nativeSpeed && !options.compact) speedTimer = setInterval(() => {
+              if (!step) return;
+              const speed = replySpeed(estimateTokens(step.cyrillic, step.other), 0, step.started, step.first, Date.now());
+              if (speed) options.nativeSpeed?.({ ...speed, estimated: true }, true);
+            }, 1000);
             waitForModel();
             break;
           case "session.step.streamed":
@@ -446,12 +464,16 @@ export class EngineAdapter {
           case "session.step.ended": {
             const tokens = event.data.tokens;
             const timing = step?.id === event.data.assistantMessageID ? step : undefined;
-            const speed = timing && !options.compact && event.data.finish !== "error"
-              ? replySpeed(tokens.output, tokens.reasoning, timing.started, timing.first, event.created) : undefined;
+            if (timing && options.nativeSpeed && !options.compact && event.data.finish !== "error") {
+              const estimated = !(tokens.output + tokens.reasoning);
+              const output = estimated ? estimateTokens(timing.cyrillic, timing.other) : tokens.output + tokens.reasoning;
+              const speed = replySpeed(output, 0, timing.started, timing.first, event.created);
+              if (speed) options.nativeSpeed({ ...speed, estimated }, false);
+            }
             const nativeCachePercent = model.providerID !== "vsemkod"
               ? (tokens.cache.read > 0 ? cachePercent(tokens.input, tokens.cache.read) : undefined) ?? null : undefined;
-            emit({ type: "usage", sessionId, usage: { ...tokens, context }, speed, nativeCachePercent });
-            if (timing) step = undefined;
+            emit({ type: "usage", sessionId, usage: { ...tokens, context }, nativeCachePercent });
+            if (timing) { clearInterval(speedTimer); step = undefined; }
             break;
           }
           case "session.compaction.ended":
@@ -468,6 +490,7 @@ export class EngineAdapter {
             if (event.type === "session.text.delta") {
               if (event.data.delta) {
                 firstToken(event.data.assistantMessageID, event.created);
+                count(event.data.assistantMessageID, event.data.delta);
                 waitForModel();
               }
               emit({ type: "delta", sessionId, partId: id, delta: event.data.delta });
@@ -549,13 +572,13 @@ export class EngineAdapter {
       const access = options.access ?? "ask";
       const { agent, permissions } = sessionAccess(access, options.webSearch);
       await this.client.session.update({
-        sessionID: sessionId, permissions, metadata: { ...info.metadata, vsemkodAccess: access }
+        sessionID: sessionId, permissions, metadata: { ...info.metadata, vsemkodAccess: access, ...(options.displayModelId && { vsemkodModel: options.displayModelId }) }
       }, request());
       if (info.agent !== agent) await this.client.session.switchAgent({ sessionID: sessionId, agent }, request());
       const selection = await this.modelInfo(directory, model).catch(() => undefined);
       context = selection?.limit.context;
       await this.client.session.switchModel({ sessionID: sessionId, model: { ...model, variant: options.variant } }, request());
-      if (interrupted()) return { changes: await this.changes(sessionId), stopped: true };
+      if (interrupted()) return { changes: await this.changes(sessionId), stopped: true, artifacts: [] };
       queued = true;
       const replay = options.replayMessageId
         ? await this.client.session.message.get({ sessionID: sessionId, messageID: options.replayMessageId }, request()) : undefined;
@@ -584,17 +607,18 @@ export class EngineAdapter {
       }
       if (interrupted()) {
         await this.stop(sessionId);
-        return { changes: await this.changes(sessionId), stopped: true };
+        return { changes: await this.changes(sessionId), stopped: true, artifacts: [] };
       }
       await Promise.race([stream, timeout]);
       if (error) throw new Error(error);
-      return { changes: mergeChanges(tracker.results(), await this.changes(sessionId)), stopped };
+      return { changes: mergeChanges(tracker.results(), await this.changes(sessionId)), stopped, artifacts: tracker.artifacts() };
     } catch (failure) {
       const routed = options.routerError?.();
       if (queued) await this.stop(sessionId).catch(() => {});
       if (routed) throw new Error(routed);
       throw failure;
     } finally {
+      clearInterval(speedTimer);
       watchdog.pause();
       signal.abort();
       await events.return?.().catch(() => {});

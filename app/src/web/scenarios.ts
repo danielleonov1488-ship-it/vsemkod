@@ -31,7 +31,7 @@ const scenarios: Record<string, Step[]> = {
     events: [tool("edit", "edit", change.file, { diff: change }), reply("Готово. Светлая тема установлена по умолчанию.")]
   }, { click: ".user-turn .message-actions button", text: "Откатить сюда" }],
   modes: [
-    { click: "button.access-chip" }, { click: "button.access-chip" }, { click: "button.access-chip" },
+    { click: "button.access-chip" }, { click: '.access-option[data-mode="read"]' },
     { send: "Составь план переключения темы.", events: [reply("1. Добавить переключатель в настройки.\n2. Сохранять выбор.\n3. Проверить обе темы.")] },
     { send: "Выполни план", events: edit.events }
   ],
@@ -43,8 +43,8 @@ const scenarios: Record<string, Step[]> = {
     ]
   }],
   subscriptions: [
-    { click: ".model-picker > summary" },
-    { click: ".model-picker .subscription-link" },
+    { click: ".model-picker .model-trigger" },
+    { click: ".model-picker .picker-link" },
     { click: '.settings-panel button[aria-label^="Подключить "]' },
     { click: ".harness-dialog button", text: "Закрыть" }
   ],
@@ -132,7 +132,7 @@ export function runScenarios(root: HTMLElement, demo: ReturnType<typeof createDe
           input.form?.requestSubmit();
         }
         await wait(100, signal);
-        await find(".sidebar-row--new", signal);
+        await find('.composer button.send[type="submit"]', signal);
         if (step.send === "Составь план переключения темы.") await wait(reduced.matches ? 0 : 1400, signal);
       }
       if (reduced.matches) return;

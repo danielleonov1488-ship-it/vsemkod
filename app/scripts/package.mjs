@@ -13,6 +13,10 @@ const catalogBundle = join(root, "resources/catalog.json");
 const timestamp = async path => Date.parse(JSON.parse(await readFile(path, "utf8")).generatedAt);
 const [sourceDate, bundledDate] = await Promise.all([timestamp(catalogSource), timestamp(catalogBundle)]);
 if (sourceDate > bundledDate) await copyFile(catalogSource, catalogBundle);
+const benchmarksSource = join(root, "../catalog-bot/data/benchmarks.json");
+const benchmarksBundle = join(root, "resources/benchmarks.json");
+const benchmarksDate = await timestamp(benchmarksSource).catch(() => 0);
+if (benchmarksDate > await timestamp(benchmarksBundle)) await copyFile(benchmarksSource, benchmarksBundle);
 if (!process.env.ELECTRON_BUILDER_CACHE) {
   // Builder's downloaded icon tool is CommonJS and lives under our ESM package.
   await mkdir(builderCache, { recursive: true });

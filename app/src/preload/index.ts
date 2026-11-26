@@ -20,6 +20,11 @@ const api: DesktopApi = {
     subscribe: listener => subscribe("voice:event", listener)
   },
   initial: () => ipcRenderer.invoke("app:initial"),
+  fileStat: (directory, path) => ipcRenderer.invoke("file:stat", directory, path),
+  filePreview: (directory, path) => ipcRenderer.invoke("file:preview", directory, path),
+  fileAction: (directory, path, action) => ipcRenderer.invoke("file:action", directory, path, action),
+  projectOpen: directory => ipcRenderer.invoke("projects:open", directory),
+  projectRemove: directory => ipcRenderer.invoke("projects:remove", directory),
   routerStats: () => ipcRenderer.invoke("router:stats"),
   onRouterStats: listener => subscribe("router:stats", listener),
   sessions: directory => ipcRenderer.invoke("chat:list", directory),

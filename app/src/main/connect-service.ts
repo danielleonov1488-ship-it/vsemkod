@@ -1,3 +1,6 @@
+import { z } from "zod";
+import { providerIdSchema } from "../shared/catalog-schema";
+import { readJson, writeJson } from "./storage";
 import { createHash } from "node:crypto";
 import type { Catalog, Provider } from "../shared/catalog-schema";
 import { personalProviders, remoteModelsSchema, type KeyId, type PersonalId, type PersonalProvider, type RemoteModel } from "../shared/providers";
@@ -28,7 +31,28 @@ function chatModel(providerId: KeyId, id: string, capabilities: unknown) {
   return !/embedding|whisper|moderation|guard|transcribe|(?:^|[-_/])rerank|(?:^|[-_/])tts/i.test(id);
 }
 
-async function modelsFor(provider: Provider | PersonalProvider, baseUrl: string, key: string, signal: AbortSignal) {
+const freePlans = new Set<KeyId>(["numes", "groq", "modelscope", "kilo"]);
+const providerModelsSchema = z.partialRecord(providerIdSchema, z.object({
+  baseUrl: z.url(), updatedAt: z.number(), models: remoteModelsSchema
+}));
+type ProviderModelCache = z.infer<typeof providerModelsSchema>;
+
+function isFreeModel(id: KeyId, item: {
+  id: string; pricing?: { prompt?: unknown; completion?: unknown }; free?: unknown; tier?: unknown;
+  capabilities?: { tools?: boolean; function_calling?: boolean }; supports_tools?: boolean; supported_parameters?: string[];
+}) {
+  const zero = (price: unknown) => price === "0" || price === 0;
+  const explicitlyFree = zero(item.pricing?.prompt) && zero(item.pricing?.completion) || item.id.endsWith(":free");
+  if (id === "openrouter") return explicitlyFree;
+  const tools = item.capabilities?.tools ?? item.capabilities?.function_calling ?? item.supports_tools ??
+    (Array.isArray(item.supported_parameters) ? item.supported_parameters.includes("tools") : undefined);
+  if (tools === false) return false;
+  if (explicitlyFree || item.free === true || item.tier === "free") return true;
+  if (item.pricing?.prompt !== undefined || item.pricing?.completion !== undefined || item.free === false) return false;
+  return freePlans.has(id);
+}
+
+async function modelsFor(provider: Provider | PersonalProvider, baseUrl: string, key: string, signal: AbortSignal, freeOnly = false) {
   const anthropic = provider.id === "anthropic-api";
   let response: Response;
   try {
@@ -49,7 +73,7 @@ async function modelsFor(provider: Provider | PersonalProvider, baseUrl: string,
   if (!Array.isArray(data?.data)) throw new Error("Сервис вернул некорректный список моделей.");
   const models = new Map<string, RemoteModel>();
   for (const item of data.data) {
-    if (typeof item?.id !== "string" || !chatModel(provider.id, item.id, item.capabilities)) continue;
+    if (typeof item?.id !== "string" || !chatModel(provider.id, item.id, item.capabilities) || freeOnly && !isFreeModel(provider.id, item)) continue;
     const result = remoteModelsSchema.element.safeParse({
       id: item.id, name: item.display_name || item.name || item.id,
       output: [item.max_output_tokens, item.max_completion_tokens].find(value => Number.isSafeInteger(value) && value > 0),
@@ -63,7 +87,40 @@ async function modelsFor(provider: Provider | PersonalProvider, baseUrl: string,
 }
 
 export class ConnectService {
-  constructor(private readonly keys: KeyStore) {}
+  private catalogModels: ProviderModelCache = {};
+  private refreshes = new Map<KeyId, Promise<void>>();
+  private writes = Promise.resolve();
+
+  constructor(private readonly keys: KeyStore, private readonly cachePath?: string) {}
+
+  async loadCatalogModels() {
+    if (this.cachePath) this.catalogModels = await readJson(this.cachePath, providerModelsSchema) ?? {};
+  }
+
+  async refreshCatalogModels(catalog: Catalog, signal = new AbortController().signal, force?: KeyId) {
+    await Promise.all(catalog.providers.map(provider => {
+      if (force && provider.id !== force) return;
+      const key = this.keys.get(provider.id);
+      if (!key || !provider.baseUrl) return;
+      const cached = this.catalogModels[provider.id];
+      if (!force && cached?.baseUrl === provider.baseUrl && Date.now() - cached.updatedAt < 6 * 60 * 60_000) return;
+      const active = this.refreshes.get(provider.id);
+      if (active) return force ? active.then(() => this.refreshCatalogModels(catalog, signal, force)) : active;
+      const task = modelsFor(provider, endpoint(provider.baseUrl), key, signal, true).then(async models => {
+        if (signal.aborted || this.keys.get(provider.id) !== key) return;
+        this.catalogModels[provider.id] = { baseUrl: provider.baseUrl!, updatedAt: Date.now(), models };
+        await this.saveCatalogModels();
+      }).catch(() => { /* Keep the last free list on temporary API errors. */ }).finally(() => this.refreshes.delete(provider.id));
+      this.refreshes.set(provider.id, task);
+      return task;
+    }));
+  }
+
+  private saveCatalogModels() {
+    const path = this.cachePath;
+    if (path) this.writes = this.writes.then(() => writeJson(path, this.catalogModels)).catch(() => {});
+    return this.writes;
+  }
 
   connected(catalog: Catalog) {
     return catalog.providers
@@ -75,8 +132,8 @@ export class ConnectService {
     return this.keys.get(id);
   }
 
-  personalRoutes() {
-    return personalProviders.flatMap(provider => {
+  personalRoutes(catalog?: Catalog) {
+    const personal = personalProviders.flatMap(provider => {
       const profile = this.keys.profile(provider.id);
       if (!profile || !this.keys.get(provider.id)) return [];
       return profile.models.map(model => ({
@@ -85,6 +142,20 @@ export class ConnectService {
         upstreamId: model.id
       }));
     });
+    const discovered = catalog?.providers.flatMap(provider => {
+      const cached = this.catalogModels[provider.id];
+      if (!cached || cached.baseUrl !== provider.baseUrl || !this.keys.get(provider.id)) return [];
+      const known = new Set([
+        ...catalog.models.map(model => model.id),
+        ...catalog.offers.filter(offer => offer.providerId === provider.id).map(offer => offer.providerModelId)
+      ]);
+      return cached.models.filter(model => !known.has(model.id)).map(model => ({
+        model: { ...model, id: modelReference(provider.id, model.id), providerId: provider.id, providerName: provider.name, upstreamId: model.id },
+        provider: { id: provider.id, name: provider.name, baseUrl: cached.baseUrl },
+        upstreamId: model.id
+      }));
+    }) ?? [];
+    return [...personal, ...discovered];
   }
 
   connectedPersonal(): PersonalId[] {
@@ -134,7 +205,12 @@ export class ConnectService {
     if (!signal.aborted) await this.keys.set(provider.id, key);
   }
 
-  disconnect(id: KeyId): Promise<void> {
-    return this.keys.remove(id);
+  async disconnect(id: KeyId): Promise<void> {
+    await this.keys.remove(id);
+    const parsed = providerIdSchema.safeParse(id);
+    if (parsed.success) {
+      delete this.catalogModels[parsed.data];
+      await this.saveCatalogModels();
+    }
   }
 }

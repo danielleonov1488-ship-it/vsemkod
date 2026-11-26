@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
 import type { Attachment, Preferences, ProjectTools } from "../shared/api";
-import { accessLabels, builtInCommands, folderName, imageFile, suggestionAt, type AccessMode } from "../shared/workspace";
+import { builtInCommands, folderName, imageFile, suggestionAt, type AccessMode } from "../shared/workspace";
+import { AccessPicker } from "./access-picker";
 import { Icon } from "./icons";
 import { useVoiceComposer } from "./voice-composer";
 
@@ -8,12 +9,12 @@ const api = window.vsemkod;
 type Suggestion = { key: string; text: string; detail?: string; folder?: boolean };
 
 export function Composer({ active, input, draft, change, directory, busy, canSend, attachments, remove, add, pick, choose,
-  projects, switchProject, access, cycle, submit, stop, selectCommand, tools, modelControls, vision, onError, preferences, updatePreferences }: {
+  projects, switchProject, access, accessMenu, selectAccess, cycle, submit, stop, selectCommand, tools, modelControls, vision, onError, preferences, updatePreferences }: {
   preferences?: Preferences; updatePreferences: (patch: Partial<Preferences>) => void;
   active: boolean; input: RefObject<HTMLTextAreaElement | null>; draft: string; change: (value: string) => void;
   directory: string; projects: string[]; switchProject: (path: string) => void; busy: boolean; canSend: boolean; attachments: Attachment[]; remove: (id: string) => void;
-  add: (files: File[]) => void; pick: () => void; choose: () => void; access: AccessMode; cycle: () => void;
-  submit: (intervene?: boolean) => void; stop: () => void; selectCommand: (name: string) => boolean;
+  add: (files: File[]) => void; pick: () => void; choose: () => void; access: AccessMode; accessMenu: number; selectAccess: (mode: AccessMode, confirmed?: boolean) => void; cycle: () => void;
+  submit: () => void; stop: () => void; selectCommand: (name: string) => boolean;
   tools?: ProjectTools; modelControls: ReactNode; vision: boolean; onError: (text: string) => void;
 }) {
   const voice = useVoiceComposer({ draft, input, change, preferences, update: updatePreferences,
@@ -103,7 +104,7 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
       event.preventDefault();
       setDismissed(true);
       setCommands(false);
-      submit(event.ctrlKey || event.metaKey);
+      submit();
     }
   }
   function toggleMenu(next: "add" | "project", trigger: HTMLButtonElement) {
@@ -197,15 +198,13 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
             </button>
           </div>}
         </div>
-        <button type="button" className="composer-control folder-chip access-chip" onClick={cycle} title="Изменить режим доступа · Shift+Tab">
-          <Icon name="lock" /><span>{accessLabels[access]}</span>
-        </button>
+        <AccessPicker value={access} confirmed={preferences?.fullAccessConfirmed} select={selectAccess} warningSignal={accessMenu} />
       </div>
       <div className="composer-controls composer-controls--right">
         {modelControls}
         {busy && <button className="send stop-button" type="button" title="Стоп · Esc Esc" aria-label="Стоп" onClick={stop}><Icon name="stop" /></button>}
         {voice.button}
-        {(!busy || draft.trim() || attachments.length > 0) && <button className="send" type="submit" title={busy ? "Отправить во время работы" : "Отправить"}
+        {!busy && <button className="send" type="submit" title="Отправить"
           aria-label="Отправить" disabled={!canSend || voice.busy}><Icon name="send" /></button>}
       </div>
     </div>

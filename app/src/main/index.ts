@@ -15,6 +15,7 @@ import { accessModes } from "../shared/workspace";
 import { Attachments, attachmentLimit } from "./attachments";
 import { chatMarkdown } from "./chat-export";
 import { migratePreferences, preferencesSchema } from "./preferences";
+import { checkedFile, previewFile } from "./file-preview";
 import { projectPath } from "./engine/revert-files";
 import { CatalogService } from "./catalog-service";
 import { ClipboardWatch } from "./clipboard-watch";
@@ -128,18 +129,23 @@ async function start() {
     preferences.directory = await realpath(defaultDirectory);
   }
   const projectsPath = join(data, "projects.json");
-  let recentProjects = await readJson(projectsPath, z.array(localPath)) ?? [];
+  const projectList = z.array(localPath);
+  const savedProjects = await readJson(projectsPath, z.union([
+    projectList.transform(recent => ({ recent, hidden: [] as string[] })),
+    z.object({ recent: projectList, hidden: projectList })
+  ]));
+  let recentProjects = savedProjects?.recent ?? [];
   const projects = new Set([preferences.directory, ...recentProjects]);
+  const hiddenProjects = new Set(savedProjects?.hidden ?? []);
   let projectWrites = Promise.resolve();
   const attachments = new Attachments(join(data, "attachments"));
   const mcpPath = join(data, "mcp.json");
   let mcp: Record<string, McpConfig> = await readJson(mcpPath, z.record(z.string(), mcpConfig)) ?? {};
-  let activeSession: string | undefined;
-  let turnInterrupted = false;
+  const activeSessions = new Map<string, { interrupted: boolean }>();
   let power: number | undefined;
   function syncPower() {
-    if (activeSession && preferences.keepAwake && power === undefined) power = powerSaveBlocker.start("prevent-app-suspension");
-    if ((!activeSession || !preferences.keepAwake) && power !== undefined) { powerSaveBlocker.stop(power); power = undefined; }
+    if (activeSessions.size && preferences.keepAwake && power === undefined) power = powerSaveBlocker.start("prevent-app-suspension");
+    if ((!activeSessions.size || !preferences.keepAwake) && power !== undefined) { powerSaveBlocker.stop(power); power = undefined; }
   }
   function announce(title: string, body: string) {
     if (!preferences.notifications || window?.isFocused() || !Notification.isSupported()) return;
@@ -153,17 +159,19 @@ async function start() {
   const voice = new VoiceService(data, join(resources, "voice", process.platform + "-" + process.arch),
     join(here, "voice-worker.js"), app.isPackaged ? join(resources, "voice-benchmark.wav") : join(resources, "../tests/fixtures/voice-en.wav"),
     () => keys.get("groq-api"), event => broadcast("voice:event", event));
-  const connections = new ConnectService(keys);
+  const connections = new ConnectService(keys, join(data, "provider-models.json"));
+  await connections.loadCatalogModels();
+  const providerRefresh = new AbortController();
   let subscriptions: SubscriptionId[] = [];
   let nativeModels: NativeModel[] = [];
-  const personalModels = () => connections.personalRoutes().map(({ model }) => model);
+  const personalModels = () => connections.personalRoutes(catalog.current).map(({ model }) => model);
   const health = new ProviderHealth(join(data, "usage.json"));
   await health.load();
   const state = () => ({
     catalog: catalog.current, connected: connections.connected(catalog.current), personal: connections.connectedPersonal(), subscriptions,
     personalModels: [...personalModels(), ...nativeModels.filter(({ model }) => model.providerId !== "opencode").map(({ model }) => model)],
     zenModels: nativeModels.filter(({ model }) => model.providerId === "opencode").map(({ model }) => model),
-    latencies: health.latencies(),
+    latencies: health.latencies(), speeds: health.speeds(), benchmarks: catalog.benchmarks,
     customProviderUrl: URL.parse(keys.profile("custom-api")?.baseUrl ?? "")?.origin
   });
   const publishState = () => {
@@ -189,9 +197,10 @@ async function start() {
   const router = new Router({
     catalog: () => catalog.current,
     key: providerId => connections.key(providerId),
-    personal: () => connections.personalRoutes(),
+    personal: () => connections.personalRoutes(catalog.current),
     health,
     onRoute: route => broadcast("chat:event", { type: "route", ...route } satisfies ChatEvent),
+    onSpeed: event => broadcast("chat:event", event),
     onReplyCache: (sessionId, cachePercent) => broadcast("chat:event", { type: "reply-cache", sessionId, cachePercent } satisfies ChatEvent),
     onStats: stats => broadcast("router:stats", stats)
   });
@@ -238,13 +247,20 @@ async function start() {
     watching = undefined;
     for (const { controller } of attempts.values()) controller.abort();
   };
+  const refreshProviderModels = () => void connections.refreshCatalogModels(catalog.current, providerRefresh.signal)
+    .then(() => { if (!providerRefresh.signal.aborted) publishState(); });
+  const providerTimer = setInterval(refreshProviderModels, 6 * 60 * 60_000);
+  providerTimer.unref();
   cancelConnections = cancelAll;
   teardown = async () => {
     cancelAll();
     voice.pause();
     catalog.stop();
+    clearInterval(providerTimer);
+    providerRefresh.abort();
     updates.stop();
-    activeSession = undefined;
+    for (const sessionId of activeSessions.keys()) void engine.stop(sessionId).catch(() => {});
+    activeSessions.clear();
     syncPower();
     await Promise.allSettled([...terminals.values()].map(terminal => terminal.close()));
     await engine.close();
@@ -268,7 +284,7 @@ async function start() {
     return session;
   }
 
-  handle("app:initial", z.tuple([]), () => ({ ...state(), projects: recentProjects, preferences, version: app.getVersion(), update: updates.ready }));
+  handle("app:initial", z.tuple([]), () => ({ ...state(), projects: recentProjects, hiddenProjects: [...hiddenProjects], preferences, version: app.getVersion(), update: updates.ready }));
   handle("router:stats", z.tuple([]), () => router.stats());
   handle("updates:check", z.tuple([]), () => updates.check());
   handle("updates:apply", z.tuple([]), () => updates.apply());
@@ -280,13 +296,34 @@ async function start() {
     const directory = await realpath(choice.filePaths[0]);
     const write = projectWrites.then(async () => {
       const next = [directory, ...recentProjects.filter(path => path !== directory)];
-      await writeJson(projectsPath, next);
+      await writeJson(projectsPath, { recent: next, hidden: [...hiddenProjects].filter(path => path !== directory) });
       recentProjects = next;
       projects.add(directory);
+      hiddenProjects.delete(directory);
     });
     projectWrites = write.catch(() => {});
     await write;
     return directory;
+  });
+  handle("projects:open", z.tuple([localPath]), async ([directory]) => {
+    const path = await realpath(project(directory));
+    if (path !== directory || !(await stat(path)).isDirectory()) throw new Error("Папка проекта недоступна.");
+    const error = await shell.openPath(path);
+    if (error) throw new Error(error);
+  });
+  handle("projects:remove", z.tuple([localPath]), ([directory]) => {
+    project(directory);
+    const write = projectWrites.then(async () => {
+      if ([...activeSessions.keys()].some(id => conversations.get(id)?.directory === directory)) {
+        throw new Error("Сначала остановите агента.");
+      }
+      const next = recentProjects.filter(path => path !== directory);
+      await writeJson(projectsPath, { recent: next, hidden: [...new Set([...hiddenProjects, directory])] });
+      recentProjects = next;
+      hiddenProjects.add(directory);
+    });
+    projectWrites = write.catch(() => {});
+    return write;
   });
   handle("projects:attach", z.tuple([localPath]), async ([directory]) => {
     project(directory);
@@ -382,6 +419,7 @@ async function start() {
         await connections.manual(provider, input.key, input.baseUrl, signal, input.models);
       } else throw new Error("Введите ключ провайдера.");
       health.reset(provider.id);
+      if ("auth" in provider) await connections.refreshCatalogModels(catalog.current, signal, provider.id);
       return publishState();
     }).catch(error => {
       if (signal.aborted) throw new Error("Подключение отменено.");
@@ -417,13 +455,15 @@ async function start() {
   });
   handle("chat:action", z.tuple([id, chatActionSchema]), async ([session, action]) => {
     conversation(session);
-    if (activeSession === session) throw new Error("Сначала остановите агента.");
+    if (activeSessions.has(session) && (action.type === "archive" || action.type === "delete")) throw new Error("Сначала остановите агента.");
     const chat = await (await engine.ready()).chatAction(session, action);
     if (chat) conversations.set(chat.id, chat);
     else conversations.delete(session);
     return chat;
   });
-  handle("chat:history", z.tuple([id]), ([session]) => engine.history(session, conversation(session).directory));
+  handle("chat:history", z.tuple([id]), async ([session]) => ({
+    ...await engine.history(session, conversation(session).directory), speed: health.lastReply(session)
+  }));
   handle("chat:revert", z.tuple([id, id.optional()]), ([session, message]) => engine.revert(session, conversation(session).directory, message));
   handle("chat:revert-file", z.tuple([id, id]), ([session, file]) => engine.revertFile(session, conversation(session).directory, file));
   handle("chat:export", z.tuple([id.optional()]), async ([session]) => {
@@ -453,7 +493,7 @@ async function start() {
   });
   const engineModel = (model: string) => nativeModels.find(entry => entry.model.id === model)?.upstream ?? { id: model, providerID: "vsemkod" };
   handle("chat:send", z.tuple([id, z.string().trim().max(100_000), id, z.array(dialogId).max(10), turnSchema.optional()]), async ([session, text, model, files, options]) => {
-    if (activeSession) throw new Error("Агент уже отвечает.");
+    if (activeSessions.has(session)) throw new Error("Агент уже отвечает в этом чате.");
     const chat = conversation(session);
     const connected = connections.connected(catalog.current);
     const available = rankedModels(catalog.current).filter(entry =>
@@ -467,21 +507,37 @@ async function start() {
     if (!text && !files.length && !options?.compact && !options?.replayMessageId) throw new Error("Введите сообщение.");
     const access = options?.access ?? preferences.defaultAccess;
     if (access === "full" && !preferences.fullAccessConfirmed) throw new Error("Подтвердите полный доступ в настройках.");
-    activeSession = session;
-    turnInterrupted = false;
+    const turn = { interrupted: false };
+    activeSessions.set(session, turn);
     syncPower();
     try {
       const paths = await attachments.resolve(chat.directory, files, details?.vision ?? catalogModel?.capabilities.includes("vision") ?? false);
-      if (turnInterrupted) return { stopped: true, changes: (await engine.history(session, chat.directory)).changes };
+      if (turn.interrupted) return { stopped: true, changes: (await engine.history(session, chat.directory)).changes };
       const result = await engine.send(session, chat.directory, text, model, preferences.auto, paths, native?.upstream, { ...options, access });
       if (!result.stopped) announce("Агент закончил работу", chat.title);
       return result;
     } finally {
-      activeSession = undefined;
+      activeSessions.delete(session);
       syncPower();
     }
   });
   const projectFile = z.string().min(1).max(32768);
+  handle("file:stat", z.tuple([localPath, projectFile]), ([directory, path]) =>
+    checkedFile(project(directory), path).then(({ info }) => info, () => null));
+  handle("file:preview", z.tuple([localPath, projectFile]), ([directory, path]) =>
+    previewFile(project(directory), path));
+  handle("file:action", z.tuple([localPath, projectFile, z.enum(["open", "reveal", "browser"])]), async ([directory, path, action]) => {
+    const { info } = await checkedFile(project(directory), path);
+    if (action === "reveal") { shell.showItemInFolder(info.path); return; }
+    if (action === "browser") {
+      if (!info.html || !info.canOpen) throw new Error("В браузере можно открыть только HTML.");
+      await shell.openExternal(pathToFileURL(info.path).href);
+      return;
+    }
+    if (!info.canOpen) throw new Error("Открытие исполняемых файлов и сценариев запрещено.");
+    const error = await shell.openPath(info.path);
+    if (error) throw new Error(error);
+  });
   const attachmentInput = z.object({
     name: projectFile, mime: z.string().max(250), path: localPath.optional(),
     data: z.instanceof(Uint8Array).refine(data => data.byteLength <= attachmentLimit).optional()
@@ -505,7 +561,7 @@ async function start() {
   handle("chat:question", z.tuple([id, id, z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.array(z.string())])).optional()]),
     async ([session, form, answer]) => {
       conversation(session);
-      if (activeSession !== session) throw new Error("Вопрос уже закрыт.");
+      if (!engine.isWorking(session)) throw new Error("Вопрос уже закрыт.");
       await (await engine.ready()).answerQuestion(session, form, answer);
     });
   handle("models:variants", z.tuple([localPath, id]), async ([directory, model]) =>
@@ -542,7 +598,6 @@ async function start() {
     ([directory, name, action, config]) => {
       project(directory);
       const task = mcpQueue.then(async () => {
-        if (activeSession) throw new Error("Дождитесь окончания работы агента.");
         if (action === "check") {
           await (await engine.ready()).mcpCheck(directory, name, mcp[name]);
           return mcpList(directory);
@@ -585,7 +640,8 @@ async function start() {
     await terminal?.close();
   });
   handle("chat:stop", z.tuple([id]), ([session]) => {
-    if (activeSession === session) turnInterrupted = true;
+    const turn = activeSessions.get(session);
+    if (turn) turn.interrupted = true;
     return engine.stop(session);
   });
   handle("chat:answer", z.tuple([id, id, z.enum(["once", "always", "reject"])]), ([session, permission, decision]) =>
@@ -602,6 +658,7 @@ async function start() {
   createWindow();
   updates.start();
   if (preferences.catalogUpdates) catalog.start();
+  refreshProviderModels();
   void refreshNative().catch(() => {});
 }
 

@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
-import { memo, useEffect, useRef, useState } from "react";
+import { createContext, memo, useCallback, useContext, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import type { ChatPart, FileChange, Permission, PermissionDecision, Question, QuestionAnswer } from "../shared/api";
+import type { ChatPart, FileChange, FileInfo, Permission, PermissionDecision, Question, QuestionAnswer } from "../shared/api";
+import { fileReference, textFileReferences, type FileReference } from "../shared/file-links";
+import { FileChip, TurnFiles, type ChatFiles } from "./chat-files";
 import { Icon } from "./icons";
 import { modelWaitState } from "../shared/model-wait";
 import { chatStatusLabel, duration, groupTurns, turnContent, type ChatStatus } from "./turns";
@@ -143,11 +145,71 @@ function QuestionCard({ question, answer }: { question: Question; answer: (answe
   </form>;
 }
 
-const AgentText = memo(function AgentText({ text }: { text: string }) {
-  return <div className="agent-text"><Markdown remarkPlugins={[remarkGfm]} disallowedElements={["img"]} components={{
-    a: ({ href, children }) => <a className="text-link" href={href} onClick={event => external(event, href)}>{children}</a>
-  }}>{text}</Markdown></div>;
+type MarkdownNode = { type: string; tagName?: string; value?: string; properties?: Record<string, unknown>; children?: MarkdownNode[] };
+
+function markFilePaths() {
+  return (tree: MarkdownNode) => {
+    function visit(node: MarkdownNode) {
+      if (!node.children || ["a", "code", "pre"].includes(node.tagName ?? "")) return;
+      node.children = node.children.flatMap(child => {
+        if (child.type !== "text" || !child.value) { visit(child); return [child]; }
+        const text = child.value;
+        const matches = textFileReferences(text);
+        if (!matches.length) return [child];
+        let cursor = 0;
+        const parts: MarkdownNode[] = [];
+        for (const match of matches) {
+          parts.push({ type: "text", value: text.slice(cursor, match.start) }, {
+            type: "element", tagName: "span", properties: { dataFilePath: match.path, dataFileLine: match.line },
+            children: [{ type: "text", value: text.slice(match.start, match.end) }]
+          });
+          cursor = match.end;
+        }
+        parts.push({ type: "text", value: text.slice(cursor) });
+        return parts;
+      });
+    }
+    visit(tree);
+  };
+}
+
+const CodeBlock = createContext(false);
+
+function CodeText({ children, className, files }: { children: ReactNode; className?: string; files: ChatFiles }) {
+  const block = useContext(CodeBlock);
+  const reference = !block && typeof children === "string" ? fileReference(children) : undefined;
+  const fallback = <code className={className}>{children}</code>;
+  return reference ? <FileChip files={files} reference={reference}>{fallback}</FileChip> : fallback;
+}
+
+const AgentText = memo(function AgentText({ text, files }: { text: string; files: ChatFiles }) {
+  return <div className="agent-text"><Markdown remarkPlugins={[remarkGfm]} rehypePlugins={window.vsemkod.fileStat ? [markFilePaths] : []}
+    disallowedElements={["img"]} components={{
+      a: ({ href, children }) => <a className="text-link" href={href} onClick={event => external(event, href)}>{children}</a>,
+      pre: ({ children }) => <CodeBlock.Provider value={true}><pre>{children}</pre></CodeBlock.Provider>,
+      code: ({ children, className }) => <CodeText files={files} className={className}>{children}</CodeText>,
+      span: ({ children, node }) => {
+        const path = node?.properties.dataFilePath;
+        const line = node?.properties.dataFileLine;
+        return typeof path === "string" ? <FileChip files={files} reference={{ path, line: typeof line === "number" ? line : undefined }}>
+          {children}</FileChip> : <span>{children}</span>;
+      }
+    }}>{text}</Markdown></div>;
 });
+
+function turnChanges(parts: ChatPart[], native: FileChange[] = []) {
+  const changes = new Map<string, FileChange>();
+  for (const part of parts) {
+    if (part.kind !== "tool") continue;
+    for (const change of part.diffs ?? (part.diff ? [part.diff] : [])) {
+      const key = change.file.replaceAll("\\", "/");
+      const previous = changes.get(key);
+      changes.set(key, previous ? { ...change, additions: previous.additions + change.additions, deletions: previous.deletions + change.deletions } : change);
+    }
+  }
+  for (const change of native) changes.set(change.file.replaceAll("\\", "/"), change);
+  return [...changes.values()].filter(change => change.status !== "deleted");
+}
 
 function Reasoning({ text }: { text: string }) {
   const [open, setOpen] = useState(false);
@@ -161,7 +223,7 @@ function Reasoning({ text }: { text: string }) {
 }
 
 export function Chat({ title, parts, permissions, questions, changeCount, busy, answer, answerQuestion, children, panel, openPanel,
-  copy, edit, revert, retry, reverted, executePlan, status, progress, failure, retryFailed, chooseModel }: {
+  copy, edit, revert, retry, reverted, executePlan, status, progress, failure, retryFailed, chooseModel, directory, preview, onError }: {
   title: string; parts: ChatPart[]; permissions: Permission[]; questions: Question[]; changeCount: number;
   busy: boolean; answer: (id: string, decision: PermissionDecision) => Promise<void>;
   answerQuestion: (id: string, answer?: QuestionAnswer) => Promise<void>; children: ReactNode;
@@ -170,7 +232,22 @@ export function Chat({ title, parts, permissions, questions, changeCount, busy, 
   reverted: boolean; executePlan?: () => void;
   status?: ChatStatus; progress?: { started: number; since: number | null }; failure?: string;
   retryFailed: () => void; chooseModel: () => void;
+  directory: string; preview: (ref: FileReference) => void; onError: (error: unknown) => void;
 }) {
+  const lookup = useRef(new Map<string, Promise<FileInfo | null>>());
+  const finishedWrites = parts.filter(part => part.kind === "tool" && (part.diffs?.length || part.diff)).length;
+  const stat = useCallback((path: string) => {
+    const key = JSON.stringify([directory, busy, finishedWrites, path]);
+    const cached = lookup.current.get(key);
+    if (cached) return cached;
+    const requested = window.vsemkod.fileStat?.(directory, path);
+    if (requested) {
+      if (lookup.current.size >= 512) lookup.current.clear();
+      lookup.current.set(key, requested);
+    }
+    return requested;
+  }, [directory, busy, finishedWrites]);
+  const fileLinks = { directory, stat, preview, onError };
   const scroll = useRef<HTMLDivElement>(null);
   const atBottom = useRef(true);
   const [clock, setClock] = useState(Date.now);
@@ -214,7 +291,7 @@ export function Chat({ title, parts, permissions, questions, changeCount, busy, 
             if (part.kind === "tool") return <Action key={part.id} part={part} />;
             if (part.kind === "reasoning") return <Reasoning key={part.id} text={part.text} />;
             if (part.kind === "note") return <p className="subtle context-note" key={part.id}>{part.text}</p>;
-            if (part.kind === "text") return <AgentText key={part.id} text={part.text} />;
+            if (part.kind === "text") return <AgentText key={part.id} text={part.text} files={fileLinks} />;
             return null;
           });
           return <div className="turn" key={user?.id ?? index}>
@@ -245,7 +322,8 @@ export function Chat({ title, parts, permissions, questions, changeCount, busy, 
                 <span>Модель думает дольше обычного. Бесплатные модели иногда отвечают до минуты.</span>
                 <button type="button" className="text-link" onClick={chooseModel}>Сменить модель</button>
               </div>}
-              {content.answer.map(part => <AgentText key={part.id} text={part.text} />)}
+              {content.answer.map(part => <AgentText key={part.id} text={part.text} files={fileLinks} />)}
+              {(!busy || !last) && <TurnFiles changes={turnChanges(agent, end?.files)} files={fileLinks} />}
               {response && (!busy || !last) && <div className="message-actions">
                 <button type="button" className="composer-control" onClick={() => copy(response)}>Копировать</button>
                 {user && <button type="button" className="composer-control" disabled={busy} onClick={() => retry(user)}>Повторить</button>}

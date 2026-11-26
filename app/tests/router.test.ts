@@ -69,6 +69,34 @@ async function fixture(
 }
 
 describe("Router", () => {
+  it("requests include_usage, retries unsupported providers, and remembers the result", async () => {
+    const server = await upstream((res, call) => {
+      if (call.body.stream_options) res.writeHead(400).end("Unsupported stream_options");
+      else res.writeHead(200, { "content-type": "text/event-stream" }).end("data: [DONE]\n\n");
+    });
+    const { send } = await fixture([provider("kilo", server.url)], [offer("first", "kilo")]);
+    for (const id of ["a", "b"]) expect(await (await send("first", { stream: true }, id)).text()).toContain("[DONE]");
+    expect(server.calls.map(call => call.body.stream_options)).toEqual([{ include_usage: true }, undefined, undefined]);
+  });
+
+  it("isolates fallback policy and errors for simultaneous engine sessions", async () => {
+    const firstProvider = await upstream(res => res.writeHead(404).end());
+    const secondProvider = await upstream();
+    const routes: string[] = [];
+    const { router, headers } = await fixture([provider("kilo", firstProvider.url), provider("numes", secondProvider.url)],
+      [offer("first", "kilo"), offer("second", "numes")], { onRoute: event => routes.push(event.sessionId) });
+    router.setTurn({ sessionId: "chat-a", auto: false });
+    router.setTurn({ sessionId: "chat-b", auto: true });
+    const replies = await Promise.all(["chat-a", "chat-b"].map(id => fetch(router.baseUrl + "/chat/completions", {
+      method: "POST", headers: { ...headers, "x-opencode-session-id": id }, body: JSON.stringify({ model: "first", messages: [] })
+    })));
+    expect(replies.map(reply => reply.status)).toEqual([404, 200]);
+    expect(routes).toEqual(["chat-b"]);
+    expect(router.turnError("chat-a")).toContain("404");
+    router.clearTurn("chat-b");
+    expect(router.turnError("chat-a")).toContain("404");
+  });
+
   it("authenticates localhost clients and exposes canonical model IDs", async () => {
     const { router, headers } = await fixture([], []);
     const url = router.baseUrl + "/models";

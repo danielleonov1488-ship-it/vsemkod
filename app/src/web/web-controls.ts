@@ -160,11 +160,8 @@ export function installWebControls(root: HTMLElement, demo: ReturnType<typeof cr
     if (event.target.closest(connectSelector)) {
       event.stopPropagation();
       event.preventDefault();
-      const picker = event.target.closest<HTMLDetailsElement>(".model-picker");
-      if (picker) {
-        picker.open = false;
-        picker.querySelector("summary")?.focus();
-      }
+      const picker = event.target.closest(".model-picker");
+      picker?.querySelector<HTMLButtonElement>('.model-trigger[aria-expanded="true"]')?.click();
       showDesktop();
       return;
     }

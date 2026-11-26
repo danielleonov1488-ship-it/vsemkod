@@ -4,9 +4,9 @@ type UserPart = Extract<ChatPart, { kind: "user" | "text" }>;
 type TurnEnd = Extract<ChatPart, { kind: "turn" }>;
 type AgentPart = Exclude<ChatPart, TurnEnd>;
 
-export type ChatStatus = "working" | "permission" | "question" | "error";
+export type ChatStatus = "working" | "queued" | "permission" | "question" | "ready" | "error";
 export const chatStatusLabel: Record<ChatStatus, string> = {
-  working: "Агент работает", permission: "Ждёт разрешения", question: "Ждёт ответа", error: "Ошибка"
+  working: "Агент работает", queued: "В очереди", permission: "Ждёт ответа", question: "Ждёт ответа", ready: "Готово", error: "Ошибка"
 };
 
 export function groupTurns(parts: ChatPart[]) {

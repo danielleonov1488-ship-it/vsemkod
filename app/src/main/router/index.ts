@@ -5,7 +5,7 @@ import { once } from "node:events";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { activeOffers, automaticModels, rankedModels } from "../../shared/catalog";
-import type { ChatEvent, RouterStats } from "../../shared/api";
+import type { ChatEvent, ModelSpeed, ReplySpeed, RouterStats } from "../../shared/api";
 import type { Catalog } from "../../shared/catalog-schema";
 import type { KeyId } from "../../shared/providers";
 import type { ConnectService } from "../connect-service";
@@ -25,6 +25,7 @@ interface RouterOptions {
   auto?: () => boolean;
   firstByteMs?: number;
   onRoute?: (event: Route) => void;
+  onSpeed?: (event: Extract<ChatEvent, { type: "reply-speed" }>) => void;
   onReplyCache?: (sessionId: string, cachePercent?: number) => void;
   onStats?: (stats: RouterStats) => void;
 }
@@ -58,7 +59,8 @@ async function readCompletion(req: IncomingMessage): Promise<Completion> {
 export class Router {
   readonly token = randomBytes(32).toString("base64url");
   private endpoint?: string;
-  private context?: { sessionId: string; auto: boolean; error?: string };
+  private turns = new Map<string, { sessionId: string; auto: boolean; preferredModel?: string; error?: string }>();
+  private noStreamOptions = new Set<KeyId>();
   private sticky = new Map<string, KeyId>();
   private lastRoutes = new Map<string, { modelId: string; providerId: KeyId }>();
   private server = createServer((req, res) => {
@@ -96,12 +98,21 @@ export class Router {
     await this.options.health.flush();
   }
 
-  setTurn(context?: { sessionId: string; auto: boolean }): void {
-    this.context = context;
+  setTurn(context: { sessionId: string; auto: boolean; preferredModel?: string }): void {
+    this.turns.set(context.sessionId, context);
+  }
+
+  clearTurn(sessionId: string) {
+    this.turns.delete(sessionId);
   }
 
   turnError(sessionId: string) {
-    return this.context?.sessionId === sessionId ? this.context.error : undefined;
+    return this.turns.get(sessionId)?.error;
+  }
+
+  reportSpeed(sessionId: string, modelId: string, providerId: ModelSpeed["providerId"], speed: ReplySpeed, live = false) {
+    const modelSpeed = live ? undefined : this.options.health.recordSpeed(modelId, providerId, speed.tokensPerSecond, { sessionId, speed });
+    this.options.onSpeed?.({ type: "reply-speed", sessionId, speed, live, modelSpeed });
   }
 
   stats(): RouterStats {
@@ -151,25 +162,29 @@ export class Router {
     }
     const cancel = new AbortController();
     res.once("close", () => cancel.abort());
-    const context = this.context;
+    const header = req.headers["x-vsemkod-session"] ?? req.headers["x-opencode-session-id"] ?? req.headers["x-session-id"];
+    const parent = req.headers["x-opencode-parent-session-id"];
+    const sessionId = typeof header === "string" ? header.slice(0, 250) : undefined;
+    const context = (sessionId ? this.turns.get(sessionId) : undefined) ??
+      (typeof parent === "string" ? this.turns.get(parent) : undefined);
     if (context) context.error = undefined;
     try {
-      await this.complete(req, res, catalog, await readCompletion(req), cancel.signal, context);
+      const body = await readCompletion(req);
+      if (context?.preferredModel && body.model === "relay") body.model = context.preferredModel;
+      await this.complete(res, catalog, body, cancel.signal, context?.sessionId ?? sessionId, context?.auto);
     } catch (error) {
       if (context && error instanceof RequestError) context.error = error.message;
       throw error;
     }
   }
 
-  private async complete(req: IncomingMessage, res: ServerResponse, catalog: Catalog, body: Completion, signal: AbortSignal,
-    context: Router["context"]) {
+  private async complete(res: ServerResponse, catalog: Catalog, body: Completion, signal: AbortSignal,
+    sessionId?: string, auto?: boolean) {
     const models = rankedModels(catalog);
     const explicit = models.find(model => model.id === body.model);
     const personal = this.options.personal?.().find(route => route.model.id === body.model);
     if (!explicit && !personal && body.model !== "auto") throw new RequestError(404, "Модель недоступна.");
-    const header = req.headers["x-vsemkod-session"];
-    const sessionId = context?.sessionId ?? (typeof header === "string" ? header.slice(0, 200) : undefined);
-    const allowFallback = !explicit || (context?.auto ?? this.options.auto?.() ?? false);
+    const allowFallback = !explicit || (auto ?? this.options.auto?.() ?? false);
     const alternatives = automaticModels(catalog).filter(model => model.id !== explicit?.id);
     const ordered = personal ? [personal.model] : explicit ? [explicit, ...(allowFallback ? alternatives : [])] : alternatives;
     const health = this.options.health;
@@ -212,7 +227,12 @@ export class Router {
         let reader: ReadableStreamDefaultReader<Uint8Array>;
         let first: ReadableStreamReadResult<Uint8Array>;
         try {
-          response = await fetch(provider.baseUrl.replace(/\/$/, "") + "/chat/completions", {
+          const upstream: Completion = { ...body, model: upstreamId };
+          if (body.stream === true) {
+            if (this.noStreamOptions.has(provider.id)) delete upstream.stream_options;
+            else upstream.stream_options ??= { include_usage: true };
+          }
+          const forward = () => fetch(provider.baseUrl.replace(/\/$/, "") + "/chat/completions", {
             method: "POST",
             redirect: "error",
             headers: {
@@ -220,9 +240,16 @@ export class Router {
               accept: body.stream ? "text/event-stream" : "application/json",
               ...(key ? { authorization: "Bearer " + key } : {})
             },
-            body: JSON.stringify({ ...body, model: upstreamId }),
+            body: JSON.stringify(upstream),
             signal: AbortSignal.any([signal, deadline.signal])
           });
+          response = await forward();
+          if (response.status === 400 && upstream.stream_options !== undefined &&
+              (await response.text()).toLowerCase().includes("stream_options")) {
+            this.noStreamOptions.add(provider.id);
+            delete upstream.stream_options;
+            response = await forward();
+          }
           if (!needsKey || this.options.key(provider.id) === key) {
             health.response(provider.id, response.headers);
             this.publishStats();
@@ -284,11 +311,20 @@ export class Router {
         });
         try {
           const onStreamError = () => { if (!signal.aborted) health.error(provider.id); };
-          const usage = sessionId && this.options.onReplyCache
-            ? readReplyUsage(response.headers.get("content-type")?.includes("text/event-stream") || body.stream === true && !response.headers.has("content-type"))
-            : undefined;
-          const onEnd = sessionId && usage ? () => this.options.onReplyCache?.(sessionId, usage.finish()) : undefined;
-          await pipeline(Readable.from(readStream(reader, first.value, deadline, onStreamError, usage?.push, onEnd)), res);
+          const usage = readReplyUsage(response.headers.get("content-type")?.includes("text/event-stream") ||
+            body.stream === true && !response.headers.has("content-type"), started);
+          const emitSpeed = (live: boolean) => {
+            const speed = usage.speed(live);
+            if (speed && sessionId) this.reportSpeed(sessionId, model.id, provider.id, speed, live);
+          };
+          const live = sessionId && setInterval(() => emitSpeed(true), 1000);
+          const onEnd = () => {
+            const cache = usage.finish();
+            if (sessionId) this.options.onReplyCache?.(sessionId, cache);
+            emitSpeed(false);
+          };
+          try { await pipeline(Readable.from(readStream(reader, first.value, deadline, onStreamError, usage.push, onEnd)), res); }
+          finally { if (live) clearInterval(live); }
           health.success(provider.id);
         } catch { /* A started response cannot switch providers. */ }
         return;

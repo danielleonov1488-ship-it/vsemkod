@@ -82,8 +82,8 @@
   .composer-toolbar { flex-wrap: wrap; gap: 4px; }
   .composer--home .composer-toolbar { margin-top: 12px; }
   .composer-controls > .folder-chip { min-width: 0; }
-  .model-picker > summary span { max-width: min(152px, 39vw); }
-  .model-picker > .model-panel { width: min(340px, 100%); right: 0; }
+  .model-picker .model-trigger span { max-width: min(152px, 39vw); }
+  .model-picker > .model-panel { width: min(380px, calc(100vw - 40px)); right: 0; }
   .composer--home .model-panel { max-height: clamp(112px, calc(50dvh - 132px), 340px); }
   .model-panel { overflow-wrap: anywhere; }
   .suggestions { flex-wrap: wrap; }

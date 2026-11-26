@@ -211,9 +211,9 @@ function LimitsPanel({ id, state, providers, stats, now, onConnect, onDisconnect
   </section>;
 }
 
-export function ComposerStatus({ state, providerId, usage, capacity, speed, cache, stats, demo, demoRemaining,
+export function ComposerStatus({ state, providerId, usage, capacity, speed, typical, cache, stats, demo, demoRemaining,
   onCompact, onConnect, onDisconnect, onOpen, onSettings }: {
-  state?: CatalogState; providerId?: string; usage?: Usage; capacity?: number; speed?: ReplySpeed; cache?: number;
+  state?: CatalogState; providerId?: string; usage?: Usage; capacity?: number; speed?: ReplySpeed; typical?: { value: number; estimated: boolean }; cache?: number;
   stats?: RouterStats; demo: boolean; demoRemaining?: number;
   onCompact?: () => void; onConnect: (connection: Connection) => void; onDisconnect: (id: ConnectionId) => Promise<void>;
   onOpen: (url: string) => void; onSettings: () => void;
@@ -266,9 +266,13 @@ export function ComposerStatus({ state, providerId, usage, capacity, speed, cach
     setOpen(value => value === which ? undefined : which);
   }
   return <div className="composer-status" ref={root} aria-label="Статистика чата">
+    {!speed && typical && <Metric kind="typical-speed" tip={"Обычно " + numbers.format(Math.round(typical.value)) + " ток/с у этой модели"}>
+      <Icon name="bolt" /><span>{typical.estimated ? "~" : ""}{numbers.format(Math.round(typical.value))} ток/с</span>
+    </Metric>}
     {speed && speedText !== undefined && <Metric kind="speed"
-      tip={"Скорость ответа: " + speedText + " " + tokenWord + " в секунду. Первый токен пришёл через " + decimal.format(speed.firstTokenMs / 1000) + " с."}>
-      <Icon name="bolt" /><span>{speedText} ток/с</span>
+      tip={"Скорость ответа: " + speedText + " " + tokenWord + " в секунду. Первый токен пришёл через " + decimal.format(speed.firstTokenMs / 1000) + " с." +
+         (speed.estimated ? " Провайдер не сообщил точное число токенов — оценка по тексту" : "")}>
+      <Icon name="bolt" /><span>{speed.estimated ? "≈ " : ""}{speedText} ток/с</span>
     </Metric>}
     {!demo && cacheText !== undefined && <Metric kind="cache"
       tip={cacheText + " запроса взято из кэша провайдера — так быстрее и экономнее для квоты. Кэш держится, пока вы работаете с той же моделью."}>

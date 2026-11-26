@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import type { CatalogState, McpConfig, McpEntry, Preferences, SkillSummary } from "../shared/api";
-import { accessLabels } from "../shared/workspace";
+import { AccessPicker } from "./access-picker";
 import { ModelSettings, PreferenceSwitch } from "./connections";
 import { Icon } from "./icons";
 import { VoiceSettings } from "./voice-settings";
@@ -168,8 +168,10 @@ export function Settings({ prefs, version, directory, choose, update, open, chec
           <Group title="Рабочая папка и доступ">
             <div className="settings-row"><span className="folder-path" title={prefs.directory}>Папка по умолчанию<span className="subtle">{prefs.directory}</span></span>
               <button type="button" className="composer-control folder-chip" onClick={choose}><Icon name="folder" />Выбрать</button></div>
-            <Select title="Режим доступа по умолчанию" value={prefs.defaultAccess} choices={accessLabels} change={defaultAccess => update({ defaultAccess })} />
-            <Select title="Enter во время работы" value={prefs.busyEnter} choices={{ queue: "В очередь", interrupt: "Вмешаться" }} change={busyEnter => update({ busyEnter })} />
+            <div className="setting-row"><span>Режим доступа по умолчанию</span>
+              <AccessPicker value={prefs.defaultAccess} confirmed={prefs.fullAccessConfirmed} settings
+                select={(defaultAccess, confirmed) => update(confirmed ? { defaultAccess, fullAccessConfirmed: true } : { defaultAccess })} />
+            </div>
           </Group>
           <Group title="Уведомления и питание">
             <PreferenceSwitch title="Системные уведомления" detail="Когда агент закончил или ждёт ответа, а окно не в фокусе"

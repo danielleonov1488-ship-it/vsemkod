@@ -43,4 +43,4 @@ export const remoteModelsSchema = z.array(z.object({
   context: z.int().positive().optional(), output: z.int().positive().optional(), vision: z.boolean().optional()
 })).max(1000);
 export type RemoteModel = z.infer<typeof remoteModelsSchema>[number];
-export type PersonalModel = RemoteModel & { providerId: PersonalId | NativeId; providerName: string; upstreamId?: string };
+export type PersonalModel = RemoteModel & { providerId: KeyId | NativeId; providerName: string; upstreamId?: string };

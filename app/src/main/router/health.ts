@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { keyIdSchema, type KeyId } from "../../shared/providers";
-import type { KeyCredits, ModelLatency, RouterStats } from "../../shared/api";
+import { keyIdSchema, nativeIdSchema, type KeyId } from "../../shared/providers";
+import type { KeyCredits, ModelLatency, ModelSpeed, ReplySpeed, RouterStats } from "../../shared/api";
 import type { Catalog } from "../../shared/catalog-schema";
 import { readJson, writeJson } from "../storage";
 import { day, keyCredits, parseRateHeaders, providerQuota, rateHeaders } from "./quotas";
@@ -15,11 +15,20 @@ const sample = z.object({
 });
 const windows = z.partialRecord(keyIdSchema, z.array(z.number()));
 const headers = z.partialRecord(keyIdSchema, rateHeaders);
+const speedSample = z.object({
+  modelId: z.string(), providerId: z.union([keyIdSchema, nativeIdSchema]),
+  samples: z.array(z.number().positive()).min(1).max(5)
+});
+const recentReply = z.object({
+  sessionId: z.string(), speed: z.object({ tokensPerSecond: z.number().positive(), firstTokenMs: z.number().nonnegative(), estimated: z.boolean().optional() })
+});
 const usage = z.object({ providers: counters, ttfb: z.array(sample),
-  windows: windows.optional(), headers: headers.optional(), credits: keyCredits.optional(), creditsCheckedAt: z.number().optional() });
+  windows: windows.optional(), headers: headers.optional(), credits: keyCredits.optional(), creditsCheckedAt: z.number().optional(), speeds: z.array(speedSample).optional(), replies: z.array(recentReply).optional() });
 
 export class ProviderHealth {
   private counts: z.infer<typeof counters> = {};
+  private lastReplies = new Map<string, ReplySpeed>();
+  private replySpeeds = new Map<string, z.infer<typeof speedSample>>();
   private firstBytes = new Map<string, z.infer<typeof sample>>();
   private windows: z.infer<typeof windows> = {};
   private headers: z.infer<typeof headers> = {};
@@ -38,7 +47,33 @@ export class ProviderHealth {
     this.headers = persisted?.headers ?? {};
     this.credits = persisted?.credits;
     this.creditsCheckedAt = persisted?.creditsCheckedAt;
+    for (const entry of persisted?.replies?.slice(-1000) ?? []) this.lastReplies.set(entry.sessionId, entry.speed);
+    for (const entry of persisted?.speeds ?? []) this.replySpeeds.set(entry.providerId + "/" + entry.modelId, entry);
     for (const entry of persisted?.ttfb ?? []) this.firstBytes.set(entry.providerId + "/" + entry.modelId, entry);
+  }
+
+  speeds(): ModelSpeed[] {
+    return [...this.replySpeeds.values()].map(entry => this.averageSpeed(entry));
+  }
+
+  lastReply(sessionId: string) { return this.lastReplies.get(sessionId); }
+
+  recordSpeed(modelId: string, providerId: ModelSpeed["providerId"], tokensPerSecond: number, reply?: { sessionId: string; speed: ReplySpeed }) {
+    if (reply) {
+      this.lastReplies.delete(reply.sessionId);
+      this.lastReplies.set(reply.sessionId, reply.speed);
+      if (this.lastReplies.size > 1000) this.lastReplies.delete(this.lastReplies.keys().next().value!);
+    }
+    const key = providerId + "/" + modelId;
+    const samples = [...(this.replySpeeds.get(key)?.samples ?? []), tokensPerSecond].slice(-5);
+    const entry = { modelId, providerId, samples };
+    this.replySpeeds.set(key, entry);
+    this.save();
+    return this.averageSpeed(entry);
+  }
+
+  private averageSpeed({ modelId, providerId, samples }: z.infer<typeof speedSample>): ModelSpeed {
+    return { modelId, providerId, tokensPerSecond: samples.reduce((sum, value) => sum + value, 0) / samples.length };
   }
 
   latencies(): ModelLatency[] {
@@ -147,7 +182,9 @@ export class ProviderHealth {
     const path = this.path;
     if (path) this.writes = this.writes.then(() => writeJson(path, {
       providers: this.counts, ttfb: [...this.firstBytes.values()], windows: this.windows, headers: this.headers,
-      credits: this.credits, creditsCheckedAt: this.creditsCheckedAt
+      credits: this.credits, creditsCheckedAt: this.creditsCheckedAt,
+      replies: this.lastReplies.size ? [...this.lastReplies].map(([sessionId, speed]) => ({ sessionId, speed })) : undefined,
+      speeds: this.replySpeeds.size ? [...this.replySpeeds.values()] : undefined
     })).catch(() => {});
   }
 }
