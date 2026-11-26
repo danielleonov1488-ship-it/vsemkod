@@ -3,6 +3,7 @@
 .titlebar { -webkit-app-region: drag; }
 .window-controls { -webkit-app-region: no-drag; }
 .window-close:hover { background: var(--close-hover); }
+.window-controls--floating { position: fixed; z-index: 1; top: 0; right: 0; height: 36px; color: var(--secondary); }
 button:disabled { cursor: default; opacity: .58; }
 textarea { color: inherit; font: inherit; }
 textarea.composer-input { field-sizing: content; height: auto; min-height: 24px; max-height: 132px; resize: none; }

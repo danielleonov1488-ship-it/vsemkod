@@ -161,6 +161,8 @@ export interface DesktopApi {
   onUpdate(listener: (update?: UpdateReady) => void): () => void;
   onUpdateProgress?(listener: (progress?: UpdateProgress) => void): () => void;
   onChatFocus?(listener: (sessionId: string) => void): () => void;
+  onNewChat?(listener: () => void): () => void;
+  onUpdateInstalling?(listener: (version: string) => void): () => void;
   browser?: BrowserApi;
   onConnect(listener: (event: ConnectEvent) => void): () => void;
 }

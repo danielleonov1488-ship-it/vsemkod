@@ -94,3 +94,14 @@ describe("ключ для мастера подключений", () => {
     }
   });
 });
+
+describe("значок в трее", () => {
+  it("пишет состояние агента и фоновых задач по-русски", async () => {
+    const { trayStatus } = await import("../src/main/tray-status");
+    expect(trayStatus({ running: 0, tasks: 0 })).toBe("агент свободен");
+    expect(trayStatus({ running: 1, tasks: 0 })).toBe("агент работает: 1 чат");
+    expect(trayStatus({ running: 3, tasks: 2 })).toBe("агент работает: 3 чата · 2 фоновые задачи");
+    expect(trayStatus({ running: 5, tasks: 1 })).toBe("агент работает: 5 чатов · 1 фоновая задача");
+    expect(trayStatus({ running: 0, tasks: 11 })).toBe("агент свободен · 11 фоновых задач");
+  });
+});

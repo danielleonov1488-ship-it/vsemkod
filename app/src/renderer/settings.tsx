@@ -149,11 +149,14 @@ function Skills({ directory, onError }: { directory: string; onError: (error: un
 
 type SettingsProps = Omit<Parameters<typeof ModelSettings>[0], "prefs"> & {
   prefs?: Preferences; version?: string; directory: string; choose: () => void; open: (url: string) => void;
-  checkUpdates: () => void; checkingUpdates: boolean; updateStatus?: string; testNotification?: () => void; exportAll: () => void; state?: CatalogState;
+  checkUpdates: () => void; checkingUpdates: boolean; updateStatus?: string; restartUpdate?: () => void; testNotification?: () => void; exportAll: () => void; state?: CatalogState;
   onError: (error: unknown) => void; onNotice: (text: string) => void;
 };
 
-export function Settings({ prefs, version, directory, choose, update, open, checkUpdates, checkingUpdates, exportAll, onError, onNotice, initialSection = 0, updateStatus, testNotification, ...models }: SettingsProps & { initialSection?: number }) {
+const mac = /Mac/i.test(navigator.platform);
+const windows = /Win/i.test(navigator.platform);
+
+export function Settings({ prefs, version, directory, choose, update, open, checkUpdates, checkingUpdates, exportAll, onError, onNotice, initialSection = 0, updateStatus, restartUpdate, testNotification, ...models }: SettingsProps & { initialSection?: number }) {
   const [section, setSection] = useState(initialSection);
   return <main className="workspace settings-workspace">
     <header className="chat-header"><h1>Настройки</h1></header>
@@ -183,9 +186,20 @@ export function Settings({ prefs, version, directory, choose, update, open, chec
             {testNotification && <button type="button" className="composer-control" onClick={testNotification}>Проверить уведомление</button>}
             <PreferenceSwitch title="Не давать компьютеру уснуть, пока агент работает" detail="" value={prefs.keepAwake} toggle={keepAwake => update({ keepAwake })} />
           </Group>
-          <Group title="Обновления"><div className="settings-row"><span className="subtle">{updateStatus || "Текущая версия " + (version ?? "")}</span>
-            <button type="button" className="composer-control connect-label" disabled={checkingUpdates} onClick={checkUpdates}>{checkingUpdates ? "Проверяем…" : "Проверить обновления"}</button>
-          </div></Group>
+          {!mac && <Group title="Окно и запуск">
+            <PreferenceSwitch title="Оставлять vsemkod в трее после закрытия окна" detail="Агент и фоновые задачи продолжат работать. Выйти — через значок в трее рядом с часами"
+              value={prefs.closeToTray ?? windows} toggle={closeToTray => update({ closeToTray })} />
+            {windows && <PreferenceSwitch title="Запускать вместе с Windows" detail="Свёрнутым в трей, без окна"
+              value={prefs.openAtLogin ?? false} toggle={openAtLogin => update({ openAtLogin })} />}
+          </Group>}
+          <Group title="Обновления">
+            <div className="settings-row"><span className="folder-path">Версия {version ?? ""}<span className="subtle">{updateStatus || "Проверяем при запуске и раз в 6 часов"}</span></span>
+              {restartUpdate ? <button type="button" className="small-button" onClick={restartUpdate}>Перезапустить и обновить</button>
+                : <button type="button" className="composer-control connect-label" disabled={checkingUpdates} onClick={checkUpdates}>{checkingUpdates ? "Проверяем…" : "Проверить обновления"}</button>}
+            </div>
+            {!mac && <PreferenceSwitch title="Устанавливать обновления автоматически" detail="Когда агент ничего не делает: сразу при запуске или пока vsemkod свёрнут в трей"
+              value={prefs.autoUpdate ?? true} toggle={autoUpdate => update({ autoUpdate })} />}
+          </Group>
         </>}
         {section === 1 && <ModelSettings {...models} prefs={prefs} update={update} onError={onError} />}
         {section === 2 && prefs && <AgentSettings prefs={prefs} update={update} onError={onError} />}

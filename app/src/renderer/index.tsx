@@ -19,6 +19,7 @@ import { panelShortcut, readPanels, type PanelState, type PanelTab } from "../sh
 import { ConnectWizard } from "./connect-wizard";
 import { SideChat } from "./side-chat";
 import notificationSound from "../../resources/notification.wav?url";
+import { WindowControls } from "./window-controls";
 import { Icon } from "./icons";
 import { UpdatePill } from "./update-pill";
 import { findSecrets, maskSecrets } from "../shared/secrets";
@@ -52,6 +53,7 @@ function App() {
   const sessionsRef = useRef<Conversation[]>([]);
   sessionsRef.current = sessions;
   const openChatRef = useRef<(session: Conversation) => Promise<void>>(undefined);
+  const startChatRef = useRef<() => void>(undefined);
   const [chat, setChat] = useState<Conversation>();
   const [settings, setSettings] = useState(false);
   const [settingsSection, setSettingsSection] = useState(0);
@@ -147,6 +149,8 @@ function App() {
       const target = sessionsRef.current.find(item => item.id === id);
       if (target) void openChatRef.current?.(target);
     });
+    const stopNewChat = api.onNewChat?.(() => startChatRef.current?.());
+    const stopInstalling = api.onUpdateInstalling?.(version => notify({ text: "Устанавливаем vsemkod " + version + " — приложение перезапустится через пару секунд." }));
     void api.initial().then(info => {
       if (!mounted) return;
       setInitial(info);
@@ -158,7 +162,7 @@ function App() {
       setHiddenProjects(info.hiddenProjects ?? []);
       setRecentProjects(info.projects ?? []);
     }).catch(showError);
-    return () => { mounted = false; stopCatalog(); stopNotice(); stopUpdate(); stopProgress?.(); stopFocus?.(); clearTimeout(noticeTimer.current); };
+    return () => { mounted = false; stopCatalog(); stopNotice(); stopUpdate(); stopProgress?.(); stopFocus?.(); stopNewChat?.(); stopInstalling?.(); clearTimeout(noticeTimer.current); };
   }, [notify, showError]);
 
   useEffect(() => {
@@ -398,7 +402,7 @@ function App() {
       } else {
         const messages = {
           disabled: "Проверка обновлений доступна в установленном приложении.",
-          current: "У вас последняя версия " + (initial?.version ?? "") + ".",
+          current: "Это последняя версия · проверено в " + new Date().toLocaleTimeString("ru", { hour: "2-digit", minute: "2-digit" }),
           downloading: "Обновление загружается в фоне."
         };
         setUpdateStatus(messages[result]);
@@ -408,6 +412,7 @@ function App() {
   }
 
   openChatRef.current = session => openChat(session);
+  startChatRef.current = () => void startChat();
   async function openChat(session: Conversation) {
     navigation.current++;
     revealChat(session);
@@ -857,11 +862,7 @@ function App() {
     <div className="app">
       <header className="titlebar" onDoubleClick={() => void api.windowAction("maximize")}>
         <span className="window-name"><img src={logo} width="14" height="14" alt="" />vsemkod</span>
-        <div className="window-controls">
-          <button className="window-control" type="button" aria-label="Свернуть" onClick={() => void api.windowAction("minimize")}><Icon name="minus" /></button>
-          <button className="window-control" type="button" aria-label="Развернуть или восстановить" onClick={() => void api.windowAction("maximize")}><Icon name="maximize" /></button>
-          <button className="window-control window-close" type="button" aria-label="Закрыть окно" onClick={() => void api.windowAction("close")}><Icon name="close" /></button>
-        </div>
+        <WindowControls />
       </header>
       <aside className="sidebar" aria-label="Чаты и настройки">
         <button type="button" className="wordmark" onClick={() => showHome(visibleProject || directory)}>
@@ -897,7 +898,10 @@ function App() {
           : settings ? <Settings state={catalog} prefs={prefs} version={initial?.version} directory={directory} choose={() => void chooseDirectory(true)} initialSection={settingsSection}
             update={updatePrefs} subscriptionsPage={() => setSubscriptions(true)} connect={setConnection} disconnect={disconnect}
             checkUpdates={() => void checkUpdates()} checkingUpdates={checkingUpdates}
-            updateStatus={updateProgress ? "Найдена " + updateProgress.version : updateReady ? "Найдена " + updateReady.version : updateStatus}
+            restartUpdate={updateReady?.action === "restart" ? () => void api.applyUpdate().catch(showError) : undefined}
+            updateStatus={updateProgress ? "Загружаем версию " + updateProgress.version + (updateProgress.percent ? " · " + Math.floor(updateProgress.percent) + "%" : "…")
+              : updateReady?.action === "restart" ? "Готова версия " + updateReady.version + (prefs?.autoUpdate === false ? "" : " — установится сама, когда вы закроете окно")
+              : updateReady ? "Доступна версия " + updateReady.version : updateStatus}
             testNotification={api.testNotification && (() => void api.testNotification?.().catch(showError))}
             openWizard={api.clipboardKey && (() => setWizard(true))}
             open={url => void api.openExternal(url).catch(showError)} onError={showError} onNotice={text => notify({ text })}

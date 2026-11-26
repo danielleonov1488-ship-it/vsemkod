@@ -9,6 +9,8 @@ extraResources:
     to: catalog.json
   - from: resources/benchmarks.json
     to: benchmarks.json
+  - from: resources/tray
+    to: tray
   - from: tests/fixtures/voice-en.wav
     to: voice-benchmark.wav
   - from: THIRD_PARTY_NOTICES.md

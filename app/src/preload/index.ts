@@ -88,6 +88,8 @@ const api: DesktopApi = {
   onUpdate: listener => subscribe("updates:ready", listener),
   onUpdateProgress: listener => subscribe("updates:progress", listener),
   onChatFocus: listener => subscribe("chat:focus", listener),
+  onNewChat: listener => subscribe("app:new-chat", listener),
+  onUpdateInstalling: listener => subscribe("updates:installing", listener),
   browser: {
     show: bounds => ipcRenderer.invoke("browser:show", bounds),
     hide: () => ipcRenderer.invoke("browser:hide"),

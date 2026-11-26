@@ -4,7 +4,7 @@ import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeTheme, Notificati
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { BackgroundTasks } from "./background-tasks";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { mkdir, readFile, realpath, stat, writeFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
@@ -30,6 +30,7 @@ import { Router } from "./router";
 import { ProviderHealth } from "./router/health";
 import { readJson, writeJson } from "./storage";
 import { createUpdates } from "./updates";
+import { createTray } from "./tray";
 import { createBrowserHost } from "./browser-view";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -68,6 +69,9 @@ let cancelConnections: (() => void) | undefined;
 let quitting = false;
 let exitConfirmed = false;
 let approveExit: (() => boolean) | undefined;
+// Возвращает true, если окно нужно спрятать в трей вместо закрытия.
+let hideOnClose: (() => boolean) | undefined;
+let startHidden = process.argv.includes("--hidden");
 const exec = promisify(execFile);
 
 async function openExternal(raw: string): Promise<void> {
@@ -114,11 +118,15 @@ function createWindow() {
     event.preventDefault();
     if (url !== rendererUrl) void openExternal(url).catch(() => {});
   });
-  window.once("ready-to-show", () => window?.show());
+  window.once("ready-to-show", () => { if (!startHidden) window?.show(); startHidden = false; });
   contents.on("did-navigate", () => cancelConnections?.());
   contents.on("render-process-gone", () => cancelConnections?.());
   window.on("focus", () => { if (window && !window.isDestroyed()) window.flashFrame(false); });
-  window.on("close", event => { if (!quitting && approveExit && !approveExit()) event.preventDefault(); });
+  window.on("close", event => {
+    if (quitting) return;
+    if (hideOnClose?.()) { event.preventDefault(); created.hide(); return; }
+    if (approveExit && !approveExit()) event.preventDefault();
+  });
   window.on("closed", () => { cancelConnections?.(); window = undefined; });
   if (devUrl) void window.loadURL(devUrl);
   else void window.loadFile(rendererFile);
@@ -132,6 +140,12 @@ async function start() {
   let preferences: Preferences = migratePreferences(await readJson(settingsPath, preferencesSchema.partial()) ?? {}, defaultDirectory);
   nativeTheme.themeSource = preferences.theme;
   Menu.setApplicationMenu(null);
+  // После тихого автообновления из трея приложение возвращается в трей, а не открывает окно.
+  const relaunchMarker = join(data, "relaunch-hidden");
+  try {
+    if (Date.now() - statSync(relaunchMarker).mtimeMs < 10 * 60_000) startHidden = true;
+    rmSync(relaunchMarker, { force: true });
+  } catch { /* маркера нет */ }
   try {
     await mkdir(preferences.directory, { recursive: true });
     preferences.directory = await realpath(preferences.directory);
@@ -274,7 +288,9 @@ async function start() {
   }, 1000);
   taskTimer.unref();
   const terminals = new Map<string, Awaited<ReturnType<EngineService["openTerminal"]>>>();
-  const updates = createUpdates(update => broadcast("updates:ready", update), progress => broadcast("updates:progress", progress));
+  let tray: ReturnType<typeof createTray> | undefined;
+  const updates = createUpdates(update => { broadcast("updates:ready", update); tray?.update({ update }); },
+    progress => { broadcast("updates:progress", progress); tray?.update({ downloading: progress }); });
   const attempts = new Map<string, { provider: z.infer<typeof connectionId>; controller: AbortController; done: Promise<unknown> }>();
   let watching: { id: string; watch: ClipboardWatch } | undefined;
   let nativeQueue = Promise.resolve();
@@ -340,6 +356,8 @@ async function start() {
     clearInterval(providerTimer);
     providerRefresh.abort();
     updates.stop();
+    tray?.destroy();
+    tray = undefined;
     for (const sessionId of activeSessions.keys()) void engine.stop(sessionId).catch(() => {});
     activeSessions.clear();
     syncPower();
@@ -442,6 +460,7 @@ async function start() {
       syncPower();
       if (patch.catalogUpdates === true) catalog.start();
       if (patch.catalogUpdates === false) catalog.stop();
+      if (patch.openAtLogin !== undefined) syncLogin();
       return preferences;
     });
     settingsQueue = write.then(() => {}, () => {});
@@ -824,6 +843,59 @@ async function start() {
     }
     if (action === "close") window?.close();
   });
+  function showWindow() {
+    if (!window) return createWindow();
+    if (window.isMinimized()) window.restore();
+    window.show();
+    window.focus();
+  }
+  // Значок в трее (Windows и Linux): окно закрывается в трей, выйти можно из меню значка.
+  if (process.platform !== "darwin") {
+    try {
+      tray = createTray(resources, {
+        open: showWindow,
+        newChat: () => { showWindow(); broadcast("app:new-chat", undefined); },
+        stopTasks: () => { void Promise.allSettled(tasks.running().map(task => tasks.stop(task.id))); },
+        checkUpdates: () => { void updates.check().catch(() => {}); },
+        applyUpdate: () => { if (updates.ready?.action === "restart") showWindow(); void updates.apply().catch(() => {}); },
+        quit: () => app.quit()
+      });
+    } catch (error) { console.warn("[tray]", error instanceof Error ? error.message : error); }
+  }
+  hideOnClose = () => {
+    // На Linux трей есть не во всех окружениях (GNOME без расширения), поэтому там это включается вручную.
+    if (!tray || !(preferences.closeToTray ?? process.platform === "win32")) return false;
+    if (!preferences.trayHintShown) {
+      void savePreferences({ trayHintShown: true }).catch(() => {});
+      try { announce("vsemkod работает в фоне", "Значок — в трее рядом с часами. Чтобы выйти, щёлкните по нему правой кнопкой → «Выйти из vsemkod».", undefined, true); } catch { /* без уведомлений */ }
+    }
+    return true;
+  };
+  function syncLogin() {
+    if (!app.isPackaged || process.platform === "linux") return;
+    app.setLoginItemSettings({ openAtLogin: preferences.openAtLogin === true, args: ["--hidden"] });
+  }
+  syncLogin();
+  // Автообновление: ставим загруженную версию, когда агент ничего не делает —
+  // сразу после запуска (обновление уже было скачано) или пока окно спрятано в трей.
+  const launchedAt = Date.now();
+  let installing = false;
+  const idle = () => !activeSessions.size && !tasks.running().length && !terminals.size && ![...sideSessions.values()].some(item => item.sending);
+  const autoUpdateTimer = setInterval(() => {
+    tray?.update({ running: activeSessions.size, tasks: tasks.running().length });
+    const ready = updates.ready;
+    if (quitting || installing || ready?.action !== "restart" || preferences.autoUpdate === false || !idle()) return;
+    const hidden = !window || !window.isVisible();
+    if (!hidden && Date.now() - launchedAt > 20_000) return;
+    installing = true;
+    if (hidden) {
+      try { writeFileSync(relaunchMarker, String(Date.now())); } catch { /* откроется с окном */ }
+    } else broadcast("updates:installing", ready.version);
+    setTimeout(() => {
+      void updates.apply().catch(() => { installing = false; rmSync(relaunchMarker, { force: true }); });
+    }, hidden ? 0 : 2500);
+  }, 1000);
+  autoUpdateTimer.unref();
   createWindow();
   updates.start();
   if (preferences.catalogUpdates) catalog.start();
@@ -834,8 +906,10 @@ async function start() {
 if (!dataOverride && !app.requestSingleInstanceLock()) app.quit();
 else {
   app.on("second-instance", () => {
-    if (window?.isMinimized()) window.restore();
-    window?.focus();
+    if (!window) { if (teardown) createWindow(); return; }
+    if (window.isMinimized()) window.restore();
+    window.show();
+    window.focus();
   });
   app.whenReady().then(start).catch(error => {
     dialog.showErrorBox("Ошибка запуска vsemkod", error instanceof Error ? error.message : "Не удалось запустить приложение.");

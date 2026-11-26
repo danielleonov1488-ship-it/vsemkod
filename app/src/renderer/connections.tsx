@@ -3,6 +3,7 @@ import type { CatalogState, ConnectionId, Preferences, SubscriptionId } from "..
 import type { Model, Provider } from "../shared/catalog-schema";
 import { nativeNames, personalProviders, type KeyId, type RemoteModel } from "../shared/providers";
 import { Icon } from "./icons";
+import { WindowControls } from "./window-controls";
 
 export type Connection =
   { name: string; model?: Model } & (
@@ -114,6 +115,7 @@ export function ConnectDialog({ connection, clipboard, close, connected, guided 
       const bounds = event.currentTarget.getBoundingClientRect();
       if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) close();
     }}>
+    <WindowControls floating />
     <button autoFocus className="composer-control attach dialog-close" type="button" title="Закрыть" aria-label="Закрыть" onClick={close}><Icon name="close" /></button>
     <span className="monogram" aria-hidden="true">{(connection.model?.name || connection.name)[0]}</span>
     <h1 id="connect-title">{title}</h1>

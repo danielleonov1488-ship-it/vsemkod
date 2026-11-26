@@ -4,6 +4,7 @@ import { compareByBenchmark } from "../shared/benchmarks";
 import type { CatalogState } from "../shared/api";
 import { catalogConnection, type Connection } from "./connections";
 import { Icon } from "./icons";
+import { WindowControls } from "./window-controls";
 
 export function ConnectWizard({ state, first, connect, close }: {
   state: CatalogState; first: boolean; connect: (connection: Connection) => void; close: () => void;
@@ -22,6 +23,7 @@ export function ConnectWizard({ state, first, connect, close }: {
     .filter(({ provider }) => state.connected.includes(provider.id)).map(({ provider }) => provider.id)).size >= 2).length;
   return <dialog ref={dialog} className="connect-dialog connect-wizard" aria-labelledby="wizard-title"
     onCancel={event => { event.preventDefault(); close(); }}>
+    <WindowControls floating />
     <button className="composer-control attach dialog-close" type="button" aria-label="Закрыть" onClick={close}><Icon name="close" /></button>
     <h1 id="wizard-title">Подключить всё за пару минут</h1>
     <ul className="wizard-providers">{sources.map(({ provider, models }) => {
