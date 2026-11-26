@@ -33,7 +33,9 @@ export type ChatEvent =
   | { type: "reply-cache"; sessionId: string; cachePercent?: number }
   | { type: "route-exhausted"; sessionId: string; modelId: string; providerId: KeyId }
   | { type: "route"; sessionId: string; modelId: string; previousModelId?: string; previousProviderId?: KeyId;
-    providerId: KeyId; averageMs: number; reason?: "quota" | "unavailable" };
+    providerId: KeyId; averageMs: number; reason?: "quota" | "unavailable"; midStream?: boolean }
+  /** Все бесплатные источники на паузе: роутер ждёт до until (мс) и сам повторит. null — ожидание закончилось. */
+  | { type: "route-wait"; sessionId: string; until: number | null };
 
 export type Preferences = z.infer<typeof preferencesSchema>;
 export type Attachment = { id: string; name: string; image: boolean; preview?: string };
@@ -51,6 +53,7 @@ export type RequestQuota = { limit: number; remaining: number; resetAt?: number;
 export type KeyCredits = { usage: number; limit: number | null; remaining?: number | null; isFreeTier: boolean };
 export type RouterStats = Partial<Record<KeyId, {
   requests?: RequestQuota; tokens?: { limit?: number; remaining?: number; resetAt?: number }; credits?: KeyCredits;
+  ready?: boolean; limited?: boolean; failures?: number;
 }>>;
 export type ProjectEntry = { path: string; type: "file" | "directory" };
 export type SkillSummary = { id: string; name: string; description?: string; path: string };
@@ -78,10 +81,13 @@ export type ConnectEvent = { id: string } & (
   { type: "waiting"; code?: string; url?: string }
 );
 export type ModelLatency = { modelId: string; providerId: KeyId; averageMs: number };
+/** Свой OpenAI-совместимый поставщик. Ключ в состояние не попадает. */
+export type CustomProvider = { id: string; name: string; baseUrl: string; models: RemoteModel[] };
 
 export type CatalogState = {
   catalog: Catalog; connected: ProviderId[]; personal: PersonalId[]; subscriptions: SubscriptionId[];
   personalModels: PersonalModel[]; zenModels: PersonalModel[]; latencies?: ModelLatency[]; speeds?: ModelSpeed[]; benchmarks?: Benchmarks; customProviderUrl?: string;
+  customProviders?: CustomProvider[];
 };
 export type Notice = { text: string; tone?: "error"; connect?: { modelId: string; providerId: ProviderId }; open?: string; download?: string };
 export type UpdateReady = { version: string; action: "restart" | "download" };
@@ -108,6 +114,10 @@ export interface DesktopApi {
   projectOpen?(directory: string): Promise<void>;
   projectRemove?(directory: string): Promise<void>;
   routerStats?(): Promise<RouterStats>;
+  /** Список моделей своего поставщика: по адресу и ключу (новый) или по id (уже сохранённый, ключ берётся из хранилища). */
+  customProviderModels?(input: { baseUrl: string; key: string } | { id: string }): Promise<RemoteModel[]>;
+  /** Создать (без id, ключ обязателен) или изменить (с id, без ключа — оставить прежний) своего поставщика. */
+  saveCustomProvider?(input: { id?: string; name: string; baseUrl: string; key?: string; models: RemoteModel[] }): Promise<CatalogState>;
   onRouterStats?(listener: (stats: RouterStats) => void): () => void;
   onDemoQuota?(listener: (remaining?: number) => void): () => void;
   initial(): Promise<InitialState>;

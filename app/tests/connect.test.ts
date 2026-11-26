@@ -8,7 +8,7 @@ import { afterEach, expect, test, vi } from "vitest";
 import { catalogSchema } from "../src/shared/catalog-schema";
 import { personalProviders } from "../src/shared/providers";
 import { ClipboardWatch, clipboardLimit, keyFromClipboard } from "../src/main/clipboard-watch";
-import { ConnectService } from "../src/main/connect-service";
+import { ConnectService, modelReference } from "../src/main/connect-service";
 import { KeyStore } from "../src/main/key-store";
 import { createPkce, openRouterKey } from "../src/main/openrouter-oauth";
 import { Router } from "../src/main/router";
@@ -53,6 +53,8 @@ test("catalog discovery caches only free models and maps them to the provider wi
       { id: "fixture/free-with-pricing", name: "Fixture Zero", pricing: { prompt: "0", completion: "0" } },
       { id: "fixture/trial:free", name: "Fixture Free" },
       { id: "fixture/paid", pricing: { prompt: "0", completion: "0.0001" } },
+      { id: "fixture/paid:free", pricing: { prompt: "0", completion: "0.0001" } },
+      { id: "fixture/no-tools:free", supports_tools: false },
       { id: "fixture/unknown" }
     ] }));
   });
@@ -68,11 +70,14 @@ test("catalog discovery caches only free models and maps them to the provider wi
   expect(await readFile(cache, "utf8")).not.toContain(expectedKey);
   const restarted = new ConnectService(keys, cache);
   await restarted.loadCatalogModels();
-  expect(restarted.personalRoutes(catalog).map(route => [route.provider.id, route.upstreamId])).toEqual([
-    ["openrouter", "fixture/free-with-pricing"], ["openrouter", "fixture/trial:free"]
+  expect(restarted.personalRoutes()).toEqual([]);
+  const discovered = () => restarted.effectiveCatalog(catalog).offers.filter(offer => offer.origin === "discovered");
+  expect(discovered().map(offer => [offer.providerId, offer.providerModelId, offer.modelId])).toEqual([
+    ["openrouter", "fixture/free-with-pricing", "x-free-with-pricing"], ["openrouter", "fixture/trial:free", "x-trial"]
   ]);
+  expect(restarted.legacyCatalogModel(catalog, modelReference("openrouter", "fixture/trial:free"))).toBe("x-trial");
   await restarted.disconnect("openrouter");
-  expect(restarted.personalRoutes(catalog)).toEqual([]);
+  expect(discovered()).toEqual([]);
 });
 
 test("PKCE uses an independent verifier and a base64url SHA-256 challenge", () => {

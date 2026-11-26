@@ -13,7 +13,8 @@ const periods = { hour: "в час", day: "сегодня", minute: "в мину
 const usageUrls = {
   openai: "https://chatgpt.com/codex/settings/usage",
   "github-copilot": "https://github.com/settings/copilot",
-  opencode: "https://opencode.ai/zen"
+  opencode: "https://opencode.ai/zen",
+  xai: "https://grok.com/"
 };
 
 function Metric({ children, tip, kind, panel, expanded, toggle }: {
@@ -78,6 +79,9 @@ function providerRows(state: CatalogState): ProviderRow[] {
     ...personalProviders.filter(provider => state.personal.includes(provider.id)).map(provider => ({
       id: provider.id, name: provider.name, url: provider.keyPageUrl ?? (provider.id === "custom-api" ? state.customProviderUrl : undefined),
       disconnect: provider.id
+    })),
+    ...(state.customProviders ?? []).filter(provider => provider.id !== "custom-api").map(provider => ({
+      id: provider.id, name: provider.name, url: provider.baseUrl, disconnect: provider.id
     })),
     ...state.subscriptions.map(id => ({
       id, name: nativeNames[id], badge: id === "openai" ? "ChatGPT" : undefined,

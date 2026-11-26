@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { keyIdSchema, nativeIdSchema, type KeyId } from "../../shared/providers";
+import { customIdSchema, keyIdSchema, nativeIdSchema, personalIdSchema, type KeyId } from "../../shared/providers";
 import type { KeyCredits, ModelLatency, ModelSpeed, ReplySpeed, RouterStats } from "../../shared/api";
 import type { Catalog } from "../../shared/catalog-schema";
 import { readJson, writeJson } from "../storage";
@@ -25,6 +25,11 @@ const recentReply = z.object({
 const usage = z.object({ providers: counters, ttfb: z.array(sample),
   windows: windows.optional(), headers: headers.optional(), credits: keyCredits.optional(), creditsCheckedAt: z.number().optional(), speeds: z.array(speedSample).optional(), replies: z.array(recentReply).optional() });
 
+const recentMs = 600_000;
+type Pause = { failures: number; until: number; limited: boolean };
+type RouteHealth = Pause & { attemptedAt: number; averageMs?: number; samples?: number };
+type Cooldown = "quota" | "unavailable" | "account" | "rejected" | "concurrent";
+
 export class ProviderHealth {
   private counts: z.infer<typeof counters> = {};
   private lastReplies = new Map<string, ReplySpeed>();
@@ -34,7 +39,8 @@ export class ProviderHealth {
   private headers: z.infer<typeof headers> = {};
   private credits?: KeyCredits;
   private creditsCheckedAt?: number;
-  private cooling = new Map<KeyId, { failures: number; until: number; limited: boolean }>();
+  private cooling = new Map<KeyId, Pause>();
+  private routes = new Map<KeyId, Map<string, RouteHealth>>();
   private writes = Promise.resolve();
 
   constructor(private readonly path?: string, private readonly now: () => number = Date.now) {}
@@ -80,7 +86,12 @@ export class ProviderHealth {
     return [...this.firstBytes.values()].map(({ modelId, providerId, averageMs }) => ({ modelId, providerId, averageMs }));
   }
 
-  firstByte(providerId: KeyId, modelId: string, ms: number): number {
+  firstByte(providerId: KeyId, modelId: string, ms: number, upstreamId?: string): number {
+    if (upstreamId !== undefined) {
+      const route = this.route(providerId, upstreamId);
+      route.samples = (route.samples ?? 0) + 1;
+      route.averageMs = (route.averageMs ?? ms) + (ms - (route.averageMs ?? ms)) / route.samples;
+    }
     const key = providerId + "/" + modelId;
     const previous = this.firstBytes.get(key);
     const samples = (previous?.samples ?? 0) + 1;
@@ -91,18 +102,57 @@ export class ProviderHealth {
   }
 
   ready(id: KeyId): boolean {
-    return (this.cooling.get(id)?.until ?? 0) <= this.now();
+    const now = this.now();
+    const recent = this.recentRoutes(id);
+    return (this.cooling.get(id)?.until ?? 0) <= now && (!recent.length || recent.some(route => route.until <= now));
   }
 
   failures(id: KeyId): number {
-    return this.cooling.get(id)?.failures ?? 0;
+    return (this.cooling.get(id)?.failures ?? 0) + this.recentRoutes(id).reduce((total, route) => total + route.failures, 0);
   }
 
   limited(id: KeyId): boolean {
-    return !this.ready(id) && this.cooling.get(id)?.limited === true;
+    const pause = this.cooling.get(id);
+    if (pause && pause.until > this.now()) return pause.limited;
+    const recent = this.recentRoutes(id);
+    return recent.length > 0 && recent.every(route => route.until > this.now() && route.limited);
   }
 
-  request(id: KeyId, trackWindow = true): void {
+  private recentRoutes(id: KeyId) {
+    return [...(this.routes.get(id)?.values() ?? [])].filter(route => route.attemptedAt > this.now() - recentMs);
+  }
+
+  private route(id: KeyId, upstreamId: string) {
+    let routes = this.routes.get(id);
+    if (!routes) this.routes.set(id, routes = new Map());
+    let route = routes.get(upstreamId);
+    if (!route) routes.set(upstreamId, route = { failures: 0, until: 0, limited: false, attemptedAt: this.now() });
+    return route;
+  }
+
+  routeFailures(id: KeyId, upstreamId: string) {
+    return this.routes.get(id)?.get(upstreamId)?.failures ?? 0;
+  }
+
+  routeLatency(id: KeyId, upstreamId: string, modelId: string) {
+    return this.routes.get(id)?.get(upstreamId)?.averageMs ??
+      this.firstBytes.get(id + "/" + modelId)?.averageMs ?? Number.MAX_SAFE_INTEGER;
+  }
+
+  routePause(id: KeyId, upstreamId: string) {
+    const provider = this.cooling.get(id);
+    const route = this.routes.get(id)?.get(upstreamId);
+    const until = Math.max(provider?.until ?? 0, route?.until ?? 0);
+    const now = this.now();
+    return {
+      until,
+      remaining: Math.max(0, until - now),
+      limited: Boolean(provider?.limited && provider.until > now || route?.limited && route.until > now)
+    };
+  }
+
+  request(id: KeyId, trackWindow = true, upstreamId?: string): void {
+    if (upstreamId !== undefined) this.route(id, upstreamId).attemptedAt = this.now();
     (this.counts[id] ??= { requests: 0, errors: 0 }).requests++;
     if (trackWindow) {
       const now = this.now();
@@ -119,16 +169,21 @@ export class ProviderHealth {
     this.save();
   }
 
-  stats(catalog: Catalog): RouterStats {
+  stats(catalog: Catalog, customIds: KeyId[] = []): RouterStats {
     const now = this.now();
     const result: RouterStats = {};
-    for (const id of keyIdSchema.options.flatMap(schema => schema.options)) {
+    const ids = new Set([...catalog.providers.map(provider => provider.id), ...personalIdSchema.options,
+      ...customIds.filter(id => customIdSchema.safeParse(id).success)]);
+    for (const id of ids) {
       const limits = catalog.providers.find(provider => provider.id === id)?.freeLimits ?? {};
       const entry = this.headers[id];
       const requests = providerQuota(id, limits, entry, this.windows[id] ?? [], now);
       const tokens = entry?.tokens && now < (entry.tokens.resetAt ?? entry.at + day) ? entry.tokens : undefined;
       const credits = id === "openrouter" ? this.credits : undefined;
-      if (requests || tokens || credits) result[id] = { requests, tokens, credits };
+      const failures = this.failures(id);
+      if (requests || tokens || credits || failures) result[id] = {
+        requests, tokens, credits, ready: this.ready(id), limited: this.limited(id), failures
+      };
     }
     return result;
   }
@@ -146,30 +201,39 @@ export class ProviderHealth {
     this.save();
   }
 
-  success(id: KeyId): void {
-    const state = this.cooling.get(id);
-    if (state && state.until <= this.now()) this.cooling.delete(id);
+  success(id: KeyId, upstreamId: string): void {
+    const route = this.route(id, upstreamId);
+    route.failures = 0;
+    route.until = 0;
+    route.limited = false;
+    const provider = this.cooling.get(id);
+    if (provider && provider.until <= this.now()) this.cooling.delete(id);
   }
 
-  error(id: KeyId, cooldown?: "quota" | "unavailable", retryAfter?: string | null): void {
+  error(id: KeyId, upstreamId: string, cooldown?: Cooldown, retryAfter?: string | null): void {
     (this.counts[id] ??= { requests: 0, errors: 0 }).errors++;
     if (cooldown) {
-      const failures = this.failures(id) + 1;
       const now = this.now();
+      const account = cooldown === "account" || cooldown === "rejected";
+      const state = account ? this.cooling.get(id) : this.route(id, upstreamId);
+      const failures = (state?.failures ?? 0) + 1;
       const retryMs = retryAfter && /^\d+(\.\d+)?$/.test(retryAfter.trim())
         ? Number(retryAfter) * 1000
         : (retryAfter ? Date.parse(retryAfter) - now : NaN);
-      const delay = Number.isFinite(retryMs) && retryMs >= 0
-        ? retryMs : 30_000 * 2 ** Math.min(failures - 1, 8);
-      this.cooling.set(id, {
-        failures, until: Math.max(now + delay, this.cooling.get(id)?.until ?? 0), limited: cooldown === "quota"
-      });
+      const backoff = account ? 900_000 : Math.min(300_000, 15_000 * 2 ** Math.min(failures - 1, 5));
+      const delay = Number.isFinite(retryMs) ? Math.max(0, Math.min(3_600_000, retryMs)) : backoff;
+      const until = cooldown === "rejected" ? now + recentMs
+        : cooldown === "concurrent" ? now + Math.min(3000, delay) : now + delay;
+      const next = { failures, until: Math.max(until, state?.until ?? 0), limited: cooldown === "quota" || cooldown === "account" };
+      if (account) this.cooling.set(id, next);
+      else Object.assign(this.route(id, upstreamId), next, { attemptedAt: now });
     }
     this.save();
   }
 
   reset(id: KeyId) {
     this.cooling.delete(id);
+    this.routes.delete(id);
     delete this.windows[id];
     delete this.headers[id];
     if (id === "openrouter") this.credits = undefined;

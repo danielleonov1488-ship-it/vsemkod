@@ -3,7 +3,7 @@ import { once } from "node:events";
 import { mkdir, mkdtemp, readFile, rm, rmdir } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import bundled from "../resources/catalog.json";
 import { catalogSchema, type Catalog, type Offer, type Provider } from "../src/shared/catalog-schema";
 import { FREE_FIRST_BYTE_MS, Router } from "../src/main/router";
@@ -57,12 +57,12 @@ async function fixture(
   models = [model("first", "top", 10), model("second", "top", 20), model("third", "good", 1), model("basic", "basic", 0)]
 ) {
   const catalog: Catalog = { ...sample, providers, offers, models, candidates: [] };
-  const router = new Router({ catalog: () => catalog, key: () => undefined, health: new ProviderHealth(), ...options });
+  const router = new Router({ catalog: () => catalog, key: () => undefined, health: new ProviderHealth(), waitBudgetMs: 0, ...options });
   await router.start();
   cleanup.push(() => router.close());
   const headers = { authorization: "Bearer " + router.token, "content-type": "application/json" };
-  const send = (model: string, patch: Record<string, unknown> = {}, session = "chat") => fetch(router.baseUrl + "/chat/completions", {
-    method: "POST", headers: { ...headers, "x-vsemkod-session": session },
+  const send = (model: string, patch: Record<string, unknown> = {}, session = "chat", signal?: AbortSignal) => fetch(router.baseUrl + "/chat/completions", {
+    method: "POST", signal, headers: { ...headers, "x-vsemkod-session": session },
     body: JSON.stringify({ model, messages: [{ role: "user", content: "Тест" }], ...patch })
   });
   return { router, headers, send };
@@ -154,16 +154,16 @@ describe("Router", () => {
     expect(reserve.calls).toHaveLength(3);
     expect((await send("second", {}, "health-check")).status).toBe(200);
     expect((await send("first", {}, "another")).status).toBe(200);
-    expect(primary.calls).toHaveLength(3);
+    expect(primary.calls).toHaveLength(2);
     expect((await send("first")).status).toBe(200);
-    expect(reserve.calls).toHaveLength(4);
+    expect(reserve.calls).toHaveLength(5);
   });
 
   it("emits a quota fallback to the next model and skips Kilo until Retry-After passes", async () => {
     let time = 5000;
     const health = new ProviderHealth(undefined, () => time);
     const primary = await upstream(res => {
-      if (time < 15_000) res.writeHead(429, { "retry-after": "10" }).end();
+      if (time < 15_000) res.writeHead(429, { "retry-after": "10" }).end("Daily quota exceeded");
       else text(res);
     });
     const reserve = await upstream();
@@ -188,22 +188,36 @@ describe("Router", () => {
   it("cools down network errors exponentially and accepts Retry-After dates", () => {
     let time = 60_000;
     const health = new ProviderHealth(undefined, () => time);
-    health.error("kilo", "unavailable");
+    health.error("kilo", "first", "unavailable");
+    time += 14_999;
+    expect(health.ready("kilo")).toBe(false);
+    time++;
+    expect(health.ready("kilo")).toBe(true);
+    health.error("kilo", "first", "unavailable");
     time += 29_999;
     expect(health.ready("kilo")).toBe(false);
     time++;
     expect(health.ready("kilo")).toBe(true);
-    health.error("kilo", "unavailable");
-    time += 59_999;
-    expect(health.ready("kilo")).toBe(false);
-    time++;
-    expect(health.ready("kilo")).toBe(true);
-    health.error("kilo", "quota", new Date(time + 15_000).toUTCString());
+    health.error("kilo", "first", "quota", new Date(time + 15_000).toUTCString());
     expect(health.limited("kilo")).toBe(true);
     time += 15_000;
     expect(health.ready("kilo")).toBe(true);
-    health.success("kilo");
+    health.success("kilo", "first");
     expect(health.failures("kilo")).toBe(0);
+  });
+
+  it("caps Retry-After at one hour and resets rejected credentials after ten minutes", () => {
+    let now = 1000;
+    const health = new ProviderHealth(undefined, () => now);
+    health.error("kilo", "one", "quota", "36000");
+    expect(health.routePause("kilo", "one").remaining).toBe(3_600_000);
+    expect(health.routePause("kilo", "two").remaining).toBe(0);
+    health.error("kilo", "one", "rejected", "1");
+    expect(health.routePause("kilo", "two").remaining).toBe(600_000);
+    now += 600_000;
+    expect(health.routePause("kilo", "two").remaining).toBe(0);
+    health.reset("kilo");
+    expect(health.routeFailures("kilo", "one")).toBe(0);
   });
 
   it.each([429, 503, 401, 403, "timeout"] as const)("tries the same model with a second key before auto fallback (%s)", async failure => {
@@ -286,10 +300,10 @@ describe("Router", () => {
     expect(await response.text()).toBe(first + second);
   });
 
-  it("does not switch upstream after any stream byte is forwarded", async () => {
+  it("fails the stream without replaying an interrupted tool call", async () => {
     const source = await upstream(res => {
       res.writeHead(200, { "content-type": "text/event-stream" });
-      res.write("data: partial\n\n");
+      res.write('data: {"choices":[{"index":0,"delta":{"tool_calls":[{"index":0}]}}]}\n\n');
       setTimeout(() => res.destroy(), 40);
     });
     const reserve = await upstream();
@@ -348,6 +362,159 @@ describe("Router", () => {
     const restored = new ProviderHealth(path);
     await restored.load();
     expect(restored.stats(sample).kilo?.requests).toMatchObject({ limit: 200, remaining: 0, source: "headers" });
+  });
+
+  it("pauses a single route for rate limiting and the provider for a 402", async () => {
+    const health = new ProviderHealth();
+    const source = await upstream((res, call) => {
+      if (call.body.model === "kilo-first") res.writeHead(429).end("Too many requests");
+      else if (call.body.model === "kilo-third") res.writeHead(402).end();
+      else text(res);
+    });
+    const { send } = await fixture([provider("kilo", source.url)],
+      [offer("first", "kilo"), offer("second", "kilo"), offer("third", "kilo")], { health });
+    expect((await send("first")).status).toBe(429);
+    expect(health.ready("kilo")).toBe(false);
+    expect((await send("second")).status).toBe(200);
+    expect(health.ready("kilo")).toBe(true);
+    expect((await send("third")).status).toBe(429);
+    expect((await send("second")).status).toBe(429);
+    expect(source.calls.map(call => call.body.model)).toEqual(["kilo-first", "kilo-second", "kilo-third"]);
+  });
+
+  it("uses the route latency after failures and session affinity", async () => {
+    const health = new ProviderHealth();
+    const slow = await upstream();
+    const fast = await upstream();
+    health.firstByte("kilo", "first", 300, "kilo-first");
+    health.firstByte("numes", "first", 100, "numes-first");
+    const { send } = await fixture([provider("kilo", slow.url), provider("numes", fast.url)],
+      [offer("first", "kilo"), offer("first", "numes")], { health });
+    expect((await send("first")).status).toBe(200);
+    expect(fast.calls).toHaveLength(1);
+    health.error("numes", "numes-first", "unavailable", "0");
+    expect((await send("first", {}, "another")).status).toBe(200);
+    expect(slow.calls).toHaveLength(1);
+    expect((await send("first")).status).toBe(200);
+    expect(fast.calls).toHaveLength(2);
+    expect(health.routeFailures("numes", "numes-first")).toBe(0);
+  });
+
+  it("learns the parallel capacity and keeps the slot until the SSE body ends", async () => {
+    let held!: ServerResponse;
+    const source = await upstream((res, call) => {
+      if (call.body.model === "numes-first") {
+        held = res;
+        res.writeHead(200, { "content-type": "text/event-stream" });
+        res.write('data: {"choices":[{"delta":{"content":"busy"}}]}\n\n');
+      } else if (call.body.model === "numes-second") {
+        res.writeHead(429, { "retry-after": "120" }).end("Too many concurrent requests");
+      } else text(res);
+    });
+    const health = new ProviderHealth();
+    const { send } = await fixture([{ ...provider("numes", source.url), freeLimits: {} }],
+      [offer("first", "numes"), offer("second", "numes"), offer("third", "numes")], { health });
+    const first = await send("first", { stream: true }, "a");
+    expect((await send("second", {}, "b")).status).toBe(429);
+    expect(health.routePause("numes", "numes-second").remaining).toBeLessThanOrEqual(3000);
+    const third = send("third", {}, "c");
+    await new Promise(resolve => setTimeout(resolve, 80));
+    expect(source.calls).toHaveLength(2);
+    held.end("data: [DONE]\n\n");
+    await first.text();
+    expect((await third).status).toBe(200);
+    expect(source.calls).toHaveLength(3);
+  });
+
+  it("waits for an eligible route and pulses the parent watchdog, or cancels the wait", async () => {
+    const source = await upstream();
+    const health = new ProviderHealth();
+    const onWait = vi.fn();
+    const onActivity = vi.fn();
+    const { router, headers, send } = await fixture([provider("kilo", source.url)], [offer("first", "kilo")],
+      { health, waitBudgetMs: 3000, onWait, onActivity });
+    health.error("kilo", "kilo-first", "quota", "2");
+    router.setTurn({ sessionId: "parent", auto: false });
+    const request = fetch(router.baseUrl + "/chat/completions", {
+      method: "POST", headers: { ...headers, "x-opencode-session-id": "child", "x-opencode-parent-session-id": "parent" },
+      body: JSON.stringify({ model: "first", messages: [] })
+    });
+    await vi.waitFor(() => expect(onWait).toHaveBeenCalledWith({ sessionId: "parent", until: expect.any(Number) }));
+    expect(source.calls).toHaveLength(0);
+    expect((await request).status).toBe(200);
+    expect(onWait).toHaveBeenLastCalledWith({ sessionId: "parent", until: null });
+    expect(onActivity.mock.calls.length).toBeGreaterThanOrEqual(3);
+    expect(onActivity.mock.calls.every(([session]) => session === "parent")).toBe(true);
+
+    health.error("kilo", "kilo-first", "quota", "2");
+    const controller = new AbortController();
+    const failure = expect(send("first", {}, "cancelled", controller.signal)).rejects.toThrow();
+    await vi.waitFor(() => expect(onWait).toHaveBeenCalledWith({ sessionId: "cancelled", until: expect.any(Number) }));
+    controller.abort();
+    await failure;
+    await vi.waitFor(() => expect(onWait).toHaveBeenLastCalledWith({ sessionId: "cancelled", until: null }));
+    expect(source.calls).toHaveLength(1);
+  });
+
+  it("splices reasoning streams at complete SSE events and uses the final usage", async () => {
+    const reasoning = 'data: {"choices":[{"delta":{"reasoning_content":"Думаю"}}]}\r\n\r\n';
+    const source = await upstream(res => res.writeHead(200, { "content-type": "text/event-stream" })
+      .end(reasoning + 'data: {"usage":{"prompt_tokens":100,"prompt_cache_hit_tokens":95}}\n\n' + "data: incomplete"));
+    const output = 'data: {"choices":[{"delta":{"content":"Ответ"},"finish_reason":"stop"}]}\n\n';
+    const reserve = await upstream(res => res.writeHead(200, { "content-type": "text/event-stream" }).end(output +
+      'data: {"usage":{"prompt_tokens":100,"prompt_cache_hit_tokens":7}}\n\n' + "data: [DONE]\n\n"));
+    const onRoute = vi.fn();
+    const onActivity = vi.fn();
+    const onReplyCache = vi.fn();
+    const { send } = await fixture([provider("kilo", source.url), provider("numes", reserve.url)],
+      [offer("first", "kilo"), offer("first", "numes")], { onRoute, onReplyCache, onActivity });
+    const reply = await send("first", { stream: true });
+    const events = await reply.text();
+    expect(events).toContain(reasoning);
+    expect(events).not.toContain("data: incomplete");
+    expect(events.indexOf("Источник оборвал ответ")).toBeGreaterThan(events.indexOf("Думаю"));
+    expect(events.indexOf(output)).toBeGreaterThan(events.indexOf("Источник оборвал ответ"));
+    expect(reserve.calls[0].body.messages).toEqual(source.calls[0].body.messages);
+    expect(onRoute).toHaveBeenLastCalledWith(expect.objectContaining({
+      providerId: "numes", previousProviderId: "kilo", midStream: true, reason: "unavailable"
+    }));
+    expect(onActivity.mock.calls).toEqual([["chat"], ["chat"], ["chat"]]);
+    expect(onReplyCache.mock.lastCall?.[0]).toBe("chat");
+    expect(onReplyCache.mock.lastCall?.[1]).toBeCloseTo(7);
+  });
+
+  it("continues from the delivered text and strips the repeated role after a stall", async () => {
+    const source = await upstream(res => {
+      res.writeHead(200, { "content-type": "text/event-stream" });
+      res.write('data: {"choices":[{"delta":{"role":"assistant","content":"Раз, "}}]}\n\n');
+    });
+    const reserve = await upstream(res => res.writeHead(200, { "content-type": "text/event-stream" }).end(
+      'data: {"choices":[{"delta":{"role":"assistant","content":"два."},"finish_reason":"stop"}]}\n\n' + "data: [DONE]\n\n"));
+    const { send } = await fixture([provider("kilo", source.url), provider("numes", reserve.url)],
+      [offer("first", "kilo"), offer("first", "numes")], { stallMs: 90 });
+    const response = await send("first", { stream: true });
+    const events = await response.text();
+    expect(response.headers.get("x-vsemkod-model")).toBe("first");
+    expect(events.match(/"role":"assistant"/g)).toHaveLength(1);
+    expect(events).toContain('"content":"два."');
+    expect(events).not.toContain("Источник оборвал ответ");
+    expect(reserve.calls[0].body.messages).toMatchObject([
+      { role: "user", content: "Тест" },
+      { role: "assistant", content: "Раз, " },
+      { role: "user", content: expect.stringContaining("Продолжи свой предыдущий ответ") }
+    ]);
+  });
+
+  it("keeps a partial non-streaming body private and retries the complete response", async () => {
+    const source = await upstream(res => {
+      res.writeHead(200, { "content-type": "application/json", "content-length": "100" });
+      res.write('{"partial":');
+      setTimeout(() => res.destroy(), 35);
+    });
+    const reserve = await upstream();
+    const { send } = await fixture([provider("kilo", source.url), provider("numes", reserve.url)],
+      [offer("first", "kilo"), offer("first", "numes")]);
+    expect(await (await send("first")).json()).toEqual({ message: "ok" });
   });
 
   it("forwards the original SSE and reports cache usage for the correct chat", async () => {

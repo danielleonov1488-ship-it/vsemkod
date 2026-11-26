@@ -37,22 +37,24 @@
 .browser-popover--errors .small-button { align-self: flex-start; }
 .browser-panel--unavailable .small-button { display: inline-flex; align-items: center; margin-top: 8px; text-decoration: none; }
 
-/* Плашка обновления в правом нижнем углу окна. */
-.update-pill { position: fixed; z-index: 40; right: calc(var(--panel-offset, 0px) + 12px); bottom: 12px; display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 6px 0 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--menu, var(--composer)); box-shadow: var(--shadow-soft); color: var(--text); font-size: 12.5px; }
-.update-pill .update-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 3px color-mix(in srgb, var(--mint) 22%, transparent); }
-.update-pill .update-ring { flex: none; width: 14px; height: 14px; }
-.update-pill .update-ring circle { fill: none; stroke-width: 2; }
-.update-pill .update-ring .track { stroke: var(--line); }
-.update-pill .update-ring .value { stroke: var(--mint); stroke-linecap: round; transform: rotate(-90deg); transform-origin: center; transition: stroke-dashoffset .3s; }
-.update-pill .update-ring--spin .value { animation: update-spin 1s linear infinite; }
+/* Обновление в боковой панели, над «Сообществом». */
+.update-row-wrap { position: relative; }
+.update-row { width: 100%; color: var(--secondary); cursor: default; }
+.update-row--ready { color: var(--mint); font-weight: 500; cursor: pointer; }
+.update-row--ready:hover { color: var(--mint); background: color-mix(in srgb, var(--mint) 9%, transparent); }
+.update-row-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.update-row-meta { margin-left: auto; color: var(--tertiary, var(--secondary)); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.update-dot-slot { display: grid; flex: none; place-items: center; width: 16px; height: 16px; }
+.update-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 3px color-mix(in srgb, var(--mint) 22%, transparent); animation: update-pulse 2.4s ease-in-out infinite; }
+@keyframes update-pulse { 50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--mint) 8%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .update-dot { animation: none; } }
+.update-ring { flex: none; width: 16px; height: 16px; }
+.update-ring circle { fill: none; stroke-width: 2; }
+.update-ring .track { stroke: var(--line); }
+.update-ring .value { stroke: var(--mint); stroke-linecap: round; transform: rotate(-90deg); transform-origin: center; transition: stroke-dashoffset .3s; }
+.update-ring--spin .value { animation: update-spin 1s linear infinite; }
 @keyframes update-spin { to { transform: rotate(270deg); } }
-.update-pill .small-button { min-height: 22px; padding: 0 10px; border-radius: 11px; font-size: 12px; }
-.update-pill .update-close { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: var(--secondary); }
-.update-pill .update-close:hover { background: var(--hover); color: var(--text); }
-.update-pill .update-close .icon { width: 12px; height: 12px; }
-.update-pill--folded { width: 28px; height: 28px; padding: 0; justify-content: center; border-radius: 50%; cursor: pointer; }
-.update-pill--folded:hover { border-color: var(--strong-line); }
-.update-confirm { position: fixed; z-index: 41; right: calc(var(--panel-offset, 0px) + 12px); bottom: 52px; display: flex; flex-direction: column; gap: 8px; width: 280px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--menu, var(--composer)); box-shadow: var(--shadow-soft); font-size: 12.5px; }
+.update-confirm { position: absolute; z-index: 41; left: 0; bottom: calc(100% + 6px); display: flex; flex-direction: column; gap: 8px; width: 100%; min-width: 220px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--menu, var(--composer)); box-shadow: var(--shadow-soft); color: var(--text); font-size: 12.5px; line-height: 1.4; }
 .update-confirm div { display: flex; gap: 6px; }
 .update-confirm .composer-control { min-height: 26px; }
 .panel-body--browser { flex: 1; display: flex; padding: 0; overflow: hidden; }

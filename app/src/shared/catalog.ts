@@ -9,7 +9,7 @@ export function rankedModels(catalog: Catalog): Model[] {
 const quickModels = ["nemotron-3.5-lightning", "beam-free", "ernie-5.5-flash-preview", "glyph-cluster", "flint-v1.0"];
 
 export function automaticModels(catalog: Catalog, now = Date.now()): Model[] {
-  const ranked = rankedModels(catalog);
+  const ranked = rankedModels(catalog).filter(model => model.origin !== "discovered");
   const anonymous = ranked.filter(model => model.tier !== "basic" && activeOffers(catalog, model.id, now)
     .some(({ offer, provider }) => offer.supportsTools && provider.auth.type === "none"));
   const preferred = quickModels.flatMap(id => anonymous.filter(model => model.id === id));

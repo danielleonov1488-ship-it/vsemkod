@@ -13,7 +13,11 @@ import { sessionAccess } from "./access";
 import { DiffTracker, fileTools, inside } from "./diff-tracker";
 
 const request = () => ({ signal: AbortSignal.timeout(20_000) });
-const nativeMethods: Record<SubscriptionId, string> = { "github-copilot": "device", openai: "chatgpt-token-sharing" };
+const nativeMethods = {
+  "github-copilot": (method: { id: string }) => method.id === "device",
+  openai: (method: { id: string }) => method.id === "chatgpt-token-sharing",
+  xai: (method: { label: string }) => /SuperGrok/i.test(method.label)
+} satisfies Record<SubscriptionId, (method: { id: string; label: string }) => boolean>;
 const eventTypes = [
   "session.text.delta", "session.text.ended", "session.tool.input.started", "session.tool.called",
   "session.tool.success", "session.tool.failed", "permission.asked", "permission.replied",
@@ -94,6 +98,7 @@ export type NativeModel = { model: PersonalModel; upstream: EngineModel };
 export class EngineAdapter {
   private readonly client;
   private readonly sideSessions = new Set<string>();
+  private readonly modelWaits = new Map<string, () => void>();
 
   constructor(private readonly url: string, auth: string) {
     this.client = OpenCode.make({ baseUrl: url, headers: { authorization: auth } });
@@ -101,15 +106,17 @@ export class EngineAdapter {
 
   info() { return this.client.server.info(request()); }
 
+  routerActivity(sessionId: string) { this.modelWaits.get(sessionId)?.(); }
+
   async nativeConnections(directory: string) {
     const location = { directory };
     await this.client.model.list({ location }, request());
     const read = async () => (await this.client.integration.list({ location }, request())).data
-      .filter(entry => entry.id === "github-copilot" || entry.id === "openai");
+      .filter(entry => Object.hasOwn(nativeMethods, entry.id));
     let integrations = await read();
-    const settled = () => Object.entries(nativeMethods).every(([id, methodID]) =>
+    const settled = () => Object.entries(nativeMethods).every(([id, matches]) =>
       integrations.some(entry => String(entry.id) === id &&
-        entry.methods.some(method => method.type === "oauth" && String(method.id) === methodID)));
+        entry.methods.some(method => method.type === "oauth" && matches(method))));
     for (let attempt = 0; !settled() && attempt < 30; attempt++) {
       await delay(100);
       integrations = await read();
@@ -121,7 +128,7 @@ export class EngineAdapter {
     const result = await this.client.model.list({ location: { directory } }, request());
     return result.data.flatMap(entry => {
       const providerId = String(entry.providerID);
-      if (providerId !== "github-copilot" && providerId !== "openai" && providerId !== "opencode") return [];
+      if (providerId !== "github-copilot" && providerId !== "openai" && providerId !== "opencode" && providerId !== "xai") return [];
       if (!entry.enabled || !entry.capabilities?.tools) return [];
       if (providerId === "opencode") {
         if (!zen || !entry.cost?.length || entry.cost.some(price => price.input !== 0 || price.output !== 0)) return [];
@@ -129,6 +136,7 @@ export class EngineAdapter {
       return [{
         model: {
           id: modelReference(providerId, entry.id), name: entry.name, providerId, providerName: nativeNames[providerId],
+          kind: providerId === "opencode" ? "zen" : "subscription",
           context: entry.limit?.context, output: entry.limit?.output, vision: entry.capabilities.input.includes("image")
         },
         upstream: { id: entry.id, providerID: providerId }
@@ -139,14 +147,14 @@ export class EngineAdapter {
   async signIn(
     directory: string, id: SubscriptionId, present: (url: string, code?: string) => Promise<void>, signal: AbortSignal
   ) {
-    const methodID = nativeMethods[id];
     const entry = (await this.nativeConnections(directory)).find(item => String(item.id) === id);
-    if (!entry?.methods.some(method => method.type === "oauth" && String(method.id) === methodID)) {
+    const method = entry?.methods.filter(method => method.type === "oauth").find(nativeMethods[id]);
+    if (!method) {
       throw new Error("Штатный вход недоступен в этой сборке OpenCode.");
     }
     const location = { directory };
     const attempt = await this.client.integration.oauth.connect({
-      integrationID: id, methodID, location, ...(id === "github-copilot" ? { answer: { deploymentType: "github.com" } } : {})
+      integrationID: id, methodID: method.id, location, ...(id === "github-copilot" ? { answer: { deploymentType: "github.com" } } : {})
     }, request()).catch(() => {
       throw new Error("Не удалось начать вход. Проверьте соединение и попробуйте ещё раз.");
     });
@@ -154,7 +162,8 @@ export class EngineAdapter {
     let complete = false;
     try {
       signal.throwIfAborted();
-      const code = id === "github-copilot" ? /\b[A-Z0-9]{4}-[A-Z0-9]{4}\b/i.exec(attempt.data.instructions)?.[0] : undefined;
+      const code = id === "xai" ? /enter code:\s*([a-z0-9-]+)/i.exec(attempt.data.instructions)?.[1]
+        : id === "github-copilot" ? /\b[A-Z0-9]{4}-[A-Z0-9]{4}\b/i.exec(attempt.data.instructions)?.[0] : undefined;
       if (id === "github-copilot" && !code) throw new Error("GitHub не вернул код устройства. Попробуйте ещё раз.");
       await present(attempt.data.url, code);
       while (!signal.aborted && Date.now() < attempt.data.time.expires) {
@@ -166,7 +175,8 @@ export class EngineAdapter {
         if (data.status === "complete") { complete = true; return; }
         if (data.status === "failed") throw new Error(id === "github-copilot"
           ? "GitHub не подтвердил вход. Проверьте доступ к Copilot и повторите попытку."
-          : "ChatGPT не подтвердил вход. Проверьте доступ Plus или Pro и повторите попытку.");
+          : id === "openai" ? "ChatGPT не подтвердил вход. Проверьте доступ Plus или Pro и повторите попытку."
+          : "SuperGrok не подтвердил вход. Проверьте подписку и повторите попытку.");
         if (data.status === "expired") break;
         await delay(1000, undefined, { signal });
       }
@@ -659,6 +669,7 @@ export class EngineAdapter {
           return { uri: pathToFileURL(target).href, name: basename(target), mention };
         }))
       ];
+      this.modelWaits.set(sessionId, waitForModel);
       waitForModel();
       if (options.compact) await this.client.session.compact({ sessionID: sessionId }, request());
       else if (options.command) await this.client.session.command({
@@ -681,6 +692,7 @@ export class EngineAdapter {
       if (routed) throw new Error(routed);
       throw failure;
     } finally {
+      this.modelWaits.delete(sessionId);
       clearInterval(speedTimer);
       watchdog.pause();
       signal.abort();

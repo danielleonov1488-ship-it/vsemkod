@@ -3,7 +3,7 @@ import { z } from "zod";
 import { keyIdSchema, remoteModelsSchema, type KeyId } from "../shared/providers";
 import { readJson, writeJson } from "./storage";
 
-const profileSchema = z.object({ baseUrl: z.url(), models: remoteModelsSchema });
+const profileSchema = z.object({ name: z.string().min(1).max(60).optional(), baseUrl: z.url(), models: remoteModelsSchema });
 type Profile = z.infer<typeof profileSchema>;
 const storedKeys = z.partialRecord(keyIdSchema, z.union([
   z.string().min(1),
@@ -29,9 +29,11 @@ export class KeyStore {
     } catch { return undefined; }
   }
 
+  ids(): KeyId[] { return Object.keys(this.keys); }
+
   profile(id: KeyId): Profile | undefined {
     const entry = this.keys[id];
-    if (entry && typeof entry !== "string") return { baseUrl: entry.baseUrl, models: entry.models };
+    if (entry && typeof entry !== "string") return { name: entry.name, baseUrl: entry.baseUrl, models: entry.models };
   }
 
   set(id: KeyId, key: string, profile?: Profile): Promise<void> {

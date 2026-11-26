@@ -11,7 +11,7 @@ export type ChatView = {
   usage?: Usage; speed?: ReplySpeed; liveSpeed?: ReplySpeed; cache?: number; provider?: string; routedModel?: string;
   routeIssue?: { modelId: string; providerId: string };
   routeSwitch?: { from: string; to: string; at: number };
-  progress?: { started: number; since: number | null };
+  progress?: { started: number; since: number | null; routeWait?: number };
   failure?: { message: string; turn: PendingTurn };
 };
 
@@ -77,6 +77,8 @@ export function applyChatEvent(view: ChatView, event: ChatEvent): Partial<ChatVi
     }
     case "model-wait":
       return { progress: view.progress && { ...view.progress, since: event.since } };
+    case "route-wait":
+      return { progress: view.progress && { ...view.progress, routeWait: event.until ?? undefined } };
     case "permission":
       return { permissions: replaceById(view.permissions, event.permission) };
     case "permission-resolved":
@@ -97,6 +99,7 @@ export function applyChatEvent(view: ChatView, event: ChatEvent): Partial<ChatVi
     case "route": {
       const sameModel = event.previousModelId === event.modelId && event.previousProviderId && event.previousProviderId !== event.providerId;
       return { provider: event.providerId, routedModel: event.modelId,
+        progress: view.progress && { ...view.progress, routeWait: undefined },
         routeIssue: view.routeIssue?.modelId === event.modelId ? undefined : view.routeIssue,
         ...(sameModel && { routeSwitch: { from: event.previousProviderId!, to: event.providerId, at: Date.now() } }) };
     }

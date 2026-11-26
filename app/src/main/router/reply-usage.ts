@@ -26,10 +26,11 @@ export function readReplyUsage(isStream: boolean, started = 0, now = () => perfo
   let other = 0;
   let first: number | undefined;
   let exact: number | undefined;
+  let previousTokens = 0;
   function speed(live = false) {
     const tokens = live ? undefined : exact;
-    const value = replySpeed(tokens ?? estimateTokens(cyrillic, other), 0, started, first, now());
-    return value && { ...value, estimated: tokens === undefined };
+    const value = replySpeed(tokens === undefined ? estimateTokens(cyrillic, other) : tokens + previousTokens, 0, started, first, now());
+    return value && { ...value, estimated: tokens === undefined || previousTokens > 0 };
   }
   const parse = (payload: string) => {
     try {
@@ -67,6 +68,11 @@ export function readReplyUsage(isStream: boolean, started = 0, now = () => perfo
   }
   return {
     speed,
+    nextStream() {
+      previousTokens = estimateTokens(cyrillic, other);
+      exact = undefined;
+      cache = undefined;
+    },
     push(chunk: Uint8Array) {
       if (!isStream && skipped) return;
       pending += decoder.decode(chunk, { stream: true });

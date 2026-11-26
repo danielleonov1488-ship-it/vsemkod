@@ -24,6 +24,8 @@ export const modelSchema = z.object({
   contextWindow: z.int().positive(),
   capabilities: z.array(z.enum(["code", "tools", "reasoning", "vision"])),
   rank: z.int().nonnegative(),
+  /** Только в приложении: модель найдена в списке бесплатных моделей подключённого провайдера, в каталоге её нет. */
+  origin: z.literal("discovered").optional(),
 }).strict();
 
 const httpUrl = z.url({ protocol: /^https?$/ });
@@ -67,6 +69,8 @@ export const offerSchema = z.object({
   lastVerified: dateSchema.nullable(),
   verifiedAt: dateSchema.optional(),
   reviewBy: dateSchema.optional(),
+  /** Только в приложении: раздача найдена в списке бесплатных моделей подключённого провайдера. */
+  origin: z.literal("discovered").optional(),
 }).strict();
 
 export const candidateSchema = offerSchema.extend({

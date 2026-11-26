@@ -3,7 +3,9 @@ import electronUpdater from "electron-updater";
 import type { UpdateCheck, UpdateProgress, UpdateReady } from "../shared/api";
 
 const releaseUrl = "https://github.com/danielleonov1488-ship-it/vsemkod/releases/latest";
-const checkInterval = 6 * 60 * 60 * 1000;
+const checkInterval = 60 * 60 * 1000;
+/** Окно показали или компьютер проснулся: проверяем снова, если прошло больше 10 минут. */
+const staleAfter = 10 * 60 * 1000;
 
 export function createUpdates(publish: (update?: UpdateReady) => void, progress: (value?: UpdateProgress) => void = () => {}) {
   const enabled = app.isPackaged && (process.platform !== "linux" || Boolean(process.env.APPIMAGE));
@@ -12,6 +14,7 @@ export function createUpdates(publish: (update?: UpdateReady) => void, progress:
   let downloading: Promise<void> | undefined;
   let downloadingVersion: string | undefined;
   let timer: ReturnType<typeof setInterval> | undefined;
+  let checkedAt = 0;
 
   if (updater) {
     updater.autoDownload = false;
@@ -30,6 +33,7 @@ export function createUpdates(publish: (update?: UpdateReady) => void, progress:
   async function check(): Promise<UpdateCheck> {
     if (!updater) return "disabled";
     if (downloading) return "downloading";
+    checkedAt = Date.now();
     const result = await updater.checkForUpdates();
     if (!result?.isUpdateAvailable) return ready ?? "current";
 
@@ -78,5 +82,11 @@ export function createUpdates(publish: (update?: UpdateReady) => void, progress:
     }
   }
 
-  return { get ready() { return ready; }, check, start, stop: () => clearInterval(timer), apply };
+  /** Окно открыли из трея или вторым запуском: приложение могло неделями жить в трее и пропустить выпуск. */
+  function checkIfStale() {
+    if (!updater || !timer || downloading || ready?.action === "restart" || Date.now() - checkedAt < staleAfter) return;
+    void check().catch(() => {});
+  }
+
+  return { get ready() { return ready; }, check, checkIfStale, start, stop: () => clearInterval(timer), apply };
 }

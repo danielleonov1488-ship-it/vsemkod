@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import type { CatalogState, ConnectionId, Preferences, SubscriptionId } from "../shared/api";
+import type { CatalogState, ConnectionId, CustomProvider, Preferences, SubscriptionId } from "../shared/api";
 import type { Model, Provider } from "../shared/catalog-schema";
 import { nativeNames, personalProviders, type KeyId, type RemoteModel } from "../shared/providers";
+import { customBaseUrl } from "../shared/model-tags";
 import { Icon } from "./icons";
 import { WindowControls } from "./window-controls";
 
@@ -45,6 +46,8 @@ export function ConnectDialog({ connection, clipboard, close, connected, guided 
   const pending = phase === "starting" || phase === "waiting";
   const manual = connection.kind === "manual";
   const copilot = connection.id === "github-copilot";
+  const grok = connection.id === "xai";
+  const plan = manual && personalProviders.some(provider => provider.id === connection.id && provider.kind === "plan");
   const custom = connection.id === "custom-api";
   const title = "Подключить " + (connection.model?.name ?? connection.name);
   useEffect(() => {
@@ -122,8 +125,10 @@ export function ConnectDialog({ connection, clipboard, close, connected, guided 
     <p className="connect-intro" id="connect-intro">
       {connection.model && <>Бесплатно через {connection.name}. </>}
       {manual ? custom ? "Укажите адрес API и ключ. Список моделей загрузится с вашего сервера."
+        : plan ? "Возьмите ключ кодинг-плана в личном кабинете " + connection.name + ". Обычный ключ с оплатой за токены сюда не подойдёт."
         : "Возьмите ключ API в личном кабинете провайдера."
         : copilot ? "Подтвердите вход кодом на GitHub, чтобы использовать свой план Copilot."
+          : grok ? "Подтвердите вход кодом на x.ai, чтобы использовать свою подписку SuperGrok или X Premium."
           : "Откройте браузер и войдите."}
     </p>
     {phase === "done" ? <p className="connect-status" role="status"><Icon name="check" />Подключено</p> :
@@ -166,14 +171,15 @@ export function ConnectDialog({ connection, clipboard, close, connected, guided 
           {clipboardStatus && <p className="connect-feedback" role="status">{clipboardStatus}</p>}
         </>}
         {phase === "idle" && <button className={manual ? "small-button connect-submit" : "google-button"} type="submit" disabled={loadingModels || (choices !== undefined && !choices.some(item => item.checked))}>
-          {manual || copilot ? "Подключить" : connection.id === "openai" ? "Войти через ChatGPT" : "Продолжить в браузере"}
+          {manual || copilot || grok ? "Подключить" : connection.id === "openai" ? "Войти через ChatGPT" : "Продолжить в браузере"}
         </button>}
         {pending && <>
           <p className="connect-status" role="status"><span className="status-dot" />{manual ? "Проверяем ключ…" :
             phase === "starting" ? "Запускаем вход…" : "Ждём вход…"}</p>
           {device && <>
-            <p className="device-instructions">Введите код <kbd>{device.code}</kbd> на github.com/login/device.</p>
-            <button className="google-button" type="button" onClick={() => open(device.url)}>Открыть GitHub</button>
+            <p className="device-instructions">{grok ? <>Подтвердите код <kbd>{device.code}</kbd> на странице x.ai.</>
+              : <>Введите код <kbd>{device.code}</kbd> на github.com/login/device.</>}</p>
+            <button className="google-button" type="button" onClick={() => open(device.url)}>{grok ? "Открыть x.ai" : "Открыть GitHub"}</button>
           </>}
           <button className="github-button" type="button" onClick={close}>Отмена</button>
         </>}
@@ -184,24 +190,47 @@ export function ConnectDialog({ connection, clipboard, close, connected, guided 
   </dialog>;
 }
 
-const subscriptions = ["github-copilot", "openai"] as const;
+const subscriptions = ["openai", "github-copilot", "xai"] as const;
+const subscriptionDetails: Record<SubscriptionId, string> = {
+  openai: "Вход через ChatGPT", "github-copilot": "Код подтверждения на GitHub", xai: "SuperGrok или X Premium, вход через x.ai"
+};
+const planDetails: Partial<Record<string, string>> = {
+  "zai-coding": "GLM по подписке", "kimi-code": "Kimi по подписке", "alibaba-coding": "Qwen, GLM и Kimi по подписке",
+  "opencode-go": "GLM, Kimi, Qwen и DeepSeek по подписке", synthetic: "Открытые модели по подписке", "ollama-cloud": "Облачные модели Ollama"
+};
 
-export function ConnectionsPage({ state, close, connect, openWizard }: {
+/** Свои поставщики из состояния; для старой версии без customProviders показываем единственный custom-api. */
+export function customProvidersOf(state?: CatalogState): CustomProvider[] {
+  if (state?.customProviders) return state.customProviders;
+  if (!state?.personal.includes("custom-api")) return [];
+  return [{ id: "custom-api", name: "Свой OpenAI-совместимый", baseUrl: state.customProviderUrl ?? "",
+    models: state.personalModels.filter(model => model.providerId === "custom-api").map(model => ({ ...model, id: model.upstreamId ?? model.id })) }];
+}
+
+export function ConnectionsPage({ state, close, connect, openWizard, onCatalog, onError }: {
   state?: CatalogState; close: () => void; connect: (value: Connection) => void; openWizard?: () => void;
+  onCatalog: (state: CatalogState) => void; onError: (error: unknown) => void;
 }) {
+  const plans = personalProviders.filter(provider => provider.kind === "plan");
+  const keys = personalProviders.filter(provider => provider.kind === "api" && provider.id !== "custom-api");
   return <main className="workspace">
-    <header className="chat-header"><h1>Свои подписки и ключи</h1>
+    <header className="chat-header"><h1>Подписки и ключи</h1>
       <button className="composer-control" type="button" onClick={close}>Назад</button>
     </header>
-    <div className="settings-panel">
+    <div className="settings-panel connections-page">
       {openWizard && <button type="button" className="small-button" onClick={openWizard}>Подключить всё за пару минут</button>}
-      <p className="settings-intro">Подключите свой аккаунт или ключ API. Модели появятся в разделе «Ещё модели».</p>
+      <p className="settings-intro">Модели подписок и ключей появятся во вкладке «Мои» в меню моделей. Бесплатные модели никогда не переключаются на платные.</p>
       <section className="settings-group"><h2>Подписки</h2>
-        {subscriptions.map(id => <ConnectionRow key={id} name={nativeNames[id]} active={state?.subscriptions.includes(id)}
+        <p className="settings-hint">Вход в аккаунт или ключ кодинг-плана. Эти сервисы официально разрешают сторонние агенты.</p>
+        {subscriptions.map(id => <ConnectionRow key={id} name={nativeNames[id]} detail={subscriptionDetails[id]} active={state?.subscriptions.includes(id)}
           action={() => connect({ id, name: nativeNames[id], kind: "subscription" })} />)}
+        {plans.map(provider => <ConnectionRow key={provider.id} name={provider.name} detail={planDetails[provider.id] ?? "Ключ кодинг-плана"}
+          active={state?.personal.includes(provider.id)} action={() => connect({ ...provider, kind: "manual" })} />)}
       </section>
+      <CustomProviders state={state} onCatalog={onCatalog} onError={onError} />
       <section className="settings-group"><h2>Ключи API</h2>
-        {personalProviders.map(provider => <ConnectionRow key={provider.id} name={provider.name} active={state?.personal.includes(provider.id)}
+        <p className="settings-hint">Оплата за токены у самого провайдера.</p>
+        {keys.map(provider => <ConnectionRow key={provider.id} name={provider.name} active={state?.personal.includes(provider.id)}
           action={() => connect({ ...provider, kind: "manual" })} />)}
       </section>
       {state?.catalog.providers.some(provider => provider.auth.type === "manual_key" || provider.auth.type === "oauth_pkce") &&
@@ -214,12 +243,157 @@ export function ConnectionsPage({ state, close, connect, openWizard }: {
   </main>;
 }
 
-function ConnectionRow({ name, active, action }: { name: string; active?: boolean; action: () => void }) {
+function ConnectionRow({ name, detail, active, action }: { name: string; detail?: string; active?: boolean; action: () => void }) {
   return <div className="settings-row provider-row">
-    <span>{name}</span>
+    <span className="provider-copy"><span>{name}</span>{detail && <span className="subtle">{detail}</span>}</span>
     {active ? <span className="connection-label"><span className="status-dot" />Подключён</span> :
       <button className="composer-control connect-label" type="button" aria-label={"Подключить " + name} onClick={action}>Подключить</button>}
   </div>;
+}
+
+const modelWord = (count: number) => ({ one: "модель", few: "модели" } as Record<string, string>)[new Intl.PluralRules("ru").select(count)] ?? "моделей";
+
+/** «Свои поставщики»: любой OpenAI-совместимый сервер. Список, «Изменить», «Удалить» и «Добавить поставщика». */
+export function CustomProviders({ state, onCatalog, onError }: {
+  state?: CatalogState; onCatalog: (state: CatalogState) => void; onError: (error: unknown) => void;
+}) {
+  const api = window.vsemkod;
+  const [editing, setEditing] = useState<CustomProvider | "new">();
+  const [confirm, setConfirm] = useState<string>();
+  const [working, setWorking] = useState<string>();
+  const providers = customProvidersOf(state);
+  useEffect(() => {
+    if (!confirm) return;
+    const timer = setTimeout(() => setConfirm(undefined), 4000);
+    return () => clearTimeout(timer);
+  }, [confirm]);
+  const host = (url: string) => { try { return new URL(url).host; } catch { return url; } };
+  return <section className="settings-group"><h2>Свои поставщики</h2>
+    <p className="settings-hint">Любой сервер с OpenAI-совместимым API: адрес, ключ и нужные модели.</p>
+    {providers.map(provider => <div className="settings-row provider-row" key={provider.id}>
+      <span className="provider-copy"><span>{provider.name}</span>
+        <span className="subtle">{[host(provider.baseUrl), provider.models.length + " " + modelWord(provider.models.length)].filter(Boolean).join(" · ")}</span></span>
+      <div className="settings-actions">
+        <button className="composer-control" type="button" disabled={!!working || !api.saveCustomProvider} onClick={() => setEditing(provider)}>Изменить</button>
+        <button className="composer-control danger-control" type="button" disabled={!!working}
+          aria-label={confirm === provider.id ? "Точно удалить " + provider.name : "Удалить " + provider.name} onClick={() => {
+            if (confirm !== provider.id) { setConfirm(provider.id); return; }
+            setConfirm(undefined);
+            setWorking(provider.id);
+            void api.disconnect(provider.id).then(onCatalog).catch(onError).finally(() => setWorking(undefined));
+          }}>{confirm === provider.id ? "Точно удалить?" : "Удалить"}</button>
+      </div>
+    </div>)}
+    <button type="button" className="add-provider" disabled={!api.saveCustomProvider} onClick={() => setEditing("new")}><Icon name="plus" />Добавить поставщика</button>
+    {editing && <CustomProviderDialog provider={editing === "new" ? undefined : editing} close={() => setEditing(undefined)}
+      saved={next => { setEditing(undefined); onCatalog(next); }} />}
+  </section>;
+}
+
+function CustomProviderDialog({ provider, close, saved }: {
+  provider?: CustomProvider; close: () => void; saved: (state: CatalogState) => void;
+}) {
+  const api = window.vsemkod;
+  const dialog = useRef<HTMLDialogElement>(null);
+  const active = useRef(true);
+  const [name, setName] = useState(provider?.name ?? "");
+  const [baseUrl, setBaseUrl] = useState(provider?.baseUrl ?? "");
+  const [key, setKey] = useState("");
+  const [choices, setChoices] = useState<ModelChoice[]>(() => provider?.models.map(model => ({ ...model, checked: true })) ?? []);
+  const [manual, setManual] = useState("");
+  const [manualOpen, setManualOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [hint, setHint] = useState("");
+  useEffect(() => {
+    active.current = true;
+    const restoreFocus = document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
+    dialog.current?.showModal();
+    return () => { active.current = false; restoreFocus?.focus(); };
+  }, []);
+  const url = customBaseUrl(baseUrl);
+  const canLoad = !!url && (!!key.trim() || !!provider);
+  const selected = choices.filter(item => item.checked);
+
+  function load() {
+    if (!api.customProviderModels) return;
+    setLoading(true);
+    setError("");
+    setHint("");
+    const input = key.trim() || !provider ? { baseUrl: url, key: key.trim() } : { id: provider.id };
+    void api.customProviderModels(input).then(list => {
+      if (!active.current) return;
+      const known = new Map(choices.map(item => [item.id, item]));
+      const many = list.length > 12;
+      const next = list.map(item => known.get(item.id) ?? { ...item, checked: !many && !provider });
+      setChoices([...next, ...choices.filter(item => !list.some(entry => entry.id === item.id))]);
+      if (!list.length) { setHint("Сервер не вернул ни одной модели. Впишите id модели вручную."); setManualOpen(true); }
+      else if (many && !provider) setHint("Отметьте модели, которые нужны в меню.");
+    }).catch(failure => {
+      if (!active.current) return;
+      const message = readableError(failure);
+      if (/вручную/i.test(message)) { setHint(message); setManualOpen(true); } else setError(message);
+    }).finally(() => { if (active.current) setLoading(false); });
+  }
+
+  function addManual() {
+    const id = manual.trim();
+    if (!id) return;
+    setChoices(items => items.some(item => item.id === id) ? items.map(item => item.id === id ? { ...item, checked: true } : item)
+      : [...items, { id, name: id, checked: true }]);
+    setManual("");
+  }
+
+  function save() {
+    if (!api.saveCustomProvider || saving) return;
+    setSaving(true);
+    setError("");
+    void api.saveCustomProvider({ id: provider?.id, name: name.trim(), baseUrl: url, key: key.trim() || undefined,
+      models: selected.map(({ checked: _checked, ...model }) => model) })
+      .then(state => { if (active.current) saved(state); })
+      .catch(failure => { if (active.current) setError(readableError(failure)); })
+      .finally(() => { if (active.current) setSaving(false); });
+  }
+
+  return <dialog ref={dialog} className="connect-dialog custom-provider-dialog" aria-labelledby="custom-title"
+    onCancel={event => { event.preventDefault(); close(); }}>
+    <WindowControls floating />
+    <button className="composer-control attach dialog-close" type="button" title="Закрыть" aria-label="Закрыть" onClick={close}><Icon name="close" /></button>
+    <h1 id="custom-title">{provider ? "Изменить «" + provider.name + "»" : "Добавить поставщика"}</h1>
+    <p className="connect-intro">Любой сервер с OpenAI-совместимым API. Если поставщик дал две ссылки, нужна та, что для OpenAI: обычно она оканчивается на /v1. Ссылка для Anthropic не подойдёт.</p>
+    <form className="provider-actions" onSubmit={event => { event.preventDefault(); save(); }}>
+      <label className="manual-field">Название<input value={name} required maxLength={60} autoFocus={!provider}
+        placeholder="Например, Qwen у партнёра" onChange={event => setName(event.target.value)} disabled={saving} /></label>
+      <label className="manual-field">Базовый URL<input type="url" value={baseUrl} required maxLength={4096} spellCheck={false}
+        placeholder="https://api.example.com/v1" onChange={event => setBaseUrl(event.target.value)}
+        onBlur={() => setBaseUrl(value => customBaseUrl(value))} disabled={saving} /></label>
+      <label className="manual-field">Ключ API<input type="password" value={key} required={!provider} maxLength={4096}
+        autoComplete="off" spellCheck={false} placeholder={provider ? "Оставьте пустым, чтобы не менять" : "Ключ API"}
+        onChange={event => setKey(event.target.value)} disabled={saving} /></label>
+      <div className="custom-models">
+        <span className="custom-models-title">Модели</span>
+        <div className="custom-model-actions">
+          <button className="composer-control" type="button" disabled={saving || loading || !canLoad || !api.customProviderModels} onClick={load}>
+            {loading ? "Загружаем…" : choices.length ? "Обновить список с сервера" : "Загрузить с сервера"}</button>
+          {!manualOpen && <button className="composer-control" type="button" disabled={saving} onClick={() => setManualOpen(true)}>Вписать вручную</button>}
+        </div>
+        {hint && <p className="settings-hint">{hint}</p>}
+        {manualOpen && <div className="custom-manual">
+          <input className="field-control" value={manual} maxLength={200} spellCheck={false} aria-label="id модели"
+            placeholder="id модели, например qwen3.8-plus" onChange={event => setManual(event.target.value)}
+            onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); addManual(); } }} disabled={saving} />
+          <button className="composer-control" type="button" disabled={saving || !manual.trim()} onClick={addManual}>Добавить</button>
+        </div>}
+        {choices.length > 0 && <CustomModelList choices={choices} update={setChoices} />}
+      </div>
+      <button className="small-button connect-submit" type="submit"
+        disabled={saving || !name.trim() || !url || (!provider && !key.trim()) || !selected.length || !api.saveCustomProvider}>
+        {saving ? "Проверяем ключ…" : provider ? "Сохранить" : "Добавить"}</button>
+      {error && <p className="connect-feedback connect-error" role="alert">{error}</p>}
+    </form>
+    <p className="privacy-note"><Icon name="lock" />Ключ хранится только на этом компьютере</p>
+  </dialog>;
 }
 
 type ModelChoice = RemoteModel & { checked: boolean };
@@ -266,13 +440,14 @@ export function ModelSettings({ state, prefs, update, subscriptionsPage, connect
   connect: (value: Connection) => void; disconnect: (id: ConnectionId) => Promise<void>;
   onCatalog: (state: CatalogState) => void; onError: (error: unknown) => void;
 }) {
+  const api = window.vsemkod;
   const [working, setWorking] = useState<ConnectionId>();
   const [refreshing, setRefreshing] = useState(false);
   const openRouter = state?.catalog.providers.find(provider => provider.id === "openrouter" && provider.auth.type === "oauth_pkce");
   const providers = [
     ...state?.catalog.providers.filter(provider => state.connected.includes(provider.id)).map(provider =>
       ({ id: provider.id, name: provider.name, public: provider.auth.type === "none" })) ?? [],
-    ...personalProviders.filter(provider => state?.personal.includes(provider.id)),
+    ...personalProviders.filter(provider => provider.id !== "custom-api" && state?.personal.includes(provider.id)),
     ...subscriptions.filter(id => state?.subscriptions.includes(id)).map(id => ({ id, name: nativeNames[id] }))
   ];
   return <>
@@ -294,9 +469,10 @@ export function ModelSettings({ state, prefs, update, subscriptionsPage, connect
         </div>)}
         {openRouter && !state?.connected.includes(openRouter.id) && <ConnectionRow name={openRouter.name}
           action={() => connect(catalogConnection(openRouter))} />}
-        <button className="composer-control subscription-link" type="button" onClick={subscriptionsPage}><Icon name="plus" />Свои подписки и ключи</button>
+        <button className="composer-control subscription-link" type="button" onClick={subscriptionsPage}><Icon name="plus" />Подписки и ключи</button>
       </section>
-      {state?.personal.includes("custom-api") && <section className="settings-group"><h2>Свой OpenAI-совместимый</h2>
+      {api.saveCustomProvider ? <CustomProviders state={state} onCatalog={onCatalog} onError={onError} />
+        : state?.personal.includes("custom-api") && <section className="settings-group"><h2>Свой OpenAI-совместимый</h2>
         <CustomProviderModels enabled={state.personalModels.filter(model => model.providerId === "custom-api").map(model => model.upstreamId ?? model.id)}
           onCatalog={onCatalog} onError={onError} />
       </section>}

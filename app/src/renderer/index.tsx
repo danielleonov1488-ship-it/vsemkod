@@ -6,6 +6,7 @@ import { Chat } from "./chat";
 import { catalogConnection, ConnectDialog, ConnectionsPage, readableError, type Connection } from "./connections";
 import { accessModes, slashCommand, type AccessMode } from "../shared/workspace";
 import { automaticModels, defaultModel } from "../shared/catalog";
+import { modelDisplayName } from "../shared/usage";
 import { applyChatEvent, applyHistory, emptyView, isRunning, useChatViews, type ChatView, type PendingTurn } from "./chat-state";
 import type { FileReference } from "../shared/file-links";
 import { modelSpeed } from "./models";
@@ -21,7 +22,7 @@ import { SideChat } from "./side-chat";
 import notificationSound from "../../resources/notification.wav?url";
 import { WindowControls } from "./window-controls";
 import { Icon } from "./icons";
-import { UpdatePill } from "./update-pill";
+import { UpdateRow } from "./update-pill";
 import { findSecrets, maskSecrets } from "../shared/secrets";
 import { ModelPicker, modelOptions } from "./models";
 import logo from "./assets/logo.svg";
@@ -221,13 +222,15 @@ function App() {
       if (event.previousModelId && (previous?.provider !== event.providerId || previous?.routedModel !== event.modelId) &&
           activeChat.current === session && chatVisible.current) {
         const names = liveCatalog.current?.catalog;
-        const modelName = (id: string) => names?.models.find(model => model.id === id)?.name ?? id;
+        const modelName = (id: string) => modelDisplayName(names?.models.find(model => model.id === id)?.name ?? id);
         const providerName = (id: string) => names?.providers.find(provider => provider.id === id)?.name ?? id;
         const sameModel = event.previousModelId === event.modelId && event.previousProviderId;
         const next = sameModel ? providerName(event.providerId) : modelName(event.modelId);
         const prior = sameModel ? providerName(sameModel) : modelName(event.previousModelId);
-        notify({ text: "Переключился на " + next + (event.reason === "quota"
-          ? " — у " + prior + " кончилась квота" : " — " + prior + " временно недоступен") });
+        notify({ text: event.midStream
+          ? (sameModel ? prior + " оборвал ответ — продолжаю через " + next : prior + " оборвала ответ — продолжает " + next)
+          : sameModel ? "Переключился на " + next + (event.reason === "quota" ? ": у " + prior + " кончилась квота" : ": " + prior + " не отвечает")
+          : "Отвечает " + next + (event.reason === "quota" ? ": у " + prior + " кончилась квота" : ": " + prior + " сейчас недоступна") });
       }
       setCatalog(state => state && { ...state,
         latencies: [...(state.latencies ?? []).filter(item => item.modelId !== event.modelId || item.providerId !== event.providerId),
@@ -848,6 +851,7 @@ function App() {
       add={value => void captureFiles(value)} pick={() => void chooseFiles()} choose={() => void chooseDirectory(false, true)}
       access={access} accessMenu={accessMenu} selectAccess={selectAccess} cycle={cycleAccess} submit={submit} stop={stop} selectCommand={quickCommand} tools={tools} vision={vision} onError={showError}
       modelControls={<ModelPicker selected={modelId} catalog={catalog?.catalog} options={options} personal={personal} zen={zen} auto={prefs?.auto ?? true} latencies={catalog?.latencies} speeds={catalog?.speeds} benchmarks={catalog?.benchmarks}
+          routed={chat ? view.routedModel : undefined}
           variant={variant} variants={variants} onVariant={setVariant}
           openSignal={modelMenu} onSelect={id => editView({ model: id, variant: "", provider: undefined })}
           onAuto={auto => updatePrefs({ auto })} onConnect={setConnection} onSubscriptions={() => setSubscriptions(true)} />} />
@@ -886,6 +890,8 @@ function App() {
           removeProject={api.projectRemove ? path => void removeProject(path) : undefined}
           open={session => void openChat(session)} perform={changeChat} />
         <div className="sidebar-end">
+          <UpdateRow ready={updateReady} downloading={updateProgress} busy={anyRunning}
+            apply={() => void api.applyUpdate().catch(showError)} applyAfterReply={() => setApplyAfterReply(true)} />
           <button type="button" className="sidebar-row community-row" title="Telegram-канал сообщества: раздачи моделей, промпты и помощь"
             onClick={() => void api.openExternal(COMMUNITY_URL).catch(showError)}><Icon name="telegram" />Сообщество вайб‑кодеров</button>
           <button type="button" className="sidebar-row" aria-current={settings || subscriptions ? "page" : undefined}
@@ -894,7 +900,7 @@ function App() {
         </div>
       </aside>
       <div className="workspace-layout">
-        {subscriptions ? <ConnectionsPage state={catalog} close={() => setSubscriptions(false)} connect={setConnection} openWizard={api.clipboardKey && (() => setWizard(true))} />
+        {subscriptions ? <ConnectionsPage state={catalog} close={() => setSubscriptions(false)} connect={setConnection} openWizard={api.clipboardKey && (() => setWizard(true))} onCatalog={setCatalog} onError={showError} />
           : settings ? <Settings state={catalog} prefs={prefs} version={initial?.version} directory={directory} choose={() => void chooseDirectory(true)} initialSection={settingsSection}
             update={updatePrefs} subscriptionsPage={() => setSubscriptions(true)} connect={setConnection} disconnect={disconnect}
             checkUpdates={() => void checkUpdates()} checkingUpdates={checkingUpdates}
@@ -971,8 +977,6 @@ function App() {
       }}>Открыть</button>}
       <button className="composer-control attach" type="button" aria-label="Закрыть уведомление" onClick={() => setNotice(undefined)}><Icon name="close" /></button>
     </div>}
-    <UpdatePill ready={updateReady} downloading={updateProgress} busy={Object.values(statuses.current).some(isRunning)}
-      apply={() => void api.applyUpdate().catch(showError)} applyAfterReply={() => setApplyAfterReply(true)} />
   </>;
 }
 

@@ -1,6 +1,6 @@
 import { voiceChunk, voiceModels } from "../shared/voice";
 import { VoiceService } from "./voice-service";
-import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeTheme, Notification, powerSaveBlocker, shell, Menu } from "electron";
+import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeTheme, Notification, powerMonitor, powerSaveBlocker, shell, Menu } from "electron";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { BackgroundTasks } from "./background-tasks";
@@ -22,7 +22,7 @@ import { checkedFile, previewFile } from "./file-preview";
 import { projectPath } from "./engine/revert-files";
 import { CatalogService } from "./catalog-service";
 import { ClipboardWatch, keyFromClipboard } from "./clipboard-watch";
-import { ConnectService } from "./connect-service";
+import { ConnectService, customProviderIdSchema, customSelectionSchema } from "./connect-service";
 import type { NativeModel } from "./engine/adapter";
 import { EngineService, enableOpenCodeZenFree, engineBinary } from "./engine/service";
 import { KeyStore } from "./key-store";
@@ -45,10 +45,11 @@ if (dataOverride) {
 // Без AppUserModelID Windows молча не показывает уведомления установленного приложения.
 if (process.platform === "win32") app.setAppUserModelId("ru.vsemkod.app");
 
-const subscriptionId = z.enum(["github-copilot", "openai"]);
+const subscriptionId = z.enum(["github-copilot", "openai", "xai"]);
 const connectionId = z.union([keyIdSchema, subscriptionId]);
 const dialogId = z.uuid();
 const id = z.string().min(1).max(250);
+const modelId = z.string().min(1).max(514);
 const localPath = z.string().min(1).max(32_768).refine(isAbsolute);
 const mcpConfig = z.discriminatedUnion("type", [
   z.object({ type: z.literal("local"), command: z.array(z.string().min(1)).min(1).max(64), environment: z.record(z.string(), z.string()).optional(), disabled: z.boolean().optional() }),
@@ -230,11 +231,14 @@ async function start() {
   const providerRefresh = new AbortController();
   let subscriptions: SubscriptionId[] = [];
   let nativeModels: NativeModel[] = [];
-  const personalModels = () => connections.personalRoutes(catalog.current).map(({ model }) => model);
+  const personalModels = () => connections.personalRoutes().map(({ model }) => model);
+  const effective = () => connections.effectiveCatalog(catalog.current);
+  const legacyModel = (id: string) => connections.legacyCatalogModel(catalog.current, id);
   const health = new ProviderHealth(join(data, "usage.json"));
   await health.load();
   const state = () => ({
-    catalog: catalog.current, connected: connections.connected(catalog.current), personal: connections.connectedPersonal(), subscriptions,
+    catalog: effective(), connected: connections.connected(catalog.current), personal: connections.connectedPersonal(), subscriptions,
+    customProviders: connections.customProviders(),
     personalModels: [...personalModels(), ...nativeModels.filter(({ model }) => model.providerId !== "opencode").map(({ model }) => model)],
     zenModels: nativeModels.filter(({ model }) => model.providerId === "opencode").map(({ model }) => model),
     latencies: health.latencies(), speeds: health.speeds(), benchmarks: catalog.benchmarks,
@@ -261,10 +265,14 @@ async function start() {
   });
   await catalog.loadInitial();
   const router = new Router({
-    catalog: () => catalog.current,
+    catalog: effective,
     key: providerId => connections.key(providerId),
-    personal: () => connections.personalRoutes(catalog.current),
+    personal: () => connections.personalRoutes(),
+    customIds: () => connections.customProviders().map(provider => provider.id),
+    legacyModel,
     health,
+    onActivity: sessionId => engine.routerActivity(sessionId),
+    onWait: event => { if (!sideIds.has(event.sessionId)) broadcast("chat:event", { type: "route-wait", ...event } satisfies ChatEvent); },
     onRoute: route => { if (!sideIds.has(route.sessionId)) broadcast("chat:event", { type: "route", ...route } satisfies ChatEvent); },
     onExhausted: event => { if (!sideIds.has(event.sessionId)) broadcast("chat:event", event); },
     onSpeed: event => { if (!sideIds.has(event.sessionId)) broadcast("chat:event", event); },
@@ -273,7 +281,7 @@ async function start() {
   });
   await router.start();
   console.info("[router] Запущен: " + router.baseUrl);
-  const engine = new EngineService(engineBinary(resources), join(data, "opencode"), () => catalog.current, router,
+  const engine = new EngineService(engineBinary(resources), join(data, "opencode"), effective, router,
     event => {
       if (sideIds.has(event.sessionId)) return;
       if (event.type === "part" && event.part.kind === "tool" && event.part.background && event.part.status === "running") {
@@ -520,11 +528,11 @@ async function start() {
       if (subscription.success) {
         const provider = subscription.data;
         await engine.withAuth(client => client.signIn(preferences.directory, provider, async (url, code) => {
-          if (!code) {
+          if (!code && provider !== "xai") {
             try { await openExternal(url); }
             catch { throw new Error("Не удалось открыть системный браузер."); }
           }
-          signalConnect({ id: token, type: "waiting", code, url: code ? url : undefined });
+          signalConnect({ id: token, type: "waiting", code, url: code || provider === "xai" ? url : undefined });
         }, signal));
         return refreshNative(provider);
       }
@@ -539,7 +547,7 @@ async function start() {
       } else if (input && (!("auth" in provider) || provider.auth.type === "manual_key")) {
         await connections.manual(provider, input.key, input.baseUrl, signal, input.models);
       } else throw new Error("Введите ключ провайдера.");
-      health.reset(provider.id);
+      router.resetProvider(provider.id);
       if ("auth" in provider) await connections.refreshCatalogModels(catalog.current, signal, provider.id);
       return publishState();
     }).catch(error => {
@@ -553,13 +561,13 @@ async function start() {
     const pending = [...attempts.values()].filter(attempt => attempt.provider === provider);
     for (const attempt of pending) attempt.controller.abort();
     await Promise.allSettled(pending.map(attempt => attempt.done));
-    if (provider === "openai" || provider === "github-copilot") {
+    if (provider === "openai" || provider === "github-copilot" || provider === "xai") {
       await engine.withAuth(client => client.disconnect(preferences.directory, provider));
       return refreshNative();
     }
     await connections.disconnect(provider);
     if (provider === "groq-api") { voice.cancel(); await savePreferences({ voiceGroq: false }); }
-    health.reset(provider);
+    router.resetProvider(provider);
     return publishState();
   });
   handle("chat:list", z.tuple([localPath.optional()]), async ([directory]) => {
@@ -612,13 +620,14 @@ async function start() {
     }
     return documents.length;
   });
-  const engineModel = (model: string) => nativeModels.find(entry => entry.model.id === model)?.upstream ?? { id: model, providerID: "vsemkod" };
-  handle("side:ask", z.tuple([dialogId, localPath, id.optional(), z.string().trim().min(1).max(100_000), id, id.optional()]),
+  const engineModel = (model: string) => nativeModels.find(entry => entry.model.id === model)?.upstream ?? { id: legacyModel(model) ?? model, providerID: "vsemkod" };
+  handle("side:ask", z.tuple([dialogId, localPath, id.optional(), z.string().trim().min(1).max(100_000), modelId, id.optional()]),
     async ([token, directory, parent, text, model, variant]) => {
       project(directory);
+      model = legacyModel(model) ?? model;
       if (parent && conversation(parent).directory !== directory) throw new Error("Чат находится в другом проекте.");
       const knownModel = nativeModels.some(entry => entry.model.id === model) || personalModels().some(entry => entry.id === model) ||
-        activeOffers(catalog.current, model).some(({ offer, provider }) => offer.supportsTools && connections.connected(catalog.current).includes(provider.id));
+        activeOffers(effective(), model).some(({ offer, provider }) => offer.supportsTools && connections.connected(catalog.current).includes(provider.id));
       if (!knownModel) throw new Error("Эта модель недоступна.");
       const entry = sideSessions.get(token) ?? { directory, parent };
       if (entry.closed || entry.directory !== directory || entry.parent !== parent || entry.sending) throw new Error("Боковой чат занят или закрыт.");
@@ -646,12 +655,14 @@ async function start() {
     });
   handle("side:close", z.tuple([dialogId]), ([token]) => closeSide(token));
 
-  handle("chat:send", z.tuple([id, z.string().trim().max(100_000), id, z.array(dialogId).max(10), turnSchema.optional()]), async ([session, text, model, files, options]) => {
+  handle("chat:send", z.tuple([id, z.string().trim().max(100_000), modelId, z.array(dialogId).max(10), turnSchema.optional()]), async ([session, text, model, files, options]) => {
     if (activeSessions.has(session)) throw new Error("Агент уже отвечает в этом чате.");
     const chat = conversation(session);
+    model = legacyModel(model) ?? model;
     const connected = connections.connected(catalog.current);
-    const available = rankedModels(catalog.current).filter(entry =>
-      entry.tier !== "basic" && activeOffers(catalog.current, entry.id).some(({ offer, provider }) => offer.supportsTools && connected.includes(provider.id)));
+    const workingCatalog = effective();
+    const available = rankedModels(workingCatalog).filter(entry =>
+      entry.tier !== "basic" && activeOffers(workingCatalog, entry.id).some(({ offer, provider }) => offer.supportsTools && connected.includes(provider.id)));
     const native = nativeModels.find(entry => entry.model.id === model);
     const details = native?.model ?? personalModels().find(entry => entry.id === model);
     const catalogModel = available.find(entry => entry.id === model);
@@ -752,11 +763,22 @@ async function start() {
       if (!engine.isWorking(session)) throw new Error("Вопрос уже закрыт.");
       await (await engine.ready()).answerQuestion(session, form, answer);
     });
-  handle("models:variants", z.tuple([localPath, id]), async ([directory, model]) =>
+  handle("models:variants", z.tuple([localPath, modelId]), async ([directory, model]) =>
     (await (await engine.ready()).modelInfo(project(directory), engineModel(model)))?.variants.map(item => item.id) ?? []);
   handle("models:custom", z.tuple([customInput.optional()]), ([input]) => connections.customModels(input));
   handle("models:custom-save", z.tuple([remoteModelsSchema.min(1)]), async ([models]) => {
     await connections.saveCustomModels(models);
+    return publishState();
+  });
+  handle("models:custom-list", z.tuple([z.union([customInput, z.object({ id: customProviderIdSchema })])]),
+    ([input]) => connections.customProviderModels(input));
+  const customSave = customInput.extend({
+    id: customProviderIdSchema.optional(), name: z.string().trim().min(1).max(60),
+    key: customInput.shape.key.optional(), models: customSelectionSchema
+  }).strict();
+  handle("models:custom-provider-save", z.tuple([customSave]), async ([input]) => {
+    const provider = await connections.saveCustomProvider(input);
+    router.resetProvider(provider);
     return publishState();
   });
   const rulesPath = join(engine.configDirectory, "AGENTS.md");
@@ -896,6 +918,9 @@ async function start() {
     }, hidden ? 0 : 2500);
   }, 1000);
   autoUpdateTimer.unref();
+  // Окно открыли из трея, вторым запуском или после сна: если давно не проверяли, проверяем обновления.
+  app.on("browser-window-focus", () => updates.checkIfStale());
+  powerMonitor.on("resume", () => updates.checkIfStale());
   createWindow();
   updates.start();
   if (preferences.catalogUpdates) catalog.start();

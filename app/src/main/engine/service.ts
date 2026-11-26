@@ -64,6 +64,8 @@ export class EngineService {
   keepBackground = () => false;
   get runningClient() { return this.client; }
 
+  routerActivity(sessionId: string) { this.client?.routerActivity(sessionId); }
+
   constructor(
     private readonly executable: string,
     private readonly data: string,
@@ -330,7 +332,7 @@ export class EngineService {
   }
 
   private configVersion(catalog: Catalog, personal: PersonalModel[]) {
-    return JSON.stringify([catalog.generatedAt, personal, this.settings()]);
+    return JSON.stringify([catalog.generatedAt, catalog.models, personal, this.settings()]);
   }
 
   private config(catalog: Catalog, personal: PersonalModel[]) {
@@ -375,7 +377,7 @@ export class EngineService {
           settings: { baseURL: this.router.baseUrl, apiKey: this.router.token },
           models: Object.fromEntries([["auto", {
             name: "Автовыбор",
-            limit: { context: Math.min(...models.filter(model => model.tier !== "basic").map(model => model.contextWindow), 128_000), output: 8192 },
+            limit: { context: Math.min(...models.filter(model => model.tier !== "basic" && model.origin !== "discovered").map(model => model.contextWindow), 128_000), output: 8192 },
             capabilities: { tools: true, input: ["text"], output: ["text"] }
           }], ["relay", {
             name: "vsemkod",

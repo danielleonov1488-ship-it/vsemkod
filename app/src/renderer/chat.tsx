@@ -256,7 +256,7 @@ export function Chat({ title, parts, permissions, questions, busy, answer, answe
   headerTools: ReactNode; openBrowser: (url: string) => void; insertDraft: (text: string) => void; copy: (text: string) => void;
   edit: (part: UserPart) => void; revert: (id?: string) => void; retry: (part: UserPart) => void;
   reverted: boolean; executePlan?: () => void;
-  status?: ChatStatus; progress?: { started: number; since: number | null }; failure?: string;
+  status?: ChatStatus; progress?: { started: number; since: number | null; routeWait?: number }; failure?: string;
   retryFailed: () => void; chooseModel: () => void;
   directory: string; preview: (ref: FileReference) => void; onError: (error: unknown) => void;
 }) {
@@ -303,6 +303,7 @@ export function Chat({ title, parts, permissions, questions, busy, answer, answe
   }, [progress?.started]);
 
   const wait = modelWaitState(progress?.since ?? null, clock);
+  const routeWait = progress?.routeWait && progress.routeWait > clock ? Math.ceil((progress.routeWait - clock) / 1000) : undefined;
   useEffect(() => {
     if (atBottom.current && scroll.current) scroll.current.scrollTop = scroll.current.scrollHeight;
   }, [parts, permissions, questions, failure, progress?.started, wait]);
@@ -363,10 +364,13 @@ export function Chat({ title, parts, permissions, questions, busy, answer, answe
                 </summary>
                 {work.length ? work : <p className="subtle">Без вызовов инструментов.</p>}
               </details>}
-              {live && status === "working" && (wait === "slow" || wait === "timeout") && <div className="model-wait" role="status">
+              {live && status === "working" && (routeWait ? <div className="model-wait" role="status">
+                <span>Все бесплатные источники на паузе. Продолжу сам через {routeWait} с.</span>
+                <button type="button" className="text-link" onClick={chooseModel}>Сменить модель</button>
+              </div> : (wait === "slow" || wait === "timeout") && <div className="model-wait" role="status">
                 <span>Модель думает дольше обычного. Бесплатные модели иногда отвечают до минуты.</span>
                 <button type="button" className="text-link" onClick={chooseModel}>Сменить модель</button>
-              </div>}
+              </div>)}
               {content.answer.map(part => <AgentText key={part.id} text={part.text} files={fileLinks} />)}
               {(!busy || !last) && <TurnFiles changes={turnChanges(agent, end?.files)} linked={linkedFiles(response)} files={fileLinks} />}
               {response && (!busy || !last) && <div className="message-actions">

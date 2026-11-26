@@ -212,11 +212,29 @@ dialog > .connect-status { margin-top: 16px; }
 .access-warning .access-enable { color: var(--error); background: var(--danger-tint); font-weight: 600; }
 .access-shortcut { padding: 7px 8px 3px; font-size: 12px; border-top: 1px solid var(--line); }
 .access-picker--settings .access-menu { top: calc(100% + 6px); bottom: auto; right: 0; left: auto; z-index: 5; }
-.model-panel.stage-g-models { display: flex; flex-direction: column; width: min(380px, calc(100vw - 32px)); overflow: hidden; padding: 0; }
+.model-panel.stage-g-models { display: flex; flex-direction: column; width: min(404px, calc(100vw - 32px)); overflow: hidden; padding: 0; }
 .stage-g-models > .model-list { overflow: auto; }
 .picker-header, .picker-footer { flex: none; padding: 8px; background: var(--menu); }
-.picker-header { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--line); }
+.picker-header { display: grid; gap: 8px; border-bottom: 1px solid var(--line); }
+.picker-search { display: flex; align-items: center; gap: 6px; }
 .picker-header input { flex: 1 1 auto; min-width: 0; height: 31px; }
+/* Вкладки меню моделей: сегментированный переключатель. */
+.picker-tabs { display: flex; gap: 2px; padding: 2px; border-radius: 9px; background: var(--raised); }
+.picker-tabs [role="tab"] { display: inline-flex; flex: 1 1 auto; align-items: center; justify-content: center; gap: 5px; min-width: 0; height: 27px; padding: 0 8px; border-radius: 7px; color: var(--secondary); font-size: calc(12px * var(--font-scale, 1)); white-space: nowrap; transition: background .12s, color .12s; }
+.picker-tabs [role="tab"]:hover { color: var(--text); }
+.picker-tabs [role="tab"][aria-selected="true"] { background: var(--menu); color: var(--text); font-weight: 500; box-shadow: 0 1px 2px var(--shadow), 0 0 0 1px var(--line); }
+.picker-tabs [role="tab"]:focus-visible { outline: 2px solid var(--mint); outline-offset: -2px; }
+.picker-tab-count, .picker-section-count { color: var(--muted); font-weight: 400; font-variant-numeric: tabular-nums; }
+.picker-section-count { margin-left: 6px; }
+.picker-kind { margin-left: 6px; color: var(--muted); }
+.picker-kind::before { content: "· "; }
+.picker-note { margin: 2px 8px 6px; color: var(--muted); font-size: calc(12px * var(--font-scale, 1)); line-height: 16px; }
+.picker-empty { display: grid; justify-items: start; gap: 8px; margin: 8px; color: var(--secondary); font-size: calc(12.5px * var(--font-scale, 1)); line-height: 18px; }
+.picker-empty p { margin: 0; }
+.stage-g-models .picker-add { justify-content: flex-start; min-height: 36px; margin-top: 4px; color: var(--mint); font-size: calc(12.5px * var(--font-scale, 1)); font-weight: 500; }
+.stage-g-models .picker-add .icon { width: 14px; height: 14px; }
+.picker-tag--live { background: var(--mint-hover); color: var(--mint); }
+.model-trigger-auto { flex: none; padding: 1px 5px; border-radius: 4px; background: var(--mint-hover); color: var(--mint); font-size: 10.5px; font-weight: 500; letter-spacing: .01em; }
 .picker-header .reasoning-option { flex: 0 0 auto; width: auto; font-size: calc(12px * var(--font-scale, 1)); }
 .picker-body { min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding: 6px 8px; }
 .stage-g-models .model-copy { flex: 1; }
@@ -538,3 +556,17 @@ select.field-control { cursor: pointer; }
 .preview-line code { padding: 0 7px; }
 .panel-tabs { flex-wrap: wrap; }
 .panel-tabs .composer-control { min-height: 24px; padding-inline: 5px; font-size: 12px; }
+
+/* Подписки и ключи: строки с пояснением, свои поставщики. */
+.settings-hint { margin: -2px 0 6px; color: var(--muted); font-size: calc(12.5px * var(--font-scale, 1)); line-height: 18px; }
+.provider-copy { display: grid; gap: 1px; min-width: 0; padding-block: 6px; }
+.provider-copy > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.provider-copy .subtle { overflow: hidden; color: var(--muted); font-size: calc(12px * var(--font-scale, 1)); text-overflow: ellipsis; white-space: nowrap; }
+.danger-control:hover, .danger-control[aria-label^="Точно"] { color: var(--error); }
+.add-provider { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; min-height: 40px; margin-top: 8px; border: 1px dashed var(--strong-line); border-radius: 10px; color: var(--secondary); font-size: calc(13px * var(--font-scale, 1)); transition: border-color .12s, color .12s, background .12s; }
+.add-provider:hover:not(:disabled) { border-color: var(--mint); color: var(--mint); background: var(--mint-hover); }
+.add-provider .icon { width: 14px; height: 14px; }
+.custom-provider-dialog { max-height: calc(100dvh - 48px); overflow: auto; }
+.custom-models-title { margin-top: 10px; font-size: calc(13px * var(--font-scale, 1)); }
+.custom-model-actions, .custom-manual { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+.custom-manual .field-control { flex: 1 1 180px; min-width: 0; height: 30px; }
