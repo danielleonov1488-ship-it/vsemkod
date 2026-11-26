@@ -3,19 +3,22 @@ import { checkOffers } from "./health.js";
 import { LlmClient } from "./llm/client.js";
 import { mergeCatalog } from "./merge.js";
 import { notifyTelegram, publish, readBenchmarks, readCatalog, readPublication, readRadar } from "./publish.js";
-import { mergeProviderRadar, mergeRadar, radarChanged } from "./radar.js";
+import { mergeFreeLlmRadar, mergeProviderRadar, mergeRadar, radarChanged } from "./radar.js";
 import { registryBatches, registryPageHash } from "./registry/offers.js";
-import type { RadarProvider } from "./schema.js";
+import { providersUnderReview } from "./registry/providers.js";
+import type { RadarFreeLlmProvider, RadarProvider } from "./schema.js";
 import { benchmarksChanged, fetchBenchmarks, shouldRefreshBenchmarks } from "./sources/artificialAnalysis.js";
 import type { Benchmarks } from "./sources/artificialAnalysis.js";
 import { describeError } from "./sources/common.js";
 import type { SourceResult } from "./sources/common.js";
 import { fetchFeed, processFeed } from "./sources/feeds.js";
 import { fetchFreeListProviders, shouldCheckFreeList } from "./sources/freeList.js";
+import { fetchFreeLlm, freeLlmModelMatcher, matchFreeLlm, shouldCheckFreeLlm } from "./sources/freeLlm.js";
 import { fetchKilo } from "./sources/kilo.js";
 import { fetchNumes } from "./sources/numes.js";
 import { fetchOpenCodeZen } from "./sources/opencodeZen.js";
 import { fetchOpenRouter } from "./sources/openrouter.js";
+import { fetchRegistryModels } from "./sources/registryModels.js";
 import { fetchPageText, processPage } from "./sources/watchPages.js";
 import { pruneState } from "./state.js";
 
@@ -58,13 +61,17 @@ async function update(args: string[]): Promise<void> {
   const feeds = useLlm ? feedIds.filter((id) => !only || only === "feeds" || only === id) : [];
 
   const checkFreeList = (!only || only === "free-list") && shouldCheckFreeList(now, state.freeListCheckedAt);
+  const checkFreeLlm = (!only || only === "free-llm") && shouldCheckFreeLlm(now, state.freeLlmCheckedAt);
+  const reviewIds = checkFreeLlm ? Object.keys(providersUnderReview) as (keyof typeof providersUnderReview)[] : [];
 
-  const [apiResults, pageResults, feedResults, [zenResult], [freeListResult]] = await Promise.all([
+  const [apiResults, pageResults, feedResults, [zenResult], [freeListResult], [freeLlmResult], reviewResults] = await Promise.all([
     Promise.allSettled(structuredJobs.map(({ load }) => load())),
     Promise.allSettled(pages.map(fetchPageText)),
     Promise.allSettled(feeds.map((id) => fetchFeed[id]())),
     Promise.allSettled(!only || only === "opencode-zen" ? [fetchOpenCodeZen()] : []),
     Promise.allSettled(checkFreeList ? [fetchFreeListProviders()] : []),
+    Promise.allSettled(checkFreeLlm ? [fetchFreeLlm()] : []),
+    Promise.allSettled(reviewIds.map(fetchRegistryModels)),
   ]);
   for (const [i, result] of apiResults.entries()) {
     if (result.status === "fulfilled") batches.push(result.value);
@@ -126,6 +133,34 @@ async function update(args: string[]): Promise<void> {
   }
   state.tracks = merged.tracks;
   const { catalog, changes } = merged;
+  let freeLlmAdded: RadarFreeLlmProvider[] = [];
+  if (freeLlmResult) {
+    state.freeLlmCheckedAt = now;
+    if (freeLlmResult.status === "fulfilled") {
+      const matches = matchFreeLlm(freeLlmResult.value, catalog);
+      const result = mergeFreeLlmRadar(radar, matches.radar, now, state.freeLlmFirstSeen);
+      radar = result.radar;
+      state.freeLlmFirstSeen = result.firstSeen;
+      freeLlmAdded = result.added;
+      console.log("Радар Free-LLM: " + matches.radar.length + " провайдеров, " + freeLlmAdded.length + " новых.");
+      for (const { providerId, id, catalogModelId } of matches.possible) {
+        console.log("  Free-LLM: возможное предложение " + providerId + " — " + id + " (" + catalogModelId + ")");
+      }
+    } else {
+      failure("Free-LLM", freeLlmResult.reason);
+    }
+    const match = freeLlmModelMatcher(catalog.models);
+    for (const [i, result] of reviewResults.entries()) {
+      const { name } = providersUnderReview[reviewIds[i]];
+      if (result.status === "rejected") {
+        failure(name + " /models", result.reason);
+        continue;
+      }
+      const matches = [...new Set(result.value.filter(match))].sort();
+      console.log(name + " /models: совпадений с каталогом " + matches.length +
+        (matches.length ? " — " + matches.join(", ") : "."));
+    }
+  }
   let benchmarks: Benchmarks | undefined;
   if (!only || only === "benchmarks") {
     if (!config.aaKey) console.log("Artificial Analysis пропущен: AA_API_KEY не задан.");
@@ -142,7 +177,7 @@ async function update(args: string[]): Promise<void> {
   const changed = await publish(previous, catalog, changes, state, dryRun, radar, benchmarks);
   if (config.telegram && !dryRun) {
     try {
-      if (await notifyTelegram(config.telegram, changes, catalog, zen?.added, providersAdded)) {
+      if (await notifyTelegram(config.telegram, changes, catalog, zen?.added, providersAdded, freeLlmAdded)) {
         console.log("Telegram: отправлено одно сообщение.");
       }
     } catch (error) {

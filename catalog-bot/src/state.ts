@@ -40,6 +40,8 @@ export const stateSchema = z.object({
   radarMissingSince: z.record(z.string(), dateSchema).default({}),
   freeListProviders: z.array(freeListProviderSchema).default([]),
   freeListCheckedAt: dateSchema.optional(),
+  freeLlmCheckedAt: dateSchema.optional(),
+  freeLlmFirstSeen: z.record(z.string(), dateSchema).optional(),
   benchmarksAttemptedAt: dateSchema.optional(),
 });
 

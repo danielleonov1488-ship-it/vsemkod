@@ -5,7 +5,7 @@ import { z } from "zod";
 import { catalogChanged, compare, stableJson } from "./merge.js";
 import { radarChanged } from "./radar.js";
 import { catalogSchema, changesSchema, offerKey, radarSchema } from "./schema.js";
-import type { Catalog, Change, Radar, RadarObservation, RadarProvider } from "./schema.js";
+import type { Catalog, Change, Radar, RadarFreeLlmProvider, RadarObservation, RadarProvider } from "./schema.js";
 import { newState, stateSchema } from "./state.js";
 import type { State } from "./state.js";
 import type { Config } from "./config.js";
@@ -127,21 +127,27 @@ export async function publish(
 export async function notifyTelegram(
   config: NonNullable<Config["telegram"]>, events: Change[], catalog: Catalog,
   radarAdded: RadarObservation[] = [], providerAdded: RadarProvider[] = [],
+  freeLlmAdded: RadarFreeLlmProvider[] = [],
 ): Promise<boolean> {
-  const models = new Map(catalog.models.filter(({ tier }) => tier === "top").map(({ id, name }) => [id, name]));
+  const models = new Map(catalog.models.map((model) => [model.id, model]));
   const active = new Set(catalog.offers.filter(({ status }) => status === "active").map(offerKey));
   const lines = new Set<string>();
   for (const event of events) {
     const { providerId, providerModelId } = event;
     const model = models.get(event.modelId);
-    if (event.type !== "offer_added" || !providerId || !providerModelId || !model ||
+    if (event.type !== "offer_added" || !providerId || !providerModelId || model?.tier !== "top" ||
         !active.has(offerKey({ providerId, providerModelId }))) continue;
-    lines.add(model + " бесплатно у " + providers[providerId].name);
+    lines.add(model.name + " бесплатно у " + providers[providerId].name);
   }
   const notices = radarAdded.map(({ name }) => "Радар: в OpenCode Zen появилась бесплатная модель " + name);
   notices.push(...providerAdded.map(({ name, section }) =>
     "Новый бесплатный провайдер в awesome-free-llm-apis: " + name +
     (section === "provider_api" ? " (разработчик моделей)" : " (инференс-провайдер)")));
+  notices.push(...freeLlmAdded.map(({ provider, signup, models: matches }) => {
+    const names = [...new Set(matches.map(({ catalogModelId }) => models.get(catalogModelId)?.name ?? catalogModelId))];
+    const access = signup === "no" ? "без регистрации" : "с регистрацией";
+    return "Free-LLM: " + names.join(", ") + " бесплатно у " + provider + " (" + access + ") — кандидат в каталог";
+  }));
   if (lines.size) notices.unshift(lines.size === 1
     ? "🦛 Новая раздача: " + [...lines][0] + ". Подключить — в vsemkod"
     : "🦛 Новые раздачи\n" + [...lines].map((line) => "• " + line).join("\n").slice(0, 3700) + "\nПодключить — в vsemkod");

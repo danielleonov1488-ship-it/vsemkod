@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { matchModel, modelSlug } from "../match.js";
+import { catalogModelMatcher, normalizeModelName } from "../match.js";
 import { stableJson } from "../merge.js";
 import { dateSchema } from "../schema.js";
 import type { Model } from "../schema.js";
@@ -66,42 +66,17 @@ export function benchmarksChanged(previous: Benchmarks | undefined, next: Benchm
   return !previous || details(previous) !== details(next);
 }
 
-function normalize(value: string): string {
-  return modelSlug(value).replace(/[.()]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
-}
-
 const variantSuffix = /-(?:high|xhigh|medium|low|minimal|max|none|(?:non-)?reasoning|(?:non-)?thinking)(?:-reasoning(?:-effort)?)?$/;
 
 function matchCatalog(models: Pick<Model, "id">[]) {
-  const ids = new Set(models.map(({ id }) => id));
-  const normalizedIds = new Map<string, string | undefined>();
-  const register = (normalized: string, id: string) =>
-    normalizedIds.set(normalized, normalizedIds.has(normalized) && normalizedIds.get(normalized) !== id ? undefined : id);
-  for (const { id } of models) register(normalize(id), id);
-  // «gemma-4-31b-it» в каталоге ↔ «Gemma 4 31B» у Artificial Analysis.
-  for (const { id } of models) {
-    const bare = normalize(id).replace(/-(?:it|instruct|chat)$/, "");
-    if (!normalizedIds.has(bare)) register(bare, id);
-  }
-  const find = (names: string[]): string | undefined => {
-    for (const name of names) {
-      const slug = modelSlug(name);
-      if (ids.has(slug)) return slug;
-      const id = normalizedIds.get(normalize(name));
-      if (id) return id;
-    }
-    for (const name of names) {
-      const id = (matchModel(name) ?? matchModel(normalize(name)))?.id;
-      if (id && ids.has(id)) return id;
-    }
-  };
+  const find = catalogModelMatcher(models);
   return ({ id, slug, name, model_creator }: AnalysisModel): string | undefined => {
     const names = [slug, name, id].filter((value): value is string => !!value);
     const direct = find(names);
     if (direct) return direct;
-    const creator = normalize(model_creator?.name ?? "") + "-";
+    const creator = normalizeModelName(model_creator?.name ?? "") + "-";
     const stems = names.flatMap((value) => {
-      const normalized = normalize(value);
+      const normalized = normalizeModelName(value);
       const withoutVariant = normalized.replace(variantSuffix, "");
       const candidates = [withoutVariant];
       if (creator !== "-" && withoutVariant.startsWith(creator)) {

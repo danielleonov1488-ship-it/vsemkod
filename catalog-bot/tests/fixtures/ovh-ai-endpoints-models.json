@@ -1,0 +1,56 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "whisper-large-v3-turbo",
+      "created": 1754992184,
+      "object": "model",
+      "owned_by": "OpenAi",
+      "pricing": {
+        "currency_unit": "USD",
+        "completion": "0",
+        "image": "0",
+        "prompt": "0",
+        "request": "0",
+        "input_cache_reads": "0",
+        "input_cache_writes": "0"
+      },
+      "context_length": 0,
+      "max_completion_tokens": 0
+    },
+    {
+      "id": "DeepSeek-V4.1-Flash-1017",
+      "created": 1794911003,
+      "object": "model",
+      "owned_by": "DeepSeek",
+      "pricing": {
+        "currency_unit": "USD",
+        "completion": "0.00000125",
+        "image": "0",
+        "prompt": "0.00000031",
+        "request": "0",
+        "input_cache_reads": "0",
+        "input_cache_writes": "0"
+      },
+      "context_length": 1048576,
+      "max_completion_tokens": 262144
+    },
+    {
+      "id": "Qwen3.8-27B",
+      "created": 1788356485,
+      "object": "model",
+      "owned_by": "Qwen",
+      "pricing": {
+        "currency_unit": "USD",
+        "completion": "0.00000319",
+        "image": "0",
+        "prompt": "0.00000047",
+        "request": "0",
+        "input_cache_reads": "0",
+        "input_cache_writes": "0"
+      },
+      "context_length": 262144,
+      "max_completion_tokens": 262144
+    }
+  ]
+}

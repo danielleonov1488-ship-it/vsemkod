@@ -1,0 +1,252 @@
+{
+  "source": "https://free-llm.com",
+  "license": "MIT",
+  "schema_version": 2,
+  "updated_at": "2026-11-25T00:38:57+01:00",
+  "providers": [
+    {
+      "slug": "cloudflare-workers-ai",
+      "name": "Cloudflare Workers AI",
+      "type": "API",
+      "base_url": "https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/",
+      "openai_base_url": "https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/v1",
+      "openai_compatible": true,
+      "free_tier": "truly_free",
+      "category": "permanent",
+      "signup_requirement": "no",
+      "verified": true,
+      "rate_limit": "Varies by model",
+      "daily_limit": "10,000 neurons/day",
+      "key_help_url": "https://free-llm.com/provider/cloudflare-workers-ai",
+      "models": [
+        {
+          "id": "@cf/qwen/qwen3.8-27b",
+          "name": "Qwen3.8 27B",
+          "kind": "chat",
+          "context_tokens": 262000
+        },
+        {
+          "id": "@cf/openai/gpt-oss-120b",
+          "name": "GPT OSS 120B",
+          "kind": "chat",
+          "context_tokens": 128000
+        }
+      ]
+    },
+    {
+      "slug": "fireworks-ai",
+      "name": "Fireworks AI",
+      "type": "Trial Credits",
+      "base_url": "https://api.fireworks.ai/inference/v1",
+      "openai_base_url": "https://api.fireworks.ai/inference/v1",
+      "openai_compatible": true,
+      "free_tier": "trial_credits",
+      "category": "trial_credit",
+      "signup_requirement": "registration",
+      "verified": true,
+      "rate_limit": "10 RPM (no payment method) / up to 6,000 RPM (with card + credits)",
+      "daily_limit": "Credit-based",
+      "key_help_url": "https://free-llm.com/provider/fireworks-ai",
+      "models": [
+        {
+          "id": "accounts/fireworks/models/glm-5p3-flash",
+          "name": "GLM 5.3 Flash",
+          "kind": "chat",
+          "context_tokens": null
+        },
+        {
+          "id": "accounts/fireworks/models/glm-5p3",
+          "name": "GLM 5.3",
+          "kind": "chat",
+          "context_tokens": 1000000
+        },
+        {
+          "id": "accounts/fireworks/models/deepseek-v4p1-flash",
+          "name": "DeepSeek V4.1 Flash",
+          "kind": "chat",
+          "context_tokens": 1000000
+        }
+      ]
+    },
+    {
+      "slug": "freeinference",
+      "name": "FreeInference",
+      "type": "API",
+      "base_url": "https://freeinference.org/v1",
+      "openai_base_url": "https://freeinference.org/v1",
+      "openai_compatible": true,
+      "free_tier": "truly_free",
+      "category": "permanent",
+      "signup_requirement": "no",
+      "verified": true,
+      "rate_limit": "Not published (\"generous quota\"; HTTP 429 when rate-limited)",
+      "daily_limit": "No published daily cap",
+      "key_help_url": "https://free-llm.com/provider/freeinference",
+      "models": [
+        {
+          "id": "glm-5.3-flash",
+          "name": "GLM-5.3 Flash",
+          "kind": "chat",
+          "context_tokens": 1000000
+        },
+        {
+          "id": "deepseek-v4-flash",
+          "name": "DeepSeek V4 Flash",
+          "kind": "chat",
+          "context_tokens": 1000000
+        }
+      ]
+    },
+    {
+      "slug": "groq-cloud",
+      "name": "Groq",
+      "type": "API",
+      "base_url": "https://api.groq.com/openai/v1",
+      "openai_base_url": "https://api.groq.com/openai/v1",
+      "openai_compatible": true,
+      "free_tier": "truly_free",
+      "category": "permanent",
+      "signup_requirement": "no",
+      "verified": true,
+      "rate_limit": "30 RPM; 8K TPM on most chat models (varies by model)",
+      "daily_limit": "1,000 requests/day and 200K tokens/day on gpt-oss / Qwen (varies by model)",
+      "key_help_url": "https://free-llm.com/provider/groq-cloud",
+      "models": [
+        {
+          "id": "openai/gpt-oss-120b",
+          "name": "GPT-OSS 120B",
+          "kind": "chat",
+          "context_tokens": 131000
+        },
+        {
+          "id": "qwen/qwen3.8-27b",
+          "name": "Qwen3.8 27B",
+          "kind": "chat",
+          "context_tokens": 131000
+        },
+        {
+          "id": "whisper-large-v3",
+          "name": "Whisper Large v3",
+          "kind": "transcription",
+          "context_tokens": null
+        },
+        {
+          "id": "whisper-large-v3-turbo",
+          "name": "Whisper Large v3 Turbo",
+          "kind": "transcription",
+          "context_tokens": null
+        }
+      ]
+    },
+    {
+      "slug": "nvidia-nim",
+      "name": "NVIDIA NIM",
+      "type": "Trial Credits",
+      "base_url": "https://integrate.api.nvidia.com/v1",
+      "openai_base_url": "https://integrate.api.nvidia.com/v1",
+      "openai_compatible": true,
+      "free_tier": "truly_free",
+      "category": "permanent",
+      "signup_requirement": "phone_verification",
+      "verified": true,
+      "rate_limit": "~40 RPM (varies per model, not published)",
+      "daily_limit": "-",
+      "key_help_url": "https://free-llm.com/provider/nvidia-nim",
+      "models": [
+        {
+          "id": "z-ai/glm-5.3-flash",
+          "name": "GLM-5.3 Flash",
+          "kind": "chat",
+          "context_tokens": 1000000
+        },
+        {
+          "id": "nvidia/nemotron-3-ultra-550b-a55b",
+          "name": "Nemotron 3 Ultra 550B A55B",
+          "kind": "chat",
+          "context_tokens": 1000000
+        }
+      ]
+    },
+    {
+      "slug": "ovh-ai",
+      "name": "OVH AI Endpoints",
+      "type": "API",
+      "base_url": "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1",
+      "openai_base_url": "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1",
+      "openai_compatible": true,
+      "free_tier": "truly_free",
+      "category": "permanent",
+      "signup_requirement": "registration",
+      "verified": true,
+      "rate_limit": "2 RPM per IP per model (anonymous, free); 400 RPM with a key (pay-as-you-go)",
+      "daily_limit": "Unspecified",
+      "key_help_url": "https://free-llm.com/provider/ovh-ai",
+      "models": [
+        {
+          "id": "Qwen3.8-27B",
+          "name": "Qwen3.8 27B",
+          "kind": "chat",
+          "context_tokens": null
+        },
+        {
+          "id": "DeepSeek-V4.1-Flash-1017",
+          "name": "DeepSeek V4.1 Flash 1017",
+          "kind": "chat",
+          "context_tokens": 1050000
+        }
+      ]
+    },
+    {
+      "slug": "pollinations-ai",
+      "name": "Pollinations.ai",
+      "type": "API",
+      "base_url": "https://gen.pollinations.ai/v1",
+      "openai_base_url": "https://gen.pollinations.ai/v1",
+      "openai_compatible": true,
+      "free_tier": "truly_free",
+      "category": "permanent",
+      "signup_requirement": "no",
+      "verified": true,
+      "rate_limit": "API key required (anonymous access removed); no card",
+      "daily_limit": "Free usage paid from Quest Pollen earned in the dashboard",
+      "key_help_url": "https://free-llm.com/provider/pollinations-ai",
+      "models": [
+        {
+          "id": "z-ai/glm-5.3-flash",
+          "name": "GLM 5.3 Flash",
+          "kind": "chat",
+          "context_tokens": 1000000
+        }
+      ]
+    },
+    {
+      "slug": "runcrate",
+      "name": "Runcrate (free inference)",
+      "type": "API",
+      "base_url": "https://api.runcrate.ai/v1",
+      "openai_base_url": "https://api.runcrate.ai/v1",
+      "openai_compatible": true,
+      "free_tier": "truly_free",
+      "category": "renewable",
+      "signup_requirement": "no",
+      "verified": true,
+      "rate_limit": "See provider",
+      "daily_limit": "See provider",
+      "key_help_url": "https://free-llm.com/provider/runcrate",
+      "models": [
+        {
+          "id": null,
+          "name": "DeepSeek V4.1 Flash (deepseek-ai/DeepSeek-V4.1-Flash)",
+          "kind": "chat",
+          "context_tokens": null
+        },
+        {
+          "id": null,
+          "name": "GLM 5.3 Flash (zai-org/GLM-5.3-Flash)",
+          "kind": "chat",
+          "context_tokens": null
+        }
+      ]
+    }
+  ]
+}

@@ -79,3 +79,29 @@ export const providers: Record<ProviderId, Provider> = {
     termsUrl: "https://groq.com/terms-of-use", notes: "Только для коротких задач из-за лимита токенов в минуту.",
   },
 };
+
+type ProviderUnderReview = Omit<Provider, "id"> & { id: string };
+
+// Идентификаторы для проверок бота. Приложение v0.1.0 принимает в catalog.json
+// только значения из providerIdSchema.
+export const providersUnderReview = {
+  "nvidia-nim": {
+    id: "nvidia-nim", name: "NVIDIA NIM", api: "openai", baseUrl: "https://integrate.api.nvidia.com/v1",
+    auth: { type: "manual_key" }, loginMethods: [], signupUrl: "https://build.nvidia.com/",
+    keyPageUrl: "https://build.nvidia.com/", keyPattern: null, clicksToConnect: 3,
+    freeLimits: { note: "Ключ NVIDIA Developer Program даёт бесплатный доступ для прототипирования. Квоты зависят от модели и аккаунта." },
+    dataPolicy: "Действуют условия NVIDIA API Catalog и выбранной модели.",
+    termsUrl: "https://developer.nvidia.com/legal/terms",
+    notes: "Free-LLM указывает, что при регистрации может потребоваться подтверждение телефона.",
+  },
+  "ovh-ai-endpoints": {
+    id: "ovh-ai-endpoints", name: "OVH AI Endpoints", api: "openai",
+    baseUrl: "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1",
+    auth: { type: "manual_key" }, loginMethods: [], signupUrl: "https://endpoints.ai.cloud.ovh.net/",
+    keyPageUrl: "https://www.ovh.com/manager/#/public-cloud/", keyPattern: null, clicksToConnect: 3,
+    freeLimits: { rpm: 2, note: "Бесплатно анонимно: 2 запроса в минуту на IP и модель. Запросы с ключом тарифицируются." },
+    dataPolicy: "Запросы обрабатывает OVHcloud в рамках условий AI Endpoints.",
+    termsUrl: "https://www.ovhcloud.com/en/terms-and-conditions/",
+    notes: "Анонимный доступ открыт без ключа. Ключ создаётся в разделе AI Endpoints проекта Public Cloud.",
+  },
+} satisfies Record<string, ProviderUnderReview>;

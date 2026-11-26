@@ -14,9 +14,15 @@ export const watchedPages = [
 export const feedIds = ["hn", "reddit", "github"] as const;
 export const structuredIds = ["openrouter", "kilo", "numes"] as const;
 export const sourceSelectors = [
-  ...structuredIds, "opencode-zen", "benchmarks", "free-list", "watchPages", "feeds", ...feedIds,
+  ...structuredIds, "opencode-zen", "benchmarks", "free-list", "free-llm", "watchPages", "feeds", ...feedIds,
   ...watchedPages.map(({ providerId }) => "page:" + providerId),
 ];
+
+// У неофициальных прокси и реселлеров условия бесплатного доступа и обработки
+// запросов зависят от посредника. Pollinations тоже исключён, условия доступа менялись.
+export const freeLlmDenylist = new Set([
+  "api-airforce", "pollinations", "pollinations-ai", "aihubmix", "bazaarlink", "token-harbor", "llmtr", "zro",
+]);
 
 export interface Config {
   llm: { baseUrl: string; key?: string; model: string; maxTokens: number };
