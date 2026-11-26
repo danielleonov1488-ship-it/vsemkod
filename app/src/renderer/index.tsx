@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import type { Attachment, ChatAction, ChatPart, CatalogState, ChatEvent, ConnectionId, Conversation, DesktopApi, InitialState, Notice, Preferences, ProjectTools, UpdateReady } from "../shared/api";
+import type { Attachment, ChatAction, ChatPart, CatalogState, ChatEvent, ConnectionId, Conversation, DesktopApi, InitialState, Notice, Preferences, ProjectTools, UpdateProgress, UpdateReady } from "../shared/api";
 import type { RouterStats } from "../shared/api";
 import { Chat } from "./chat";
 import { catalogConnection, ConnectDialog, ConnectionsPage, readableError, type Connection } from "./connections";
@@ -15,6 +15,8 @@ import { ComposerStatus } from "./composer-status";
 import { Settings } from "./settings";
 import { WorkspacePanel, type PanelTab } from "./workspace-panel";
 import { Icon } from "./icons";
+import { UpdatePill } from "./update-pill";
+import { findSecrets, maskSecrets } from "../shared/secrets";
 import { ModelPicker, modelOptions } from "./models";
 import logo from "./assets/logo.svg";
 
@@ -42,6 +44,9 @@ function App() {
   const [directory, setDirectory] = useState("");
   const [recentProjects, setRecentProjects] = useState<string[]>([]);
   const [sessions, setSessions] = useState<Conversation[]>([]);
+  const sessionsRef = useRef<Conversation[]>([]);
+  sessionsRef.current = sessions;
+  const openChatRef = useRef<(session: Conversation) => Promise<void>>(undefined);
   const [chat, setChat] = useState<Conversation>();
   const [settings, setSettings] = useState(false);
   const [settingsModels, setSettingsModels] = useState(false);
@@ -88,6 +93,10 @@ function App() {
   const navigation = useRef(0);
   const [notice, setNotice] = useState<Notice>();
   const [updateReady, setUpdateReady] = useState<UpdateReady>();
+  const [updateProgress, setUpdateProgress] = useState<UpdateProgress>();
+  const [applyAfterReply, setApplyAfterReply] = useState(false);
+  const [secretWarning, setSecretWarning] = useState(false);
+  const secretBypass = useRef(false);
   const [checkingUpdates, setCheckingUpdates] = useState(false);
   const [connection, setConnection] = useState<Connection>();
   const draftInput = useRef<HTMLTextAreaElement>(null);
@@ -115,6 +124,11 @@ function App() {
     const stopCatalog = api.onCatalog(state => { live = true; setCatalog(state); });
     const stopNotice = api.onNotice(notify);
     const stopUpdate = api.onUpdate(update => { liveUpdate = true; setUpdateReady(update); });
+    const stopProgress = api.onUpdateProgress?.(setUpdateProgress);
+    const stopFocus = api.onChatFocus?.(id => {
+      const target = sessionsRef.current.find(item => item.id === id);
+      if (target) void openChatRef.current?.(target);
+    });
     void api.initial().then(info => {
       if (!mounted) return;
       setInitial(info);
@@ -126,7 +140,7 @@ function App() {
       setHiddenProjects(info.hiddenProjects ?? []);
       setRecentProjects(info.projects ?? []);
     }).catch(showError);
-    return () => { mounted = false; stopCatalog(); stopNotice(); stopUpdate(); clearTimeout(noticeTimer.current); };
+    return () => { mounted = false; stopCatalog(); stopNotice(); stopUpdate(); stopProgress?.(); stopFocus?.(); clearTimeout(noticeTimer.current); };
   }, [notify, showError]);
 
   useEffect(() => api.onChat((event: ChatEvent) => {
@@ -326,6 +340,7 @@ function App() {
     finally { setCheckingUpdates(false); }
   }
 
+  openChatRef.current = session => openChat(session);
   async function openChat(session: Conversation) {
     navigation.current++;
     revealChat(session);
@@ -382,6 +397,10 @@ function App() {
       const visible = activeChat.current === sessionId && chatVisible.current;
       setStatus(sessionId, !result.stopped && !visible ? "ready" : undefined);
       if (visible && result.stopped) notify({ text: "Ответ остановлен" });
+      if (!visible && !result.stopped && document.hasFocus()) {
+        const title = (session?.title ?? turn.text).slice(0, 60);
+        notify({ text: "«" + title + "» — готово", open: sessionId });
+      }
     } catch (error) {
       const message = readableError(error);
       if (!session || activeChat.current === session.id && chatVisible.current) notify({ text: message, tone: "error" });
@@ -474,6 +493,9 @@ function App() {
       return;
     }
     if (!modelId) return;
+    if (!secretBypass.current && findSecrets(message).length) { setSecretWarning(true); return; }
+    secretBypass.current = false;
+    setSecretWarning(false);
     if (!vision && readyFiles.some(file => file.image)) {
       showError("Выбранная модель не принимает изображения.");
       return;
@@ -622,10 +644,24 @@ function App() {
     setPanel(true);
   }
 
+  const anyRunning = Object.values(running).some(isRunning);
+  useEffect(() => {
+    if (applyAfterReply && updateReady && !anyRunning) { setApplyAfterReply(false); void api.applyUpdate().catch(showError); }
+  }, [applyAfterReply, updateReady, anyRunning, showError]);
+  const panelShown = Boolean(directory && panel && !settings && !subscriptions);
+  const panelSize = panelWidth ?? prefs?.panelWidth ?? 360;
+  useEffect(() => {
+    document.documentElement.style.setProperty("--panel-offset", panelShown ? panelSize + "px" : "0px");
+  }, [panelShown, panelSize]);
   const capacity = usage?.context ?? contextWindow;
   const typical = modelId && currentProviderId ? modelSpeed(modelId, ownModel?.providerId ?? selected?.available[0]?.provider.id ?? currentProviderId, catalog?.speeds, catalog?.benchmarks) : undefined;
   const demo = !!api.onDemoQuota;
   const composer = <>
+    {secretWarning && <div className="secret-warning" role="alert">
+      <span>Похоже, в сообщении ключ или пароль. Бесплатные провайдеры могут хранить запросы.</span>
+      <button type="button" className="small-button" onClick={() => { setSecretWarning(false); setDraft(maskSecrets(draft)); }}>Заменить на ***</button>
+      <button type="button" className="composer-control" onClick={() => { secretBypass.current = true; setSecretWarning(false); submit(); }}>Отправить как есть</button>
+    </div>}
     <Composer key={chat?.id ?? directory} preferences={prefs} updatePreferences={updatePrefs} active={!!chat} input={draftInput} draft={draft} change={setDraft} directory={directory} busy={busy}
       projects={projectDirectories} switchProject={path => { if (!busy && path !== directory) void startChat(path); }}
       canSend={!!modelId && !!directory && !loadingChat} attachments={files} remove={id => setFiles(items => items.filter(file => file.id !== id))}
@@ -719,7 +755,9 @@ function App() {
             if (final) { updatePrefs({ panelWidth: next }); setPanelWidth(undefined); }
             else setPanelWidth(next);
           }} close={() => setPanel(false)} parts={parts} changes={changes} revert={file => void revertFile(file)} busy={busy || !!loadingChat}
-          theme={theme} onError={showError} />}
+          theme={theme} onError={showError}
+          insertDraft={text => { setDraft((draft.trim() ? draft.trimEnd() + "\n\n" : "") + text); draftInput.current?.focus(); }}
+          notify={text => notify({ text })} />}
       </div>
     </div>
     {connection && <ConnectDialog key={connection.id + "/" + (connection.model?.id ?? "")} connection={connection}
@@ -730,17 +768,19 @@ function App() {
         setConnection(undefined);
         notify({ text: "Подключено: " + connection.name });
       }} />}
-    {(notice || updateReady) && <div className={"toast" + (notice?.tone === "error" ? " toast--error" : "")}
-      role={notice?.tone === "error" ? "alert" : "status"}><span className="status-dot" />
-      <span>{notice?.text ?? (updateReady?.action === "download" ? "Вышла новая версия" : "Доступна версия " + updateReady?.version)}</span>
-      {notice?.connect && <button type="button" className="connect-label" onClick={connectFromNotice}>Подключить</button>}
-      {!notice && updateReady && <button type="button" className="connect-label"
-        onClick={() => void api.applyUpdate().catch(showError)}>{updateReady.action === "download" ? "Скачать" : "Перезапустить"}</button>}
-      <button className="composer-control attach" type="button" aria-label="Закрыть уведомление" onClick={() => {
-        if (notice) setNotice(undefined);
-        else setUpdateReady(undefined);
-      }}><Icon name="close" /></button>
+    {notice && <div className={"toast" + (notice.tone === "error" ? " toast--error" : "")}
+      role={notice.tone === "error" ? "alert" : "status"}><span className="status-dot" />
+      <span>{notice.text}</span>
+      {notice.connect && <button type="button" className="connect-label" onClick={connectFromNotice}>Подключить</button>}
+      {notice.open && <button type="button" className="connect-label" onClick={() => {
+        const target = sessions.find(item => item.id === notice.open);
+        setNotice(undefined);
+        if (target) void openChat(target);
+      }}>Открыть</button>}
+      <button className="composer-control attach" type="button" aria-label="Закрыть уведомление" onClick={() => setNotice(undefined)}><Icon name="close" /></button>
     </div>}
+    <UpdatePill ready={updateReady} downloading={updateProgress} busy={Object.values(statuses.current).some(isRunning)}
+      apply={() => void api.applyUpdate().catch(showError)} applyAfterReply={() => setApplyAfterReply(true)} />
   </>;
 }
 

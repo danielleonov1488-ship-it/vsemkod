@@ -4,7 +4,7 @@ import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeTheme, Notificati
 import { mkdirSync } from "node:fs";
 import { mkdir, readFile, realpath, stat, writeFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
-import { basename, dirname, isAbsolute, join, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
 import { z } from "zod";
@@ -27,6 +27,7 @@ import { Router } from "./router";
 import { ProviderHealth } from "./router/health";
 import { readJson, writeJson } from "./storage";
 import { createUpdates } from "./updates";
+import { createBrowserHost } from "./browser-view";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const devUrl = process.env.ELECTRON_RENDERER_URL;
@@ -37,6 +38,8 @@ if (dataOverride) {
   mkdirSync(dataOverride, { recursive: true });
   app.setPath("userData", dataOverride);
 }
+// Без AppUserModelID Windows молча не показывает уведомления установленного приложения.
+if (process.platform === "win32") app.setAppUserModelId("ru.vsemkod.app");
 
 const subscriptionId = z.enum(["github-copilot", "openai"]);
 const connectionId = z.union([keyIdSchema, subscriptionId]);
@@ -108,6 +111,7 @@ function createWindow() {
   window.once("ready-to-show", () => window?.show());
   contents.on("did-navigate", () => cancelConnections?.());
   contents.on("render-process-gone", () => cancelConnections?.());
+  window.on("focus", () => { if (window && !window.isDestroyed()) window.flashFrame(false); });
   window.on("closed", () => { cancelConnections?.(); window = undefined; });
   if (devUrl) void window.loadURL(devUrl);
   else void window.loadFile(rendererFile);
@@ -147,10 +151,18 @@ async function start() {
     if (activeSessions.size && preferences.keepAwake && power === undefined) power = powerSaveBlocker.start("prevent-app-suspension");
     if ((!activeSessions.size || !preferences.keepAwake) && power !== undefined) { powerSaveBlocker.stop(power); power = undefined; }
   }
-  function announce(title: string, body: string) {
-    if (!preferences.notifications || window?.isFocused() || !Notification.isSupported()) return;
+  function announce(title: string, body: string, sessionId?: string) {
+    if (!preferences.notifications || window?.isFocused()) return;
+    if (process.platform === "darwin") app.dock?.bounce("informational");
+    else window?.flashFrame(true);
+    if (!Notification.isSupported()) return;
     const notification = new Notification({ title, body, silent: !preferences.notificationSound });
-    notification.on("click", () => { window?.restore(); window?.focus(); });
+    notification.on("click", () => {
+      if (window?.isMinimized()) window.restore();
+      window?.show();
+      window?.focus();
+      if (sessionId) broadcast("chat:focus", sessionId);
+    });
     notification.show();
   }
   const conversations = new Map<string, Conversation>();
@@ -209,10 +221,10 @@ async function start() {
   const engine = new EngineService(engineBinary(resources), join(data, "opencode"), () => catalog.current, router,
     event => {
       broadcast("chat:event", event);
-      if (event.type === "permission" || event.type === "question") announce("Агент ждёт ответа", conversations.get(event.sessionId)?.title ?? "vsemkod");
+      if (event.type === "permission" || event.type === "question") announce("Агент ждёт ответа", conversations.get(event.sessionId)?.title ?? "vsemkod", event.sessionId);
     }, personalModels, () => ({ agentSteps: preferences.agentSteps, webSearch: preferences.webSearch, mcp }));
   const terminals = new Map<string, Awaited<ReturnType<EngineService["openTerminal"]>>>();
-  const updates = createUpdates(update => broadcast("updates:ready", update));
+  const updates = createUpdates(update => broadcast("updates:ready", update), progress => broadcast("updates:progress", progress));
   const attempts = new Map<string, { provider: z.infer<typeof connectionId>; controller: AbortController; done: Promise<unknown> }>();
   let watching: { id: string; watch: ClipboardWatch } | undefined;
   let nativeQueue = Promise.resolve();
@@ -514,12 +526,35 @@ async function start() {
       const paths = await attachments.resolve(chat.directory, files, details?.vision ?? catalogModel?.capabilities.includes("vision") ?? false);
       if (turn.interrupted) return { stopped: true, changes: (await engine.history(session, chat.directory)).changes };
       const result = await engine.send(session, chat.directory, text, model, preferences.auto, paths, native?.upstream, { ...options, access });
-      if (!result.stopped) announce("Агент закончил работу", chat.title);
+      if (!result.stopped) announce("Готово: " + chat.title, "Агент закончил работу. Нажмите, чтобы открыть чат.", session);
       return result;
     } finally {
       activeSessions.delete(session);
       syncPower();
     }
+  });
+  let browserRoot: string | undefined;
+  const browser = createBrowserHost({ window: () => window, projectRoot: () => browserRoot, publish: event => broadcast("browser:event", event) });
+  const browserBounds = z.object({ x: z.number().finite(), y: z.number().finite(), width: z.number().finite().min(0), height: z.number().finite().min(0) }).strict();
+  handle("browser:show", z.tuple([browserBounds]), ([bounds]) => browser.show(bounds));
+  handle("browser:hide", z.tuple([]), () => browser.hide());
+  handle("browser:navigate", z.tuple([z.string().max(8192), localPath.optional()]), ([input, directory]) => {
+    if (directory) browserRoot = project(directory);
+    return browser.navigate(input, browserRoot);
+  });
+  handle("browser:back", z.tuple([]), () => browser.back());
+  handle("browser:forward", z.tuple([]), () => browser.forward());
+  handle("browser:reload", z.tuple([]), () => browser.reload());
+  handle("browser:stop", z.tuple([]), () => browser.stop());
+  handle("browser:external", z.tuple([]), () => browser.external());
+  handle("browser:devtools", z.tuple([]), () => browser.devtools());
+  handle("browser:clear-data", z.tuple([]), () => browser.clearData());
+  handle("browser:clear-errors", z.tuple([]), () => browser.clearErrors());
+  handle("browser:state", z.tuple([]), () => browser.state());
+  handle("browser:reveal", z.tuple([localPath]), ([path]) => {
+    const downloads = app.getPath("downloads");
+    if (relative(downloads, path).startsWith("..") || isAbsolute(relative(downloads, path))) throw new Error("Можно показать только скачанные файлы.");
+    shell.showItemInFolder(path);
   });
   const projectFile = z.string().min(1).max(32768);
   handle("file:stat", z.tuple([localPath, projectFile]), ([directory, path]) =>

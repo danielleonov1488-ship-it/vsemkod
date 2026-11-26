@@ -4,6 +4,32 @@ import { createDemo, readTheme, themeKey } from "./demo-api";
 import { installWebControls, showDesktop } from "./web-controls";
 import { preloadTurnstile } from "./transport";
 
+// Внутри iframe на лендинге любой focus()/scrollIntoView() прокручивает и саму страницу сайта.
+// Поэтому прокручиваем только контейнеры внутри копии приложения, а фокус ставим без прокрутки.
+if (window.parent !== window) {
+  const focus = HTMLElement.prototype.focus;
+  // Сценарии в блоке «Что умеет» не забирают фокус у страницы, пока посетитель сам не щёлкнул по копии.
+  let touched = !new URLSearchParams(location.search).has("scenario");
+  for (const type of ["pointerdown", "keydown"]) window.addEventListener(type, () => { touched = true; }, { capture: true, once: true });
+  HTMLElement.prototype.focus = function (options?: FocusOptions) { if (touched) focus.call(this, { ...options, preventScroll: true }); };
+  Element.prototype.scrollIntoView = function (arg?: boolean | ScrollIntoViewOptions) {
+    const options = typeof arg === "object" ? arg : { block: arg === false ? "end" : "start" } as ScrollIntoViewOptions;
+    let box = this.parentElement;
+    while (box && !(box.scrollHeight > box.clientHeight && /(auto|scroll)/.test(getComputedStyle(box).overflowY))) box = box.parentElement;
+    if (!box) return;
+    const target = this.getBoundingClientRect();
+    const frame = box.getBoundingClientRect();
+    const block = options.block ?? "start";
+    let delta = 0;
+    if (block === "start") delta = target.top - frame.top;
+    else if (block === "end") delta = target.bottom - frame.bottom;
+    else if (block === "center") delta = target.top + target.height / 2 - (frame.top + frame.height / 2);
+    else if (target.top < frame.top) delta = target.top - frame.top;
+    else if (target.bottom > frame.bottom) delta = target.bottom - frame.bottom;
+    if (delta) box.scrollBy({ top: delta, behavior: options.behavior === "smooth" ? "smooth" : "auto" });
+  };
+}
+
 const scenario = new URLSearchParams(location.search).get("scenario");
 const root = document.querySelector<HTMLElement>("#root")!;
 const demo = createDemo({ scenario: Boolean(scenario), showDesktop, setAvailability: state => controls.setAvailability(state) });

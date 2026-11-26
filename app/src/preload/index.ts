@@ -75,6 +75,24 @@ const api: DesktopApi = {
   onCatalog: listener => subscribe("catalog:update", listener),
   onNotice: listener => subscribe("notice", listener),
   onUpdate: listener => subscribe("updates:ready", listener),
+  onUpdateProgress: listener => subscribe("updates:progress", listener),
+  onChatFocus: listener => subscribe("chat:focus", listener),
+  browser: {
+    show: bounds => ipcRenderer.invoke("browser:show", bounds),
+    hide: () => ipcRenderer.invoke("browser:hide"),
+    navigate: (input, directory) => ipcRenderer.invoke("browser:navigate", input, directory),
+    back: () => ipcRenderer.invoke("browser:back"),
+    forward: () => ipcRenderer.invoke("browser:forward"),
+    reload: () => ipcRenderer.invoke("browser:reload"),
+    stop: () => ipcRenderer.invoke("browser:stop"),
+    external: () => ipcRenderer.invoke("browser:external"),
+    devtools: () => ipcRenderer.invoke("browser:devtools"),
+    clearData: () => ipcRenderer.invoke("browser:clear-data"),
+    clearErrors: () => ipcRenderer.invoke("browser:clear-errors"),
+    reveal: path => ipcRenderer.invoke("browser:reveal", path),
+    state: () => ipcRenderer.invoke("browser:state"),
+    subscribe: listener => subscribe("browser:event", listener)
+  },
   onConnect: listener => subscribe("connect:event", listener)
 };
 

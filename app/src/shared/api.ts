@@ -1,3 +1,4 @@
+import type { BrowserApi } from "./browser";
 import type { Benchmarks } from "./benchmarks";
 import type { VoiceApi } from "./voice";
 import type { z } from "zod";
@@ -76,8 +77,9 @@ export type CatalogState = {
   catalog: Catalog; connected: ProviderId[]; personal: PersonalId[]; subscriptions: SubscriptionId[];
   personalModels: PersonalModel[]; zenModels: PersonalModel[]; latencies?: ModelLatency[]; speeds?: ModelSpeed[]; benchmarks?: Benchmarks; customProviderUrl?: string;
 };
-export type Notice = { text: string; tone?: "error"; connect?: { modelId: string; providerId: ProviderId } };
+export type Notice = { text: string; tone?: "error"; connect?: { modelId: string; providerId: ProviderId }; open?: string };
 export type UpdateReady = { version: string; action: "restart" | "download" };
+export type UpdateProgress = { version: string; percent?: number };
 export type UpdateCheck = UpdateReady | "disabled" | "current" | "downloading";
 export type InitialState = CatalogState & { projects?: string[]; hiddenProjects?: string[]; preferences: Preferences; version: string; update?: UpdateReady };
 
@@ -140,5 +142,8 @@ export interface DesktopApi {
   onCatalog(listener: (catalog: CatalogState) => void): () => void;
   onNotice(listener: (notice: Notice) => void): () => void;
   onUpdate(listener: (update?: UpdateReady) => void): () => void;
+  onUpdateProgress?(listener: (progress?: UpdateProgress) => void): () => void;
+  onChatFocus?(listener: (sessionId: string) => void): () => void;
+  browser?: BrowserApi;
   onConnect(listener: (event: ConnectEvent) => void): () => void;
 }

@@ -1,0 +1,66 @@
+/* Этап H: встроенный браузер и плашка обновления. Токены — из styles.css / design/free-ai.css. */
+/* --panel-offset задаёт index.tsx, пока открыта правая панель: нативный слой браузера не должен перекрывать плашку. */
+
+.browser-panel { position: relative; display: flex; flex: 1; flex-direction: column; min-height: 0; }
+.browser-toolbar { position: relative; display: flex; align-items: center; gap: 2px; height: 36px; padding: 0 6px; border-bottom: 1px solid var(--line); }
+.browser-button { display: grid; flex: none; place-items: center; width: 26px; height: 26px; border-radius: 6px; color: var(--secondary); }
+.browser-button:hover:not(:disabled) { background: var(--hover); color: var(--text); }
+.browser-button:disabled { opacity: .4; }
+.browser-button .icon { width: 14px; height: 14px; }
+.browser-address { flex: 1; min-width: 0; margin: 0 4px; }
+.browser-address input { width: 100%; height: 26px; padding: 0 10px; border: 1px solid transparent; border-radius: 7px; background: var(--subtle-surface, var(--hover)); color: var(--text); font: inherit; font-size: 12.5px; text-overflow: ellipsis; }
+.browser-address input:focus { border-color: var(--mint); outline: none; background: var(--composer, transparent); }
+.browser-errors { flex: none; height: 22px; padding: 0 8px; border-radius: 11px; background: color-mix(in srgb, var(--error) 12%, transparent); color: var(--error); font-size: 11.5px; white-space: nowrap; }
+.browser-errors:hover { background: color-mix(in srgb, var(--error) 20%, transparent); }
+.browser-progress { position: absolute; right: 0; bottom: -1px; left: 0; height: 2px; overflow: hidden; }
+.browser-progress::after { position: absolute; inset: 0 auto 0 0; width: 35%; background: var(--mint); content: ""; animation: browser-progress 1.1s ease-in-out infinite; }
+@keyframes browser-progress { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
+@media (prefers-reduced-motion: reduce) { .browser-progress::after { width: 100%; animation: none; opacity: .5; } }
+.browser-failure { margin: 0; padding: 6px 12px; border-bottom: 1px solid var(--line); color: var(--error); font-size: 12px; }
+.browser-host { position: relative; flex: 1; min-height: 0; }
+.browser-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; height: 100%; padding: 24px; color: var(--secondary); text-align: center; }
+.browser-empty > .icon { width: 28px; height: 28px; margin-bottom: 4px; color: var(--muted, var(--secondary)); }
+.browser-empty h2 { margin: 0; color: var(--text); font-size: 15px; font-weight: 600; }
+.browser-empty p { margin: 0; font-size: 12.5px; }
+.browser-quick { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 10px; }
+.browser-chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--text); font-size: 12.5px; }
+.browser-chip:hover { border-color: var(--strong-line); background: var(--hover); }
+.browser-chip .icon { width: 13px; height: 13px; color: var(--secondary); }
+.browser-popover { position: absolute; z-index: 5; top: 6px; right: 6px; }
+.browser-popover--menu { width: 220px; padding: 4px; }
+.browser-popover--errors { left: 6px; display: flex; flex-direction: column; gap: 8px; max-height: calc(100% - 12px); padding: 10px; }
+.browser-popover--errors header { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; }
+.browser-popover--errors ol { display: flex; flex-direction: column; gap: 6px; min-height: 0; margin: 0; padding: 0; overflow: auto; list-style: none; }
+.browser-popover--errors li { display: flex; flex-direction: column; gap: 2px; padding: 6px 8px; border-radius: 6px; background: color-mix(in srgb, var(--error) 7%, transparent); }
+.browser-popover--errors code { color: var(--text); font: 11.5px/1.45 var(--mono); white-space: pre-wrap; word-break: break-word; }
+.browser-popover--errors .subtle { font-size: 11px; }
+.browser-popover--errors .small-button { align-self: flex-start; }
+.browser-panel--unavailable .small-button { display: inline-flex; align-items: center; margin-top: 8px; text-decoration: none; }
+
+/* Плашка обновления в правом нижнем углу окна. */
+.update-pill { position: fixed; z-index: 40; right: calc(var(--panel-offset, 0px) + 12px); bottom: 12px; display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 6px 0 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--menu, var(--composer)); box-shadow: var(--shadow-soft); color: var(--text); font-size: 12.5px; }
+.update-pill .update-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 3px color-mix(in srgb, var(--mint) 22%, transparent); }
+.update-pill .update-ring { flex: none; width: 14px; height: 14px; }
+.update-pill .update-ring circle { fill: none; stroke-width: 2; }
+.update-pill .update-ring .track { stroke: var(--line); }
+.update-pill .update-ring .value { stroke: var(--mint); stroke-linecap: round; transform: rotate(-90deg); transform-origin: center; transition: stroke-dashoffset .3s; }
+.update-pill .update-ring--spin .value { animation: update-spin 1s linear infinite; }
+@keyframes update-spin { to { transform: rotate(270deg); } }
+.update-pill .small-button { min-height: 22px; padding: 0 10px; border-radius: 11px; font-size: 12px; }
+.update-pill .update-close { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: var(--secondary); }
+.update-pill .update-close:hover { background: var(--hover); color: var(--text); }
+.update-pill .update-close .icon { width: 12px; height: 12px; }
+.update-pill--folded { width: 28px; height: 28px; padding: 0; justify-content: center; border-radius: 50%; cursor: pointer; }
+.update-pill--folded:hover { border-color: var(--strong-line); }
+.update-confirm { position: fixed; z-index: 41; right: calc(var(--panel-offset, 0px) + 12px); bottom: 52px; display: flex; flex-direction: column; gap: 8px; width: 280px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--menu, var(--composer)); box-shadow: var(--shadow-soft); font-size: 12.5px; }
+.update-confirm div { display: flex; gap: 6px; }
+.update-confirm .composer-control { min-height: 26px; }
+.panel-body--browser { flex: 1; display: flex; padding: 0; overflow: hidden; }
+.panel-body--browser[hidden] { display: none; }
+
+/* Предупреждение о ключе или пароле в сообщении. */
+.secret-warning { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 8px; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--amber) 45%, transparent); border-radius: 10px; background: color-mix(in srgb, var(--amber) 10%, transparent); color: var(--text); font-size: 12.5px; }
+.secret-warning span { flex: 1 1 260px; }
+.secret-warning .composer-control { min-height: 30px; }
+.panel-heading .panel-tabs { flex-wrap: nowrap; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.panel-heading .panel-tabs button { flex: none; }

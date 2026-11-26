@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Terminal } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 import type { ChatPart, FileChange, ProjectEntry } from "../shared/api";
@@ -6,9 +6,11 @@ import { Delta, Diff } from "./chat";
 import type { FileReference } from "../shared/file-links";
 import { Preview } from "./chat-files";
 import { Icon } from "./icons";
+import { BrowserPanel } from "./browser-panel";
+import { findLocalUrls } from "../shared/browser";
 
 const api = window.vsemkod;
-export const panelTabs = [{ id: "changes", title: "Изменения" }, { id: "files", title: "Файлы" }, { id: "terminal", title: "Терминал" }, { id: "preview", title: "Просмотр" }] as const;
+export const panelTabs = [{ id: "changes", title: "Изменения" }, { id: "browser", title: "Браузер" }, { id: "files", title: "Файлы" }, { id: "terminal", title: "Терминал" }, { id: "preview", title: "Просмотр" }] as const;
 export type PanelTab = typeof panelTabs[number]["id"];
 
 function Files({ directory, path, select, onError }: {
@@ -108,8 +110,9 @@ function ProjectTerminal({ directory, theme, parts }: { directory: string; theme
   </div>;
 }
 
-export function WorkspacePanel({ directory, tab, setTab, visible, width, resize, close, parts, changes, revert, busy, theme, onError, preview, openPreview }: {
+export function WorkspacePanel({ directory, tab, setTab, visible, width, resize, close, parts, changes, revert, busy, theme, onError, preview, openPreview, insertDraft, notify }: {
   preview?: FileReference; openPreview: (ref: FileReference) => void;
+  insertDraft: (text: string) => void; notify: (text: string) => void;
   directory: string; tab: PanelTab; setTab: (tab: PanelTab) => void; visible: boolean; width: number;
   resize: (width: number, final?: boolean) => void; close: () => void; parts: ChatPart[]; changes: FileChange[];
   revert: (file: string) => void; busy: boolean; theme: string; onError: (error: unknown) => void;
@@ -119,6 +122,18 @@ export function WorkspacePanel({ directory, tab, setTab, visible, width, resize,
   const [terminalStarted, setTerminalStarted] = useState(false);
   const [fileError, setFileError] = useState("");
   useEffect(() => { if (visible && tab === "terminal") setTerminalStarted(true); }, [visible, tab]);
+  const [browserStarted, setBrowserStarted] = useState(false);
+  useEffect(() => { if (visible && tab === "browser") setBrowserStarted(true); }, [visible, tab]);
+  const browserKey = "vsemkod-browser:" + directory;
+  const quickLinks = useMemo(() => findLocalUrls(parts.map(part => "text" in part && typeof part.text === "string" ? part.text : "").join("\n")), [parts]);
+  const projectIndex = useMemo(() => "file:///" + directory.replace(/\\/g, "/").replace(/^\/+/, "") + "/index.html", [directory]);
+  const [hasIndex, setHasIndex] = useState(false);
+  useEffect(() => {
+    let current = true;
+    if (!api.fileStat) return;
+    void api.fileStat(directory, "index.html").then(info => { if (current) setHasIndex(Boolean(info)); }, () => {});
+    return () => { current = false; };
+  }, [directory]);
   useEffect(() => {
     setContent(undefined);
     setFileError("");
@@ -161,6 +176,11 @@ export function WorkspacePanel({ directory, tab, setTab, visible, width, resize,
       {selected && <details className="file-preview" open key={selected}><summary>{selected}</summary><pre>{fileError || content || (!fileError && content === "" ? "Пустой файл" : "Открываем файл…")}</pre></details>}
     </section>}
     {tab === "preview" && <Preview directory={directory} reference={preview} onError={onError} />}
+    {browserStarted && <section className="panel-body panel-body--browser" hidden={tab !== "browser"}>
+      <BrowserPanel api={api.browser} directory={directory} active={visible && tab === "browser"} quickLinks={quickLinks}
+        projectIndex={hasIndex ? projectIndex : undefined} initialUrl={localStorage.getItem(browserKey) ?? undefined}
+        onUrl={url => localStorage.setItem(browserKey, url)} onSendErrors={insertDraft} onNotice={notify} />
+    </section>}
     {terminalStarted && <section className="panel-body panel-body--terminal" hidden={tab !== "terminal"}>
       <ProjectTerminal key={directory} directory={directory} parts={parts} theme={theme} />
     </section>}

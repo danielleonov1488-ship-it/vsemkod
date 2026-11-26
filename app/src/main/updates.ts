@@ -1,21 +1,24 @@
 import { app, shell } from "electron";
 import electronUpdater from "electron-updater";
-import type { UpdateCheck, UpdateReady } from "../shared/api";
+import type { UpdateCheck, UpdateProgress, UpdateReady } from "../shared/api";
 
 const releaseUrl = "https://github.com/danielleonov1488-ship-it/vsemkod/releases/latest";
 const checkInterval = 6 * 60 * 60 * 1000;
 
-export function createUpdates(publish: (update?: UpdateReady) => void) {
+export function createUpdates(publish: (update?: UpdateReady) => void, progress: (value?: UpdateProgress) => void = () => {}) {
   const enabled = app.isPackaged && (process.platform !== "linux" || Boolean(process.env.APPIMAGE));
   const updater = enabled ? electronUpdater.autoUpdater : undefined;
   let ready: UpdateReady | undefined;
   let downloading: Promise<void> | undefined;
+  let downloadingVersion: string | undefined;
   let timer: ReturnType<typeof setInterval> | undefined;
 
   if (updater) {
     updater.autoDownload = false;
-    updater.autoInstallOnAppQuit = false;
+    // Windows и Linux: если пользователь просто закрыл приложение, загруженное обновление ставится при выходе.
+    updater.autoInstallOnAppQuit = process.platform !== "darwin";
     updater.on("error", error => console.warn("[updates]", error.message));
+    updater.on("download-progress", info => { if (downloadingVersion) progress({ version: downloadingVersion, percent: info.percent }); });
   }
 
   function setReady(update?: UpdateReady) {
@@ -38,10 +41,12 @@ export function createUpdates(publish: (update?: UpdateReady) => void) {
     }
     if (!downloading) {
       setReady(undefined);
+      downloadingVersion = version;
+      progress({ version });
       downloading = updater.downloadUpdate(result.cancellationToken)
         .then(() => setReady({ version, action: "restart" }))
         .catch(() => {}) // electron-updater emits and logs the error above.
-        .finally(() => { downloading = undefined; });
+        .finally(() => { downloading = undefined; downloadingVersion = undefined; progress(undefined); });
     }
     return "downloading";
   }
