@@ -1,6 +1,20 @@
 {
   "benchmarksAttemptedAt": "2026-11-27T04:11:10.828Z",
-  "freeListCheckedAt": "2026-11-26T07:15:32.656Z",
+  "discoveryFailures": {
+    "assemblyai": 1,
+    "cloud": 1,
+    "deepgram": 1,
+    "dots": 1,
+    "endpoints": 1,
+    "generativelanguage": 1,
+    "kilo-2": 1,
+    "opencode": 1,
+    "scnet": 1,
+    "synap402": 1,
+    "twigpine": 1
+  },
+  "freeInferenceCheckedAt": "2026-11-27T11:16:31.091Z",
+  "freeListCheckedAt": "2026-11-27T11:16:31.091Z",
   "freeListProviders": [
     {
       "name": "Aion Labs",
@@ -365,6 +379,10 @@
       "observations": [],
       "savedAt": "2026-11-26T21:53:59.801Z"
     },
+    "1f35ff8b75eaba686ce04e1cbe2a338b917595c75e0581d0ec4c49e2b3761adb": {
+      "observations": [],
+      "savedAt": "2026-11-27T11:16:31.091Z"
+    },
     "1fb25aebdc464991d8a6670bbd882982a21af9d641cd07f54af69f437c876ebd": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
@@ -434,6 +452,10 @@
       ],
       "savedAt": "2026-11-25T12:06:35.747Z"
     },
+    "35fb558124948ab2045deeef47362d46f7a97ad3bc26f16dfc3c7f444f55c0b5": {
+      "observations": [],
+      "savedAt": "2026-11-27T11:16:31.091Z"
+    },
     "3b68688abcf73501edfccdd92c346a20c609034deba8d91b9ea4f12d61fb3a1a": {
       "observations": [],
       "savedAt": "2026-11-26T12:19:22.119Z"
@@ -466,6 +488,10 @@
       "observations": [],
       "savedAt": "2026-11-26T21:53:59.801Z"
     },
+    "526b030561f3f01d107a403451f226552e2edf6a9314c18e693f75ce9359f8ee": {
+      "observations": [],
+      "savedAt": "2026-11-27T11:16:31.091Z"
+    },
     "540c68cfde00260d3a6f30911628ffe5b660c73999be7ed06ca5f784d3ffb4c0": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
@@ -481,6 +507,270 @@
     "624fadc60a3ad376bede15c54198065fb9e8794cbd861345f4e255e735e1ea10": {
       "observations": [],
       "savedAt": "2026-11-26T21:53:59.801Z"
+    },
+    "647bba2d7bd9cf28be7608db7d6b728b95e0e114b2cca2e740818172e39f26c1": {
+      "observations": [
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Trial API key: 1,000 API calls/month, non-commercial use only"
+          },
+          "promo": false,
+          "providerId": "cohere",
+          "providerModelId": "command",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Permanent free models, no credit card required"
+          },
+          "promo": false,
+          "providerId": "zai",
+          "providerModelId": "glm",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Free plan limits per model",
+            "rpd": 1000,
+            "rpm": 30,
+            "tpd": 200000,
+            "tpm": 8000
+          },
+          "promo": false,
+          "providerId": "groq",
+          "providerModelId": "qwen/qwen3.8-27b",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "200 requests/hour per IP, no API key required",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "200 requests/hour per IP, no API key required",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "200 requests/hour per IP, no API key required",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "openrouter/free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "200 requests/hour per IP, no API key required",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "200 requests/hour per IP, no API key required",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "kilo-auto/free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "200 requests/hour per IP, no API key required",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "200 requests/hour per IP, no API key required",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "stealth/glyph-cluster",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Requires Alibaba Cloud binding and real-name verification; per-model daily quota capped at 500",
+            "rpd": 2000
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "modelscope",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Free with NVIDIA Developer Program membership; rate-limited per model"
+          },
+          "promo": false,
+          "providerId": "nvidia-nim",
+          "providerModelId": "nvidia-nim",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262144,
+          "expiresAt": null,
+          "limits": {
+            "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "google/gemma-4-26b-a4b-it:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262144,
+          "expiresAt": null,
+          "limits": {
+            "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "google/gemma-4-31b-it:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262144,
+          "expiresAt": null,
+          "limits": {
+            "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "recursive/flint-v1.0:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Free usage on five open models with GitHub sign-in (account at least 30 days old); weekly allowance resetting every Monday"
+          },
+          "promo": false,
+          "providerId": "runcrate",
+          "providerModelId": "runcrate",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        }
+      ],
+      "savedAt": "2026-11-27T11:16:31.091Z"
     },
     "64cd2ff1380ef4ed2e3cc6a6336be6cfa6405a44adede46d143088c8585fd3b9": {
       "observations": [],
@@ -513,6 +803,10 @@
     "715b14bf63883ec5ecb2afc38a8050687ab4cb069c2b834da9b818e18d3e67d3": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "7315d0ff9b733c9a63afccc1a5e62c380f8420dc5735b74f9597090834e300e6": {
+      "observations": [],
+      "savedAt": "2026-11-27T11:16:31.091Z"
     },
     "74e65f547ab3935531e0b957729acb26012d634fff397589876ca374ecd1ae16": {
       "observations": [],
@@ -877,6 +1171,10 @@
       "observations": [],
       "savedAt": "2026-11-27T04:11:10.828Z"
     },
+    "badd5ce26ed6850628ed88c9d88914597c8f0f9f92c4eebe7528ccb8ddf2bce0": {
+      "observations": [],
+      "savedAt": "2026-11-27T11:16:31.091Z"
+    },
     "bdc5743b6616d3e249ffb54f4de2b9d2dbcaf5a156cab2d6935f783d9f96c4f9": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
@@ -1107,6 +1405,99 @@
       "observations": [],
       "savedAt": "2026-11-26T12:19:22.119Z"
     },
+    "fc2d67a5fd864516e0e5d529a0d4c5d64759fc8e4177f0df33731b81b973066a": {
+      "observations": [
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "MiniMax/MiniMax-M3",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "Qwen/Qwen3.8-27B",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "ZhipuAI/GLM-4.7-Flash",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "ZhipuAI/GLM-5.2",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4-Flash-0731",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "moonshotai/Kimi-K3.1-Pro",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        }
+      ],
+      "savedAt": "2026-11-27T11:16:31.091Z"
+    },
     "fe3296cc916d25ba31ede38be07f54e8b4c8e3e7e7c7ad77fb3f028e45208038": {
       "observations": [],
       "savedAt": "2026-11-25T20:09:57.184Z"
@@ -1123,14 +1514,14 @@
       "hash": "34dcf2cfab29787fbf6996ff0beb94011ceb1dfe066670b92ed2458f37a2d4ad"
     },
     "page:modelscope": {
-      "changedAt": "2026-11-24T15:12:29.146Z",
-      "checkedAt": "2026-11-27T04:11:10.828Z",
-      "hash": "b84f5a2c3f6c54778285e39fb4d064fe92a05e29aca9a2244b7e906fec73c33f"
+      "changedAt": "2026-11-27T11:16:31.091Z",
+      "checkedAt": "2026-11-27T11:16:31.091Z",
+      "hash": "a14bdfcaa62452c3762cb5d8bc5b8b6831283cdf5b5b267ae04a29ce322c7293"
     },
     "page:numes": {
-      "changedAt": "2026-11-25T12:06:35.747Z",
-      "checkedAt": "2026-11-27T04:11:10.828Z",
-      "hash": "c636e7f9d2482f208841317335ea973798f20138fa1197297d1ca826c1f00a8d"
+      "changedAt": "2026-11-27T11:16:31.091Z",
+      "checkedAt": "2026-11-27T11:16:31.091Z",
+      "hash": "f6a85ef8c4bbf5a451a98a27dadbdecb2413a53179a1f4d958b0e2ff36699646"
     },
     "page:runcrate": {
       "changedAt": "2026-11-26T03:04:04.312Z",
@@ -1149,13 +1540,13 @@
       "observations": []
     },
     "page:modelscope": {
-      "hash": "b84f5a2c3f6c54778285e39fb4d064fe92a05e29aca9a2244b7e906fec73c33f",
+      "hash": "a14bdfcaa62452c3762cb5d8bc5b8b6831283cdf5b5b267ae04a29ce322c7293",
       "observations": [
         {
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1166,7 +1557,7 @@
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1177,7 +1568,7 @@
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1188,7 +1579,7 @@
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1199,7 +1590,18 @@
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4-Flash-0731",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1210,7 +1612,7 @@
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1221,7 +1623,7 @@
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1231,7 +1633,7 @@
       ]
     },
     "page:numes": {
-      "hash": "c636e7f9d2482f208841317335ea973798f20138fa1197297d1ca826c1f00a8d",
+      "hash": "f6a85ef8c4bbf5a451a98a27dadbdecb2413a53179a1f4d958b0e2ff36699646",
       "observations": []
     },
     "page:runcrate": {
@@ -1328,6 +1730,270 @@
     "tidepool-alpha-free": "2026-11-26T03:04:04.312Z"
   },
   "seenNews": {
+    "github:4c8719de2577dd20a0bafd84d724560cc3cee2b77a6f520f6a88aa81147b6b90": {
+      "observations": [
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Trial API key: 1,000 API calls/month, non-commercial use only"
+          },
+          "promo": false,
+          "providerId": "cohere",
+          "providerModelId": "command",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Permanent free models, no credit card required"
+          },
+          "promo": false,
+          "providerId": "zai",
+          "providerModelId": "glm",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Free plan limits per model",
+            "rpd": 1000,
+            "rpm": 30,
+            "tpd": 200000,
+            "tpm": 8000
+          },
+          "promo": false,
+          "providerId": "groq",
+          "providerModelId": "qwen/qwen3.8-27b",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "200 requests/hour per IP, no API key required",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "200 requests/hour per IP, no API key required",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "200 requests/hour per IP, no API key required",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "openrouter/free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "200 requests/hour per IP, no API key required",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "200 requests/hour per IP, no API key required",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "kilo-auto/free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "200 requests/hour per IP, no API key required",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "200 requests/hour per IP, no API key required",
+            "rph": 200
+          },
+          "promo": false,
+          "providerId": "kilo",
+          "providerModelId": "stealth/glyph-cluster",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Requires Alibaba Cloud binding and real-name verification; per-model daily quota capped at 500",
+            "rpd": 2000
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "modelscope",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Free with NVIDIA Developer Program membership; rate-limited per model"
+          },
+          "promo": false,
+          "providerId": "nvidia-nim",
+          "providerModelId": "nvidia-nim",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262144,
+          "expiresAt": null,
+          "limits": {
+            "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "google/gemma-4-26b-a4b-it:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262144,
+          "expiresAt": null,
+          "limits": {
+            "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "google/gemma-4-31b-it:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3.5-lightning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 262144,
+          "expiresAt": null,
+          "limits": {
+            "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "recursive/flint-v1.0:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 1000000,
+          "expiresAt": null,
+          "limits": {
+            "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3.5-super-vl:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "contextWindow": 256000,
+          "expiresAt": null,
+          "limits": {
+            "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
+            "rpd": 50,
+            "rpm": 20
+          },
+          "promo": false,
+          "providerId": "openrouter",
+          "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        },
+        {
+          "confidence": "news",
+          "expiresAt": null,
+          "limits": {
+            "note": "Free usage on five open models with GitHub sign-in (account at least 30 days old); weekly allowance resetting every Monday"
+          },
+          "promo": false,
+          "providerId": "runcrate",
+          "providerModelId": "runcrate",
+          "source": "https://github.com/mnfst/awesome-free-llm-apis"
+        }
+      ],
+      "savedAt": "2026-11-27T11:16:31.091Z"
+    },
     "github:692fbee205f7e74e87155aae308bf507ed150780fe7c76daf3c6720209d86aed": {
       "observations": [
         {
@@ -1959,7 +2625,7 @@
     },
     "hn:50631103": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T11:16:31.091Z"
     },
     "hn:50631626": {
       "observations": [],
@@ -2160,9 +2826,221 @@
     "hn:50662700": {
       "observations": [],
       "savedAt": "2026-11-27T04:11:10.828Z"
+    },
+    "hn:50663124": {
+      "observations": [],
+      "savedAt": "2026-11-27T11:16:31.091Z"
+    },
+    "hn:50664165": {
+      "observations": [],
+      "savedAt": "2026-11-27T11:16:31.091Z"
+    },
+    "hn:50664246": {
+      "observations": [],
+      "savedAt": "2026-11-27T11:16:31.091Z"
+    },
+    "hn:50664461": {
+      "observations": [],
+      "savedAt": "2026-11-27T11:16:31.091Z"
+    },
+    "hn:50664795": {
+      "observations": [],
+      "savedAt": "2026-11-27T11:16:31.091Z"
     }
   },
+  "telegramLastPost": {
+    "rubiconzone": 135
+  },
   "tracks": {
+    "berget:moonshotai/Kimi-K3.1-Pro": {
+      "evidence": {
+        "registry:berget": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 327680,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "berget",
+            "providerModelId": "moonshotai/Kimi-K3.1-Pro",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:berget",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "berget:zai-org/GLM-5.3-Flash": {
+      "evidence": {
+        "registry:berget": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 262144,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "berget",
+            "providerModelId": "zai-org/GLM-5.3-Flash",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:berget",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "cent-ai:hy4-flash:free": {
+      "evidence": {
+        "registry:cent-ai": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": "2026-11-30T23:59:59Z",
+            "promo": true,
+            "providerId": "cent-ai",
+            "providerModelId": "hy4-flash:free",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:cent-ai",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "cohere:command": {
+      "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "expiresAt": null,
+            "limits": {
+              "note": "Trial API key: 1,000 API calls/month, non-commercial use only"
+            },
+            "promo": false,
+            "providerId": "cohere",
+            "providerModelId": "command",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        }
+      }
+    },
+    "cohere:command-a-03-2025": {
+      "evidence": {
+        "registry:cohere": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 256000,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "cohere",
+            "providerModelId": "command-a-03-2025",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:cohere",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "dahl:MiniMaxAI/MiniMax-M2.7": {
+      "evidence": {
+        "registry:dahl": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 204800,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "dahl",
+            "providerModelId": "MiniMaxAI/MiniMax-M2.7",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:dahl",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "dahl:deepseek-ai/DeepSeek-V4-Flash-0731": {
+      "evidence": {
+        "registry:dahl": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "dahl",
+            "providerModelId": "deepseek-ai/DeepSeek-V4-Flash-0731",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:dahl",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "gonkarouter:MiniMaxAI/MiniMax-M2.7": {
+      "evidence": {
+        "registry:gonkarouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 200000,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "gonkarouter",
+            "providerModelId": "MiniMaxAI/MiniMax-M2.7",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:gonkarouter",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "gonkarouter:deepseek-ai/DeepSeek-V4-Flash-0731": {
+      "evidence": {
+        "registry:gonkarouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 200000,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "gonkarouter",
+            "providerModelId": "deepseek-ai/DeepSeek-V4-Flash-0731",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:gonkarouter",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "gonkarouter:zai-org/GLM-5.3-Flash": {
+      "evidence": {
+        "registry:gonkarouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 200000,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "gonkarouter",
+            "providerModelId": "zai-org/GLM-5.3-Flash",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:gonkarouter",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
     "groq:openai/gpt-oss-120b": {
       "evidence": {
         "registry:groq": {
@@ -2204,12 +3082,12 @@
     "groq:qwen/qwen3.8-27b": {
       "evidence": {
         "github": {
-          "missedRuns": 6,
+          "missedRuns": 0,
           "observation": {
             "confidence": "news",
             "expiresAt": null,
             "limits": {
-              "note": "Лимиты бесплатного плана для чат-моделей; точные лимиты организации — на странице аккаунта.",
+              "note": "Free plan limits per model",
               "rpd": 1000,
               "rpm": 30,
               "tpd": 200000,
@@ -2234,6 +3112,139 @@
             "source": "registry:groq",
             "supportsTools": true,
             "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "ifm:IFM/Jais-3-MoVA-36B-A4B": {
+      "evidence": {
+        "registry:ifm": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 524288,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "ifm",
+            "providerModelId": "IFM/Jais-3-MoVA-36B-A4B",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:ifm",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "ifm:IFM/K2-Horizon-375B-A23B": {
+      "evidence": {
+        "registry:ifm": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 524288,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "ifm",
+            "providerModelId": "IFM/K2-Horizon-375B-A23B",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:ifm",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "k-exaone:k-exaone_v2.5": {
+      "evidence": {
+        "registry:k-exaone": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 524288,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "k-exaone",
+            "providerModelId": "k-exaone_v2.5",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:k-exaone",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "kenari:glm-4-7-flash:free": {
+      "evidence": {
+        "registry:kenari": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 200000,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "kenari",
+            "providerModelId": "glm-4-7-flash:free",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:kenari",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "kenari:hy4-flash:free": {
+      "evidence": {
+        "registry:kenari": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "kenari",
+            "providerModelId": "hy4-flash:free",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:kenari",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "kenari:nemotron-3-5-lightning:free": {
+      "evidence": {
+        "registry:kenari": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1000000,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "kenari",
+            "providerModelId": "nemotron-3-5-lightning:free",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:kenari",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "kenari:nemotron-3-ultra-550b-a55b:free": {
+      "evidence": {
+        "registry:kenari": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1000000,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "kenari",
+            "providerModelId": "nemotron-3-ultra-550b-a55b:free",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:kenari",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
           }
         }
       }
@@ -2353,6 +3364,7 @@
             "contextWindow": 256000,
             "expiresAt": null,
             "limits": {
+              "note": "200 requests/hour per IP, no API key required",
               "rph": 200
             },
             "promo": false,
@@ -2390,6 +3402,7 @@
             "contextWindow": 256000,
             "expiresAt": null,
             "limits": {
+              "note": "200 requests/hour per IP, no API key required",
               "rph": 200
             },
             "promo": false,
@@ -2423,6 +3436,7 @@
             "contextWindow": 1000000,
             "expiresAt": null,
             "limits": {
+              "note": "200 requests/hour per IP, no API key required",
               "rph": 200
             },
             "promo": false,
@@ -2456,6 +3470,7 @@
             "contextWindow": 1000000,
             "expiresAt": null,
             "limits": {
+              "note": "200 requests/hour per IP, no API key required",
               "rph": 200
             },
             "promo": false,
@@ -2489,6 +3504,7 @@
             "contextWindow": 1000000,
             "expiresAt": null,
             "limits": {
+              "note": "200 requests/hour per IP, no API key required",
               "rph": 200
             },
             "promo": false,
@@ -2521,6 +3537,7 @@
             "confidence": "news",
             "expiresAt": null,
             "limits": {
+              "note": "200 requests/hour per IP, no API key required",
               "rph": 200
             },
             "promo": false,
@@ -2612,6 +3629,7 @@
             "contextWindow": 256000,
             "expiresAt": null,
             "limits": {
+              "note": "200 requests/hour per IP, no API key required",
               "rph": 200
             },
             "promo": false,
@@ -2664,7 +3682,7 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
             },
             "promo": false,
             "providerId": "modelscope",
@@ -2695,7 +3713,7 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
             },
             "promo": false,
             "providerId": "modelscope",
@@ -2713,7 +3731,7 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
             },
             "promo": false,
             "providerId": "modelscope",
@@ -2731,7 +3749,7 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
             },
             "promo": false,
             "providerId": "modelscope",
@@ -2754,6 +3772,24 @@
         }
       }
     },
+    "modelscope:deepseek-ai/DeepSeek-V4-Flash-0731": {
+      "evidence": {
+        "page:modelscope": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+            },
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "deepseek-ai/DeepSeek-V4-Flash-0731",
+            "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+          }
+        }
+      }
+    },
     "modelscope:deepseek-ai/DeepSeek-V4.1-Flash": {
       "evidence": {
         "page:modelscope": {
@@ -2762,7 +3798,7 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
             },
             "promo": false,
             "providerId": "modelscope",
@@ -2793,12 +3829,31 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
             },
             "promo": false,
             "providerId": "modelscope",
             "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
             "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+          }
+        }
+      }
+    },
+    "modelscope:modelscope": {
+      "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "expiresAt": null,
+            "limits": {
+              "note": "Requires Alibaba Cloud binding and real-name verification; per-model daily quota capped at 500",
+              "rpd": 2000
+            },
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "modelscope",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
           }
         }
       }
@@ -2811,7 +3866,7 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
             },
             "promo": false,
             "providerId": "modelscope",
@@ -2996,6 +4051,62 @@
         }
       }
     },
+    "nvidia-nim:nvidia-nim": {
+      "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "expiresAt": null,
+            "limits": {
+              "note": "Free with NVIDIA Developer Program membership; rate-limited per model"
+            },
+            "promo": false,
+            "providerId": "nvidia-nim",
+            "providerModelId": "nvidia-nim",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        }
+      }
+    },
+    "nvidia-nim:nvidia/nemotron-3-ultra-550b-a55b": {
+      "evidence": {
+        "registry:nvidia-nim": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "nvidia-nim",
+            "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:nvidia-nim",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "nvidia-nim:nvidia/nemotron-3.5-super-vl-120b-a12b": {
+      "evidence": {
+        "registry:nvidia-nim": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "nvidia-nim",
+            "providerModelId": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:nvidia-nim",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
     "openrouter:baidu/ernie-5.5-flash-preview:free": {
       "evidence": {
         "openrouter": {
@@ -3036,9 +4147,10 @@
           "missedRuns": 0,
           "observation": {
             "confidence": "news",
-            "contextWindow": 262000,
+            "contextWindow": 262144,
             "expiresAt": null,
             "limits": {
+              "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
               "rpd": 50,
               "rpm": 20
             },
@@ -3070,9 +4182,10 @@
           "missedRuns": 0,
           "observation": {
             "confidence": "news",
-            "contextWindow": 262000,
+            "contextWindow": 262144,
             "expiresAt": null,
             "limits": {
+              "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
               "rpd": 50,
               "rpm": 20
             },
@@ -3179,6 +4292,7 @@
             "contextWindow": 256000,
             "expiresAt": null,
             "limits": {
+              "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
               "rpd": 50,
               "rpm": 20
             },
@@ -3213,6 +4327,7 @@
             "contextWindow": 1000000,
             "expiresAt": null,
             "limits": {
+              "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
               "rpd": 50,
               "rpm": 20
             },
@@ -3247,6 +4362,7 @@
             "contextWindow": 1000000,
             "expiresAt": null,
             "limits": {
+              "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
               "rpd": 50,
               "rpm": 20
             },
@@ -3281,6 +4397,7 @@
             "contextWindow": 1000000,
             "expiresAt": null,
             "limits": {
+              "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
               "rpd": 50,
               "rpm": 20
             },
@@ -3330,9 +4447,10 @@
           "missedRuns": 0,
           "observation": {
             "confidence": "news",
-            "contextWindow": 262000,
+            "contextWindow": 262144,
             "expiresAt": null,
             "limits": {
+              "note": "20 RPM and 50 RPD across all free models; 1,000 RPD if at least 10 credits purchased",
               "rpd": 50,
               "rpm": 20
             },
@@ -3354,6 +4472,158 @@
             "supportsReasoning": true,
             "supportsTools": true,
             "supportsVision": false
+          }
+        }
+      }
+    },
+    "orcarouter:deepseek/deepseek-v4.1-flash-free": {
+      "evidence": {
+        "registry:orcarouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "orcarouter",
+            "providerModelId": "deepseek/deepseek-v4.1-flash-free",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:orcarouter",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "orcarouter:tencent/hy4-preview-free": {
+      "evidence": {
+        "registry:orcarouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "orcarouter",
+            "providerModelId": "tencent/hy4-preview-free",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:orcarouter",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "orcarouter:z-ai/glm-5.3-flash-free": {
+      "evidence": {
+        "registry:orcarouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "orcarouter",
+            "providerModelId": "z-ai/glm-5.3-flash-free",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:orcarouter",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "requesty:google/gemma-4-31b-it": {
+      "evidence": {
+        "registry:requesty": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 262144,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "requesty",
+            "providerModelId": "google/gemma-4-31b-it",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:requesty",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "requesty:nvidia/muse-glimmer-30b": {
+      "evidence": {
+        "registry:requesty": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 131072,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "requesty",
+            "providerModelId": "nvidia/muse-glimmer-30b",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:requesty",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "requesty:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning": {
+      "evidence": {
+        "registry:requesty": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 131072,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "requesty",
+            "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:requesty",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "requesty:nvidia/nemotron-3-ultra-550b-a55b": {
+      "evidence": {
+        "registry:requesty": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "requesty",
+            "providerModelId": "nvidia/nemotron-3-ultra-550b-a55b",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:requesty",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "requesty:nvidia/nemotron-3.5-lightning-30b-a3b": {
+      "evidence": {
+        "registry:requesty": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "requesty",
+            "providerModelId": "nvidia/nemotron-3.5-lightning-30b-a3b",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:requesty",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
           }
         }
       }
@@ -3476,6 +4746,24 @@
         }
       }
     },
+    "runcrate:runcrate": {
+      "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "expiresAt": null,
+            "limits": {
+              "note": "Free usage on five open models with GitHub sign-in (account at least 30 days old); weekly allowance resetting every Monday"
+            },
+            "promo": false,
+            "providerId": "runcrate",
+            "providerModelId": "runcrate",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        }
+      }
+    },
     "runcrate:zai-org/GLM-5.3": {
       "evidence": {
         "page:runcrate": {
@@ -3542,6 +4830,25 @@
         }
       }
     },
+    "wusrouter:mimo-v2.5:free": {
+      "evidence": {
+        "registry:wusrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "wusrouter",
+            "providerModelId": "mimo-v2.5:free",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:wusrouter",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
     "zai:GLM-4.5-Flash": {
       "evidence": {
         "page:zai": {
@@ -3591,6 +4898,24 @@
         }
       }
     },
+    "zai:glm": {
+      "evidence": {
+        "github": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "news",
+            "expiresAt": null,
+            "limits": {
+              "note": "Permanent free models, no credit card required"
+            },
+            "promo": false,
+            "providerId": "zai",
+            "providerModelId": "glm",
+            "source": "https://github.com/mnfst/awesome-free-llm-apis"
+          }
+        }
+      }
+    },
     "zai:glm-4.7-flash": {
       "evidence": {
         "page:zai": {
@@ -3617,6 +4942,25 @@
             "source": "registry:zai",
             "supportsTools": true,
             "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "zro:deepseek-v4.1-flash": {
+      "evidence": {
+        "registry:zro": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "zro",
+            "providerModelId": "deepseek-v4.1-flash",
+            "reviewBy": "2026-12-11T00:00:00.000Z",
+            "source": "registry:zro",
+            "supportsTools": true,
+            "verifiedAt": "2026-11-27T00:00:00Z"
           }
         }
       }

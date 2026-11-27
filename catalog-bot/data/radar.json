@@ -1,6 +1,670 @@
 {
   "discovered": [
     {
+      "baseUrl": "https://api.aihubmix.com/v1",
+      "endsAt": null,
+      "id": "aihubmix",
+      "limits": {
+        "rpd": 1000,
+        "rpm": 60
+      },
+      "models": [],
+      "name": "AIHubMix",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "ling-3.2-flash-free",
+      "signupUrl": "https://aihubmix.com/",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.apinex.bond/v1",
+      "endsAt": null,
+      "id": "apinex",
+      "limits": {},
+      "models": [
+        "free/deepseek-v4.1-flash",
+        "free/gemini-3.8-flash",
+        "free/gpt-6-luna",
+        "free/minimax-m3.1-flash"
+      ],
+      "name": "APInex",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://apinex.bond/",
+      "sources": [
+        "https://t.me/rubiconzone/48"
+      ]
+    },
+    {
+      "baseUrl": "https://api.assemblyai.com/v2",
+      "endsAt": null,
+      "id": "assemblyai",
+      "limits": {},
+      "models": [
+        "Unknown"
+      ],
+      "name": "AssemblyAI",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "signupUrl": "https://www.assemblyai.com/pricing",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://cloud.amd.com/api/v1",
+      "endsAt": null,
+      "id": "cloud",
+      "limits": {
+        "rpd": 1000,
+        "rpm": 30
+      },
+      "models": [
+        "GLM-5.3-Flash",
+        "MiMo-V2.6-Flash",
+        "MiniCPM5-2B"
+      ],
+      "name": "AMD Developer Cloud",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "signupUrl": "https://cloud.amd.com/",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.codiv.ai/v1",
+      "endsAt": null,
+      "id": "codiv",
+      "limits": {},
+      "models": [],
+      "name": "codiv",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": null,
+      "sources": [
+        "https://t.me/rubiconzone/117"
+      ]
+    },
+    {
+      "baseUrl": "https://api.cohere.com/v1",
+      "endsAt": null,
+      "id": "cohere-2",
+      "limits": {},
+      "models": [],
+      "name": "Cohere",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://docs.cohere.com/docs/rate-limits",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://crowllm.com/v1",
+      "endsAt": null,
+      "id": "crowllm",
+      "limits": {},
+      "models": [
+        "qwen4-max:free"
+      ],
+      "name": "CrowLLM",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "ernie-5.5-flash-preview:free",
+      "signupUrl": "https://crowllm.com/",
+      "sources": [
+        "https://t.me/rubiconzone/119"
+      ]
+    },
+    {
+      "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "endsAt": null,
+      "id": "dashscope",
+      "limits": {
+        "rpm": 60
+      },
+      "models": [
+        "GLM-5.3",
+        "MiniMax-M2.5"
+      ],
+      "name": "Alibaba DashScope (Bailian)",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://www.alibabacloud.com/help/en/model-studio/developer-reference/get-api-key",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.deepgram.com/v1",
+      "endsAt": null,
+      "id": "deepgram",
+      "limits": {},
+      "models": [
+        "aura",
+        "flux",
+        "nova-2",
+        "nova-3"
+      ],
+      "name": "Deepgram",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "signupUrl": "https://deepgram.com/pricing",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.deepinfra.com/v1/openai",
+      "endsAt": null,
+      "id": "deepinfra",
+      "limits": {},
+      "models": [
+        "Qwen/Qwen2.5-72B-Instruct",
+        "Qwen/Qwen3-32B",
+        "deepseek-ai/DeepSeek-V3.1",
+        "zai-org/GLM-4.7"
+      ],
+      "name": "DeepInfra",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "zai-org/GLM-4.7",
+      "signupUrl": "https://docs.deepinfra.com/account/rate-limits",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.deepseek.com/v1",
+      "endsAt": null,
+      "id": "deepseek",
+      "limits": {
+        "rpm": 60
+      },
+      "models": [
+        "deepseek-chat",
+        "deepseek-reasoner"
+      ],
+      "name": "DeepSeek Platform",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://api-docs.deepseek.com/",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.dots.ai/v1",
+      "endsAt": null,
+      "id": "dots",
+      "limits": {},
+      "models": [
+        "dots-3-note-preview"
+      ],
+      "name": "Dots Studio",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "signupUrl": "https://dots.ai/",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://endpoints.ai.cloud.ovh.net/v1",
+      "endsAt": null,
+      "id": "endpoints",
+      "limits": {},
+      "models": [
+        "Olala-v1.0-translate",
+        "Qwen3Guard-Gen-0.6B",
+        "Qwen3Guard-Gen-8B"
+      ],
+      "name": "OVHcloud AI Endpoints",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "signupUrl": "https://www.ovhcloud.com/en/public-cloud/ai-endpoints/",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "endsAt": null,
+      "id": "generativelanguage",
+      "limits": {},
+      "models": [
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+        "gemini-3-flash-preview",
+        "gemini-3.1-flash-lite",
+        "gemini-3.1-flash-lite-preview",
+        "gemini-3.5-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-3.6-flash",
+        "gemini-3.7-flash",
+        "gemini-3.8-flash",
+        "gemini-flash-latest",
+        "gemini-flash-lite-latest",
+        "gemini-omni-1.1-flash",
+        "gemini-omni-flash-preview",
+        "gemma-4-26b-a4b-it",
+        "gemma-4-31b-it"
+      ],
+      "name": "Google AI Studio (Gemini API)",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "signupUrl": "https://ai.google.dev/gemini-api/docs/rate-limits",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.hcnsec.cn/v1",
+      "endsAt": null,
+      "id": "hcnsec",
+      "limits": {},
+      "models": [
+        "DeepSeek-V4-Flash",
+        "DeepSeek-V4-Pro",
+        "MiniMax-M3.1-Flash",
+        "Qwen3.8-27B",
+        "Qwen3.8-Flash-Next"
+      ],
+      "name": "HCNSec API",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://api.hcnsec.cn/sign-up?aff=GlrI",
+      "sources": [
+        "https://t.me/rubiconzone/51"
+      ]
+    },
+    {
+      "baseUrl": "https://api.kilo.ai/v1",
+      "endsAt": null,
+      "id": "kilo-2",
+      "limits": {
+        "rpd": 200,
+        "rpm": 20
+      },
+      "models": [
+        "cohere/north-mini-code:free",
+        "dots-studio/dots-3-note-preview:free",
+        "liquid/lfm-2.5-2.6b:free",
+        "nvidia/nemotron-3.5-lightning:free",
+        "nvidia/nemotron-3.5-super-vl:free",
+        "poolside/laguna-s-2.1:free",
+        "poolside/laguna-xs-2.1:free"
+      ],
+      "name": "Kilo Gateway",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "signupUrl": "https://kilo.ai/gateway",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.kimi.ai/coding/v1",
+      "endsAt": null,
+      "id": "kimi",
+      "limits": {
+        "rpd": 1000,
+        "rpm": 60
+      },
+      "models": [
+        "kimi-for-coding"
+      ],
+      "name": "Kimi For Coding (Moonshot AI)",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://www.kimi.ai/code/docs/en/kimi-code/models.html",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.mistral.ai/v1",
+      "endsAt": null,
+      "id": "mistral",
+      "limits": {},
+      "models": [
+        "codestral-latest",
+        "mistral-small-latest",
+        "open-mistral-nemo"
+      ],
+      "name": "Mistral La Plateforme",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://docs.mistral.ai/",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://model.inferx.net/endpoints/v1",
+      "endsAt": null,
+      "id": "model",
+      "limits": {
+        "rpd": 2000,
+        "rpm": 60
+      },
+      "models": [
+        "Agents-A1",
+        "Devstral-2-123B-Instruct-2512-int4-AutoRound",
+        "Ornith-1.0-35B-FP8",
+        "Qwen3-Coder-Next-FP8-no-thinking",
+        "Qwen3-Embedding-8B",
+        "Qwen3.6-35B-A3B-fp8-no-thinking",
+        "deepseek-v4-flash",
+        "mimo-v25"
+      ],
+      "name": "InferX",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://model.inferx.net/endpoints",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://inference-api.nousresearch.com/v1",
+      "endsAt": null,
+      "id": "nousresearch",
+      "limits": {
+        "rpm": 50,
+        "tpm": 500000
+      },
+      "models": [
+        "ornith/ornith-1.5-122b:free",
+        "poolside/laguna-s-2.1:free",
+        "poolside/laguna-xs-2.1:free",
+        "reflection/beam-1.0-501b-a23b:free",
+        "stepfun/step-3.7-flash:free",
+        "upstage/solar-mini4:free"
+      ],
+      "name": "Nous Portal",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://portal.nousresearch.com/api-docs",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://open.bigmodel.cn/api/paas/v4",
+      "endsAt": null,
+      "id": "open",
+      "limits": {},
+      "models": [
+        "GLM-4.5-Flash",
+        "GLM-4.6V-Flash",
+        "GLM-4.7-Flash",
+        "GLM-5.1"
+      ],
+      "name": "Z.AI (Zhipu)",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://z.ai/",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://opencode.ai/inference/openai/v1",
+      "endsAt": null,
+      "id": "opencode",
+      "limits": {},
+      "models": [],
+      "name": "OpenCode Zen",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "probedModel": "mimo-v2.6-flash-free",
+      "signupUrl": "https://opencode.ai/v2/docs/console/models/",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.packet.ai/v1",
+      "endsAt": null,
+      "id": "packet",
+      "limits": {},
+      "models": [
+        "minimaxai-minimax-m3-1-flash",
+        "nvidia-deepseek-v4-1-flash-nvfp4",
+        "qwen-qwen2-5-1-5b-instruct"
+      ],
+      "name": "Packet",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://dash.packet.ai/",
+      "sources": [
+        "https://t.me/rubiconzone/127"
+      ]
+    },
+    {
+      "baseUrl": "https://gateway.respan.ai/v1",
+      "endsAt": null,
+      "id": "respan",
+      "limits": {},
+      "models": [
+        "openai/gpt-6.2-sol:free"
+      ],
+      "name": "Respan",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://respan.ai/",
+      "sources": [
+        "https://t.me/rubiconzone/112"
+      ]
+    },
+    {
+      "baseUrl": "https://api.sambanova.ai/v1",
+      "endsAt": null,
+      "id": "sambanova",
+      "limits": {},
+      "models": [
+        "Meta-Llama-3.3-70B-Instruct"
+      ],
+      "name": "SambaNova Cloud",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "GLM-5.3",
+      "signupUrl": "https://cloud.sambanova.ai/apis",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.scnet.cn/v1",
+      "endsAt": null,
+      "id": "scnet",
+      "limits": {
+        "rpd": 1000,
+        "rpm": 60
+      },
+      "models": [
+        "GLM-5.3",
+        "MiniMax-M2.5",
+        "MiniMax-M2.7",
+        "MiniMax-M3"
+      ],
+      "name": "SCNet",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "signupUrl": "https://www.scnet.cn/",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.siliconflow.cn/v1",
+      "endsAt": null,
+      "id": "siliconflow",
+      "limits": {},
+      "models": [],
+      "name": "SiliconFlow",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://siliconflow.cn/",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://speka.me/v1",
+      "endsAt": null,
+      "id": "speka",
+      "limits": {},
+      "models": [
+        "black-forest-labs/flux.1-dev",
+        "deepseek-ai/deepseek-v4-flash",
+        "deepseek-ai/deepseek-v4-pro",
+        "meta/llama-3.1-8b-instruct",
+        "meta/llama-3.2-11b-vision-instruct",
+        "meta/llama-3.2-3b-instruct",
+        "meta/llama-3.2-90b-vision-instruct",
+        "meta/llama-3.3-70b-instruct",
+        "minimaxai/minimax-m3",
+        "mistralai/mistral-large-4-1t-a52b",
+        "mistralai/mistral-medium-3.5-128b",
+        "mistralai/mistral-nemotron",
+        "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+        "nvidia/nemotron-3-embed-1b",
+        "nvidia/nemotron-3-nano-30b-a3b",
+        "nvidia/nemotron-3-super-120b-a12b",
+        "nvidia/nemotron-3-ultra-550b-a55b",
+        "nvidia/nemotron-3.5-bolt-e4b",
+        "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "nvidia/nemotron-nano-12b-v2-vl",
+        "nvidia/nemotron-nano-9b-v2",
+        "openai/gpt-oss-120b",
+        "openai/gpt-oss-20b",
+        "poolside/laguna-xs-2.1",
+        "stepfun-ai/step-3.7-flash",
+        "stepfun-ai/step-5-preview",
+        "z-ai/glm-5.2"
+      ],
+      "name": "Speka",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "available",
+        "tools": null
+      },
+      "signupUrl": "https://speka.me/",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://synap402.com/v1",
+      "endsAt": null,
+      "id": "synap402",
+      "limits": {
+        "rpd": 50,
+        "rpm": 10,
+        "tpd": 100000
+      },
+      "models": [
+        "qwen3-coder-30b"
+      ],
+      "name": "Synap by Linkrra",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "probedModel": "qwen3-coder-30b",
+      "signupUrl": "https://synap402.com/ai/account.html",
+      "sources": [
+        "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
       "baseUrl": null,
       "endsAt": null,
       "id": "tinygrad",
@@ -17,6 +681,54 @@
       "signupUrl": "https://llm.tinygrad.win/",
       "sources": [
         "https://llm.tinygrad.win/"
+      ]
+    },
+    {
+      "baseUrl": "https://api.tokenlab.amd.com/v1",
+      "endsAt": null,
+      "id": "tokenlab",
+      "limits": {},
+      "models": [
+        "Clef",
+        "DeepSeek-V4-Flash-0731",
+        "DeepSeek-V4.1-Flash-1017",
+        "Gemma-4-31B-IT",
+        "MiniCPM-V-4.7-1B",
+        "MiniCPM-V-4.7-35B-A3B",
+        "MiniCPM5-2B",
+        "Qwen3.8-27B",
+        "d3"
+      ],
+      "name": "Token Lab",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://developer.amd.com/ai-developer-program/",
+      "sources": [
+        "https://t.me/rubiconzone/99"
+      ]
+    },
+    {
+      "baseUrl": "https://api.twigpine.com/v1",
+      "endsAt": "2026-11-13T23:59:59.000Z",
+      "id": "twigpine",
+      "limits": {},
+      "models": [
+        "qwen/qwen3.8-flash",
+        "qwen/qwen3.8-max"
+      ],
+      "name": "twigpine",
+      "probe": {
+        "at": "2026-11-27T11:16:31.091Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "probedModel": "nvidia/nemotron-3.5-super-vl:free",
+      "signupUrl": "https://twigpine.com/opengateway?ref=VP4GW8CQ",
+      "sources": [
+        "https://t.me/rubiconzone/88"
       ]
     }
   ],
@@ -198,7 +910,7 @@
       "slug": "novai"
     }
   ],
-  "generatedAt": "2026-11-27T11:06:03.117Z",
+  "generatedAt": "2026-11-27T11:16:31.091Z",
   "models": [
     {
       "active": true,
@@ -207,7 +919,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "beam-free",
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T11:16:31.091Z",
       "name": "Beam Free",
       "source": "opencode-zen",
       "tools": true
@@ -219,7 +931,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "big-pickle",
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T11:16:31.091Z",
       "name": "Big Pickle",
       "source": "opencode-zen",
       "tools": true
@@ -231,7 +943,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "deepseek-v4.1-flash-free",
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T11:16:31.091Z",
       "name": "DeepSeek V4.1 Flash Free",
       "source": "opencode-zen",
       "tools": true
@@ -243,7 +955,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "flint-40b-free",
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T11:16:31.091Z",
       "name": "Flint 40B Free",
       "source": "opencode-zen",
       "tools": true
@@ -255,7 +967,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "hy4-flash-free",
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T11:16:31.091Z",
       "name": "Hy4 flash Free",
       "source": "opencode-zen",
       "tools": true
@@ -267,7 +979,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "iceman-free",
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T11:16:31.091Z",
       "name": "Iceman Free",
       "source": "opencode-zen",
       "tools": true
@@ -279,7 +991,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "jev-1.13-free",
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T11:16:31.091Z",
       "name": "Jev 1.13 Free",
       "source": "opencode-zen",
       "tools": false
@@ -291,7 +1003,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "mimo-v2.6-flash-free",
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T11:16:31.091Z",
       "name": "MiMo-V2.6-Flash Free",
       "source": "opencode-zen",
       "tools": true
@@ -303,7 +1015,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "nemotron-3.5-lightning-free",
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T11:16:31.091Z",
       "name": "Nemotron 3.5 Lightning Free",
       "source": "opencode-zen",
       "tools": true
@@ -315,7 +1027,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "nemotron-3.5-super-vl-free",
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T11:16:31.091Z",
       "name": "Nemotron 3.5 Super VL Free",
       "source": "opencode-zen",
       "tools": true
@@ -327,7 +1039,7 @@
       "firstSeen": "2026-11-26T03:04:04.312Z",
       "free": true,
       "id": "seaglass-alpha-free",
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T11:16:31.091Z",
       "name": "Seaglass Alpha Free",
       "source": "opencode-zen",
       "tools": true
