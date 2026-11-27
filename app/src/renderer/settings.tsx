@@ -7,9 +7,11 @@ import { panelTabs } from "../shared/panels";
 import { macShortcuts } from "./panel-controls";
 import { VoiceSettings } from "./voice-settings";
 import { ConnectorCatalog, SkillCatalog } from "./catalog-settings";
+import { AutomationSettings } from "./automations";
+import { RemoteAccessSettings } from "./remote-access";
 
 const api = window.vsemkod;
-const sections = ["Общие", "Модели и подключения", "Агент", "Коннекторы", "Навыки", "Горячие клавиши", "Данные", "О программе", "Голос"];
+const sections = ["Общие", "Модели и подключения", "Агент", "Коннекторы", "Навыки", "Автоматизации", "Доступ с телефона", "Горячие клавиши", "Данные", "О программе", "Голос"];
 const hotkeys = [
   ["Ctrl+N", "Новый чат"], ["Ctrl+K", "Поиск чатов"], ["Ctrl+B", "Правая панель"],
   ...panelTabs.flatMap(tab => "key" in tab ? [[(macShortcuts ? "Cmd" : "Ctrl") + "+" + (tab.shift ? "Shift+" : "") + tab.key, tab.title]] : []),
@@ -158,7 +160,7 @@ function SkillsPage({ directory, onError }: { directory: string; onError: (error
 }
 
 type SettingsProps = Omit<Parameters<typeof ModelSettings>[0], "prefs"> & {
-  prefs?: Preferences; version?: string; directory: string; choose: () => void; open: (url: string) => void;
+  prefs?: Preferences; version?: string; directory: string; projects: string[]; choose: () => void; open: (url: string) => void;
   checkUpdates: () => void; checkingUpdates: boolean; updateStatus?: string; restartUpdate?: () => void; testNotification?: () => void; exportAll: () => void; state?: CatalogState;
   onError: (error: unknown) => void; onNotice: (text: string) => void;
 };
@@ -166,7 +168,7 @@ type SettingsProps = Omit<Parameters<typeof ModelSettings>[0], "prefs"> & {
 const mac = /Mac/i.test(navigator.platform);
 const windows = /Win/i.test(navigator.platform);
 
-export function Settings({ prefs, version, directory, choose, update, open, checkUpdates, checkingUpdates, exportAll, onError, onNotice, initialSection = 0, updateStatus, restartUpdate, testNotification, ...models }: SettingsProps & { initialSection?: number }) {
+export function Settings({ prefs, version, directory, projects, choose, update, open, checkUpdates, checkingUpdates, exportAll, onError, onNotice, initialSection = 0, updateStatus, restartUpdate, testNotification, ...models }: SettingsProps & { initialSection?: number }) {
   const [section, setSection] = useState(initialSection);
   return <main className="workspace settings-workspace">
     <header className="chat-header"><h1>Настройки</h1></header>
@@ -218,8 +220,10 @@ export function Settings({ prefs, version, directory, choose, update, open, chec
           <Group title="Свои MCP-серверы"><McpSettings key={directory} directory={directory} onError={onError} /></Group>
         </>}
         {section === 4 && <SkillsPage directory={directory} onError={onError} />}
-        {section === 5 && <dl className="hotkey-list">{hotkeys.map(([key, action]) => <div key={key}><dt>{action}</dt><dd><kbd>{key}</kbd></dd></div>)}</dl>}
-        {section === 6 && <>
+        {section === 5 && <AutomationSettings directory={directory} projects={projects} onError={onError} />}
+        {section === 6 && <RemoteAccessSettings projects={projects} onError={onError} />}
+        {section === 7 && <dl className="hotkey-list">{hotkeys.map(([key, action]) => <div key={key}><dt>{action}</dt><dd><kbd>{key}</kbd></dd></div>)}</dl>}
+        {section === 8 && <>
           <p className="subtle settings-detail">Телеметрии нет: vsemkod ничего не отправляет, кроме запросов к выбранным вами моделям.</p>
           <div className="data-actions">
             <button className="composer-control folder-chip" type="button" onClick={() => void api.openFolder("data").catch(onError)}>Открыть папку данных</button>
@@ -228,8 +232,8 @@ export function Settings({ prefs, version, directory, choose, update, open, chec
             <button className="composer-control folder-chip" type="button" onClick={() => void api.clearCatalog().then(() => onNotice("Кэш каталога очищен")).catch(onError)}>Очистить кэш каталога</button>
           </div>
         </>}
-        {section === 8 && prefs && <VoiceSettings prefs={prefs} update={update} onError={onError} connected={models.state?.personal.includes("groq-api") ?? false} />}
-        {section === 7 && <><Group title="vsemkod"><p className="subtle settings-detail">Версия {version} · лицензия MIT</p>
+        {section === 10 && prefs && <VoiceSettings prefs={prefs} update={update} onError={onError} connected={models.state?.personal.includes("groq-api") ?? false} />}
+        {section === 9 && <><Group title="vsemkod"><p className="subtle settings-detail">Версия {version} · лицензия MIT</p>
           <div className="settings-actions">
             <button className="text-link" type="button" onClick={() => open("https://github.com/danielleonov1488-ship-it/vsemkod")}>GitHub</button>
             <button className="text-link" type="button" onClick={() => open("https://vsemkod.ru")}>vsemkod.ru</button>

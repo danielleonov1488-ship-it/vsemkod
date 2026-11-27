@@ -901,7 +901,7 @@ function App() {
       </aside>
       <div className="workspace-layout">
         {subscriptions ? <ConnectionsPage state={catalog} close={() => setSubscriptions(false)} connect={setConnection} openWizard={api.clipboardKey && (() => setWizard(true))} onCatalog={setCatalog} onError={showError} />
-          : settings ? <Settings state={catalog} prefs={prefs} version={initial?.version} directory={directory} choose={() => void chooseDirectory(true)} initialSection={settingsSection}
+          : settings ? <Settings state={catalog} prefs={prefs} version={initial?.version} directory={directory} projects={projectDirectories} choose={() => void chooseDirectory(true)} initialSection={settingsSection}
             update={updatePrefs} subscriptionsPage={() => setSubscriptions(true)} connect={setConnection} disconnect={disconnect}
             checkUpdates={() => void checkUpdates()} checkingUpdates={checkingUpdates}
             restartUpdate={updateReady?.action === "restart" ? () => void api.applyUpdate().catch(showError) : undefined}
