@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer, webUtils, type IpcRendererEvent } from "electron";
 import type { DesktopApi } from "../shared/api";
+import { remoteAccessApi } from "./remote-access";
 import { automationMethods, exposeAutomationChat } from "./automations";
 
 function subscribe<T>(channel: string, listener: (data: T) => void) {
@@ -9,6 +10,7 @@ function subscribe<T>(channel: string, listener: (data: T) => void) {
 }
 
 const api: DesktopApi & { worktreeInitGit: (origin: string) => Promise<void> } = {
+  ...remoteAccessApi(subscribe),
   ...automationMethods,
   worktreeCreate: (origin, title) => ipcRenderer.invoke("worktree:create", origin, title),
   worktreeInfo: directory => ipcRenderer.invoke("worktree:info", directory),

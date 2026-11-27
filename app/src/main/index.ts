@@ -13,7 +13,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { z } from "zod";
 import { activeOffers, rankedModels } from "../shared/catalog";
 import { keyIdSchema, personalProviders, remoteModelsSchema } from "../shared/providers";
-import type { ChatEvent, ConnectEvent, Conversation, McpEntry, Notice, Preferences, SubscriptionId } from "../shared/api";
+import type { ChatEvent, ConnectEvent, Conversation, McpEntry, Notice, Preferences, QuestionAnswer, SubscriptionId } from "../shared/api";
 import { accessModes } from "../shared/workspace";
 import { Attachments, attachmentLimit } from "./attachments";
 import { chatMarkdown } from "./chat-export";
@@ -35,6 +35,7 @@ import { createUpdates } from "./updates";
 import { projectTemplates, templateFolderName } from "../shared/templates";
 import { createTray } from "./tray";
 import { createBrowserHost } from "./browser-view";
+import { registerRemoteAccess } from "./remote-access";
 import { registerWorktreeIpc, Worktrees } from "./worktrees";
 import { registerHooks } from "./hooks";
 import { registerSchedules } from "./schedules";
@@ -286,6 +287,7 @@ async function start() {
   console.info("[router] Запущен: " + router.baseUrl);
   // Навыки движок читает при запуске: смена номера перезапускает его, когда агент свободен.
   let skillsRevision = 0;
+  let remote: ReturnType<typeof registerRemoteAccess> | undefined;
   const engine = new EngineService(engineBinary(resources), join(data, "opencode"), effective, router,
     event => {
       if (sideIds.has(event.sessionId)) return;
@@ -293,10 +295,11 @@ async function start() {
         tasks.called(event.part.id, event.sessionId, event.part.target);
       }
       if (!(event.type === "turn-status" && activeSessions.get(event.sessionId)?.scheduled)) broadcast("chat:event", event);
+      remote?.onChat(event);
       if (event.type === "permission" || event.type === "question") announce("Агент ждёт ответа", conversations.get(event.sessionId)?.title ?? "vsemkod", event.sessionId);
     }, personalModels, () => ({ agentSteps: preferences.agentSteps, webSearch: preferences.webSearch, mcp: { servers: connectors.engineConfigs() }, skills: skillsRevision }));
   const skills = new SkillsCatalog(join(resources, "skills-catalog"), engine.configDirectory);
-  engine.keepBackground = () => tasks.running().length > 0 || sideSessions.size > 0 || terminals.size > 0;
+  engine.keepBackground = () => remote?.webEnabled() === true || tasks.running().length > 0 || sideSessions.size > 0 || terminals.size > 0;
   const taskTimer = setInterval(() => {
     if (engine.runningClient) void tasks.refresh(engine.runningClient, conversations).catch(() => {});
   }, 1000);
@@ -362,6 +365,7 @@ async function start() {
     for (const token of sideSessions.keys()) void closeSide(token).catch(() => {});
   };
   teardown = async () => {
+    await remote?.close();
     stopSchedules?.();
     for (const turn of activeSessions.values()) turn.cancel.abort();
     cancelAll();
@@ -852,12 +856,13 @@ async function start() {
     if (!info.isFile() || info.size > 512 * 1024) throw new Error("Текстовый просмотр доступен для файлов размером до 512 КБ.");
     return (await engine.ready()).readFile(directory, path);
   });
+  async function answerQuestion(session: string, form: string, answer?: QuestionAnswer) {
+    conversation(session);
+    if (!engine.isWorking(session)) throw new Error("Вопрос уже закрыт.");
+    await (await engine.ready()).answerQuestion(session, form, answer);
+  }
   handle("chat:question", z.tuple([id, id, z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.array(z.string())])).optional()]),
-    async ([session, form, answer]) => {
-      conversation(session);
-      if (!engine.isWorking(session)) throw new Error("Вопрос уже закрыт.");
-      await (await engine.ready()).answerQuestion(session, form, answer);
-    });
+    ([session, form, answer]) => answerQuestion(session, form, answer));
   handle("models:variants", z.tuple([localPath, modelId]), async ([directory, model]) =>
     (await (await engine.ready()).modelInfo(project(directory), engineModel(model)))?.variants.map(item => item.id) ?? []);
   handle("models:custom", z.tuple([customInput.optional()]), ([input]) => connections.customModels(input));
@@ -1016,11 +1021,12 @@ async function start() {
     terminals.delete(token);
     await terminal?.close();
   });
-  handle("chat:stop", z.tuple([id]), ([session]) => {
+  function stopChat(session: string) {
     const turn = activeSessions.get(session);
     turn?.cancel.abort();
     return engine.stop(session);
-  });
+  }
+  handle("chat:stop", z.tuple([id]), ([session]) => stopChat(session));
   handle("chat:answer", z.tuple([id, id, z.enum(["once", "always", "reject"])]), ([session, permission, decision]) =>
     engine.answer(session, permission, decision));
   handle("app:external", z.tuple([z.string().url().max(4096)]), ([url]) => openExternal(url));
@@ -1088,6 +1094,20 @@ async function start() {
   // Окно открыли из трея, вторым запуском или после сна: если давно не проверяли, проверяем обновления.
   app.on("browser-window-focus", () => updates.checkIfStale());
   powerMonitor.on("resume", () => updates.checkIfStale());
+  remote = registerRemoteAccess(handle, broadcast, () => engine.webTarget(), keys, {
+    projects: () => ({ directory: preferences.directory, available: [...projects].filter(path => !hiddenProjects.has(path) || path === preferences.directory) }),
+    find: async (session, directory) => {
+      const chat = (await (await engine.ready()).list(directory)).find(item => item.id === session && !item.archived);
+      if (chat) conversations.set(chat.id, chat);
+      return chat;
+    },
+    create: createChat,
+    send: (session, text) => sendTurn(session, text, "auto", [], { access: "ask" }),
+    stop: stopChat,
+    history: (session, directory) => engine.history(session, directory),
+    permission: (session, permission, decision) => engine.answer(session, permission, decision),
+    question: answerQuestion
+  });
   createWindow();
   stopSchedules = schedules.start();
   updates.start();

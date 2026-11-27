@@ -52,6 +52,7 @@ export const enableOpenCodeZenFree = process.env.ENABLE_OPENCODE_ZEN_FREE === "t
 export class EngineService {
   private child?: ChildProcess;
   private client?: EngineAdapter;
+  private target?: { url: string; authorization: string };
   private starting?: Promise<EngineAdapter>;
   private queue = new TurnQueue();
   private active = new Map<string, { stopRequested: boolean; pending: Map<string, Permission>; approvals: Approval[]; saves: Promise<unknown> }>();
@@ -60,6 +61,12 @@ export class EngineService {
   private authorizing = 0;
   keepBackground = () => false;
   get runningClient() { return this.client; }
+
+  async webTarget() {
+    await this.ready();
+    if (!this.target) throw new Error("OpenCode недоступен.");
+    return this.target;
+  }
 
   routerActivity(sessionId: string) { this.client?.routerActivity(sessionId); }
 
@@ -249,6 +256,7 @@ export class EngineService {
     const child = this.child;
     this.child = undefined;
     this.client = undefined;
+    this.target = undefined;
     if (child && child.exitCode === null && child.signalCode === null) {
       const exited = new Promise<void>(resolve => child.once("close", () => resolve()));
       child.kill();
@@ -299,6 +307,7 @@ export class EngineService {
       if (this.child === child) {
         this.child = undefined;
         this.client = undefined;
+        this.target = undefined;
       }
     });
     const lines = createInterface({ input: child.stdout });
@@ -313,11 +322,13 @@ export class EngineService {
           if (match) resolve(match[1]);
         });
       });
-      const client = new EngineAdapter(url, "Basic " + Buffer.from("opencode:" + password).toString("base64"));
+      const authorization = "Basic " + Buffer.from("opencode:" + password).toString("base64");
+      const client = new EngineAdapter(url, authorization);
       await client.info();
       console.info("[engine] OpenCode запущен: " + this.executable + " · " + url);
       this.catalogVersion = this.configVersion(catalog, personal);
       this.configuredModels = new Set([...catalog.models, ...personal].map(model => model.id));
+      this.target = { url, authorization };
       this.client = client;
       return client;
     } catch (error) {

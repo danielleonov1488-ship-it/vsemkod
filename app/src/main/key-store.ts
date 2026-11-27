@@ -6,9 +6,9 @@ import { readJson, writeJson } from "./storage";
 const profileSchema = z.object({ name: z.string().min(1).max(60).optional(), baseUrl: z.url(), models: remoteModelsSchema });
 type Profile = z.infer<typeof profileSchema>;
 export type McpKeyId = `mcp:${string}`;
-type StoredKeyId = KeyId | McpKeyId;
+type StoredKeyId = KeyId | McpKeyId | "telegram-bot";
 const mcpKeyId = z.custom<McpKeyId>(value => typeof value === "string" && /^mcp:[a-zA-Z0-9_-]{1,64}$/.test(value));
-const storedKeys = z.partialRecord(z.union([keyIdSchema, mcpKeyId]), z.union([
+const storedKeys = z.partialRecord(z.union([keyIdSchema, mcpKeyId, z.literal("telegram-bot")]), z.union([
   z.string().min(1),
   profileSchema.extend({ encrypted: z.string().min(1) })
 ]));

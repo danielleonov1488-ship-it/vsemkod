@@ -681,3 +681,22 @@ fieldset.auto-field { border: 0; margin: 0; padding: 0; }
 .auto-chat-hook { display: grid; gap: 4px; margin-top: 8px; }
 .auto-chat-hook .auto-result { flex-wrap: nowrap; align-items: flex-start; }
 .auto-chat-hook .icon { flex: none; }
+
+.remote-switch { min-width: 0; margin: 0; padding: 0; border: 0; }
+.remote-card { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin: 8px 0 12px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--raised); }
+.remote-qr { display: grid; place-items: center; flex: none; box-sizing: border-box; width: 168px; height: 168px; padding: 10px; border-radius: 10px; background: #fff; }
+.remote-qr img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.remote-card-details { display: grid; flex: 1 1 200px; gap: 8px; min-width: 0; }
+.remote-address { font-size: calc(15px * var(--font-scale, 1)); overflow-wrap: anywhere; }
+.remote-other-addresses { display: grid; gap: 3px; margin: 0; padding: 0; list-style: none; font-size: calc(12px * var(--font-scale, 1)); overflow-wrap: anywhere; }
+.remote-card-details p, .remote-steps p { margin: 0; }
+.remote-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.remote-steps { display: grid; gap: 12px; padding-inline-start: 23px; margin: 0 0 8px; }
+.remote-steps p, .remote-steps label { display: block; margin-bottom: 6px; }
+.remote-token { flex: 1 1 180px; min-width: 0; max-width: 350px; }
+.remote-bot-label, .remote-empty { margin: 0 0 10px; }
+.remote-pair { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
+.remote-pair code { font-size: calc(20px * var(--font-scale, 1)); }
+.remote-project { display: grid; gap: 5px; margin-bottom: 12px; }
+.remote-project select { max-width: 100%; min-width: 0; }
+.remote-error { margin: 9px 0 6px; color: var(--error); }

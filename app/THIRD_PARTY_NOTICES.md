@@ -93,3 +93,31 @@ SOFTWARE.
 
 - Навыки Anthropic: frontend-design, webapp-testing, pdf, docx, xlsx, pptx, mcp-builder и skill-creator. В каждом каталоге сохранён исходный текст Apache 2.0. [Anthropic Skills](https://github.com/anthropics/skills/tree/e4bb5d960d87126ff3b3a8af1a104b7db67560ba/skills)
 - Навыки Superpowers: test-driven-development, systematic-debugging, verification-before-completion, brainstorming и writing-plans. Copyright (c) 2025 Jesse Vincent. Текст MIT прилагается к каждому навыку. [Лицензия Superpowers](https://github.com/obra/superpowers/blob/22f0b463e7a5e579904dd6211a520321035526f7/LICENSE)
+
+## QR Code Generator
+
+Генерация QR-кодов использует пакет `qrcode-generator` 2.0.4 по лицензии MIT. [Исходный код](https://github.com/kazuhikoarase/qrcode-generator)
+
+```text
+MIT License
+
+Copyright (c) 2009 Kazuhiko Arase
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
