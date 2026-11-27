@@ -80,6 +80,42 @@ test("catalog discovery caches only free models and maps them to the provider wi
   expect(discovered()).toEqual([]);
 });
 
+test("discovers free model conventions and restricts allModelsFree to explicit tool support", async () => {
+  const catalog = catalogSchema.parse(bundled);
+  const regular = await mockServer((_req, res) => res.end(JSON.stringify({ data: [
+    { id: "fixture/a-free" }, { id: "fixture/b:free" }, { id: "free/c" }, { id: "fixture/d", free: true },
+    { id: "fixture/e", pricing: { input: "0", output: 0 } },
+    { id: "fixture/f", input_price: 0, output_price: "0.0000", supports_tool_calling: true },
+    { id: "fixture/g", pricing: { free: true }, tool_call: true },
+    { id: "fixture/paid", pricing: { input: 0, output: 1 } },
+    { id: "fixture/no-tool-free", supports_tools: false }
+  ] })));
+  const allFree = await mockServer((_req, res) => res.end(JSON.stringify({ data: [
+    { id: "fixture/allfree", capabilities: { function_calling: true } },
+    { id: "fixture/no-tools", supports_tools: false }, { id: "fixture/unknown" }
+  ] })));
+  const sample = catalog.providers.find(provider => provider.id === "groq")!;
+  catalog.providers.push(
+    { ...sample, id: "test-gateway", baseUrl: regular },
+    { ...sample, id: "another-provider", baseUrl: allFree, auth: { type: "none" }, freeLimits: { allModelsFree: true } },
+  );
+  const dir = await mkdtemp(join(tmpdir(), "vsemkod-k1-connect-"));
+  cleanup.push(() => rm(dir, { recursive: true, force: true }));
+  const path = join(dir, "keys.json");
+  const keys = new KeyStore(path);
+  await keys.set("test-gateway", "fixture-test-key");
+  const reloaded = new KeyStore(path);
+  await reloaded.load();
+  expect(reloaded.get("test-gateway")).toBe("fixture-test-key");
+  const service = new ConnectService(reloaded);
+  await service.refreshCatalogModels(catalog);
+  const offers = service.effectiveCatalog(catalog).offers.filter(offer => offer.origin === "discovered");
+  expect(offers.filter(offer => offer.providerId === "test-gateway").map(offer => offer.providerModelId))
+    .toEqual(["fixture/a-free", "fixture/b:free", "free/c", "fixture/d", "fixture/e", "fixture/f", "fixture/g"]);
+  expect(offers.filter(offer => offer.providerId === "another-provider").map(offer => offer.providerModelId))
+    .toEqual(["fixture/allfree"]);
+});
+
 test("PKCE uses an independent verifier and a base64url SHA-256 challenge", () => {
   const { verifier, challenge } = createPkce();
   expect(verifier).toMatch(/^[A-Za-z0-9_-]{43,128}$/);

@@ -47,14 +47,17 @@ it("узнаёт варианты ID, сохраняя различие межд
     "nvidia/nemotron-3-ultra-550b-a55b", "deepseek-v4-flash", "minimaxai/minimax-m3.1-flash",
   ].map(match)).toEqual([
     "deepseek-v4.1-flash", "deepseek-v4.1-flash", "deepseek-v4.1-flash",
-    "glm-5.3", "glm-5.3-flash", "glm-5.3-flash", "nemotron-3-ultra", undefined, undefined,
+    "glm-5.3", "glm-5.3-flash", "glm-5.3-flash", "nemotron-3-ultra", "deepseek-v4-flash", undefined,
   ]);
 });
 
 it("сортирует кандидатов по top-моделям и показывает пропуски у известных провайдеров в журнале", () => {
   const { radar, possible } = matchFreeLlm(selected, catalog);
   expect(radar.map(({ slug }) => slug)).toEqual(["cloudflare-workers-ai", "freeinference"]);
-  expect(radar[1].models).toEqual([{ id: "glm-5.3-flash", catalogModelId: "glm-5.3-flash" }]);
+  expect(radar[1].models).toEqual([
+    { id: "deepseek-v4-flash", catalogModelId: "deepseek-v4-flash" },
+    { id: "glm-5.3-flash", catalogModelId: "glm-5.3-flash" },
+  ]);
   expect(possible).toEqual([
     { providerId: "ovh-ai-endpoints", id: "DeepSeek-V4.1-Flash-1017", catalogModelId: "deepseek-v4.1-flash" },
     { providerId: "ovh-ai-endpoints", id: "Qwen3.8-27B", catalogModelId: "qwen3.8-27b" },
@@ -69,7 +72,7 @@ it("сортирует кандидатов по top-моделям и пока�
     "cloudflare-workers-ai", "aaa-good",
   ]);
   expect(catalog.providers.map(({ id }) => id)).not.toContain("ovh-ai-endpoints");
-  expect(catalog.providers.map(({ id }) => id)).not.toContain("nvidia-nim");
+  expect(catalog.providers.map(({ id }) => id)).toContain("nvidia-nim");
 });
 
 it("сохраняет данные рядом с другими радарами и сообщает о каждом новом провайдере один раз", async () => {
@@ -100,7 +103,7 @@ it("сохраняет данные рядом с другими радарам�
   expect(await notifyTelegram(telegram, [], catalog, [], [], back.added)).toBe(false);
   expect(fetcher).toHaveBeenCalledTimes(1);
   expect(JSON.parse(fetcher.mock.calls[0][1].body).text).toBe(
-    "Free-LLM: GLM 5.3 Flash бесплатно у " + candidates[1].provider + " (" +
+    "Free-LLM: DeepSeek V4 Flash, GLM 5.3 Flash бесплатно у " + candidates[1].provider + " (" +
     (candidates[1].signup === "no" ? "без регистрации" : "с регистрацией") + ") — кандидат в каталог",
   );
   const empty = mergeFreeLlmRadar(zen, [], now);

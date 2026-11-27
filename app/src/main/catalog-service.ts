@@ -88,7 +88,7 @@ export class CatalogService {
     const fromSources = async <T>(name: string, schema: ZodType<T>) =>
       await download(publicOrigin + "/" + name, schema, signal) ?? await download(mirror + "/" + name, schema, signal);
     const [downloaded, benchmarks] = await Promise.all([
-      fromSources("catalog.json", catalogSchema), fromSources("benchmarks.json", benchmarksSchema)
+      fromSources("catalog-v2.json", catalogSchema), fromSources("benchmarks.json", benchmarksSchema)
     ]);
     if (signal.aborted) return;
     if (benchmarks && (!this.benchmarks || Date.parse(benchmarks.generatedAt) >= Date.parse(this.benchmarks.generatedAt))) {

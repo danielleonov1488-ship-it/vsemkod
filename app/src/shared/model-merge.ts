@@ -31,11 +31,11 @@ export function effectiveCatalog(base: Catalog, discovered: DiscoveredModels): C
   }
 
   for (const provider of base.providers) {
-    const list = discovered[provider.id];
+    const list = Object.hasOwn(discovered, provider.id) ? discovered[provider.id] : undefined;
     if (!list || provider.api !== "openai") continue;
     // Если каталог проверил раздачи провайдера и ни одна не умеет инструменты (так у ModelScope), найденные тоже не умеют.
     const known = base.offers.filter(offer => offer.providerId === provider.id);
-    const supportsTools = !known.length || known.some(offer => offer.supportsTools);
+    const supportsTools = provider.freeLimits.allModelsFree || !known.length || known.some(offer => offer.supportsTools);
     const seen = new Date(list.updatedAt).toISOString();
     for (const remote of list.models) {
       const normalized = normalizeModelId(remote.id);

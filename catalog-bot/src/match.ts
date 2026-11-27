@@ -11,7 +11,8 @@ export function modelSlug(providerModelId: string): string {
 
 export function matchModel(providerModelId: string): Model | undefined {
   const slug = modelSlug(providerModelId);
-  const entry = modelRegistry.find(({ id, aliases }) => id === slug || aliases.some((alias) => alias.test(slug)));
+  const find = (name: string) => modelRegistry.find(({ id, aliases }) => id === name || aliases.some(alias => alias.test(name)));
+  const entry = find(slug) ?? (slug.endsWith("-free") ? find(slug.slice(0, -5)) : undefined);
   if (!entry) return undefined;
   const { aliases: _aliases, ...model } = entry;
   return model;

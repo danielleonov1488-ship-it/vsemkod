@@ -9,7 +9,7 @@ import { Router } from "../main/router";
 import { ProviderHealth } from "../main/router/health";
 import { writeJson } from "../main/storage";
 import { activeOffers, rankedModels } from "../shared/catalog";
-import type { Catalog } from "../shared/catalog-schema";
+import { communityWarning, type Catalog } from "../shared/catalog-schema";
 import { personalProviders, type PersonalProvider } from "../shared/providers";
 import { FileKeys } from "./file-keys";
 
@@ -81,7 +81,9 @@ export function modelList(catalog: Catalog, context: CliContext, all: boolean) {
     const connected = offers.filter(({ provider }) => provider.auth.type === "none" || context.keys.get(provider.id));
     if (!connected.length && !all) return [];
     const providers = [...new Set((connected.length ? connected : offers).map(({ provider }) => provider.name))];
-    return [{ id: model.id, name: model.name, detail: providers.join(", ") + (connected.length ? "" : providers.length ? " · нужен ключ" : "нет активных раздач") }];
+    const warning = (connected.length ? connected : offers).some(({ provider }) => provider.trust === "community");
+    const detail = providers.join(", ") + (connected.length ? "" : providers.length ? " · нужен ключ" : "нет активных раздач");
+    return [{ id: model.id, name: model.name, detail: detail + (warning ? " · " + communityWarning : "") }];
   });
   const own = context.connections.personalRoutes().map(({ model }) => ({ id: model.id, name: model.name, detail: model.providerName + " · своё подключение" }));
   return [...free, ...own];

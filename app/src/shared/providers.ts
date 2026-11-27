@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { providerIdSchema } from "./catalog-schema";
+export const providerSlugSchema = z.string().regex(/^[a-z0-9][a-z0-9-]{1,40}$/);
 
 export const personalIdSchema = z.enum([
   "openai-api", "anthropic-api", "google-api", "deepseek-api", "zai-api", "zai-coding",
@@ -8,7 +8,7 @@ export const personalIdSchema = z.enum([
 ]);
 /** Свои поставщики, которых пользователь добавил сам (их может быть несколько): custom-<8 символов a-z0-9>. */
 export const customIdSchema = z.string().regex(/^custom-[a-z0-9]{8}$/);
-export const keyIdSchema = z.union([providerIdSchema, personalIdSchema, customIdSchema]);
+export const keyIdSchema = providerSlugSchema;
 export const nativeIdSchema = z.enum(["github-copilot", "openai", "opencode", "xai"]);
 export type PersonalId = z.infer<typeof personalIdSchema>;
 export type CustomId = z.infer<typeof customIdSchema>;

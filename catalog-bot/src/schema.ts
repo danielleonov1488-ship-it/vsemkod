@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-export const providerIdSchema = z.enum(["openrouter", "kilo", "numes", "runcrate", "zai", "modelscope", "groq"]);
+export const legacyProviderIds = ["openrouter", "kilo", "numes", "runcrate", "zai", "modelscope", "groq"] as const;
+export const providerIdSchema = z.string().regex(/^[a-z0-9][a-z0-9-]{1,40}$/);
 export const tierSchema = z.enum(["top", "good", "new", "basic"]);
 export const confidenceSchema = z.enum(["structured", "page", "news"]);
 export const dateSchema = z.iso.datetime({ offset: true });
@@ -13,6 +14,7 @@ export const limitsSchema = z.object({
   tpd: z.int().positive().optional(),
   concurrent: z.int().positive().optional(),
   note: z.string().optional(),
+  allModelsFree: z.boolean().optional(),
 }).strict();
 
 export const modelSchema = z.object({
@@ -47,6 +49,7 @@ export const providerSchema = z.object({
   dataPolicy: z.string(),
   termsUrl: httpUrl,
   notes: z.string(),
+  trust: z.literal("community").optional(),
 }).strict();
 
 export const offerSchema = z.object({
@@ -162,12 +165,37 @@ const radarFreeLlmProviderSchema = z.object({
   firstSeen: dateSchema,
 }).strict();
 
+export const discoveredInputSchema = z.object({
+  id: providerIdSchema,
+  name: z.string().min(1).max(200),
+  baseUrl: httpUrl.nullable(),
+  signupUrl: httpUrl.nullable(),
+  models: z.array(z.string().min(1).max(250)),
+  endsAt: dateSchema.nullable(),
+  sources: z.array(httpUrl).min(1),
+  limits: limitsSchema.optional(),
+}).strict();
+
+const discoveredSchema = discoveredInputSchema.extend({
+  probe: z.object({
+    at: dateSchema.nullable(),
+    status: z.enum(["pending", "watching", "available", "key-required", "unreachable", "dead"]),
+    tools: z.boolean().nullable(),
+    authenticated: z.boolean().optional(),
+  }).strict(),
+  probedModel: z.string().min(1).optional(),
+});
+
+export type DiscoveredInput = z.infer<typeof discoveredInputSchema>;
+export type Discovered = z.infer<typeof discoveredSchema>;
+
 export const radarSchema = z.object({
   schemaVersion: z.literal(1),
   generatedAt: dateSchema,
   models: z.array(radarModelSchema),
   providers: z.array(radarProviderSchema).optional(),
   freeLlm: z.array(radarFreeLlmProviderSchema).optional(),
+  discovered: z.array(discoveredSchema).optional(),
 }).strict();
 
 export type ProviderId = z.infer<typeof providerIdSchema>;

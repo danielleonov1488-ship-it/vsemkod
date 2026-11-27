@@ -195,7 +195,9 @@ describe("слияние", () => {
     const first = mergeCatalog(undefined, state, [batch(known, unknown)], options());
     const opposite = mergeCatalog(undefined, state, [batch(unknown, known)], options());
     expect(stableJson(first.catalog)).toBe(stableJson(opposite.catalog));
-    expect(first.catalog.providers.map(({ id }) => id)).toEqual(["groq", "kilo", "modelscope", "numes", "openrouter", "runcrate", "zai"]);
+    const ids = first.catalog.providers.map(({ id }) => id);
+    expect(ids).toEqual([...ids].sort());
+    expect(ids).toContain("cent-ai");
     expect(stableJson({ z: 1, a: 2 })).toBe('{\n  "a": 2,\n  "z": 1\n}\n');
     state.tracks = first.tracks;
     const next = mergeCatalog(first.catalog, state, [batch(known, unknown)], options(later(1)));

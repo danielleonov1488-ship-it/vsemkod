@@ -3,7 +3,7 @@ import { watchedPages } from "../src/config.js";
 import { LlmClient } from "../src/llm/client.js";
 import { mergeCatalog } from "../src/merge.js";
 import { registryBatches, registryPages } from "../src/registry/offers.js";
-import { catalogSchema, offerKey } from "../src/schema.js";
+import { catalogSchema, legacyProviderIds, offerKey } from "../src/schema.js";
 import { newState, stateSchema } from "../src/state.js";
 import { processPage } from "../src/sources/watchPages.js";
 
@@ -12,7 +12,8 @@ const changedAt = "2026-11-25T15:00:00Z";
 const reviewBy = "2026-12-08T00:00:00.000Z";
 const options = (now: string) => ({ now, missingRuns: 6, retentionDays: 7, healthFailureThreshold: 2 });
 const runcratePage = watchedPages[0];
-const registry = registryBatches();
+const legacyIds = new Set<string>(legacyProviderIds.map(id => 'registry:' + id));
+const registry = registryBatches().filter(batch => legacyIds.has(batch.id));
 const target = (catalog: ReturnType<typeof mergeCatalog>["catalog"]) =>
   catalog.offers.find((offer) => offer.providerId === "runcrate" && offer.providerModelId === "zai-org/GLM-5.3")!;
 

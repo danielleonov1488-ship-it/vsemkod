@@ -1,4 +1,25 @@
 {
+  "discovered": [
+    {
+      "baseUrl": null,
+      "endsAt": null,
+      "id": "tinygrad",
+      "models": [
+        "Qwen 3.8 Flash",
+        "GLM 5.3 Flash"
+      ],
+      "name": "TinyGrad",
+      "probe": {
+        "at": null,
+        "status": "watching",
+        "tools": null
+      },
+      "signupUrl": "https://llm.tinygrad.win/",
+      "sources": [
+        "https://llm.tinygrad.win/"
+      ]
+    }
+  ],
   "freeLlm": [
     {
       "baseUrl": "https://api.llm.kiwi/v1",
@@ -177,7 +198,7 @@
       "slug": "novai"
     }
   ],
-  "generatedAt": "2026-11-26T07:39:04.135Z",
+  "generatedAt": "2026-11-27T11:06:03.117Z",
   "models": [
     {
       "active": true,

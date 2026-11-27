@@ -1,6 +1,5 @@
 import { loadEnvFile } from "node:process";
 import { z } from "zod";
-import { providers } from "./registry/providers.js";
 import type { ProviderId } from "./schema.js";
 
 export const watchedPages = [
@@ -14,7 +13,7 @@ export const watchedPages = [
 export const feedIds = ["hn", "reddit", "github"] as const;
 export const structuredIds = ["openrouter", "kilo", "numes"] as const;
 export const sourceSelectors = [
-  ...structuredIds, "opencode-zen", "benchmarks", "free-list", "free-llm", "watchPages", "feeds", ...feedIds,
+  ...structuredIds, "opencode-zen", "benchmarks", "free-list", "free-llm", "watchPages", "feeds", "telegram", "freeinference", ...feedIds,
   ...watchedPages.map(({ providerId }) => "page:" + providerId),
 ];
 
@@ -34,6 +33,8 @@ export interface Config {
   healthFailureThreshold: number;
   healthKeys: Partial<Record<ProviderId, string>>;
   telegram?: { token: string; chatId: string };
+  telegramChannels?: string[];
+  discoveryKeyBases?: Partial<Record<ProviderId, string>>;
 }
 
 export function readConfig(): Config {
@@ -57,10 +58,18 @@ export function readConfig(): Config {
   const parsedUrl = z.url({ protocol: /^https?$/ }).safeParse(baseUrl);
   if (!parsedUrl.success) throw new Error("LLM_BASE_URL должна быть HTTP(S)-ссылкой");
 
-  const healthKeys: Config["healthKeys"] = {};
-  for (const provider of Object.values(providers)) {
-    const key = env("HEALTH_" + provider.id.toUpperCase() + "_KEY");
-    if (key) healthKeys[provider.id] = key;
+  const healthKeys: Config["healthKeys"] = Object.create(null);
+  const discoveryKeyBases: NonNullable<Config["discoveryKeyBases"]> = Object.create(null);
+  for (const name of Object.keys(process.env)) {
+    const match = /^HEALTH_([A-Z0-9][A-Z0-9_-]{1,40})_(KEY|BASE_URL)$/.exec(name);
+    if (!match) continue;
+    const id = match[1].toLowerCase().replaceAll("_", "-");
+    (match[2] === "KEY" ? healthKeys : discoveryKeyBases)[id] = env(name);
+  }
+  const telegramChannels = [...new Set((process.env.TELEGRAM_CHANNELS ?? "rubiconzone").toLowerCase()
+    .split(/[\s,]+/).map(channel => channel.replace(/^@/, "")).filter(Boolean))];
+  if (telegramChannels.some(channel => !/^[a-z0-9_]{5,32}$/.test(channel))) {
+    throw new Error("TELEGRAM_CHANNELS ожидает имена публичных каналов через запятую");
   }
   const token = env("TELEGRAM_BOT_TOKEN");
   const chatId = env("TELEGRAM_CHAT_ID");
@@ -78,6 +87,8 @@ export function readConfig(): Config {
     healthIntervalHours: positiveInt("HEALTH_INTERVAL_HOURS", 6),
     healthFailureThreshold: positiveInt("HEALTH_FAILURE_THRESHOLD", 2),
     healthKeys,
+    discoveryKeyBases,
+    telegramChannels,
     telegram: token && chatId ? { token, chatId } : undefined,
   };
 }

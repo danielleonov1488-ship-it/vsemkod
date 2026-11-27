@@ -256,9 +256,11 @@ export function mergeCatalog(
     });
   }
 
+  const offeredModels = new Set(offers.map(({ modelId }) => modelId));
   const catalog = sortedCatalog({
     schemaVersion: 1, generatedAt: now,
-    models: [...models, ...[...automaticModels.values()].map(({ model }) => model)],
+    models: [...models.filter(model => model.tier !== "new" || offeredModels.has(model.id)),
+      ...[...automaticModels.values()].map(({ model }) => model)],
     providers: Object.values(providers), offers, candidates,
   });
   catalogSchema.parse(catalog);

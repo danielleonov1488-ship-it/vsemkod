@@ -2,6 +2,7 @@ import { createServer, get, type ServerResponse } from "node:http";
 import { once } from "node:events";
 import { mkdir, mkdtemp, readFile, rm, rmdir } from "node:fs/promises";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import bundled from "../resources/catalog.json";
@@ -69,6 +70,26 @@ async function fixture(
 }
 
 describe("Router", () => {
+  it("routes a new provider ID and persists its health and quota", async () => {
+    const server = await upstream();
+    const data = await mkdtemp(join(tmpdir(), "vsemkod-k1-health-"));
+    cleanup.push(() => rm(data, { recursive: true, force: true }));
+    const path = join(data, "usage.json");
+    const health = new ProviderHealth(path);
+    const id = "constructor";
+    const dynamic = { ...provider("kilo", server.url, false), id, freeLimits: { rpd: 50 } };
+    const route = offer("first", id, { limits: { rpd: 50 } });
+    const { send } = await fixture([dynamic], [route], { key: keyId => keyId === id ? "fixture-key" : undefined, health });
+    expect((await send("first")).status).toBe(200);
+    expect(server.calls[0]).toMatchObject({ auth: "Bearer fixture-key", body: { model: "constructor-first" } });
+    await health.flush();
+    const restarted = new ProviderHealth(path);
+    await restarted.load();
+    const catalog = { ...sample, providers: [dynamic], offers: [route] };
+    expect(restarted.stats(catalog)[id]).toMatchObject({ requests: { remaining: 49, limit: 50 }, ready: true });
+    expect(restarted.latencies()[0]).toMatchObject({ providerId: id, modelId: "first" });
+  });
+
   it("requests include_usage, retries unsupported providers, and remembers the result", async () => {
     const server = await upstream((res, call) => {
       if (call.body.stream_options) res.writeHead(400).end("Unsupported stream_options");

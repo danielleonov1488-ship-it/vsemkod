@@ -39,20 +39,26 @@ const providerModelsSchema = z.partialRecord(providerIdSchema, z.object({
 }));
 type ProviderModelCache = z.infer<typeof providerModelsSchema>;
 
-function isFreeModel(id: KeyId, item: {
-  id: string; pricing?: { prompt?: unknown; completion?: unknown }; free?: unknown; tier?: unknown;
-  capabilities?: { tools?: boolean; function_calling?: boolean }; supports_tools?: boolean; supported_parameters?: string[];
+function isFreeModel(provider: Pick<Provider, "id"> & Partial<Pick<Provider, "freeLimits">>, item: {
+  id: string; pricing?: { prompt?: unknown; completion?: unknown; input?: unknown; output?: unknown; free?: unknown };
+  input_price?: unknown; output_price?: unknown; free?: unknown; tier?: unknown; tool_call?: boolean;
+  capabilities?: { tools?: boolean; function_calling?: boolean } | string[]; supports_tools?: boolean;
+  supports_tool_calling?: boolean; supported_parameters?: string[];
 }) {
-  const zero = (price: unknown) => price === "0" || price === 0;
-  const prices = [item.pricing?.prompt, item.pricing?.completion];
-  const explicitlyFree = prices.every(zero) || item.id.endsWith(":free") && prices.every(price => price === undefined || zero(price));
-  const tools = item.capabilities?.tools ?? item.capabilities?.function_calling ?? item.supports_tools ??
+  const zero = (price: unknown) => price === 0 ||
+    typeof price === "string" && /^(?:0+\.?0*|\.0+)(?:e[+-]?\d+)?$/i.test(price.trim());
+  const input = item.pricing?.prompt ?? item.pricing?.input ?? item.input_price;
+  const output = item.pricing?.completion ?? item.pricing?.output ?? item.output_price;
+  const capabilities = item.capabilities;
+  const tools = (Array.isArray(capabilities) ? capabilities.includes("tools") : capabilities?.tools ?? capabilities?.function_calling) ??
+    item.supports_tools ?? item.supports_tool_calling ?? item.tool_call ??
     (Array.isArray(item.supported_parameters) ? item.supported_parameters.includes("tools") : undefined);
+  if (provider.freeLimits?.allModelsFree) return tools === true;
   if (tools === false || item.free === false) return false;
-  if (id === "openrouter" || explicitlyFree) return explicitlyFree;
-  if (prices.some(price => price !== undefined)) return false;
-  if (item.free === true || item.tier === "free") return true;
-  return freePlans.has(id);
+  if (item.free === true || item.pricing?.free === true || zero(input) && zero(output)) return true;
+  if ([input, output].some(price => price != null && !zero(price))) return false;
+  return /(?:-free|:free)$/i.test(item.id) || /^free\//i.test(item.id) ||
+    provider.id !== "openrouter" && (item.tier === "free" || input == null && output == null && freePlans.has(provider.id));
 }
 
 class ModelsError extends Error {
@@ -65,14 +71,14 @@ export const customSelectionSchema = remoteModelsSchema.min(1).max(50).refine(mo
   id.length <= 200 && id.trim() === id), "Проверьте идентификаторы моделей (1–200 символов, без пробелов по краям).");
 type CustomSave = Omit<CustomProvider, "id"> & { id?: string; key?: string };
 
-async function modelsFor(provider: { id: KeyId }, baseUrl: string, key: string,
+async function modelsFor(provider: Pick<Provider, "id"> & Partial<Pick<Provider, "freeLimits">>, baseUrl: string, key: string | undefined,
   signal: AbortSignal, freeOnly = false) {
   const anthropic = provider.id === "anthropic-api";
   let response: Response;
   try {
     response = await fetch(baseUrl + "/models", {
       redirect: "error",
-      headers: anthropic ? { "x-api-key": key, "anthropic-version": "2023-06-01" } : { authorization: "Bearer " + key },
+      headers: key ? (anthropic ? { "x-api-key": key, "anthropic-version": "2023-06-01" } : { authorization: "Bearer " + key }) : {},
       signal: AbortSignal.any([signal, AbortSignal.timeout(15_000)])
     });
   } catch { throw new Error(signal.aborted ? "Подключение отменено." : "Не удалось проверить ключ. Проверьте соединение и адрес API."); }
@@ -91,7 +97,7 @@ async function modelsFor(provider: { id: KeyId }, baseUrl: string, key: string,
   const custom = customProviderIdSchema.safeParse(provider.id).success;
   for (const item of data.data) {
     if (typeof item?.id !== "string" || !custom && !chatModel(provider.id, item.id, item.capabilities) ||
-      freeOnly && !isFreeModel(provider.id, item)) continue;
+      freeOnly && !isFreeModel(provider, item)) continue;
     const result = remoteModelsSchema.element.safeParse({
       id: item.id, name: item.display_name || item.name || item.id,
       output: [item.max_output_tokens, item.max_completion_tokens].find(value => Number.isSafeInteger(value) && value > 0),
@@ -143,8 +149,9 @@ export class ConnectService {
     await Promise.all(catalog.providers.map(provider => {
       if (force && provider.id !== force) return;
       const key = this.keys.get(provider.id);
-      if (!key || !provider.baseUrl) return;
-      const cached = this.catalogModels[provider.id];
+      if (provider.api !== "openai" || (!key && provider.auth.type !== "none") ||
+        (!key && provider.id === "kilo" && !provider.freeLimits.allModelsFree)) return;
+      const cached = Object.hasOwn(this.catalogModels, provider.id) ? this.catalogModels[provider.id] : undefined;
       if (!force && cached?.baseUrl === provider.baseUrl && Date.now() - cached.updatedAt < 6 * 60 * 60_000) return;
       const active = this.refreshes.get(provider.id);
       if (active) return force ? active.then(() => this.refreshCatalogModels(catalog, signal, force)) : active;
@@ -167,7 +174,7 @@ export class ConnectService {
 
   connected(catalog: Catalog) {
     return catalog.providers
-      .filter(provider => provider.auth.type === "none" || this.keys.get(provider.id))
+      .filter(provider => provider.api === "openai" && (provider.auth.type === "none" || this.keys.get(provider.id)))
       .map(provider => provider.id);
   }
 
@@ -177,10 +184,12 @@ export class ConnectService {
 
   effectiveCatalog(base: Catalog) {
     if (this.merged?.base === base) return this.merged.catalog;
-    const discovered: DiscoveredModels = {};
+    const discovered: DiscoveredModels = Object.create(null);
     for (const provider of base.providers) {
       const cached = this.catalogModels[provider.id];
-      if (cached?.baseUrl === provider.baseUrl && this.keys.get(provider.id)) discovered[provider.id] = cached;
+      if (cached?.baseUrl === provider.baseUrl && (provider.auth.type === "none" || this.keys.get(provider.id))) {
+        discovered[provider.id] = cached;
+      }
     }
     const catalog = effectiveCatalog(base, discovered);
     const aliases = new Map<string, string>();

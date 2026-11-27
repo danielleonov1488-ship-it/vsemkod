@@ -35,12 +35,12 @@ export class FileKeys implements Pick<KeyStore, "load" | "get" | "ids" | "profil
   }
 
   environment(id: KeyId) {
-    const alias = aliases[id];
+    const alias = Object.hasOwn(aliases, id) ? aliases[id] : undefined;
     return this.env[keyVariable(id)]?.trim() || (alias ? this.env[alias]?.trim() : undefined) || undefined;
   }
 
   get(id: KeyId) {
-    const entry = this.keys[id];
+    const entry = Object.hasOwn(this.keys, id) ? this.keys[id] : undefined;
     const saved = typeof entry === "string" ? entry : entry?.key;
     return this.environment(id) ?? saved;
   }
@@ -50,7 +50,7 @@ export class FileKeys implements Pick<KeyStore, "load" | "get" | "ids" | "profil
   }
 
   profile(id: KeyId): Profile | undefined {
-    const entry = this.keys[id];
+    const entry = Object.hasOwn(this.keys, id) ? this.keys[id] : undefined;
     if (entry && typeof entry !== "string") return { name: entry.name, baseUrl: entry.baseUrl, models: entry.models };
   }
 

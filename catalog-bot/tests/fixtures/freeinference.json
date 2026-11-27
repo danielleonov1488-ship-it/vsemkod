@@ -1,0 +1,32 @@
+{
+  "title": "Free Inference",
+  "verified": "2026-11-27",
+  "website": "https://freeinference.dev",
+  "columns": [],
+  "providers": [
+    {
+      "name": "Fixture",
+      "url": "https://example.org/signup",
+      "base_url": "https://api.example.org/api/v1/",
+      "free_type": "Rate-limited free",
+      "models": [
+        { "name": "sample/model:free", "cost": "$0", "rpm": "5", "rpd": "50", "tpm": "20K", "tpd": "Not published" },
+        { "name": "sample/paid", "cost": "$0.25", "rpm": "10" }
+      ]
+    },
+    {
+      "name": "Card Required",
+      "url": "https://paid.example.org/",
+      "base_url": "https://paid.example.org/v1",
+      "free_type": "Trial",
+      "models": [{ "name": "paid", "cost": "$0 (trial credits, card required)" }]
+    },
+    {
+      "name": "Qronos",
+      "url": "https://qronos.example.org/",
+      "base_url": "https://qronos.example.org/v1",
+      "free_type": "Free",
+      "models": [{ "name": "excluded", "cost": "$0" }]
+    }
+  ]
+}

@@ -147,7 +147,7 @@ export function RemoteAccessSettings({ projects, onError }: { projects: string[]
           <label className="remote-project">Проект для новых чатов
             <select className="field-control" value={telegram.project ?? ""} disabled={disabled}
               onChange={event => botChange("", event.currentTarget.value)}>
-              {projectChoices.map(project => <option key={project} value={project}>{project}</option>)}
+              {projectChoices.map(project => <option key={project} value={project} title={project}>{project.split(/[\\/]/).filter(Boolean).at(-1) ?? project}</option>)}
             </select>
           </label>
         </> : <>

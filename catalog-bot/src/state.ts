@@ -43,6 +43,9 @@ export const stateSchema = z.object({
   freeLlmCheckedAt: dateSchema.optional(),
   freeLlmFirstSeen: z.record(z.string(), dateSchema).optional(),
   benchmarksAttemptedAt: dateSchema.optional(),
+  telegramLastPost: z.record(z.string(), z.int().positive()).default({}),
+  freeInferenceCheckedAt: dateSchema.optional(),
+  discoveryFailures: z.record(z.string(), z.int().positive()).default({}),
 });
 
 export type HealthState = z.infer<typeof healthStateSchema>;
@@ -52,7 +55,7 @@ export type State = z.infer<typeof stateSchema>;
 export function newState(): State {
   return {
     version: 1, pages: {}, pageChecks: {}, seenNews: {}, llmCache: {}, tracks: {},
-    radarMissingSince: {}, freeListProviders: [],
+    radarMissingSince: {}, freeListProviders: [], telegramLastPost: Object.create(null), discoveryFailures: Object.create(null),
   };
 }
 

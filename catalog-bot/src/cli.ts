@@ -1,8 +1,12 @@
 import { feedIds, readConfig, sourceSelectors, structuredIds, watchedPages } from "./config.js";
+import { approve } from "./approve.js";
+import { updateDiscovered } from "./discovered.js";
+import { discoveryIntervalMs, fetchFreeInference } from "./sources/freeInference.js";
+import { fetchTelegram } from "./sources/telegram.js";
 import { checkOffers } from "./health.js";
 import { LlmClient } from "./llm/client.js";
 import { mergeCatalog } from "./merge.js";
-import { notifyTelegram, publish, readBenchmarks, readCatalog, readPublication, readRadar } from "./publish.js";
+import { notifyTelegram, publish, readBenchmarks, readCatalog, readCatalogV2, readPublication, readRadar } from "./publish.js";
 import { mergeFreeLlmRadar, mergeProviderRadar, mergeRadar, radarChanged } from "./radar.js";
 import { registryBatches, registryPageHash } from "./registry/offers.js";
 import { providersUnderReview } from "./registry/providers.js";
@@ -63,6 +67,12 @@ async function update(args: string[]): Promise<void> {
   const checkFreeList = (!only || only === "free-list") && shouldCheckFreeList(now, state.freeListCheckedAt);
   const checkFreeLlm = (!only || only === "free-llm") && shouldCheckFreeLlm(now, state.freeLlmCheckedAt);
   const reviewIds = checkFreeLlm ? Object.keys(providersUnderReview) as (keyof typeof providersUnderReview)[] : [];
+
+  const channels = !only || only === "telegram" ? config.telegramChannels ?? [] : [];
+  const checkInference = (!only || only === "freeinference") && (!state.freeInferenceCheckedAt ||
+    Date.parse(now) - Date.parse(state.freeInferenceCheckedAt) >= discoveryIntervalMs);
+  const telegramJob = Promise.allSettled(channels.map(channel => fetchTelegram(channel, state, useLlm ? llm : undefined)));
+  const inferenceJob = Promise.allSettled(checkInference ? [fetchFreeInference()] : []);
 
   const [apiResults, pageResults, feedResults, [zenResult], [freeListResult], [freeLlmResult], reviewResults] = await Promise.all([
     Promise.allSettled(structuredJobs.map(({ load }) => load())),
@@ -161,6 +171,33 @@ async function update(args: string[]): Promise<void> {
         (matches.length ? " — " + matches.join(", ") : "."));
     }
   }
+  const [telegramResults, [inference]] = await Promise.all([telegramJob, inferenceJob]);
+  const discoveries = [];
+  for (const [i, result] of telegramResults.entries()) {
+    const channel = channels[i];
+    if (result.status === "rejected") { failure("telegram/" + channel, result.reason); continue; }
+    discoveries.push(...result.value.discoveries);
+    console.log("Telegram @" + channel + ": постов " + result.value.count + ", упоминаний " + result.value.discoveries.length + ".");
+    for (const item of result.value.discoveries) {
+      console.log("  " + item.baseUrl + " — " + (item.models.join(", ") || "ID моделей не указаны") +
+        (item.endsAt ? ", до " + item.endsAt.slice(0, 10) : "") + " (" + item.sources[0] + ")");
+    }
+  }
+  if (inference) {
+    state.freeInferenceCheckedAt = now;
+    if (inference.status === "fulfilled") {
+      discoveries.push(...inference.value);
+      console.log("FreeInference: источников " + inference.value.length + ".");
+    } else failure("FreeInference", inference.reason);
+  }
+  const discovered = !only || only === "telegram" || only === "freeinference"
+    ? await updateDiscovered(radar, discoveries, state, dryRun ? { ...config, healthKeys: {} } : config, now)
+    : undefined;
+  if (discovered) {
+    radar = discovered.radar;
+    for (const item of discovered.added) console.log("Радар: " + item.id + " — " + item.probe.status + ", " + item.baseUrl);
+  }
+
   let benchmarks: Benchmarks | undefined;
   if (!only || only === "benchmarks") {
     if (!config.aaKey) console.log("Artificial Analysis пропущен: AA_API_KEY не задан.");
@@ -177,8 +214,8 @@ async function update(args: string[]): Promise<void> {
   const changed = await publish(previous, catalog, changes, state, dryRun, radar, benchmarks);
   if (config.telegram && !dryRun) {
     try {
-      if (await notifyTelegram(config.telegram, changes, catalog, zen?.added, providersAdded, freeLlmAdded)) {
-        console.log("Telegram: отправлено одно сообщение.");
+      if (await notifyTelegram(config.telegram, changes, catalog, zen?.added, providersAdded, freeLlmAdded, discovered?.added)) {
+        console.log("Telegram: уведомления отправлены.");
       }
     } catch (error) {
       failure("Telegram", error);
@@ -224,15 +261,18 @@ async function update(args: string[]): Promise<void> {
 async function main(): Promise<void> {
   const [command, ...args] = process.argv.slice(2);
   if (command === "validate" && !args.length) {
-    const [catalog, radar, benchmarks] = await Promise.all([readCatalog(), readRadar(), readBenchmarks()]);
+    const [catalog, catalogV2, radar, benchmarks] = await Promise.all([readCatalog(), readCatalogV2(), readRadar(), readBenchmarks()]);
     if (!catalog) throw new Error("Отсутствует data/catalog.json");
     console.log("data/catalog.json соответствует схеме v" + catalog.schemaVersion + ".");
+    if (catalogV2) console.log("data/catalog-v2.json соответствует схеме v" + catalogV2.schemaVersion + ".");
     if (radar) console.log("data/radar.json соответствует схеме v" + radar.schemaVersion + ".");
     if (benchmarks) console.log("data/benchmarks.json соответствует схеме v" + benchmarks.schemaVersion + ".");
   } else if (command === "update") {
     await update(args);
+  } else if (command === "approve" && (args.length === 1 || args.length === 3 && args[1] === "--trust" && args[2] === "community")) {
+    console.log(await approve(args[0]));
   } else {
-    throw new Error("Команды: update [--dry-run] [--no-llm] [--only=<источник>], validate");
+    throw new Error("Команды: update [--dry-run] [--no-llm] [--only=<источник>], validate, approve <id> [--trust community]");
   }
 }
 

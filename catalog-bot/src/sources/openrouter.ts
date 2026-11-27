@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { providers } from "../registry/providers.js";
-import type { ProviderId } from "../schema.js";
 import { isZeroPrice, priceSchema, requestJson } from "./common.js";
 import type { Observation, SourceResult } from "./common.js";
 
@@ -45,7 +44,7 @@ export function textModelDetails(model: z.infer<typeof modelDetailsSchema>) {
 
 export function parseOpenAIModels(
   input: unknown,
-  providerId: Extract<ProviderId, "openrouter" | "kilo" | "numes">,
+  providerId: "openrouter" | "kilo" | "numes",
 ): Observation[] {
   return modelList.parse(input).data.flatMap((model) => {
     if (providerId === "numes") {

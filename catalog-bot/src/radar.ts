@@ -71,7 +71,7 @@ export function mergeFreeLlmRadar(
 }
 
 export function radarChanged(previous: Radar | undefined, next: Radar): boolean {
-  const details = ({ models, providers = [], freeLlm }: Radar) =>
-    stableJson({ models: models.map(({ lastSeen: _lastSeen, ...model }) => model), providers, freeLlm });
+  const details = ({ models, providers = [], freeLlm, discovered }: Radar) =>
+    stableJson({ models: models.map(({ lastSeen: _lastSeen, ...model }) => model), providers, freeLlm, discovered });
   return !previous || details(previous) !== details(next);
 }

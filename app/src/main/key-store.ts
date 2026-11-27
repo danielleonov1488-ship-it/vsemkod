@@ -24,7 +24,7 @@ export class KeyStore {
   }
 
   get(id: StoredKeyId): string | undefined {
-    const entry = this.keys[id];
+    const entry = Object.hasOwn(this.keys, id) ? this.keys[id] : undefined;
     const encrypted = typeof entry === "string" ? entry : entry?.encrypted;
     if (!encrypted || !this.encryptionAvailable()) return;
     try {
@@ -35,7 +35,7 @@ export class KeyStore {
   ids(): KeyId[] { return Object.keys(this.keys).filter(id => keyIdSchema.safeParse(id).success); }
 
   profile(id: KeyId): Profile | undefined {
-    const entry = this.keys[id];
+    const entry = Object.hasOwn(this.keys, id) ? this.keys[id] : undefined;
     if (entry && typeof entry !== "string") return { name: entry.name, baseUrl: entry.baseUrl, models: entry.models };
   }
 

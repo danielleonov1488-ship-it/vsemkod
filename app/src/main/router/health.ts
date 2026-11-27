@@ -31,12 +31,12 @@ type RouteHealth = Pause & { attemptedAt: number; averageMs?: number; samples?: 
 type Cooldown = "quota" | "unavailable" | "account" | "rejected" | "concurrent";
 
 export class ProviderHealth {
-  private counts: z.infer<typeof counters> = {};
+  private counts: z.infer<typeof counters> = Object.create(null);
   private lastReplies = new Map<string, ReplySpeed>();
   private replySpeeds = new Map<string, z.infer<typeof speedSample>>();
   private firstBytes = new Map<string, z.infer<typeof sample>>();
-  private windows: z.infer<typeof windows> = {};
-  private headers: z.infer<typeof headers> = {};
+  private windows: z.infer<typeof windows> = Object.create(null);
+  private headers: z.infer<typeof headers> = Object.create(null);
   private credits?: KeyCredits;
   private creditsCheckedAt?: number;
   private cooling = new Map<KeyId, Pause>();
@@ -48,9 +48,9 @@ export class ProviderHealth {
   async load(): Promise<void> {
     if (!this.path) return;
     const persisted = await readJson(this.path, usage);
-    this.counts = persisted?.providers ?? await readJson(this.path, counters) ?? {};
-    this.windows = persisted?.windows ?? {};
-    this.headers = persisted?.headers ?? {};
+    this.counts = Object.assign(Object.create(null), persisted?.providers ?? await readJson(this.path, counters));
+    this.windows = Object.assign(Object.create(null), persisted?.windows);
+    this.headers = Object.assign(Object.create(null), persisted?.headers);
     this.credits = persisted?.credits;
     this.creditsCheckedAt = persisted?.creditsCheckedAt;
     for (const entry of persisted?.replies?.slice(-1000) ?? []) this.lastReplies.set(entry.sessionId, entry.speed);

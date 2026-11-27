@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-export const providerIdSchema = z.enum(["openrouter", "kilo", "numes", "runcrate", "zai", "modelscope", "groq"]);
+import { nativeIdSchema, personalIdSchema, providerSlugSchema } from "./providers";
+
+export const providerIdSchema = providerSlugSchema;
+const reservedIds = new Set<string>([...personalIdSchema.options, ...nativeIdSchema.options]);
+const reservedProviderId = (id: string) => reservedIds.has(id) || id.startsWith("custom-");
+
+export const communityWarning = "Новый сервис: запросы видит его владелец, не отправляйте секреты";
 export const tierSchema = z.enum(["top", "good", "new", "basic"]);
 export const confidenceSchema = z.enum(["structured", "page", "news"]);
 export const dateSchema = z.iso.datetime({ offset: true });
@@ -13,6 +19,7 @@ export const limitsSchema = z.object({
   tpd: z.int().positive().optional(),
   concurrent: z.int().positive().optional(),
   note: z.string().optional(),
+  allModelsFree: z.boolean().optional(),
 }).strict();
 
 export const modelSchema = z.object({
@@ -30,7 +37,7 @@ export const modelSchema = z.object({
 
 const httpUrl = z.url({ protocol: /^https?$/ });
 export const providerSchema = z.object({
-  id: providerIdSchema,
+  id: providerIdSchema.refine(id => !reservedProviderId(id), "Идентификатор занят личными подключениями"),
   name: z.string().min(1),
   api: z.enum(["openai", "anthropic"]),
   baseUrl: httpUrl,
@@ -49,7 +56,12 @@ export const providerSchema = z.object({
   dataPolicy: z.string(),
   termsUrl: httpUrl,
   notes: z.string(),
-}).strict();
+  trust: z.literal("community").optional(),
+}).strict().transform(provider => {
+  const note = provider.freeLimits.note;
+  if (provider.trust !== "community" || note?.includes(communityWarning)) return provider;
+  return { ...provider, freeLimits: { ...provider.freeLimits, note: note ? note + " · " + communityWarning : communityWarning } };
+});
 
 export const offerSchema = z.object({
   modelId: z.string().min(1),
@@ -78,7 +90,7 @@ export const candidateSchema = offerSchema.extend({
   suggestedDescription: z.string().min(1).max(240).optional(),
 });
 
-export const catalogSchema = z.object({
+const supportedCatalogSchema = z.object({
   schemaVersion: z.literal(1),
   generatedAt: dateSchema,
   models: z.array(modelSchema),
@@ -115,6 +127,37 @@ export const catalogSchema = z.object({
     }
   }
 });
+
+const catalogEntries = z.object({
+  providers: z.array(z.unknown()),
+  offers: z.array(z.unknown()),
+  candidates: z.array(z.unknown()),
+}).passthrough();
+const providerEnvelope = z.object({ id: providerIdSchema, api: z.string(), auth: z.unknown() });
+const authEnvelope = z.object({ type: z.string() });
+const offerEnvelope = z.object({ providerId: providerIdSchema });
+const supportedAuth = new Set(["none", "manual_key", "oauth_pkce", "device_code"]);
+
+export const catalogSchema = z.preprocess(input => {
+  const parsed = catalogEntries.safeParse(input);
+  if (!parsed.success) return input;
+  const { providers, offers, candidates } = parsed.data;
+  const ignored = new Set<string>();
+  const compatible = providers.filter(entry => {
+    const result = providerEnvelope.safeParse(entry);
+    if (!result.success) return true;
+    const { id, api, auth } = result.data;
+    const type = authEnvelope.safeParse(auth).data?.type;
+    if (api === "openai" && (!type || supportedAuth.has(type)) && !reservedProviderId(id)) return true;
+    ignored.add(id);
+    return false;
+  });
+  const visible = (entry: unknown) => {
+    const result = offerEnvelope.safeParse(entry);
+    return !result.success || !ignored.has(result.data.providerId);
+  };
+  return { ...parsed.data, providers: compatible, offers: offers.filter(visible), candidates: candidates.filter(visible) };
+}, supportedCatalogSchema);
 
 export const changeSchema = z.object({
   type: z.enum(["offer_added", "offer_ended", "offer_changed", "candidate_added", "model_tier_changed"]),

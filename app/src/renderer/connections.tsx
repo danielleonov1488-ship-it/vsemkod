@@ -7,14 +7,14 @@ import { Icon } from "./icons";
 import { WindowControls } from "./window-controls";
 
 export type Connection =
-  { name: string; model?: Model } & (
+  { name: string; model?: Model; community?: boolean } & (
     { id: KeyId; kind: "manual"; keyPageUrl?: string; keyPattern?: string } |
     { id: KeyId; kind: "oauth" } |
     { id: SubscriptionId; kind: "subscription" }
   );
 
 export function catalogConnection(provider: Provider, model?: Model): Connection {
-  const common = { id: provider.id, name: provider.name, model };
+  const common = { id: provider.id, name: provider.name, model, community: provider.trust === "community" };
   return provider.auth.type === "oauth_pkce" ? { ...common, kind: "oauth" } : {
     ...common, kind: "manual", keyPageUrl: provider.keyPageUrl ?? provider.signupUrl, keyPattern: provider.keyPattern ?? undefined
   };
@@ -131,6 +131,7 @@ export function ConnectDialog({ connection, clipboard, close, connected, guided 
           : grok ? "Подтвердите вход кодом на x.ai, чтобы использовать свою подписку SuperGrok или X Premium."
           : "Откройте браузер и войдите."}
     </p>
+    {connection.community && phase !== "done" && <p className="connect-warning" role="note">Новый сервис из сообщества: запросы видит его владелец. Не отправляйте через него пароли, ключи и личные данные.</p>}
     {phase === "done" ? <p className="connect-status" role="status"><Icon name="check" />Подключено</p> :
       <form className="provider-actions" onSubmit={event => { event.preventDefault(); void connect(); }}>
         {manual && <>
