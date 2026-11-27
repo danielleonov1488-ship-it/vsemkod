@@ -20,9 +20,22 @@ type CreateResult = { directory: string; worktree: Worktree; warning?: string };
 type MergeResult = WorktreeMerge & { baseBranch?: string };
 
 async function git(cwd: string, ...args: string[]) {
+  return gitWith(cwd, {}, ...args);
+}
+
+/** Коммит без настроенного в git имени падает: подставляем «vsemkod», только если имени и почты нет. */
+async function identity(cwd: string): Promise<Record<string, string>> {
+  const read = (key: string) => git(cwd, "config", "--get", key).then(value => value.trim()).catch(() => "");
+  const [name, email] = await Promise.all([read("user.name"), read("user.email")]);
+  if (name && email) return {};
+  return { GIT_AUTHOR_NAME: name || "vsemkod", GIT_AUTHOR_EMAIL: email || "vsemkod@localhost",
+    GIT_COMMITTER_NAME: name || "vsemkod", GIT_COMMITTER_EMAIL: email || "vsemkod@localhost" };
+}
+
+async function gitWith(cwd: string, extra: Record<string, string>, ...args: string[]) {
   try {
     return (await exec("git", args, { cwd, windowsHide: true, timeout: 120_000, maxBuffer: 8 * 1024 * 1024,
-      env: { ...process.env, LC_ALL: "C", GIT_TERMINAL_PROMPT: "0" } })).stdout;
+      env: { ...process.env, LC_ALL: "C", GIT_TERMINAL_PROMPT: "0", ...extra } })).stdout;
   } catch (error) {
     const failure = error as NodeJS.ErrnoException & { stderr?: string };
     if (failure.code === "ENOENT" && failure.syscall === "spawn git" && statSync(cwd, { throwIfNoEntry: false })?.isDirectory()) {
@@ -237,12 +250,12 @@ export class Worktrees {
       if (!(await this.attached(entry))) throw new Error(missingCopy);
       if (await status(path)) {
         await git(path, "add", "-A");
-        if (await status(path)) await git(path, "commit", "-m", message);
+        if (await status(path)) await gitWith(path, await identity(path), "commit", "-m", message);
       }
       if (await status(origin)) throw new Error("Сначала сохраните или отмените изменения в основной папке");
       const current = (await git(origin, "branch", "--show-current")).trim();
       const baseBranch = /^[a-z\d_][\w./-]*$/i.test(current) ? current : await revision(origin);
-      try { await git(origin, "merge", "--no-ff", "-m", message, "--", branch); }
+      try { await gitWith(origin, await identity(origin), "merge", "--no-ff", "-m", message, "--", branch); }
       catch (error) {
         const conflicts = names(await git(origin, "diff", "--name-only", "--diff-filter=U", "-z"));
         if (!conflicts.length) throw error;
