@@ -43,8 +43,11 @@ export const stateSchema = z.object({
   freeLlmCheckedAt: dateSchema.optional(),
   freeLlmFirstSeen: z.record(z.string(), dateSchema).optional(),
   benchmarksAttemptedAt: dateSchema.optional(),
+  qualityWarningSent: z.string().optional(),
   telegramLastPost: z.record(z.string(), z.int().positive()).default({}),
   freeInferenceCheckedAt: dateSchema.optional(),
+  publicModelsCheckedAt: z.record(z.string(), dateSchema).optional(),
+  trackerCheckedAt: z.record(z.string(), dateSchema).optional(),
   discoveryFailures: z.record(z.string(), z.int().positive()).default({}),
 });
 

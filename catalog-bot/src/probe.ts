@@ -4,8 +4,8 @@ import { request as httpsRequest } from "node:https";
 import { BlockList } from "node:net";
 import { z } from "zod";
 import type { Discovered, DiscoveredInput } from "./schema.js";
-import { isZeroPrice } from "./sources/common.js";
-import { isFreeId, isModelId, providerBase } from "./sources/discovery.js";
+import { isFreeRoute } from "../../app/src/shared/free-model.js";
+import { isModelId, providerBase } from "./sources/discovery.js";
 
 const privateAddresses = new BlockList();
 for (const [address, prefix] of [
@@ -113,9 +113,7 @@ export async function probeCandidate(
     if (!parsed.success) return result("unreachable");
     const models = parsed.data.data.filter(model => model !== null).filter(model => model.free !== false &&
       !/(?:embed|rerank|image|tts|moderation|whisper|router\/free)/i.test(model.id));
-    const free = models.filter(model => model.free || model.pricing?.free || isFreeId(model.id) ||
-      isZeroPrice(model.pricing?.prompt ?? model.pricing?.input ?? model.input_price) &&
-      isZeroPrice(model.pricing?.completion ?? model.pricing?.output ?? model.output_price));
+    const free = models.filter(model => isFreeRoute(model));
     const mentioned = models.filter(model => candidate.models.includes(model.id));
     modelId = free.find(model => candidate.models.includes(model.id))?.id ?? free[0]?.id ??
       mentioned[0]?.id ?? (key ? undefined : models[0]?.id);

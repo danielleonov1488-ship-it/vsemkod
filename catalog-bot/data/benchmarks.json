@@ -1,6 +1,12 @@
 {
-  "generatedAt": "2026-11-27T04:11:10.828Z",
+  "generatedAt": "2026-11-27T13:30:57.991Z",
   "models": {
+    "beam-free": {
+      "index": 17.7
+    },
+    "deepseek-v4-pro": {
+      "index": 23.1
+    },
     "deepseek-v4.1-flash": {
       "index": 32.4,
       "speed": 178.6,
@@ -48,15 +54,33 @@
       "speed": 155.7,
       "ttft": 1.15
     },
+    "hy4": {
+      "index": 34.6
+    },
+    "k2-horizon": {
+      "index": 17.8
+    },
     "kimi-k3.1-pro": {
       "index": 46.6,
       "speed": 36.9,
       "ttft": 3.22
     },
+    "mimo-v2.6-flash": {
+      "index": 26.8
+    },
+    "mimo-v2.6-pro": {
+      "index": 29.9
+    },
     "minimax-m3": {
       "index": 19,
       "speed": 113.6,
       "ttft": 1.66
+    },
+    "minimax-m3.1-flash": {
+      "index": 29.1
+    },
+    "muse-glimmer-30b": {
+      "index": 6.3
     },
     "nemotron-3-nano-omni-30b-a3b-reasoning": {},
     "nemotron-3-ultra": {
@@ -74,6 +98,9 @@
       "speed": 348.1,
       "ttft": 0.89
     },
+    "north-mini-code": {
+      "index": 3.4
+    },
     "qwen3.8": {
       "index": 33.7,
       "speed": 61,
@@ -83,6 +110,9 @@
       "index": 20.1,
       "speed": 58.7,
       "ttft": 5.37
+    },
+    "step-5-preview": {
+      "index": 28.5
     }
   },
   "schemaVersion": 1,

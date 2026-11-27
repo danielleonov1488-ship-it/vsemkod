@@ -53,14 +53,13 @@ describe("этап D2", () => {
 
   it("предпочитает быстрые модели с активным предложением без ключа и с инструментами", () => {
     const catalog = catalogSchema.parse(bundled);
-    expect(defaultModel(catalog)?.id).toBe("nemotron-3.5-lightning");
-    for (const offer of catalog.offers) {
-      if (offer.modelId === "nemotron-3.5-lightning") offer.expiresAt = "2020-01-01T00:00:00Z";
-      if (offer.modelId === "beam-free") offer.supportsTools = false;
-    }
     expect(defaultModel(catalog)?.id).toBe("ernie-5.5-flash-preview");
+    for (const offer of catalog.offers) {
+      if (offer.modelId === "ernie-5.5-flash-preview") offer.expiresAt = "2020-01-01T00:00:00Z";
+    }
+    expect(defaultModel(catalog)?.id).toBe("beam-free");
     const kilo = catalog.providers.find(provider => provider.id === "kilo")!;
     kilo.auth = { type: "manual_key" };
-    expect(defaultModel(catalog)?.id).not.toBe("ernie-5.5-flash-preview");
+    expect(defaultModel(catalog)?.id).not.toBe("beam-free");
   });
 });

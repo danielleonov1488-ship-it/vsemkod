@@ -1,11 +1,6 @@
 import { personalProviders, type PersonalKind, type PersonalModel } from "./providers";
 
-/** Версии моделей со снятыми отказами: abliterated, uncensored, dealign и т. п. Проверяем название и все id раздач. */
-const uncensoredPattern = /uncensor|abliterat|dealign|heretic|unfilter|unalign|no-?refusal|без цензуры/i;
-
-export function isUncensored(...values: (string | undefined)[]) {
-  return values.some(value => !!value && uncensoredPattern.test(value));
-}
+export { isUncensored } from "./uncensored";
 
 const subscriptionIds = new Set(["github-copilot", "openai", "xai"]);
 

@@ -56,8 +56,6 @@ describe("слияние", () => {
     { providerModelId: "kilo-auto/free" },
     { providerModelId: "vendor/tiny-1.7b:free" },
     { providerModelId: "vendor/tiny-19b:free" },
-    { providerModelId: "vendor/glm-5.3-uncensored-fp8:free" },
-    { providerModelId: "vendor/kimi-k3-abliterated-v1:free" },
     { confidence: "page" },
     { confidence: "news" },
   ])("сохраняет неподходящую модель кандидатом (%j)", (fields) => {

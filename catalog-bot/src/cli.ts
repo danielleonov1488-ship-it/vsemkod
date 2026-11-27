@@ -5,11 +5,11 @@ import { discoveryIntervalMs, fetchFreeInference } from "./sources/freeInference
 import { fetchTelegram } from "./sources/telegram.js";
 import { checkOffers } from "./health.js";
 import { LlmClient } from "./llm/client.js";
-import { mergeCatalog } from "./merge.js";
-import { notifyTelegram, publish, readBenchmarks, readCatalog, readCatalogV2, readPublication, readRadar } from "./publish.js";
+import { makeChanges, mergeCatalog } from "./merge.js";
+import { notifyTelegram, publish, readBenchmarks, readCatalog, readCatalogV2, readPublication, readRadar, saveState } from "./publish.js";
 import { mergeFreeLlmRadar, mergeProviderRadar, mergeRadar, radarChanged } from "./radar.js";
 import { registryBatches, registryPageHash } from "./registry/offers.js";
-import { providersUnderReview } from "./registry/providers.js";
+import { providers, providersUnderReview } from "./registry/providers.js";
 import type { RadarFreeLlmProvider, RadarProvider } from "./schema.js";
 import { benchmarksChanged, fetchBenchmarks, shouldRefreshBenchmarks } from "./sources/artificialAnalysis.js";
 import type { Benchmarks } from "./sources/artificialAnalysis.js";
@@ -22,8 +22,11 @@ import { fetchKilo } from "./sources/kilo.js";
 import { fetchNumes } from "./sources/numes.js";
 import { fetchOpenCodeZen } from "./sources/opencodeZen.js";
 import { fetchOpenRouter } from "./sources/openrouter.js";
+import { trackerJobs } from "./sources/offerTrackers.js";
+import { fetchPublicModels, publicModelProviders } from "./sources/publicModels.js";
 import { fetchRegistryModels } from "./sources/registryModels.js";
 import { fetchPageText, processPage } from "./sources/watchPages.js";
+import { classifyCatalog, indexVersionWarning, qualitySummary } from "./quality.js";
 import { pruneState } from "./state.js";
 
 function parseFlags(args: string[]) {
@@ -66,6 +69,18 @@ async function update(args: string[]): Promise<void> {
 
   const checkFreeList = (!only || only === "free-list") && shouldCheckFreeList(now, state.freeListCheckedAt);
   const checkFreeLlm = (!only || only === "free-llm") && shouldCheckFreeLlm(now, state.freeLlmCheckedAt);
+  let freeLlmRequest: ReturnType<typeof fetchFreeLlm> | undefined;
+  const loadFreeLlm = () => freeLlmRequest ??= fetchFreeLlm();
+  const daily = (checkedAt?: string) => !checkedAt || Date.parse(now) - Date.parse(checkedAt) >= discoveryIntervalMs;
+  const publicChecks = state.publicModelsCheckedAt ??= {};
+  const publicIds = (Object.keys(publicModelProviders) as (keyof typeof publicModelProviders)[])
+    .filter(id => (!only || only === "public-models" || only === id) && daily(publicChecks[id]));
+  const trackerChecks = state.trackerCheckedAt ??= {};
+  const trackerLoads = trackerJobs(loadFreeLlm);
+  const trackerIds = (Object.keys(trackerLoads) as (keyof typeof trackerLoads)[])
+    .filter(id => (!only || only === "trackers") && daily(trackerChecks[id]));
+  const publicJob = Promise.allSettled(publicIds.map(fetchPublicModels));
+  const trackerJob = Promise.allSettled(trackerIds.map(id => trackerLoads[id]()));
   const reviewIds = checkFreeLlm ? Object.keys(providersUnderReview) as (keyof typeof providersUnderReview)[] : [];
 
   const channels = !only || only === "telegram" ? config.telegramChannels ?? [] : [];
@@ -80,7 +95,7 @@ async function update(args: string[]): Promise<void> {
     Promise.allSettled(feeds.map((id) => fetchFeed[id]())),
     Promise.allSettled(!only || only === "opencode-zen" ? [fetchOpenCodeZen()] : []),
     Promise.allSettled(checkFreeList ? [fetchFreeListProviders()] : []),
-    Promise.allSettled(checkFreeLlm ? [fetchFreeLlm()] : []),
+    Promise.allSettled(checkFreeLlm ? [loadFreeLlm()] : []),
     Promise.allSettled(reviewIds.map(fetchRegistryModels)),
   ]);
   for (const [i, result] of apiResults.entries()) {
@@ -134,6 +149,14 @@ async function update(args: string[]): Promise<void> {
     }
   }
 
+  const publicResults = await publicJob;
+  for (const [i, result] of publicResults.entries()) {
+    const id = publicIds[i];
+    publicChecks[id] = now;
+    if (result.status === "fulfilled") batches.push(result.value);
+    else failure(id + " /models", result.reason);
+  }
+
   const options = { now, ...config };
   let merged = mergeCatalog(previous.catalog, state, batches, options);
   if (!dryRun && !only && Object.keys(config.healthKeys).length) {
@@ -142,7 +165,23 @@ async function update(args: string[]): Promise<void> {
     errors.push(...health.errors.map((error) => "Health-check " + error));
   }
   state.tracks = merged.tracks;
-  const { catalog, changes } = merged;
+  let benchmarks: Benchmarks | undefined;
+  if (!only || only === "benchmarks") {
+    if (!config.aaKey) console.log("Artificial Analysis пропущен: AA_API_KEY не задан.");
+    else if (shouldRefreshBenchmarks(now, previous.benchmarks?.generatedAt, state.benchmarksAttemptedAt)) {
+      state.benchmarksAttemptedAt = now;
+      try {
+        benchmarks = await fetchBenchmarks(config.aaKey, merged.catalog.models, now);
+      } catch (error) {
+        failure("Artificial Analysis", error);
+      }
+    }
+  }
+  const currentBenchmarks = benchmarks ?? previous.benchmarks;
+  const catalog = classifyCatalog(merged.catalog, previous.catalog, currentBenchmarks);
+  const changes = makeChanges(previous.catalog, catalog);
+  const qualityWarning = indexVersionWarning(currentBenchmarks);
+  if (qualityWarning) console.warn(qualityWarning);
   let freeLlmAdded: RadarFreeLlmProvider[] = [];
   if (freeLlmResult) {
     state.freeLlmCheckedAt = now;
@@ -190,37 +229,42 @@ async function update(args: string[]): Promise<void> {
       console.log("FreeInference: источников " + inference.value.length + ".");
     } else failure("FreeInference", inference.reason);
   }
-  const discovered = !only || only === "telegram" || only === "freeinference"
-    ? await updateDiscovered(radar, discoveries, state, dryRun ? { ...config, healthKeys: {} } : config, now)
+  const trackerResults = await trackerJob;
+  for (const [i, result] of trackerResults.entries()) {
+    const id = trackerIds[i];
+    trackerChecks[id] = now;
+    if (result.status === "fulfilled") {
+      discoveries.push(...result.value);
+      console.log("Трекер " + id + ": записей " + result.value.length + ".");
+    } else failure("Трекер " + id, result.reason);
+  }
+  const catalogRoutes = new Set(catalog.offers.filter(offer => offer.status !== "ended").map(offer =>
+    providers[offer.providerId].baseUrl + "/" + offer.providerModelId.toLowerCase()));
+  const discovered = !only || only === "telegram" || only === "freeinference" || only === "trackers"
+    ? await updateDiscovered(radar, discoveries, state, dryRun ? { ...config, healthKeys: {} } : config, now, undefined, catalogRoutes)
     : undefined;
   if (discovered) {
     radar = discovered.radar;
     for (const item of discovered.added) console.log("Радар: " + item.id + " — " + item.probe.status + ", " + item.baseUrl);
   }
 
-  let benchmarks: Benchmarks | undefined;
-  if (!only || only === "benchmarks") {
-    if (!config.aaKey) console.log("Artificial Analysis пропущен: AA_API_KEY не задан.");
-    else if (shouldRefreshBenchmarks(now, previous.benchmarks?.generatedAt, state.benchmarksAttemptedAt)) {
-      // Дата попытки ограничивает расход квоты при ошибке и при ответе без изменений.
-      state.benchmarksAttemptedAt = now;
-      try {
-        benchmarks = await fetchBenchmarks(config.aaKey, catalog.models, now);
-      } catch (error) {
-        failure("Artificial Analysis", error);
-      }
-    }
-  }
+  if (!qualityWarning) delete state.qualityWarningSent;
   const changed = await publish(previous, catalog, changes, state, dryRun, radar, benchmarks);
   if (config.telegram && !dryRun) {
     try {
-      if (await notifyTelegram(config.telegram, changes, catalog, zen?.added, providersAdded, freeLlmAdded, discovered?.added)) {
+      const warning = state.qualityWarningSent === currentBenchmarks?.source.indexVersion ? undefined : qualityWarning;
+      if (await notifyTelegram(config.telegram, changes, catalog, zen?.added, providersAdded, freeLlmAdded, discovered?.added, warning)) {
+        if (warning) {
+          state.qualityWarningSent = currentBenchmarks?.source.indexVersion;
+          await saveState(state);
+        }
         console.log("Telegram: уведомления отправлены.");
       }
     } catch (error) {
       failure("Telegram", error);
     }
   }
+  if (dryRun) for (const line of qualitySummary(catalog, currentBenchmarks)) console.log(line);
 
   const active = catalog.offers.filter((offer) => offer.status === "active");
   const degraded = catalog.offers.filter((offer) => offer.status === "degraded");

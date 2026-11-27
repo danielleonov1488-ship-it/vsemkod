@@ -81,9 +81,10 @@ export function legacyCatalog(catalog: Catalog): Catalog {
     .map(offer => ({ ...offer, limits: legacyLimits(offer.limits) }));
   const modelsInV2Only = new Set(catalog.offers.filter(offer => !legacyIds.has(offer.providerId)).map(offer => offer.modelId));
   const offers = legacyOffers(catalog.offers);
+  const legacyModelIds = new Set(offers.map(({ modelId }) => modelId));
   for (const offer of offers) modelsInV2Only.delete(offer.modelId);
   return { ...catalog,
-    models: catalog.models.filter(model => !modelsInV2Only.has(model.id)),
+    models: catalog.models.filter(model => !modelsInV2Only.has(model.id) || legacyModelIds.has(model.id)),
     providers: catalog.providers.filter(provider => legacyIds.has(provider.id))
       .map(({ trust: _trust, ...provider }) => ({ ...provider, freeLimits: legacyLimits(provider.freeLimits) })),
     offers, candidates: legacyOffers(catalog.candidates),
@@ -153,10 +154,14 @@ export async function publish(
   return changed;
 }
 
+export function saveState(state: State): Promise<void> {
+  return writeAtomic(stateFile, state);
+}
+
 export async function notifyTelegram(
   config: NonNullable<Config["telegram"]>, events: Change[], catalog: Catalog,
   radarAdded: RadarObservation[] = [], providerAdded: RadarProvider[] = [],
-  freeLlmAdded: RadarFreeLlmProvider[] = [], discovered: Discovered[] = [],
+  freeLlmAdded: RadarFreeLlmProvider[] = [], discovered: Discovered[] = [], qualityWarning?: string,
 ): Promise<boolean> {
   const models = new Map(catalog.models.map((model) => [model.id, model]));
   const active = new Set(catalog.offers.filter(({ status }) => status === "active").map(offerKey));
@@ -184,6 +189,7 @@ export async function notifyTelegram(
   if (lines.size) notices.unshift(lines.size === 1
     ? "🦛 Новая раздача: " + [...lines][0] + ". Подключить — в vsemkod"
     : "🦛 Новые раздачи\n" + [...lines].map((line) => "• " + line).join("\n").slice(0, 3700) + "\nПодключить — в vsemkod");
+  if (qualityWarning) notices.unshift(qualityWarning);
   if (!notices.length) return false;
   const messages: string[] = [];
   let current = "";

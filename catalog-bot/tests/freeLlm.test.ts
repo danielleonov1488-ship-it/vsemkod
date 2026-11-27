@@ -19,7 +19,9 @@ const { catalog } = mergeCatalog(undefined, newState(), registryBatches(), {
   now, missingRuns: 6, retentionDays: 7, healthFailureThreshold: 2,
 });
 const selected = parseFreeLlm(snapshot);
-const { radar: candidates } = matchFreeLlm(selected, catalog);
+const [cloudflare] = selected;
+const unregistered = { ...cloudflare, slug: "fixture-top", baseUrl: "https://fixture-top.example.com/v1" };
+const { radar: candidates } = matchFreeLlm([unregistered, ...selected], catalog);
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -53,12 +55,13 @@ it("узнаёт варианты ID, сохраняя различие межд
 
 it("сортирует кандидатов по top-моделям и показывает пропуски у известных провайдеров в журнале", () => {
   const { radar, possible } = matchFreeLlm(selected, catalog);
-  expect(radar.map(({ slug }) => slug)).toEqual(["cloudflare-workers-ai", "freeinference"]);
-  expect(radar[1].models).toEqual([
+  expect(radar.map(({ slug }) => slug)).toEqual(["freeinference"]);
+  expect(radar[0].models).toEqual([
     { id: "deepseek-v4-flash", catalogModelId: "deepseek-v4-flash" },
     { id: "glm-5.3-flash", catalogModelId: "glm-5.3-flash" },
   ]);
   expect(possible).toEqual([
+    { providerId: "cloudflare", id: "@cf/qwen/qwen3.8-27b", catalogModelId: "qwen3.8-27b" },
     { providerId: "ovh-ai-endpoints", id: "DeepSeek-V4.1-Flash-1017", catalogModelId: "deepseek-v4.1-flash" },
     { providerId: "ovh-ai-endpoints", id: "Qwen3.8-27B", catalogModelId: "qwen3.8-27b" },
   ]);
@@ -66,10 +69,9 @@ it("сортирует кандидатов по top-моделям и пока�
   expect(missingGroq.possible.filter(({ providerId }) => providerId === "groq")).toHaveLength(2);
   const basicOnly = { ...selected[0], models: ["openai/gpt-oss-20b"] };
   expect(matchFreeLlm([basicOnly], catalog).radar).toEqual([]);
-  const goodOnly = { ...basicOnly, slug: "aaa-good", models: ["glm-5.3-flash"] };
-  const [topProvider] = selected;
-  expect(matchFreeLlm([goodOnly, topProvider], catalog).radar.map(({ slug }) => slug)).toEqual([
-    "cloudflare-workers-ai", "aaa-good",
+  const goodOnly = { ...basicOnly, slug: "aaa-good", baseUrl: "https://aaa-good.example.com/v1", models: ["glm-5.3-flash"] };
+  expect(matchFreeLlm([goodOnly, unregistered], catalog).radar.map(({ slug }) => slug)).toEqual([
+    "fixture-top", "aaa-good",
   ]);
   expect(catalog.providers.map(({ id }) => id)).not.toContain("ovh-ai-endpoints");
   expect(catalog.providers.map(({ id }) => id)).toContain("nvidia-nim");

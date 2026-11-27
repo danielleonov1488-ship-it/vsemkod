@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { cloudflareBaseUrl, cloudflareProbeModel } from "../shared/cloudflare";
+import { isFreeRoute, toolSupport, type FreeModelMetadata } from "../shared/free-model";
 import { providerIdSchema } from "../shared/catalog-schema";
 import { readJson, writeJson } from "./storage";
 import { createHash, randomBytes } from "node:crypto";
@@ -39,26 +41,10 @@ const providerModelsSchema = z.partialRecord(providerIdSchema, z.object({
 }));
 type ProviderModelCache = z.infer<typeof providerModelsSchema>;
 
-function isFreeModel(provider: Pick<Provider, "id"> & Partial<Pick<Provider, "freeLimits">>, item: {
-  id: string; pricing?: { prompt?: unknown; completion?: unknown; input?: unknown; output?: unknown; free?: unknown };
-  input_price?: unknown; output_price?: unknown; free?: unknown; tier?: unknown; tool_call?: boolean;
-  capabilities?: { tools?: boolean; function_calling?: boolean } | string[]; supports_tools?: boolean;
-  supports_tool_calling?: boolean; supported_parameters?: string[];
-}) {
-  const zero = (price: unknown) => price === 0 ||
-    typeof price === "string" && /^(?:0+\.?0*|\.0+)(?:e[+-]?\d+)?$/i.test(price.trim());
-  const input = item.pricing?.prompt ?? item.pricing?.input ?? item.input_price;
-  const output = item.pricing?.completion ?? item.pricing?.output ?? item.output_price;
-  const capabilities = item.capabilities;
-  const tools = (Array.isArray(capabilities) ? capabilities.includes("tools") : capabilities?.tools ?? capabilities?.function_calling) ??
-    item.supports_tools ?? item.supports_tool_calling ?? item.tool_call ??
-    (Array.isArray(item.supported_parameters) ? item.supported_parameters.includes("tools") : undefined);
+function isFreeModel(provider: Pick<Provider, "id"> & Partial<Pick<Provider, "freeLimits">>, item: FreeModelMetadata) {
+  const tools = toolSupport(item);
   if (provider.freeLimits?.allModelsFree) return tools === true;
-  if (tools === false || item.free === false) return false;
-  if (item.free === true || item.pricing?.free === true || zero(input) && zero(output)) return true;
-  if ([input, output].some(price => price != null && !zero(price))) return false;
-  return /(?:-free|:free)$/i.test(item.id) || /^free\//i.test(item.id) ||
-    provider.id !== "openrouter" && (item.tier === "free" || input == null && output == null && freePlans.has(provider.id));
+  return tools !== false && isFreeRoute(item, freePlans.has(provider.id));
 }
 
 class ModelsError extends Error {
@@ -149,7 +135,7 @@ export class ConnectService {
     await Promise.all(catalog.providers.map(provider => {
       if (force && provider.id !== force) return;
       const key = this.keys.get(provider.id);
-      if (provider.api !== "openai" || (!key && provider.auth.type !== "none") ||
+      if (provider.api !== "openai" || provider.auth.type === "cloudflare" || (!key && provider.auth.type !== "none") ||
         (!key && provider.id === "kilo" && !provider.freeLimits.allModelsFree)) return;
       const cached = Object.hasOwn(this.catalogModels, provider.id) ? this.catalogModels[provider.id] : undefined;
       if (!force && cached?.baseUrl === provider.baseUrl && Date.now() - cached.updatedAt < 6 * 60 * 60_000) return;
@@ -174,8 +160,13 @@ export class ConnectService {
 
   connected(catalog: Catalog) {
     return catalog.providers
-      .filter(provider => provider.api === "openai" && (provider.auth.type === "none" || this.keys.get(provider.id)))
+      .filter(provider => provider.api === "openai" && (provider.auth.type === "none" || this.keys.get(provider.id) &&
+        (provider.auth.type !== "cloudflare" || this.cloudflareAccount(provider.id))))
       .map(provider => provider.id);
+  }
+
+  cloudflareAccount(id: KeyId): string | undefined {
+    return this.keys.profile(id)?.accountId;
   }
 
   key(id: KeyId): string | undefined {
@@ -236,10 +227,20 @@ export class ConnectService {
     return personalProviders.filter(provider => this.keys.profile(provider.id) && this.keys.get(provider.id)).map(provider => provider.id);
   }
 
-  async manual(provider: Provider | PersonalProvider, key: string, customUrl: string | undefined, signal: AbortSignal, selection?: RemoteModel[]) {
+  async manual(provider: Provider | PersonalProvider, key: string, customUrl: string | undefined, signal: AbortSignal,
+    selection?: RemoteModel[], accountId?: string) {
     if (!/^[!-~]+$/.test(key)) throw new Error("Ключ не подошёл. Вставьте ключ целиком.");
+    if ("auth" in provider && provider.auth.type === "cloudflare") {
+      const baseUrl = cloudflareBaseUrl(provider.baseUrl, accountId);
+      if (!baseUrl) throw new Error("Введите Account ID из Cloudflare Workers AI.");
+      await probeCompletion(baseUrl, key, cloudflareProbeModel, signal);
+      if (signal.aborted) throw new Error("Подключение отменено.");
+      await this.keys.set(provider.id, key, { baseUrl, accountId, models: [] });
+      this.merged = undefined;
+      return;
+    }
     const baseUrl = endpoint(provider.baseUrl ?? customUrl ?? "");
-    const models = "models" in provider && provider.models ? provider.models : await modelsFor(provider, baseUrl, key, signal);
+    const models = !("auth" in provider) && provider.models ? provider.models : await modelsFor(provider, baseUrl, key, signal);
     if (!("auth" in provider) && provider.kind === "plan" && models.length) {
       await probeCompletion(baseUrl, key, models[0].id, signal);
     }

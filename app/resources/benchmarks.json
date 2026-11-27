@@ -1,14 +1,26 @@
 {
-  "generatedAt": "2026-11-26T07:20:05.075Z",
+  "generatedAt": "2026-11-27T13:30:57.991Z",
   "models": {
+    "beam-free": {
+      "index": 17.7
+    },
+    "deepseek-v4-pro": {
+      "index": 23.1
+    },
     "deepseek-v4.1-flash": {
       "index": 32.4,
-      "speed": 177.6,
-      "ttft": 1.18
+      "speed": 178.6,
+      "ttft": 1.17
+    },
+    "ernie-5.5-flash-preview": {
+      "index": 31.3,
+      "speed": 185.1,
+      "ttft": 2.48
     },
     "gemma-4-26b-a4b-it": {
-      "speed": 89.3,
-      "ttft": 1.32
+      "index": 4,
+      "speed": 86.5,
+      "ttft": 1.38
     },
     "gemma-4-31b-it": {
       "index": 4.4,
@@ -16,67 +28,91 @@
       "ttft": 0.98
     },
     "glm-4.7-flash": {
-      "speed": 85.9,
-      "ttft": 12.51
+      "speed": 86.9,
+      "ttft": 15.42
     },
     "glm-5.2": {
-      "speed": 132.3,
-      "ttft": 1.73
+      "speed": 134.1,
+      "ttft": 1.69
     },
     "glm-5.3": {
       "index": 31.6,
-      "speed": 74,
-      "ttft": 3.6
+      "speed": 78.2,
+      "ttft": 1.43
     },
     "glm-5.3-flash": {
       "index": 27.7,
-      "speed": 54.9,
-      "ttft": 3.18
+      "speed": 52.7,
+      "ttft": 3.17
     },
     "gpt-oss-120b": {
       "index": 3.8,
-      "speed": 191.5,
+      "speed": 200.2,
       "ttft": 1.3
     },
     "gpt-oss-20b": {
-      "speed": 147.1,
-      "ttft": 1.17
+      "speed": 155.7,
+      "ttft": 1.15
+    },
+    "hy4": {
+      "index": 34.6
+    },
+    "k2-horizon": {
+      "index": 17.8
     },
     "kimi-k3.1-pro": {
       "index": 46.6,
-      "speed": 36,
+      "speed": 36.9,
       "ttft": 3.22
+    },
+    "mimo-v2.6-flash": {
+      "index": 26.8
+    },
+    "mimo-v2.6-pro": {
+      "index": 29.9
     },
     "minimax-m3": {
       "index": 19,
-      "speed": 108.7,
-      "ttft": 1.45
+      "speed": 113.6,
+      "ttft": 1.66
+    },
+    "minimax-m3.1-flash": {
+      "index": 29.1
+    },
+    "muse-glimmer-30b": {
+      "index": 6.3
     },
     "nemotron-3-nano-omni-30b-a3b-reasoning": {},
     "nemotron-3-ultra": {
       "index": 11.8,
-      "speed": 186.7,
-      "ttft": 1.07
+      "speed": 190.4,
+      "ttft": 1.2
     },
     "nemotron-3.5-lightning": {
       "index": 5.5,
-      "speed": 314,
-      "ttft": 0.75
+      "speed": 308.8,
+      "ttft": 0.76
     },
     "nemotron-3.5-super": {
       "index": 13.6,
-      "speed": 330.6,
-      "ttft": 1
+      "speed": 348.1,
+      "ttft": 0.89
+    },
+    "north-mini-code": {
+      "index": 3.4
     },
     "qwen3.8": {
       "index": 33.7,
-      "speed": 52.4,
-      "ttft": 8.71
+      "speed": 61,
+      "ttft": 3.7
     },
     "qwen3.8-27b": {
       "index": 20.1,
-      "speed": 59.2,
-      "ttft": 5.71
+      "speed": 58.7,
+      "ttft": 5.37
+    },
+    "step-5-preview": {
+      "index": 28.5
     }
   },
   "schemaVersion": 1,

@@ -26,49 +26,6 @@
       "confidence": "news",
       "contextWindow": 0,
       "expiresAt": null,
-      "firstSeen": "2026-11-27T11:16:31.091Z",
-      "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "Trial API key: 1,000 API calls/month, non-commercial use only",
-        "rpm": 20
-      },
-      "modelId": "command",
-      "promo": false,
-      "providerId": "cohere",
-      "providerModelId": "command",
-      "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis"
-      ],
-      "status": "unverified",
-      "supportsTools": false
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 1048576,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
-      },
-      "modelId": "deepseek-v4.1-flash-uncensored-fp8",
-      "promo": false,
-      "providerId": "numes",
-      "providerModelId": "dealignai/deepseek-v4.1-flash-uncensored-fp8:free",
-      "sources": [
-        "https://numes.ai/api/public-catalogue/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "news",
-      "contextWindow": 0,
-      "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
       "lastSeen": "2026-11-25T12:06:35.747Z",
@@ -92,10 +49,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
-        "note": "200 requests/hour per IP, no API key required",
+        "note": "На IP-адрес",
         "rph": 200
       },
       "modelId": "free",
@@ -114,10 +71,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
-        "note": "200 requests/hour per IP, no API key required",
+        "note": "На IP-адрес",
         "rph": 200
       },
       "modelId": "free",
@@ -152,33 +109,12 @@
       "supportsTools": false
     },
     {
-      "confidence": "news",
-      "contextWindow": 0,
-      "expiresAt": null,
-      "firstSeen": "2026-11-27T11:16:31.091Z",
-      "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "Permanent free models, no credit card required"
-      },
-      "modelId": "glm",
-      "promo": false,
-      "providerId": "zai",
-      "providerModelId": "glm",
-      "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis"
-      ],
-      "status": "unverified",
-      "supportsTools": false
-    },
-    {
       "confidence": "page",
       "contextWindow": 0,
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "GLM-4.7-Flash бесплатна. Ограничение параллельных запросов смотрите в кабинете API."
@@ -199,7 +135,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "GLM-4.7-Flash бесплатна. Ограничение параллельных запросов смотрите в кабинете API."
@@ -216,74 +152,11 @@
     },
     {
       "confidence": "structured",
-      "contextWindow": 1048576,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
-      },
-      "modelId": "glm-5.3-flash-uncensored-fp8",
-      "promo": false,
-      "providerId": "numes",
-      "providerModelId": "dealignai/glm-5.3-flash-uncensored-fp8:free",
-      "sources": [
-        "https://numes.ai/api/public-catalogue/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 1048576,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
-      },
-      "modelId": "glm-5.3-uncensored-fp8",
-      "promo": false,
-      "providerId": "numes",
-      "providerModelId": "dealignai/glm-5.3-uncensored-fp8:free",
-      "sources": [
-        "https://numes.ai/api/public-catalogue/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
-      "contextWindow": 1048576,
-      "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
-      "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
-      },
-      "modelId": "kimi-k3-abliterated-v1",
-      "promo": false,
-      "providerId": "numes",
-      "providerModelId": "uniboshi/kimi-k3-abliterated-v1:free",
-      "sources": [
-        "https://numes.ai/api/public-catalogue/models"
-      ],
-      "status": "unverified",
-      "supportsTools": true
-    },
-    {
-      "confidence": "structured",
       "contextWindow": 262144,
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -305,10 +178,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
         "rpd": 50,
         "rpm": 20
       },
@@ -328,7 +201,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -350,10 +223,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
         "rpd": 50,
         "rpm": 20
       },
@@ -373,7 +246,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -395,10 +268,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
         "rpd": 50,
         "rpm": 20
       },
@@ -408,76 +281,12 @@
       "providerModelId": "google/lyria-3-pro-preview",
       "sources": [
         "openrouter:/api/v1/models"
-      ],
-      "status": "unverified",
-      "supportsTools": false
-    },
-    {
-      "confidence": "news",
-      "contextWindow": 0,
-      "expiresAt": null,
-      "firstSeen": "2026-11-27T11:16:31.091Z",
-      "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "Requires Alibaba Cloud binding and real-name verification; per-model daily quota capped at 500",
-        "rpd": 2000
-      },
-      "modelId": "modelscope",
-      "promo": false,
-      "providerId": "modelscope",
-      "providerModelId": "modelscope",
-      "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis"
-      ],
-      "status": "unverified",
-      "supportsTools": false
-    },
-    {
-      "confidence": "news",
-      "contextWindow": 0,
-      "expiresAt": null,
-      "firstSeen": "2026-11-27T11:16:31.091Z",
-      "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "Free with NVIDIA Developer Program membership; rate-limited per model"
-      },
-      "modelId": "nvidia-nim",
-      "promo": false,
-      "providerId": "nvidia-nim",
-      "providerModelId": "nvidia-nim",
-      "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis"
-      ],
-      "status": "unverified",
-      "supportsTools": false
-    },
-    {
-      "confidence": "news",
-      "contextWindow": 0,
-      "expiresAt": null,
-      "firstSeen": "2026-11-27T11:16:31.091Z",
-      "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
-      "lastVerified": null,
-      "limits": {
-        "note": "Free usage on five open models with GitHub sign-in (account at least 30 days old); weekly allowance resetting every Monday"
-      },
-      "modelId": "runcrate",
-      "promo": false,
-      "providerId": "runcrate",
-      "providerModelId": "runcrate",
-      "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis"
       ],
       "status": "unverified",
       "supportsTools": false
     }
   ],
-  "generatedAt": "2026-11-27T11:16:31.091Z",
+  "generatedAt": "2026-11-27T13:36:02.639Z",
   "models": [
     {
       "capabilities": [
@@ -518,7 +327,7 @@
       "id": "glm-5.2",
       "name": "GLM 5.2",
       "rank": 30,
-      "tier": "top",
+      "tier": "basic",
       "vendor": "Z.ai"
     },
     {
@@ -546,7 +355,7 @@
       "id": "nemotron-3-ultra",
       "name": "Nemotron 3 Ultra",
       "rank": 50,
-      "tier": "top",
+      "tier": "good",
       "vendor": "NVIDIA"
     },
     {
@@ -574,7 +383,7 @@
       "id": "minimax-m3",
       "name": "MiniMax M3",
       "rank": 70,
-      "tier": "top",
+      "tier": "good",
       "vendor": "MiniMax"
     },
     {
@@ -588,7 +397,7 @@
       "id": "gpt-oss-120b",
       "name": "gpt-oss-120b",
       "rank": 80,
-      "tier": "top",
+      "tier": "basic",
       "vendor": "OpenAI"
     },
     {
@@ -602,7 +411,7 @@
       "id": "glm-5.3-flash",
       "name": "GLM 5.3 Flash",
       "rank": 110,
-      "tier": "good",
+      "tier": "top",
       "vendor": "Z.ai"
     },
     {
@@ -616,7 +425,7 @@
       "id": "glm-4.7-flash",
       "name": "GLM-4.7-Flash",
       "rank": 120,
-      "tier": "good",
+      "tier": "basic",
       "vendor": "Z.ai"
     },
     {
@@ -630,7 +439,7 @@
       "id": "qwen3.8-flash",
       "name": "Qwen3.8 Flash",
       "rank": 130,
-      "tier": "good",
+      "tier": "basic",
       "vendor": "Alibaba"
     },
     {
@@ -672,7 +481,7 @@
       "id": "command-a",
       "name": "Command A",
       "rank": 160,
-      "tier": "good",
+      "tier": "basic",
       "vendor": "Cohere"
     },
     {
@@ -700,7 +509,7 @@
       "id": "jais-3",
       "name": "Jais 3 MoVA",
       "rank": 162,
-      "tier": "good",
+      "tier": "basic",
       "vendor": "IFM"
     },
     {
@@ -714,7 +523,7 @@
       "id": "k-exaone-2.5",
       "name": "K-EXAONE 2.5",
       "rank": 163,
-      "tier": "good",
+      "tier": "basic",
       "vendor": "LG AI Research"
     },
     {
@@ -728,7 +537,7 @@
       "id": "minimax-m2.7",
       "name": "MiniMax M2.7",
       "rank": 164,
-      "tier": "good",
+      "tier": "basic",
       "vendor": "MiniMax"
     },
     {
@@ -742,7 +551,7 @@
       "id": "deepseek-v4-flash",
       "name": "DeepSeek V4 Flash",
       "rank": 165,
-      "tier": "good",
+      "tier": "basic",
       "vendor": "DeepSeek"
     },
     {
@@ -756,7 +565,7 @@
       "id": "hy4-preview",
       "name": "HY4 Preview",
       "rank": 166,
-      "tier": "good",
+      "tier": "basic",
       "vendor": "Tencent"
     },
     {
@@ -770,7 +579,7 @@
       "id": "hy4-flash",
       "name": "HY4 Flash",
       "rank": 167,
-      "tier": "good",
+      "tier": "basic",
       "vendor": "Tencent"
     },
     {
@@ -784,7 +593,77 @@
       "id": "mimo-v2.5",
       "name": "MiMo V2.5",
       "rank": 168,
+      "tier": "basic",
+      "vendor": "Xiaomi"
+    },
+    {
+      "capabilities": [
+        "code",
+        "reasoning",
+        "tools"
+      ],
+      "contextWindow": 1048576,
+      "description": "Для многошаговых задач по коду",
+      "id": "beam-free",
+      "name": "Beam 1.0",
+      "rank": 169,
       "tier": "good",
+      "vendor": "Reflection AI"
+    },
+    {
+      "capabilities": [
+        "code",
+        "reasoning",
+        "tools"
+      ],
+      "contextWindow": 262144,
+      "description": "Для задач по коду с инструментами",
+      "id": "kimi-k2.7-code",
+      "name": "Kimi K2.7 Code",
+      "rank": 170,
+      "tier": "good",
+      "vendor": "Moonshot AI"
+    },
+    {
+      "capabilities": [
+        "code",
+        "reasoning",
+        "tools"
+      ],
+      "contextWindow": 1048576,
+      "description": "Для длинных задач с инструментами",
+      "id": "deepseek-v4-pro",
+      "name": "DeepSeek V4 Pro",
+      "rank": 171,
+      "tier": "good",
+      "vendor": "DeepSeek"
+    },
+    {
+      "capabilities": [
+        "code",
+        "reasoning",
+        "tools"
+      ],
+      "contextWindow": 1048576,
+      "description": "Для сложных задач с инструментами",
+      "id": "mimo-v2.6-pro",
+      "name": "MiMo V2.6 Pro",
+      "rank": 172,
+      "tier": "top",
+      "vendor": "Xiaomi"
+    },
+    {
+      "capabilities": [
+        "code",
+        "reasoning",
+        "tools"
+      ],
+      "contextWindow": 1048576,
+      "description": "Для быстрых задач с инструментами",
+      "id": "mimo-v2.6-flash",
+      "name": "MiMo V2.6 Flash",
+      "rank": 173,
+      "tier": "top",
       "vendor": "Xiaomi"
     },
     {
@@ -798,7 +677,7 @@
       "id": "muse-glimmer-30b",
       "name": "Muse Glimmer 30B",
       "rank": 180,
-      "tier": "new",
+      "tier": "basic",
       "vendor": "Meta"
     },
     {
@@ -812,7 +691,7 @@
       "id": "nemotron-3-nano-omni-30b-a3b-reasoning",
       "name": "Nemotron 3 Nano Omni",
       "rank": 181,
-      "tier": "new",
+      "tier": "basic",
       "vendor": "NVIDIA"
     },
     {
@@ -826,7 +705,7 @@
       "id": "nemotron-3.5-lightning",
       "name": "Nemotron 3.5 Lightning",
       "rank": 182,
-      "tier": "new",
+      "tier": "basic",
       "vendor": "NVIDIA"
     },
     {
@@ -841,7 +720,7 @@
       "id": "gemma-4-31b-it",
       "name": "Gemma 4 31B",
       "rank": 183,
-      "tier": "new",
+      "tier": "basic",
       "vendor": "Google"
     },
     {
@@ -868,32 +747,141 @@
       "id": "ampersand-v0.1",
       "name": "Ampersand v0.1",
       "rank": 211,
-      "tier": "new",
+      "tier": "basic",
       "vendor": "Humans&"
     },
     {
       "capabilities": [
-        "reasoning",
         "tools"
       ],
-      "contextWindow": 1048576,
+      "contextWindow": 200000,
       "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
-      "id": "beam-free",
-      "name": "Reflection: Beam 1.0 (Free)",
+      "id": "coding-glm-4.6",
+      "name": "Coding GLM 4.6 (free)",
       "rank": 211,
-      "tier": "new",
-      "vendor": "Reflection AI"
+      "tier": "basic",
+      "vendor": "Неизвестно"
     },
     {
       "capabilities": [
         "tools"
       ],
-      "contextWindow": 512000,
+      "contextWindow": 200000,
       "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
-      "id": "dots-3-note-preview",
-      "name": "Dots 3 Note Preview",
+      "id": "coding-glm-4.7",
+      "name": "Coding GLM 4.7 (free)",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 200000,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "coding-glm-5",
+      "name": "Coding GLM 5 (free)",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 204800,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "coding-glm-5-turbo",
+      "name": "Coding GLM 5 Turbo (free)",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 200000,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "coding-glm-5.1",
+      "name": "Coding GLM 5.1 (free)",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 1048576,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "coding-kimi-k3",
+      "name": "Coding Kimi K3 (free)",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 204800,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "coding-minimax-m2",
+      "name": "Coding MiniMax M2 (free)",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 204800,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "coding-minimax-m2.1",
+      "name": "Coding MiniMax M2.1 (free)",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 204800,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "coding-minimax-m2.5",
+      "name": "Coding MiniMax M2.5 (free)",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "vision"
+      ],
+      "contextWindow": 1048576,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "deepseek-v4.1-flash-uncensored-fp8",
+      "name": "DeepSeek V4.1 Flash Uncensored FP8 (free)",
       "rank": 211,
       "tier": "new",
+      "vendor": "DeAlign AI"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 524288,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "dots-3-note-preview",
+      "name": "Dots 3 Note Preview (free)",
+      "rank": 211,
+      "tier": "basic",
       "vendor": "Неизвестно"
     },
     {
@@ -906,7 +894,7 @@
       "id": "ernie-5.5-flash-preview",
       "name": "Baidu: ERNIE-5.5-Flash-Preview (free)",
       "rank": 211,
-      "tier": "new",
+      "tier": "top",
       "vendor": "Baidu"
     },
     {
@@ -919,8 +907,20 @@
       "id": "flint-v1.0",
       "name": "Recursive: Flint",
       "rank": 211,
-      "tier": "new",
+      "tier": "basic",
       "vendor": "Recursive"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 262144,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "gemma-4-26b-a4b-it",
+      "name": "Gemma 4 26B A4B It (free)",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
     },
     {
       "capabilities": [
@@ -928,13 +928,26 @@
         "tools",
         "vision"
       ],
-      "contextWindow": 262144,
+      "contextWindow": 1048576,
       "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
-      "id": "gemma-4-26b-a4b-it",
-      "name": "Google: Gemma 4 26B A4B  (free)",
+      "id": "glm-5.3-flash-uncensored-fp8",
+      "name": "GLM 5.3 Flash Uncensored FP8 (free)",
       "rank": 211,
       "tier": "new",
-      "vendor": "Google"
+      "vendor": "DeAlign AI"
+    },
+    {
+      "capabilities": [
+        "reasoning",
+        "tools"
+      ],
+      "contextWindow": 1048576,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "glm-5.3-uncensored-fp8",
+      "name": "GLM 5.3 Uncensored FP8 (free)",
+      "rank": 211,
+      "tier": "new",
+      "vendor": "DeAlign AI"
     },
     {
       "capabilities": [
@@ -945,6 +958,56 @@
       "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
       "id": "glyph-cluster",
       "name": "Glyph Cluster",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 1048576,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "hy4",
+      "name": "Hy4",
+      "rank": 211,
+      "tier": "top",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 262144,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "k2.6-code-preview",
+      "name": "K2.6 Code Preview (free)",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 256000,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "kimi-for-coding",
+      "name": "Kimi For Coding (free)",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "reasoning",
+        "tools",
+        "vision"
+      ],
+      "contextWindow": 1048576,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "kimi-k3-abliterated-v1",
+      "name": "Kimi K3 Abliterated (free)",
       "rank": 211,
       "tier": "new",
       "vendor": "Неизвестно"
@@ -960,8 +1023,68 @@
       "id": "ling-3.2-flash",
       "name": "inclusionAI: Ling 3.2 Flash (free)",
       "rank": 211,
-      "tier": "new",
+      "tier": "basic",
       "vendor": "inclusionAI"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 24000,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "llama-3.3-70b-instruct-fp8-fast",
+      "name": "Llama 3.3 70B Instruct Fp8 Fast",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 32768,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "longcat-2.5",
+      "name": "Longcat 2.5",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 1048576,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "minimax-m3.1-flash",
+      "name": "Minimax M3.1 Flash",
+      "rank": 211,
+      "tier": "top",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 256000,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "north-mini-code",
+      "name": "North Mini Code (free)",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 32768,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "openai-fast",
+      "name": "Openai Fast",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
     },
     {
       "capabilities": [
@@ -974,8 +1097,68 @@
       "id": "particle-1",
       "name": "Particle AI: Particle-1 (free)",
       "rank": 211,
-      "tier": "new",
+      "tier": "basic",
       "vendor": "Particle AI"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 32768,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "qwen3-30b-a3b-fp8",
+      "name": "Qwen3 30B A3b Fp8",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 131072,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "qwen3-coder-30b",
+      "name": "Qwen: Qwen3 Coder 30B A3B Instruct",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 524288,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "solar-mini4",
+      "name": "Upstage: Solar Mini 4 (free)",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 256000,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "step-3.7-flash",
+      "name": "StepFun: Step 3.7 Flash (free)",
+      "rank": 211,
+      "tier": "basic",
+      "vendor": "Неизвестно"
+    },
+    {
+      "capabilities": [
+        "tools"
+      ],
+      "contextWindow": 32768,
+      "description": "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
+      "id": "step-5-preview",
+      "name": "Step 5 Preview",
+      "rank": 211,
+      "tier": "top",
+      "vendor": "Неизвестно"
     }
   ],
   "offers": [
@@ -985,7 +1168,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1003,11 +1186,78 @@
     },
     {
       "confidence": "structured",
+      "contextWindow": 1000000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатные маршруты и $5 кредита на 30 дней на Free. После покупки кредитов условия меняются."
+      },
+      "modelId": "ampersand-v0.1",
+      "promo": false,
+      "providerId": "vercel",
+      "providerModelId": "humansand/ampersand-v0.1",
+      "sources": [
+        "https://ai-gateway.vercel.sh/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "concurrent": 2,
+        "note": "Без пополнения 10 запросов/мин, 60 взвешенных единиц/сутки. Платный режим отключается в кабинете.",
+        "rpm": 10
+      },
+      "modelId": "beam-free",
+      "promo": false,
+      "providerId": "bazaarlink",
+      "providerModelId": "beam-free",
+      "sources": [
+        "https://api.bazaarlink.ai/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "concurrent": 2,
+        "note": "Без пополнения 10 запросов/мин, 60 взвешенных единиц/сутки. Платный режим отключается в кабинете.",
+        "rpm": 10
+      },
+      "modelId": "beam-free",
+      "promo": false,
+      "providerId": "bazaarlink",
+      "providerModelId": "reflection/beam-free:free",
+      "sources": [
+        "https://api.bazaarlink.ai/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
       "contextWindow": 1048576,
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1024,12 +1274,243 @@
       "supportsTools": true
     },
     {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатные маршруты и $5 кредита на 30 дней на Free. После покупки кредитов условия меняются."
+      },
+      "modelId": "beam-free",
+      "promo": false,
+      "providerId": "vercel",
+      "providerModelId": "reflection/beam",
+      "sources": [
+        "https://ai-gateway.vercel.sh/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатные маршруты и $5 кредита на 30 дней на Free. После покупки кредитов условия меняются."
+      },
+      "modelId": "beam-free",
+      "promo": false,
+      "providerId": "vercel",
+      "providerModelId": "reflection/beam-free",
+      "sources": [
+        "https://ai-gateway.vercel.sh/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 200000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "coding-glm-4.6",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "coding-glm-4.6-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 200000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "coding-glm-4.7",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "coding-glm-4.7-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 200000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "coding-glm-5",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "coding-glm-5-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 204800,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "coding-glm-5-turbo",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "coding-glm-5-turbo-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 200000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "coding-glm-5.1",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "coding-glm-5.1-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "coding-kimi-k3",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "coding-kimi-k3-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 204800,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "coding-minimax-m2",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "coding-minimax-m2-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 204800,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "coding-minimax-m2.1",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "coding-minimax-m2.1-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 204800,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "coding-minimax-m2.5",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "coding-minimax-m2.5-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 256000,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "До 1000 вызовов в месяц с пробным ключом.",
@@ -1048,12 +1529,77 @@
       "verifiedAt": "2026-11-27T00:00:00Z"
     },
     {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "concurrent": 2,
+        "note": "Без пополнения 10 запросов/мин, 60 взвешенных единиц/сутки. Платный режим отключается в кабинете.",
+        "rpm": 10
+      },
+      "modelId": "deepseek-v4-flash",
+      "promo": false,
+      "providerId": "bazaarlink",
+      "providerModelId": "deepseek/deepseek-v4-flash-0731free:free",
+      "sources": [
+        "https://api.bazaarlink.ai/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
+      },
+      "modelId": "deepseek-v4-flash",
+      "promo": false,
+      "providerId": "crowllm",
+      "providerModelId": "deepseek-v4-flash-0731-thinking:free",
+      "sources": [
+        "https://crowllm.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
+      },
+      "modelId": "deepseek-v4-flash",
+      "promo": false,
+      "providerId": "crowllm",
+      "providerModelId": "deepseek-v4-flash-0731:free",
+      "sources": [
+        "https://crowllm.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 1048576,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "100 млн токенов при регистрации. Бесплатные токены сгорают после 7 дней без запросов."
@@ -1071,12 +1617,33 @@
       "verifiedAt": "2026-11-27T00:00:00Z"
     },
     {
+      "confidence": "structured",
+      "contextWindow": 400000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "От 1 млн токенов в месяц после SMS-подтверждения. Платный баланс может использоваться после расходования бесплатного."
+      },
+      "modelId": "deepseek-v4-flash",
+      "promo": false,
+      "providerId": "gonkabroker",
+      "providerModelId": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "sources": [
+        "https://proxy.gonkabroker.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 200000,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Стартовая квота 1 млн токенов, без карты. Актуальный баланс доступен в кабинете."
@@ -1096,23 +1663,66 @@
     {
       "confidence": "page",
       "contextWindow": 1048576,
-      "expiresAt": null,
-      "firstSeen": "2026-11-27T11:16:31.091Z",
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+        "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
       },
-      "modelId": "deepseek-v4-flash",
-      "promo": false,
-      "providerId": "modelscope",
-      "providerModelId": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "modelId": "deepseek-v4-pro",
+      "promo": true,
+      "providerId": "tokenhub",
+      "providerModelId": "deepseek-v4-pro-0813",
       "sources": [
-        "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        "https://www.tencentcloud.com/document/product/1300/78934"
       ],
       "status": "active",
-      "supportsTools": false
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "1 успешный запрос в минуту до пополнения. После пополнения до 10.",
+        "rpm": 1
+      },
+      "modelId": "deepseek-v4.1-flash",
+      "promo": false,
+      "providerId": "beatapi",
+      "providerModelId": "deepseek-v4.1-flash-free",
+      "sources": [
+        "https://api.beatapi.io/v1/text/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 131072,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатная бета. После беты от 5000 входных и 1000 выходных токенов в час."
+      },
+      "modelId": "deepseek-v4.1-flash",
+      "promo": false,
+      "providerId": "cheapllm",
+      "providerModelId": "deepseek-v4.1-flash-1017",
+      "sources": [
+        "https://cheapllm.shop/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
     },
     {
       "confidence": "page",
@@ -1120,10 +1730,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+        "note": "До 250 бесплатных Magicubes в день за ежедневный вход и привязку Alibaba Cloud. Вызов расходует 0,5–2 Magicubes. Нужны подтверждённый email и верифицированный аккаунт Alibaba Cloud."
       },
       "modelId": "deepseek-v4.1-flash",
       "promo": false,
@@ -1131,10 +1741,9 @@
       "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
       "reviewBy": "2026-12-08T00:00:00.000Z",
       "sources": [
-        "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md",
         "registry:modelscope"
       ],
-      "status": "active",
+      "status": "unverified",
       "supportsTools": false,
       "verifiedAt": "2026-11-24T00:00:00Z"
     },
@@ -1144,10 +1753,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+        "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
       },
       "modelId": "deepseek-v4.1-flash",
       "promo": false,
@@ -1165,7 +1774,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -1186,7 +1795,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "У бесплатных моделей ID заканчивается на -free. Список и квоты могут меняться."
@@ -1209,7 +1818,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."
@@ -1230,10 +1839,52 @@
     {
       "confidence": "page",
       "contextWindow": 1048576,
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
+      },
+      "modelId": "deepseek-v4.1-flash",
+      "promo": true,
+      "providerId": "tokenhub",
+      "providerModelId": "deepseek-v4.1-flash-1017",
+      "sources": [
+        "https://www.tencentcloud.com/document/product/1300/78934"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатные маршруты группы default. Числовая квота не опубликована."
+      },
+      "modelId": "deepseek-v4.1-flash",
+      "promo": false,
+      "providerId": "tokenrouter",
+      "providerModelId": "deepseek/deepseek-v4.1-flash-1017-free",
+      "sources": [
+        "https://api.tokenrouter.com/api/pricing"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 1048576,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная квота DeepSeek V4.1 Flash обновляется ежедневно."
@@ -1249,6 +1900,48 @@
       "status": "active",
       "supportsTools": true,
       "verifiedAt": "2026-11-27T00:00:00Z"
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
+      },
+      "modelId": "deepseek-v4.1-flash-uncensored-fp8",
+      "promo": false,
+      "providerId": "numes",
+      "providerModelId": "dealignai/deepseek-v4.1-flash-uncensored-fp8:free",
+      "sources": [
+        "https://numes.ai/api/public-catalogue/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 524288,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "dots-3-note-preview",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "dots-3-note-preview-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
     },
     {
       "confidence": "structured",
@@ -1297,11 +1990,32 @@
     },
     {
       "confidence": "structured",
+      "contextWindow": 32768,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
+      },
+      "modelId": "ernie-5.5-flash-preview",
+      "promo": false,
+      "providerId": "crowllm",
+      "providerModelId": "ernie-5.5-flash-preview:free",
+      "sources": [
+        "https://crowllm.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
       "contextWindow": 1024000,
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1323,10 +2037,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
         "rpd": 50,
         "rpm": 20
       },
@@ -1346,7 +2060,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1368,7 +2082,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1390,10 +2104,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
         "rpd": 50,
         "rpm": 20
       },
@@ -1412,12 +2126,54 @@
       "confidence": "structured",
       "contextWindow": 262144,
       "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "note": "Бесплатные маршруты и $5 кредита на 30 дней на Free. После покупки кредитов условия меняются."
+      },
+      "modelId": "flint-v1.0",
+      "promo": false,
+      "providerId": "vercel",
+      "providerModelId": "recursive/flint-v1.0",
+      "sources": [
+        "https://ai-gateway.vercel.sh/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 262144,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "gemma-4-26b-a4b-it",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "gemma-4-26b-a4b-it-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 262144,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
         "rpd": 50,
         "rpm": 20
       },
@@ -1436,12 +2192,54 @@
       "confidence": "structured",
       "contextWindow": 262144,
       "expiresAt": null,
-      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "gemma-4-31b-it",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "gemma-4-31b-it-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 262144,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "20 запросов в минуту. Пробный ключ даёт 10 баллов на 30 дней."
+      },
+      "modelId": "gemma-4-31b-it",
+      "promo": false,
+      "providerId": "amd-token-lab",
+      "providerModelId": "Gemma-4-31B-IT",
+      "sources": [
+        "https://devcommunity.amd.com/t/cant-beat-free-gemma-4-31b-on-amd-token-lab-with-a-local-chat-page-and-an-adk-agent/"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 262144,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
         "rpd": 50,
         "rpm": 20
       },
@@ -1462,7 +2260,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "200 запросов в день на бесплатных моделях, карта не нужна.",
@@ -1481,12 +2279,54 @@
       "verifiedAt": "2026-11-27T00:00:00Z"
     },
     {
+      "confidence": "structured",
+      "contextWindow": 200000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "glm-4.7-flash",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "glm-4.7-flash-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 131072,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "10 000 нейронов в сутки на Free. Сброс в 00:00 UTC."
+      },
+      "modelId": "glm-4.7-flash",
+      "promo": false,
+      "providerId": "cloudflare",
+      "providerModelId": "@cf/zai-org/glm-4.7-flash",
+      "sources": [
+        "https://developers.cloudflare.com/workers-ai/models/"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 200000,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "50 бесплатных запросов в день без пополнения.",
@@ -1511,10 +2351,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+        "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
       },
       "modelId": "glm-4.7-flash",
       "promo": false,
@@ -1532,7 +2372,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "GLM-4.7-Flash бесплатна. Ограничение параллельных запросов смотрите в кабинете API."
@@ -1551,15 +2391,36 @@
       "verifiedAt": "2026-11-24T00:00:00Z"
     },
     {
+      "confidence": "structured",
+      "contextWindow": 1000000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "glm-5.2",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "coding-glm-5.2-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 1048576,
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+        "note": "До 250 бесплатных Magicubes в день за ежедневный вход и привязку Alibaba Cloud. Вызов расходует 0,5–2 Magicubes. Нужны подтверждённый email и верифицированный аккаунт Alibaba Cloud."
       },
       "modelId": "glm-5.2",
       "promo": false,
@@ -1567,12 +2428,32 @@
       "providerModelId": "ZhipuAI/GLM-5.2",
       "reviewBy": "2026-12-08T00:00:00.000Z",
       "sources": [
-        "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md",
         "registry:modelscope"
       ],
-      "status": "active",
+      "status": "unverified",
       "supportsTools": false,
       "verifiedAt": "2026-11-24T00:00:00Z"
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "glm-5.3",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "coding-glm-5.3-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
     },
     {
       "confidence": "structured",
@@ -1580,7 +2461,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -1601,7 +2482,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."
@@ -1621,11 +2502,75 @@
     },
     {
       "confidence": "page",
+      "contextWindow": 1048576,
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
+      },
+      "modelId": "glm-5.3",
+      "promo": true,
+      "providerId": "tokenhub",
+      "providerModelId": "glm-5.3",
+      "sources": [
+        "https://www.tencentcloud.com/document/product/1300/78934"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1000000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "glm-5.3-flash",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "coding-glm-5.3-flash-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "1 успешный запрос в минуту до пополнения. После пополнения до 10.",
+        "rpm": 1
+      },
+      "modelId": "glm-5.3-flash",
+      "promo": false,
+      "providerId": "beatapi",
+      "providerModelId": "glm-5.3-flash-free",
+      "sources": [
+        "https://api.beatapi.io/v1/text/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
       "contextWindow": 262144,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "€5 стартового баланса на пробном плане, лимиты общие для аккаунта."
@@ -1643,12 +2588,54 @@
       "verifiedAt": "2026-11-27T00:00:00Z"
     },
     {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
+      },
+      "modelId": "glm-5.3-flash",
+      "promo": false,
+      "providerId": "crowllm",
+      "providerModelId": "glm-5.3-flash:free",
+      "sources": [
+        "https://crowllm.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 400000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "От 1 млн токенов в месяц после SMS-подтверждения. Платный баланс может использоваться после расходования бесплатного."
+      },
+      "modelId": "glm-5.3-flash",
+      "promo": false,
+      "providerId": "gonkabroker",
+      "providerModelId": "zai-org/GLM-5.3-Flash",
+      "sources": [
+        "https://proxy.gonkabroker.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 200000,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Стартовая квота 1 млн токенов, без карты. Актуальный баланс доступен в кабинете."
@@ -1671,7 +2658,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -1692,7 +2679,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "У бесплатных моделей ID заканчивается на -free. Список и квоты могут меняться."
@@ -1715,7 +2702,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."
@@ -1734,12 +2721,75 @@
       "verifiedAt": "2026-11-24T00:00:00Z"
     },
     {
+      "confidence": "page",
+      "contextWindow": 1048576,
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
+      },
+      "modelId": "glm-5.3-flash",
+      "promo": true,
+      "providerId": "tokenhub",
+      "providerModelId": "glm-5.3-flash",
+      "sources": [
+        "https://www.tencentcloud.com/document/product/1300/78934"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
+      },
+      "modelId": "glm-5.3-flash-uncensored-fp8",
+      "promo": false,
+      "providerId": "numes",
+      "providerModelId": "dealignai/glm-5.3-flash-uncensored-fp8:free",
+      "sources": [
+        "https://numes.ai/api/public-catalogue/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
+      },
+      "modelId": "glm-5.3-uncensored-fp8",
+      "promo": false,
+      "providerId": "numes",
+      "providerModelId": "dealignai/glm-5.3-uncensored-fp8:free",
+      "sources": [
+        "https://numes.ai/api/public-catalogue/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "structured",
       "contextWindow": 256000,
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1757,15 +2807,57 @@
       "supportsTools": true
     },
     {
+      "confidence": "structured",
+      "contextWindow": 256000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатные маршруты и $5 кредита на 30 дней на Free. После покупки кредитов условия меняются."
+      },
+      "modelId": "glyph-cluster",
+      "promo": false,
+      "providerId": "vercel",
+      "providerModelId": "stealth/glyph-cluster",
+      "sources": [
+        "https://ai-gateway.vercel.sh/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 128000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "10 000 нейронов в сутки на Free. Сброс в 00:00 UTC."
+      },
+      "modelId": "gpt-oss-120b",
+      "promo": false,
+      "providerId": "cloudflare",
+      "providerModelId": "@cf/openai/gpt-oss-120b",
+      "sources": [
+        "https://developers.cloudflare.com/workers-ai/models/"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 131072,
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B",
+        "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B. Из России может понадобиться VPN",
         "rpd": 1000,
         "rpm": 30,
         "tpd": 200000,
@@ -1789,7 +2881,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."
@@ -1809,14 +2901,35 @@
     },
     {
       "confidence": "page",
+      "contextWindow": 128000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "10 000 нейронов в сутки на Free. Сброс в 00:00 UTC."
+      },
+      "modelId": "gpt-oss-20b",
+      "promo": false,
+      "providerId": "cloudflare",
+      "providerModelId": "@cf/openai/gpt-oss-20b",
+      "sources": [
+        "https://developers.cloudflare.com/workers-ai/models/"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
       "contextWindow": 131072,
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B",
+        "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B. Из России может понадобиться VPN",
         "rpd": 1000,
         "rpm": 30,
         "tpd": 200000,
@@ -1837,10 +2950,53 @@
     {
       "confidence": "page",
       "contextWindow": 1048576,
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
+      },
+      "modelId": "hy4",
+      "promo": true,
+      "providerId": "tokenhub",
+      "providerModelId": "hy4",
+      "sources": [
+        "https://www.tencentcloud.com/document/product/1300/78934"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "1 успешный запрос в минуту до пополнения. После пополнения до 10.",
+        "rpm": 1
+      },
+      "modelId": "hy4-flash",
+      "promo": false,
+      "providerId": "beatapi",
+      "providerModelId": "hy4-flash-free",
+      "sources": [
+        "https://api.beatapi.io/v1/text/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 1048576,
       "expiresAt": "2026-11-30T23:59:59Z",
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Акция HY4 Flash до 30 ноября 2026 года."
@@ -1863,7 +3019,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "50 бесплатных запросов в день без пополнения.",
@@ -1883,12 +3039,54 @@
       "verifiedAt": "2026-11-27T00:00:00Z"
     },
     {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Выберите Free. Числовая квота и требование карты для Free не указаны."
+      },
+      "modelId": "hy4-flash",
+      "promo": false,
+      "providerId": "nous",
+      "providerModelId": "tencent/hy4-flash:free",
+      "sources": [
+        "https://inference-api.nousresearch.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 1048576,
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
+      },
+      "modelId": "hy4-flash",
+      "promo": true,
+      "providerId": "tokenhub",
+      "providerModelId": "hy4-flash",
+      "sources": [
+        "https://www.tencentcloud.com/document/product/1300/78934"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 1048576,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "У бесплатных моделей ID заканчивается на -free. Список и квоты могут меняться."
@@ -1911,7 +3109,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "allModelsFree": true,
@@ -1936,7 +3134,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "API пока бесплатен. Суточная квота зависит от согласия на использование данных."
@@ -1954,12 +3152,33 @@
       "verifiedAt": "2026-11-27T00:00:00Z"
     },
     {
+      "confidence": "structured",
+      "contextWindow": 524288,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
+      },
+      "modelId": "k2-horizon",
+      "promo": false,
+      "providerId": "crowllm",
+      "providerModelId": "k2-horizon-375b-a23b:free",
+      "sources": [
+        "https://crowllm.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 524288,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "allModelsFree": true,
@@ -1979,12 +3198,96 @@
       "verifiedAt": "2026-11-27T00:00:00Z"
     },
     {
+      "confidence": "structured",
+      "contextWindow": 262144,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "k2.6-code-preview",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "k2.6-code-preview-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 256000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "kimi-for-coding",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "kimi-for-coding-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 262144,
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
+      },
+      "modelId": "kimi-k2.7-code",
+      "promo": true,
+      "providerId": "tokenhub",
+      "providerModelId": "kimi-k2.7-code",
+      "sources": [
+        "https://www.tencentcloud.com/document/product/1300/78934"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-24T14:58:16.109Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
+      },
+      "modelId": "kimi-k3-abliterated-v1",
+      "promo": false,
+      "providerId": "numes",
+      "providerModelId": "uniboshi/kimi-k3-abliterated-v1:free",
+      "sources": [
+        "https://numes.ai/api/public-catalogue/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 327680,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "€5 стартового баланса на пробном плане, лимиты общие для аккаунта."
@@ -2007,10 +3310,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+        "note": "До 250 бесплатных Magicubes в день за ежедневный вход и привязку Alibaba Cloud. Вызов расходует 0,5–2 Magicubes. Нужны подтверждённый email и верифицированный аккаунт Alibaba Cloud."
       },
       "modelId": "kimi-k3.1-pro",
       "promo": false,
@@ -2018,10 +3321,9 @@
       "providerModelId": "moonshotai/Kimi-K3.1-Pro",
       "reviewBy": "2026-12-08T00:00:00.000Z",
       "sources": [
-        "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md",
         "registry:modelscope"
       ],
-      "status": "active",
+      "status": "unverified",
       "supportsTools": false,
       "verifiedAt": "2026-11-24T00:00:00Z"
     },
@@ -2031,7 +3333,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -2047,12 +3349,33 @@
       "supportsTools": true
     },
     {
+      "confidence": "page",
+      "contextWindow": 1048576,
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
+      },
+      "modelId": "kimi-k3.1-pro",
+      "promo": true,
+      "providerId": "tokenhub",
+      "providerModelId": "kimi-k3.1-pro",
+      "sources": [
+        "https://www.tencentcloud.com/document/product/1300/78934"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "structured",
       "contextWindow": 1048576,
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -2074,10 +3397,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
         "rpd": 50,
         "rpm": 20
       },
@@ -2093,11 +3416,74 @@
     },
     {
       "confidence": "page",
+      "contextWindow": 24000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "10 000 нейронов в сутки на Free. Сброс в 00:00 UTC."
+      },
+      "modelId": "llama-3.3-70b-instruct-fp8-fast",
+      "promo": false,
+      "providerId": "cloudflare",
+      "providerModelId": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "sources": [
+        "https://developers.cloudflare.com/workers-ai/models/"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 32768,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
+      },
+      "modelId": "longcat-2.5",
+      "promo": false,
+      "providerId": "crowllm",
+      "providerModelId": "longcat-2.5:free",
+      "sources": [
+        "https://crowllm.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатные токены LongCat. Объём зависит от уровня проверки аккаунта."
+      },
+      "modelId": "longcat-2.5",
+      "promo": false,
+      "providerId": "longcat",
+      "providerModelId": "LongCat-2.5",
+      "sources": [
+        "https://longcat.chat/platform/docs/ChangeLog.html"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
       "contextWindow": 1048576,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный маршрут из публичного списка. Доступность и квоту проверяйте в кабинете."
@@ -2116,11 +3502,74 @@
     },
     {
       "confidence": "page",
+      "contextWindow": 1048576,
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
+      },
+      "modelId": "mimo-v2.6-flash",
+      "promo": true,
+      "providerId": "tokenhub",
+      "providerModelId": "mimo-v2.6-flash",
+      "sources": [
+        "https://www.tencentcloud.com/document/product/1300/78934"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 1048576,
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
+      },
+      "modelId": "mimo-v2.6-pro",
+      "promo": true,
+      "providerId": "tokenhub",
+      "providerModelId": "mimo-v2.6-pro",
+      "sources": [
+        "https://www.tencentcloud.com/document/product/1300/78934"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 204800,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "minimax-m2.7",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "coding-minimax-m2.7-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
       "contextWindow": 204800,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "100 млн токенов при регистрации. Бесплатные токены сгорают после 7 дней без запросов."
@@ -2138,12 +3587,33 @@
       "verifiedAt": "2026-11-27T00:00:00Z"
     },
     {
+      "confidence": "structured",
+      "contextWindow": 204800,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "От 1 млн токенов в месяц после SMS-подтверждения. Платный баланс может использоваться после расходования бесплатного."
+      },
+      "modelId": "minimax-m2.7",
+      "promo": false,
+      "providerId": "gonkabroker",
+      "providerModelId": "MiniMaxAI/MiniMax-M2.7",
+      "sources": [
+        "https://proxy.gonkabroker.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 200000,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Стартовая квота 1 млн токенов, без карты. Актуальный баланс доступен в кабинете."
@@ -2161,15 +3631,36 @@
       "verifiedAt": "2026-11-27T00:00:00Z"
     },
     {
+      "confidence": "structured",
+      "contextWindow": 1000000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "minimax-m3",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "coding-minimax-m3-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 1048576,
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+        "note": "До 250 бесплатных Magicubes в день за ежедневный вход и привязку Alibaba Cloud. Вызов расходует 0,5–2 Magicubes. Нужны подтверждённый email и верифицированный аккаунт Alibaba Cloud."
       },
       "modelId": "minimax-m3",
       "promo": false,
@@ -2177,12 +3668,53 @@
       "providerModelId": "MiniMax/MiniMax-M3",
       "reviewBy": "2026-12-08T00:00:00.000Z",
       "sources": [
-        "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md",
         "registry:modelscope"
       ],
-      "status": "active",
+      "status": "unverified",
       "supportsTools": false,
       "verifiedAt": "2026-11-24T00:00:00Z"
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 1048576,
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
+      },
+      "modelId": "minimax-m3",
+      "promo": true,
+      "providerId": "tokenhub",
+      "providerModelId": "minimax-m3",
+      "sources": [
+        "https://www.tencentcloud.com/document/product/1300/78934"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 1048576,
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
+      },
+      "modelId": "minimax-m3.1-flash",
+      "promo": true,
+      "providerId": "tokenhub",
+      "providerModelId": "minimax-m3.1-flash",
+      "sources": [
+        "https://www.tencentcloud.com/document/product/1300/78934"
+      ],
+      "status": "active",
+      "supportsTools": true
     },
     {
       "confidence": "page",
@@ -2190,7 +3722,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "200 запросов в день на бесплатных моделях, карта не нужна.",
@@ -2210,11 +3742,32 @@
     },
     {
       "confidence": "structured",
+      "contextWindow": 262144,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "nemotron-3-nano-omni-30b-a3b-reasoning",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "nemotron-3-nano-omni-30b-a3b-reasoning-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
       "contextWindow": 256000,
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -2237,10 +3790,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
         "rpd": 50,
         "rpm": 20
       },
@@ -2261,7 +3814,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "200 запросов в день на бесплатных моделях, карта не нужна.",
@@ -2280,12 +3833,75 @@
       "verifiedAt": "2026-11-27T00:00:00Z"
     },
     {
+      "confidence": "structured",
+      "contextWindow": 131072,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатные маршруты группы default. Числовая квота не опубликована."
+      },
+      "modelId": "nemotron-3-nano-omni-30b-a3b-reasoning",
+      "promo": false,
+      "providerId": "tokenrouter",
+      "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "sources": [
+        "https://api.tokenrouter.com/api/pricing"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "nemotron-3-ultra",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "nemotron-3-ultra-550b-a55b-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 262144,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
+      },
+      "modelId": "nemotron-3-ultra",
+      "promo": false,
+      "providerId": "crowllm",
+      "providerModelId": "nemotron-3-ultra-550b-a55b:free",
+      "sources": [
+        "https://crowllm.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 1000000,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "50 бесплатных запросов в день без пополнения.",
@@ -2310,7 +3926,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -2333,7 +3949,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -2354,10 +3970,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатный доступ NVIDIA Developer Program для тестов. Квота зависит от модели и аккаунта."
+        "note": "Бесплатный доступ NVIDIA Developer Program для тестов. Квота зависит от модели и аккаунта. Подтверждение по номеру +7 не принимается"
       },
       "modelId": "nemotron-3-ultra",
       "promo": false,
@@ -2377,10 +3993,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
         "rpd": 50,
         "rpm": 20
       },
@@ -2401,7 +4017,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "200 запросов в день на бесплатных моделях, карта не нужна.",
@@ -2420,12 +4036,79 @@
       "verifiedAt": "2026-11-27T00:00:00Z"
     },
     {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "nemotron-3.5-lightning",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "nemotron-3.5-lightning-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1000000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "concurrent": 2,
+        "note": "Без пополнения 10 запросов/мин, 60 взвешенных единиц/сутки. Платный режим отключается в кабинете.",
+        "rpm": 10
+      },
+      "modelId": "nemotron-3.5-lightning",
+      "promo": false,
+      "providerId": "bazaarlink",
+      "providerModelId": "nemotron-3.5-lightning-free",
+      "sources": [
+        "https://api.bazaarlink.ai/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1000000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "concurrent": 2,
+        "note": "Без пополнения 10 запросов/мин, 60 взвешенных единиц/сутки. Платный режим отключается в кабинете.",
+        "rpm": 10
+      },
+      "modelId": "nemotron-3.5-lightning",
+      "promo": false,
+      "providerId": "bazaarlink",
+      "providerModelId": "nvidia/nemotron-3.5-lightning-free:free",
+      "sources": [
+        "https://api.bazaarlink.ai/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
       "confidence": "page",
       "contextWindow": 1000000,
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "50 бесплатных запросов в день без пополнения.",
@@ -2450,7 +4133,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -2473,10 +4156,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
         "rpd": 50,
         "rpm": 20
       },
@@ -2497,7 +4180,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "200 запросов в день на бесплатных моделях, карта не нужна.",
@@ -2519,9 +4202,51 @@
       "confidence": "structured",
       "contextWindow": 1000000,
       "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатные маршруты и $5 кредита на 30 дней на Free. После покупки кредитов условия меняются."
+      },
+      "modelId": "nemotron-3.5-lightning",
+      "promo": false,
+      "providerId": "vercel",
+      "providerModelId": "nvidia/nemotron-3.5-lightning-free",
+      "sources": [
+        "https://ai-gateway.vercel.sh/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
+      },
+      "modelId": "nemotron-3.5-super",
+      "promo": false,
+      "providerId": "crowllm",
+      "providerModelId": "nemotron-3.5-super-vl:free",
+      "sources": [
+        "https://crowllm.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 1000000,
+      "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -2544,10 +4269,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатный доступ NVIDIA Developer Program для тестов. Квота зависит от модели и аккаунта."
+        "note": "Бесплатный доступ NVIDIA Developer Program для тестов. Квота зависит от модели и аккаунта. Подтверждение по номеру +7 не принимается"
       },
       "modelId": "nemotron-3.5-super",
       "promo": false,
@@ -2567,10 +4292,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
         "rpd": 50,
         "rpm": 20
       },
@@ -2587,11 +4312,53 @@
     },
     {
       "confidence": "structured",
+      "contextWindow": 256000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "modelId": "north-mini-code",
+      "promo": false,
+      "providerId": "aihubmix",
+      "providerModelId": "north-mini-code-free",
+      "sources": [
+        "https://aihubmix.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 32768,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Анонимный текстовый API. Числовой лимит старого маршрута не опубликован."
+      },
+      "modelId": "openai-fast",
+      "promo": false,
+      "providerId": "pollinations",
+      "providerModelId": "openai-fast",
+      "sources": [
+        "https://text.pollinations.ai/openai/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
       "contextWindow": 1048576,
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -2613,10 +4380,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
         "rpd": 50,
         "rpm": 20
       },
@@ -2632,14 +4399,77 @@
     },
     {
       "confidence": "page",
+      "contextWindow": 32768,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "10 000 нейронов в сутки на Free. Сброс в 00:00 UTC."
+      },
+      "modelId": "qwen3-30b-a3b-fp8",
+      "promo": false,
+      "providerId": "cloudflare",
+      "providerModelId": "@cf/qwen/qwen3-30b-a3b-fp8",
+      "sources": [
+        "https://developers.cloudflare.com/workers-ai/models/"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 131072,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Qwen3 Coder 30B: первые 7 дней до 50 запросов или 100 тыс. токенов в сутки, затем 10 запросов или 50 тыс. токенов."
+      },
+      "modelId": "qwen3-coder-30b",
+      "promo": false,
+      "providerId": "synap",
+      "providerModelId": "qwen3-coder-30b",
+      "sources": [
+        "https://synap402.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 262144,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "3 млн бесплатных серверных токенов на 30 дней после проверки карты без списания."
+      },
+      "modelId": "qwen3.8-27b",
+      "promo": false,
+      "providerId": "axforge",
+      "providerModelId": "qwen3.8-27b",
+      "sources": [
+        "https://axforge.ai/models/"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
       "contextWindow": 131072,
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B",
+        "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B. Из России может понадобиться VPN",
         "rpd": 1000,
         "rpm": 30,
         "tpd": 200000,
@@ -2651,7 +4481,6 @@
       "providerModelId": "qwen/qwen3.8-27b",
       "reviewBy": "2026-12-08T00:00:00.000Z",
       "sources": [
-        "https://github.com/mnfst/awesome-free-llm-apis",
         "registry:groq"
       ],
       "status": "active",
@@ -2660,14 +4489,36 @@
     },
     {
       "confidence": "page",
+      "contextWindow": 262144,
+      "expiresAt": "2026-12-08T00:00:00Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Эксперимент бесплатен до 08.12.2026. До 10 запросов в минуту на ключ.",
+        "rpm": 10
+      },
+      "modelId": "qwen3.8-27b",
+      "promo": true,
+      "providerId": "hetzner",
+      "providerModelId": "Qwen3.8-27B",
+      "sources": [
+        "https://docs.hetzner.com/general/company-and-policy/experiments/inference/"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
       "contextWindow": 1024000,
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-26T07:39:04.135Z",
       "lastVerified": null,
       "limits": {
-        "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+        "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
       },
       "modelId": "qwen3.8-27b",
       "promo": false,
@@ -2685,7 +4536,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:36:02.639Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."
@@ -2702,9 +4553,200 @@
       "status": "active",
       "supportsTools": true,
       "verifiedAt": "2026-11-24T00:00:00Z"
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 524288,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Выберите Free. Числовая квота и требование карты для Free не указаны."
+      },
+      "modelId": "solar-mini4",
+      "promo": false,
+      "providerId": "nous",
+      "providerModelId": "upstage/solar-mini4:free",
+      "sources": [
+        "https://inference-api.nousresearch.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 256000,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Выберите Free. Числовая квота и требование карты для Free не указаны."
+      },
+      "modelId": "step-3.7-flash",
+      "promo": false,
+      "providerId": "nous",
+      "providerModelId": "stepfun/step-3.7-flash:free",
+      "sources": [
+        "https://inference-api.nousresearch.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "structured",
+      "contextWindow": 32768,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
+      },
+      "modelId": "step-5-preview",
+      "promo": false,
+      "providerId": "crowllm",
+      "providerModelId": "step-5-preview:free",
+      "sources": [
+        "https://crowllm.com/v1/models"
+      ],
+      "status": "active",
+      "supportsTools": true
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 1048576,
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "firstSeen": "2026-11-27T13:36:02.639Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
+      },
+      "modelId": "step-5-preview",
+      "promo": true,
+      "providerId": "tokenhub",
+      "providerModelId": "step-5-preview",
+      "sources": [
+        "https://www.tencentcloud.com/document/product/1300/78934"
+      ],
+      "status": "active",
+      "supportsTools": true
     }
   ],
   "providers": [
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://aihubmix.com/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Данные обрабатывают шлюз и выбранный поставщик. Нулевое хранение зависит от маршрута.",
+      "freeLimits": {
+        "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
+      },
+      "id": "aihubmix",
+      "keyPageUrl": "https://aihubmix.com/token",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "AIHubMix",
+      "notes": "Используйте маршруты с пометкой free. Условия — в документации AIHubMix.",
+      "signupUrl": "https://aihubmix.com",
+      "termsUrl": "https://aihubmix.com/terms",
+      "trust": "community"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://api.tokenlab.amd.com/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Действуют правила программы AMD и политика обработки данных AMD.",
+      "freeLimits": {
+        "note": "20 запросов в минуту. Пробный ключ даёт 10 баллов на 30 дней."
+      },
+      "id": "amd-token-lab",
+      "keyPageUrl": "https://tokenlab.amd.com",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "AMD Token Lab",
+      "notes": "Ключ создаётся в AMD Token Lab.",
+      "signupUrl": "https://tokenlab.amd.com",
+      "termsUrl": "https://www.amd.com/en/legal/privacy.html"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://api.axforge.ai/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "AxForge размещает модели в ЕС. Действуют условия AxForge.",
+      "freeLimits": {
+        "note": "3 млн бесплатных серверных токенов на 30 дней после проверки карты без списания."
+      },
+      "id": "axforge",
+      "keyPageUrl": "https://console.axforge.ai/",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "AxForge",
+      "notes": "Используйте квоту своего аккаунта.",
+      "signupUrl": "https://axforge.ai/",
+      "termsUrl": "https://axforge.ai/rules/",
+      "trust": "community"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://api.bazaarlink.ai/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Политика хранения зависит от конкретного маршрута. В каталоге есть признак ZDR.",
+      "freeLimits": {
+        "concurrent": 2,
+        "note": "Без пополнения 10 запросов/мин, 60 взвешенных единиц/сутки. Платный режим отключается в кабинете.",
+        "rpm": 10
+      },
+      "id": "bazaarlink",
+      "keyPageUrl": "https://bazaarlink.ai/en/docs",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "BazaarLink",
+      "notes": "Бесплатные маршруты делят квоту аккаунта.",
+      "signupUrl": "https://bazaarlink.ai",
+      "termsUrl": "https://bazaarlink.ai/en/docs",
+      "trust": "community"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://api.beatapi.io/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "BeatAPI маршрутизирует запросы к поставщикам моделей.",
+      "freeLimits": {
+        "note": "1 успешный запрос в минуту до пополнения. После пополнения до 10.",
+        "rpm": 1
+      },
+      "id": "beatapi",
+      "keyPageUrl": "https://beatapi.io/dashboard/apikeys",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "BeatAPI",
+      "notes": "Используйте точный ID с -free и ключ группы auto.",
+      "signupUrl": "https://beatapi.io",
+      "termsUrl": "https://beatapi.io/terms-of-service",
+      "trust": "community"
+    },
     {
       "api": "openai",
       "auth": {
@@ -2755,6 +4797,47 @@
       "auth": {
         "type": "manual_key"
       },
+      "baseUrl": "https://cheapllm.shop/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Провайдер указывает, что не хранит API-промпты и ответы. Метаданные запросов сохраняются.",
+      "freeLimits": {
+        "note": "Бесплатная бета. После беты от 5000 входных и 1000 выходных токенов в час."
+      },
+      "id": "cheapllm",
+      "keyPageUrl": "https://cheapllm.shop/signup",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "CheapLLM",
+      "notes": "Личный ключ. Бесплатная квота только для собственного использования.",
+      "signupUrl": "https://cheapllm.shop",
+      "termsUrl": "https://cheapllm.shop/terms",
+      "trust": "community"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "cloudflare"
+      },
+      "baseUrl": "https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Правила Workers AI и режим хранения зависят от модели. Смотрите Zero Data Retention в карточке модели.",
+      "freeLimits": {
+        "note": "10 000 нейронов в сутки на Free. Сброс в 00:00 UTC."
+      },
+      "id": "cloudflare",
+      "keyPageUrl": "https://dash.cloudflare.com/",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "Cloudflare Workers AI",
+      "notes": "Дашборд → Workers AI → Use REST API. Нужны Account ID и API-токен.",
+      "signupUrl": "https://dash.cloudflare.com/",
+      "termsUrl": "https://www.cloudflare.com/terms/"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
       "baseUrl": "https://api.cohere.ai/compatibility/v1",
       "clicksToConnect": 3,
       "dataPolicy": "Для пробного аккаунта применяются политика конфиденциальности и правила обучения Cohere.",
@@ -2776,6 +4859,27 @@
       "auth": {
         "type": "manual_key"
       },
+      "baseUrl": "https://crowllm.com/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Запросы обрабатывают CrowLLM и поставщик маршрута согласно условиям сервиса.",
+      "freeLimits": {
+        "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
+      },
+      "id": "crowllm",
+      "keyPageUrl": "https://crowllm.com/keys",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "CrowLLM",
+      "notes": "Ключ аккаунта и точный ID с :free.",
+      "signupUrl": "https://crowllm.com",
+      "termsUrl": "https://crowllm.com/terms-of-service",
+      "trust": "community"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
       "baseUrl": "https://inference.dahl.global/v1",
       "clicksToConnect": 3,
       "dataPolicy": "Данные обрабатывает FROMZERO OÜ и поставщики инфраструктуры по политике Dahl.",
@@ -2790,6 +4894,27 @@
       "notes": "Выделите токены из стартового баланса на свой ключ.",
       "signupUrl": "https://inference.dahl.global/",
       "termsUrl": "https://inference.dahl.global/terms",
+      "trust": "community"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://proxy.gonkabroker.com/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Запросы обрабатывает брокер и инфраструктура сети Gonka.",
+      "freeLimits": {
+        "note": "От 1 млн токенов в месяц после SMS-подтверждения. Платный баланс может использоваться после расходования бесплатного."
+      },
+      "id": "gonkabroker",
+      "keyPageUrl": "https://gonkabroker.com",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "Gonka Broker",
+      "notes": "Бесплатный баланс распространяется на все модели. Проверьте остаток, если на аккаунте есть платные средства.",
+      "signupUrl": "https://gonkabroker.com",
+      "termsUrl": "https://gonkabroker.com/terms",
       "trust": "community"
     },
     {
@@ -2824,7 +4949,7 @@
       "clicksToConnect": 3,
       "dataPolicy": "Политика Groq зависит от функции API и настроек организации.",
       "freeLimits": {
-        "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B",
+        "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B. Из России может понадобиться VPN",
         "rpd": 1000,
         "rpm": 30,
         "tpd": 200000,
@@ -2840,6 +4965,27 @@
       "notes": "Только для коротких задач из-за лимита токенов в минуту.",
       "signupUrl": "https://console.groq.com/login",
       "termsUrl": "https://groq.com/terms-of-use"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://inference.hetzner.com/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "API в ЕС. Экспериментальный сервис, возможны изменения доступности.",
+      "freeLimits": {
+        "note": "Эксперимент бесплатен до 08.12.2026. До 10 запросов в минуту на ключ.",
+        "rpm": 10
+      },
+      "id": "hetzner",
+      "keyPageUrl": "https://experiments.hetzner.com/inference",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "Hetzner Inference",
+      "notes": "Токен создаётся в Hetzner Experiments.",
+      "signupUrl": "https://experiments.hetzner.com/inference",
+      "termsUrl": "https://docs.hetzner.com/general/company-and-policy/experiments/inference/"
     },
     {
       "api": "openai",
@@ -2863,6 +5009,47 @@
       "signupUrl": "https://platform.ifm.ai/",
       "termsUrl": "https://platform.ifm.ai/",
       "trust": "community"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://model.inferx.net/endpoints/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Запросы обрабатываются InferX согласно условиям аккаунта.",
+      "freeLimits": {
+        "note": "Квота зависит от рабочего пространства и выбранного endpoint."
+      },
+      "id": "inferx",
+      "keyPageUrl": "https://console.inferx.net/",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "InferX",
+      "notes": "API требует ключ и контекст рабочего пространства.",
+      "signupUrl": "https://www.inferx.net/",
+      "termsUrl": "https://www.inferx.net/docs/quickstart",
+      "trust": "community"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://discovery-api.intern-ai.org.cn/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Политика обработки запросов доступна в кабинете.",
+      "freeLimits": {
+        "note": "Бесплатные модели в программе InkStone. Условия регистрации и подтверждения телефона проверяйте в кабинете."
+      },
+      "id": "inkstone",
+      "keyPageUrl": "https://discovery.intern-ai.org.cn/",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "Intern InkStone",
+      "notes": "API запрашивает ключ. Точные условия и инструменты требуют проверки.",
+      "signupUrl": "https://discovery.intern-ai.org.cn/",
+      "termsUrl": "https://discovery.intern-ai.org.cn/"
     },
     {
       "api": "openai",
@@ -2934,6 +5121,47 @@
       "auth": {
         "type": "manual_key"
       },
+      "baseUrl": "https://api.llm7.io/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Действуют условия LLM7 для аккаунта и выбранного поставщика.",
+      "freeLimits": {
+        "note": "Текущая бесплатная квота не подтверждена. Проверьте условия токена."
+      },
+      "id": "llm7",
+      "keyPageUrl": "https://token.llm7.io/",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "LLM7",
+      "notes": "Анонимный чат требует ключ.",
+      "signupUrl": "https://llm7.io",
+      "termsUrl": "https://github.com/chigwell/llm7.io/blob/main/TERMS.md",
+      "trust": "community"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://api.longcat.chat/openai/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Применяются политика LongCat и условия Meituan.",
+      "freeLimits": {
+        "note": "Бесплатные токены LongCat. Объём зависит от уровня проверки аккаунта."
+      },
+      "id": "longcat",
+      "keyPageUrl": "https://longcat.chat/platform",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "Meituan LongCat",
+      "notes": "Проверьте доступную квоту LongCat-2.5 в кабинете.",
+      "signupUrl": "https://longcat.chat/platform",
+      "termsUrl": "https://longcat.chat/platform/docs/FAQ.html"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
       "baseUrl": "https://api-inference.modelscope.cn/v1",
       "clicksToConnect": 3,
       "dataPolicy": "Запросы обрабатываются на вычислительных ресурсах Alibaba Cloud.",
@@ -2948,6 +5176,26 @@
       "notes": "Некоммерческое использование. Нужен привязанный аккаунт Alibaba Cloud с подтверждённой личностью.",
       "signupUrl": "https://modelscope.cn/",
       "termsUrl": "https://www.modelscope.cn/docs/model-service/API-Inference/limits"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://inference-api.nousresearch.com/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Действует политика Nous Portal и выбранного поставщика.",
+      "freeLimits": {
+        "note": "Выберите Free. Числовая квота и требование карты для Free не указаны."
+      },
+      "id": "nous",
+      "keyPageUrl": "https://portal.nousresearch.com/",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "Nous Portal",
+      "notes": "Точные ID заканчиваются на :free.",
+      "signupUrl": "https://portal.nousresearch.com",
+      "termsUrl": "https://portal.nousresearch.com/terms"
     },
     {
       "api": "openai",
@@ -2982,7 +5230,7 @@
       "clicksToConnect": 3,
       "dataPolicy": "Применяются условия пробного API NVIDIA и выбранной модели.",
       "freeLimits": {
-        "note": "Бесплатный доступ NVIDIA Developer Program для тестов. Квота зависит от модели и аккаунта."
+        "note": "Бесплатный доступ NVIDIA Developer Program для тестов. Квота зависит от модели и аккаунта. Подтверждение по номеру +7 не принимается"
       },
       "id": "nvidia-nim",
       "keyPageUrl": "https://build.nvidia.com/nvidia/nemotron-3-ultra-550b-a55b",
@@ -3004,7 +5252,7 @@
       "clicksToConnect": 1,
       "dataPolicy": "Бесплатные маршруты могут сохранять запросы. Политика зависит от поставщика модели.",
       "freeLimits": {
-        "note": "1000 запросов в сутки после покупки не менее $10 кредитов",
+        "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
         "rpd": 50,
         "rpm": 20
       },
@@ -3040,6 +5288,26 @@
       "signupUrl": "https://www.orcarouter.ai/login",
       "termsUrl": "https://www.orcarouter.ai/terms.html",
       "trust": "community"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "none"
+      },
+      "baseUrl": "https://text.pollinations.ai/openai",
+      "clicksToConnect": 0,
+      "dataPolicy": "Запросы проходят через Pollinations и поставщика модели.",
+      "freeLimits": {
+        "note": "Анонимный текстовый API. Числовой лимит старого маршрута не опубликован."
+      },
+      "id": "pollinations",
+      "keyPageUrl": null,
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "Pollinations",
+      "notes": "Анонимный openai-fast. Состав модели за этим псевдонимом может меняться.",
+      "signupUrl": "https://pollinations.ai",
+      "termsUrl": "https://pollinations.ai/terms"
     },
     {
       "api": "openai",
@@ -3084,6 +5352,108 @@
       "notes": "Для бесплатного доступа без карты аккаунт GitHub должен быть старше 30 дней. При входе через Google нужна карта, сверх квоты возможна автодоплата.",
       "signupUrl": "https://www.runcrate.ai/inference/free",
       "termsUrl": "https://www.runcrate.ai/terms"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://token.sensenova.cn/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Применяются условия SenseTime для аккаунта и вызовов API.",
+      "freeLimits": {
+        "note": "Бесплатно в публичной бете. Требуется проверка личности. Поддержка иностранных документов не подтверждена."
+      },
+      "id": "sensenova",
+      "keyPageUrl": "https://platform.sensenova.cn",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "SenseNova Token Plan",
+      "notes": "Нужен ключ Token Plan. Поддержка tools в публичной документации бесплатного маршрута не подтверждена.",
+      "signupUrl": "https://www.sensenova.cn/token-plan",
+      "termsUrl": "https://www.sensenova.cn/en/token-plan"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://synap402.com/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Применяется политика Synap для выбранной модели.",
+      "freeLimits": {
+        "note": "Qwen3 Coder 30B: первые 7 дней до 50 запросов или 100 тыс. токенов в сутки, затем 10 запросов или 50 тыс. токенов."
+      },
+      "id": "synap",
+      "keyPageUrl": "https://synap402.com/",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "Synap",
+      "notes": "Маршруты общего тарифа могут быть платными.",
+      "signupUrl": "https://synap402.com",
+      "termsUrl": "https://synap402.com/terms",
+      "trust": "community"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://tokenhub-intl.tencentcloudmaas.com/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Действуют условия Tencent Cloud и поставщика модели.",
+      "freeLimits": {
+        "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
+      },
+      "id": "tokenhub",
+      "keyPageUrl": "https://console.tencentcloud.com/tokenhub/apikey",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "Tencent TokenHub",
+      "notes": "Международный API. Проверьте остаток бесплатного пакета и настройку постоплаты.",
+      "signupUrl": "https://www.tencentcloud.com/products/tokenhub",
+      "termsUrl": "https://www.tencentcloud.com/document/product/301"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://api.tokenrouter.com/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Запросы обрабатывают TokenRouter и поставщик модели.",
+      "freeLimits": {
+        "note": "Бесплатные маршруты группы default. Числовая квота не опубликована."
+      },
+      "id": "tokenrouter",
+      "keyPageUrl": "https://www.tokenrouter.com/console/token",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "TokenRouter",
+      "notes": "Используйте точный нулевой тариф из каталога.",
+      "signupUrl": "https://www.tokenrouter.com",
+      "termsUrl": "https://www.tokenrouter.com/",
+      "trust": "community"
+    },
+    {
+      "api": "openai",
+      "auth": {
+        "type": "manual_key"
+      },
+      "baseUrl": "https://ai-gateway.vercel.sh/v1",
+      "clicksToConnect": 3,
+      "dataPolicy": "Хранение и обучение зависят от поставщика маршрута. Параметры ZDR и No Training видны в каталоге.",
+      "freeLimits": {
+        "note": "Бесплатные маршруты и $5 кредита на 30 дней на Free. После покупки кредитов условия меняются."
+      },
+      "id": "vercel",
+      "keyPageUrl": "https://vercel.com/d?to=%2F%5Bteam%5D%2F%2Fai-gateway%2Fapi-keys",
+      "keyPattern": null,
+      "loginMethods": [],
+      "name": "Vercel AI Gateway",
+      "notes": "Ключ создаётся в AI Gateway → API Keys.",
+      "signupUrl": "https://vercel.com/ai-gateway",
+      "termsUrl": "https://vercel.com/legal/terms"
     },
     {
       "api": "openai",

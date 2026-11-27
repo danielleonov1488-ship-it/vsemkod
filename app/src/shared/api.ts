@@ -200,7 +200,7 @@ export interface DesktopApi {
   chooseDirectory(): Promise<string | null>;
   chooseFiles(directory: string): Promise<Attachment[]>;
   preferences(patch: Partial<Preferences>): Promise<Preferences>;
-  connect(id: string, provider: ConnectionId, input?: { key: string; baseUrl?: string; models?: RemoteModel[] }): Promise<CatalogState>;
+  connect(id: string, provider: ConnectionId, input?: { key: string; baseUrl?: string; models?: RemoteModel[]; accountId?: string }): Promise<CatalogState>;
   cancelConnection(id: string): Promise<void>;
   watchClipboard(id: string, provider: KeyId, enabled: boolean): Promise<void>;
   disconnect(id: ConnectionId): Promise<CatalogState>;

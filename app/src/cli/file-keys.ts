@@ -2,11 +2,13 @@
 import { chmod, mkdir, readFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { z } from "zod";
+import { cloudflareAccountId } from "../shared/cloudflare";
 import type { KeyStore } from "../main/key-store";
 import { writeJson } from "../main/storage";
 import { keyIdSchema, remoteModelsSchema, type KeyId } from "../shared/providers";
 
-const profileSchema = z.object({ name: z.string().min(1).max(60).optional(), baseUrl: z.url(), models: remoteModelsSchema });
+const profileSchema = z.object({ name: z.string().min(1).max(60).optional(), baseUrl: z.url(), models: remoteModelsSchema,
+  accountId: z.string().regex(cloudflareAccountId).optional() });
 type Profile = z.infer<typeof profileSchema>;
 const stored = z.partialRecord(keyIdSchema, z.union([z.string().min(1), profileSchema.extend({ key: z.string().min(1) })]));
 
@@ -51,7 +53,7 @@ export class FileKeys implements Pick<KeyStore, "load" | "get" | "ids" | "profil
 
   profile(id: KeyId): Profile | undefined {
     const entry = Object.hasOwn(this.keys, id) ? this.keys[id] : undefined;
-    if (entry && typeof entry !== "string") return { name: entry.name, baseUrl: entry.baseUrl, models: entry.models };
+    if (entry && typeof entry !== "string") return { name: entry.name, baseUrl: entry.baseUrl, models: entry.models, ...(entry.accountId ? { accountId: entry.accountId } : {}) };
   }
 
   set(id: KeyId, key: string, profile?: Profile) {

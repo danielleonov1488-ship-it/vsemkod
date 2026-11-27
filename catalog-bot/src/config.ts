@@ -1,5 +1,6 @@
 import { loadEnvFile } from "node:process";
 import { z } from "zod";
+import { publicModelProviders } from "./sources/publicModels.js";
 import type { ProviderId } from "./schema.js";
 
 export const watchedPages = [
@@ -10,15 +11,21 @@ export const watchedPages = [
   { providerId: "numes", url: "https://numes.ai/docs/models.md" },
 ] as const;
 
+export const qualityFloor = { indexVersion: "5", minIndex: 12, reference: "GPT-5 (high), AA Progress Index v1 = 270.7" };
+export const fallbackModels = new Set(["nemotron-3-ultra"]);
+export const qualityOverrides = new Map<string, { tier: "top" | "good" | "basic"; reason: string }>([
+  ["kimi-k2.7-code", { tier: "good", reason: "Нет индекса v5, Progress Index 287,6 > GPT-5" }],
+] as const);
+
 export const feedIds = ["hn", "reddit", "github"] as const;
 export const structuredIds = ["openrouter", "kilo", "numes"] as const;
 export const sourceSelectors = [
-  ...structuredIds, "opencode-zen", "benchmarks", "free-list", "free-llm", "watchPages", "feeds", "telegram", "freeinference", ...feedIds,
+  ...structuredIds, "opencode-zen", "benchmarks", "free-list", "free-llm", "watchPages", "feeds", "telegram", "freeinference", "trackers", "public-models", ...feedIds, ...Object.keys(publicModelProviders),
   ...watchedPages.map(({ providerId }) => "page:" + providerId),
 ];
 
 // У неофициальных прокси и реселлеров условия бесплатного доступа и обработки
-// запросов зависят от посредника. Pollinations тоже исключён, условия доступа менялись.
+// запросов зависят от посредника. Pollinations проверяется напрямую отдельным источником.
 export const freeLlmDenylist = new Set([
   "api-airforce", "pollinations", "pollinations-ai", "aihubmix", "bazaarlink", "token-harbor", "llmtr", "zro",
 ]);
@@ -66,7 +73,7 @@ export function readConfig(): Config {
     const id = match[1].toLowerCase().replaceAll("_", "-");
     (match[2] === "KEY" ? healthKeys : discoveryKeyBases)[id] = env(name);
   }
-  const telegramChannels = [...new Set((process.env.TELEGRAM_CHANNELS ?? "rubiconzone").toLowerCase()
+  const telegramChannels = [...new Set((process.env.TELEGRAM_CHANNELS ?? "rubiconzone,freemodelradar,neuro_channel").toLowerCase()
     .split(/[\s,]+/).map(channel => channel.replace(/^@/, "")).filter(Boolean))];
   if (telegramChannels.some(channel => !/^[a-z0-9_]{5,32}$/.test(channel))) {
     throw new Error("TELEGRAM_CHANNELS ожидает имена публичных каналов через запятую");

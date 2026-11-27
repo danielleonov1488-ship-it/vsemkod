@@ -4,6 +4,8 @@ import { performance } from "node:perf_hooks";
 import { once } from "node:events";
 import { setTimeout as delay } from "node:timers/promises";
 import { activeOffers, automaticModels, rankedModels } from "../../shared/catalog";
+import { cloudflareBaseUrl } from "../../shared/cloudflare";
+import type { Benchmarks } from "../../shared/benchmarks";
 import type { ChatEvent, ModelSpeed, ReplySpeed, RouterStats } from "../../shared/api";
 import type { Catalog, Limits } from "../../shared/catalog-schema";
 import type { KeyId } from "../../shared/providers";
@@ -28,7 +30,9 @@ type Started = (response: Response, averageMs: number) => void;
 
 interface RouterOptions {
   catalog: () => Catalog;
+  benchmarks?: () => Benchmarks | undefined;
   key: (id: KeyId) => string | undefined;
+  cloudflareAccount?: (id: KeyId) => string | undefined;
   personal?: ConnectService["personalRoutes"];
   customIds?: () => KeyId[];
   legacyModel?: (id: string) => string | undefined;
@@ -219,15 +223,20 @@ export class Router {
       return { groups: [[candidate]], explicit, personal: true };
     }
     if (!explicit && body.model !== "auto") throw new RequestError(404, "Модель недоступна. Выберите её заново в списке моделей.");
-    const alternatives = automaticModels(catalog).filter(model => model.id !== explicit?.id);
+    const alternatives = automaticModels(catalog, undefined, this.options.benchmarks?.()).filter(model => model.id !== explicit?.id);
     const models = explicit ? [explicit, ...((auto ?? this.options.auto?.() ?? false) ? alternatives : [])] : alternatives;
     const requiresTools = Array.isArray(body.tools) && body.tools.length > 0;
     const groups = models.map(model => activeOffers(catalog, model.id)
       .filter(({ offer }) => offer.free === true && (!requiresTools || offer.supportsTools))
-      .map(({ provider, offer }): Candidate => ({
-        modelId: model.id, provider, upstreamId: offer.providerModelId, limits: provider.freeLimits,
-        needsKey: provider.auth.type !== "none"
-      })));
+      .flatMap(({ provider, offer }): Candidate[] => {
+        const baseUrl = provider.auth.type === "cloudflare"
+          ? cloudflareBaseUrl(provider.baseUrl, this.options.cloudflareAccount?.(provider.id)) : provider.baseUrl;
+        if (!baseUrl) return [];
+        return [{
+          modelId: model.id, provider: { ...provider, baseUrl }, upstreamId: offer.providerModelId,
+          limits: provider.freeLimits, needsKey: provider.auth.type !== "none"
+        }];
+      }));
     return { groups, explicit, personal: false };
   }
 

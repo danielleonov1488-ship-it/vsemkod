@@ -12,6 +12,7 @@ export const observationSchema = z.object({
   promo: z.boolean().optional(),
   expiresAt: dateSchema.nullable().optional(),
   supportsTools: z.boolean().optional(),
+  documentedRoute: z.boolean().optional(),
   supportsReasoning: z.boolean().optional(),
   supportsVision: z.boolean().optional(),
   contextWindow: z.int().positive().optional(),

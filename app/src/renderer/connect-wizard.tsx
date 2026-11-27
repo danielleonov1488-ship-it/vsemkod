@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { activeOffers, rankedModels } from "../shared/catalog";
+import { activeOffers, rankedModels, uncensoredModel, visibleFreeModel } from "../shared/catalog";
 import { compareByBenchmark } from "../shared/benchmarks";
 import type { CatalogState } from "../shared/api";
 import { catalogConnection, type Connection } from "./connections";
@@ -11,7 +11,7 @@ export function ConnectWizard({ state, first, connect, close }: {
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => { dialog.current?.showModal(); }, []);
-  const models = rankedModels(state.catalog).filter(model => model.tier !== "basic").sort((a, b) => compareByBenchmark(a, b, state.benchmarks));
+  const models = rankedModels(state.catalog).filter(model => visibleFreeModel(state.catalog, model) && !uncensoredModel(state.catalog, model)).sort((a, b) => compareByBenchmark(a, b, state.benchmarks));
   const sources = state.catalog.providers
     .filter(provider => provider.auth.type === "manual_key" || provider.auth.type === "oauth_pkce")
     .map(provider => ({ provider, models: models.filter(model => activeOffers(state.catalog, model.id).some(entry => entry.provider === provider)) }))

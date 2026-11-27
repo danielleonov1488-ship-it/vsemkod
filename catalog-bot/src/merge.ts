@@ -1,7 +1,7 @@
 import { modelSlug, matchModel } from "./match.js";
 import { newModel } from "./newModel.js";
 import { models } from "./registry/models.js";
-import { registryPageHash, registryReviewMs } from "./registry/offers.js";
+import { isDocumentedSource, registryPageHash, registryReviewMs } from "./registry/offers.js";
 import { providers } from "./registry/providers.js";
 import { catalogSchema, offerKey } from "./schema.js";
 import type { Candidate, Catalog, Change, Model, Offer } from "./schema.js";
@@ -69,7 +69,7 @@ function recoverTrack(offer: Candidate, previous: Catalog, model: Model | undefi
   for (const source of offer.sources) {
     let id = "hn";
     if (source === "registry:" + offer.providerId) id = source;
-    else if (offer.confidence === "structured") id = offer.providerId;
+    else if (offer.confidence === "structured" || isDocumentedSource(offer.providerId, source)) id = offer.providerId;
     else if (offer.confidence === "page") id = "page:" + offer.providerId;
     else if (source.startsWith("https://www.reddit.com/")) id = "reddit";
     else if (source.startsWith("https://github.com/")) id = "github";
@@ -77,6 +77,7 @@ function recoverTrack(offer: Candidate, previous: Catalog, model: Model | undefi
       observation: {
         ...offer, source, contextWindow: offer.contextWindow || undefined,
         name: model?.name,
+        documentedRoute: isDocumentedSource(offer.providerId, source) || !!model && !registeredIds.has(model.id),
         supportsReasoning: model?.capabilities.includes("reasoning"),
         supportsVision: model?.capabilities.includes("vision"),
       },
@@ -121,6 +122,8 @@ function registryReview(
   return { pageConfirmed, needsReview };
 }
 
+const registeredIds = new Set(models.map(model => model.id));
+
 export function mergeCatalog(
   previous: Catalog | undefined,
   state: State,
@@ -134,7 +137,7 @@ export function mergeCatalog(
   const tracks = structuredClone(state.tracks);
   const previousEntries = new Map<string, Candidate>();
   const previousOffers = new Map(previous?.offers.map((offer) => [offerKey(offer), offer]));
-  const previousAutomatic = new Map(previous?.models.filter(({ tier }) => tier === "new").map((model) => [model.id, model]));
+  const previousAutomatic = new Map(previous?.models.filter(({ id }) => !registeredIds.has(id)).map((model) => [model.id, model]));
   const seen = new Set<string>();
 
   if (previous) {
@@ -243,7 +246,7 @@ export function mergeCatalog(
     };
     if (eligible) {
       offers.push(entry);
-      if (model.tier === "new" && !registered) {
+      if (!registered) {
         const priority = entry.status === "ended" ? 0 : strongest.name ? 2 : 1;
         const current = automaticModels.get(model.id);
         if (!current || priority > current.priority) automaticModels.set(model.id, { model, priority });
@@ -267,13 +270,13 @@ export function mergeCatalog(
   return { catalog, tracks, changes: makeChanges(previous, catalog) };
 }
 
-function makeChanges(previous: Catalog | undefined, next: Catalog): Change[] {
+export function makeChanges(previous: Catalog | undefined, next: Catalog): Change[] {
   const changes: Change[] = [];
   const priorOffers = new Map(previous?.offers.map((offer) => [offerKey(offer), offer]));
   const activeKeys = new Set(next.offers.map(offerKey));
   const priorCandidates = new Set(previous?.candidates.map(offerKey));
   const modelNames = new Map(next.models.map(({ id, name }) => [id, name]));
-  const automaticIds = new Set(next.models.filter(({ tier }) => tier === "new").map(({ id }) => id));
+  const automaticIds = new Set(next.models.filter(({ id }) => !registeredIds.has(id)).map(({ id }) => id));
   const date = next.generatedAt;
   const nameFor = (offer: Offer) => modelNames.get(offer.modelId) ?? offer.providerModelId;
   const offerChange = (type: Change["type"], offer: Offer, text: string) => changes.push({

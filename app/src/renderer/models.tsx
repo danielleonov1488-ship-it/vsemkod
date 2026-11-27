@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
-import { activeOffers, rankedModels } from "../shared/catalog";
+import { activeOffers, rankedModels, uncensoredModel, visibleFreeModel } from "../shared/catalog";
 import { compareByBenchmark, type Benchmarks } from "../shared/benchmarks";
 import type { CatalogState, ModelLatency, ModelSpeed } from "../shared/api";
 import type { Model, Provider } from "../shared/catalog-schema";
@@ -29,7 +29,7 @@ const kindLabels: Record<PersonalKind, string> = {
 const kindOrder: PersonalKind[] = ["subscription", "plan", "api", "custom"];
 
 export function modelOptions(state: CatalogState) {
-  return rankedModels(state.catalog).filter(model => model.tier !== "basic").flatMap(model => {
+  return rankedModels(state.catalog).filter(model => visibleFreeModel(state.catalog, model)).flatMap(model => {
     const offers = activeOffers(state.catalog, model.id).filter(({ offer }) => offer.supportsTools);
     const available = offers.filter(({ provider }) => state.connected.includes(provider.id));
     const locked = offers.filter(({ provider }) => !state.connected.includes(provider.id));
@@ -133,7 +133,7 @@ export function ModelPicker({ selected, catalog, options, personal, zen, auto, l
     providers: (available.length ? available : locked).map(({ provider }) => provider),
     sources: { connected: available.map(({ provider }) => provider), locked: locked.map(({ provider }) => provider) },
     connect: available.length ? undefined : locked[0]?.provider,
-    uncensored: isUncensored(model.name, model.id, ...[...available, ...locked].map(({ offer }) => offer.providerModelId)),
+    uncensored: catalog ? uncensoredModel(catalog, model) : isUncensored(model.name, model.id),
     kind: "free" as const
   }));
   const personalEntry = (model: PersonalModel): Entry => ({
@@ -142,12 +142,16 @@ export function ModelPicker({ selected, catalog, options, personal, zen, auto, l
     uncensored: isUncensored(model.name, model.upstreamId, model.id), kind: personalKind(model, catalogProviders), context: model.context
   });
   const personalEntries = personal.map(personalEntry);
-  const listed = personalEntries.filter(entry => entry.kind === "free");
+  const listed = personalEntries.filter(entry => entry.kind === "free" && entry.uncensored);
   const own = personalEntries.filter(entry => entry.kind !== "free" && entry.kind !== "zen");
   const zenEntries = [...zen.map(personalEntry), ...personalEntries.filter(entry => entry.kind === "zen")];
   const sort = (a: Entry, b: Entry) => compareByBenchmark(a, b, benchmarks) || byName.compare(a.name, b.name);
   const connected = [...free.filter(entry => !entry.connect), ...listed].sort(sort);
   const lockable = free.filter(entry => entry.connect).sort(sort);
+  const regularConnected = connected.filter(entry => !entry.uncensored);
+  const regularLockable = lockable.filter(entry => !entry.uncensored);
+  const uncensoredConnected = [...connected, ...zenEntries, ...own].filter(entry => entry.uncensored).sort(sort);
+  const uncensoredLocked = lockable.filter(entry => entry.uncensored);
   const all = [...connected, ...zenEntries, ...lockable, ...own];
 
   const selectedEntry = all.find(entry => entry.id === selected);
@@ -161,35 +165,34 @@ export function ModelPicker({ selected, catalog, options, personal, zen, auto, l
     .some(value => value?.toLocaleLowerCase("ru").includes(term));
   const hasIndex = Object.values(benchmarks?.models ?? {}).some(entry => entry.index !== undefined);
   const counts: Record<Tab, number> = {
-    best: 0, free: connected.length + zenEntries.length,
-    uncensored: connected.filter(entry => entry.uncensored).length, own: own.length
+    best: 0, free: regularConnected.length + regularLockable.length,
+    uncensored: uncensoredConnected.length + uncensoredLocked.length, own: own.length + zenEntries.length
   };
 
   type Section = { key: string; title?: string; kind?: string; rows: Entry[]; note?: string };
   let sections: Section[];
   if (term) {
     sections = [
-      { key: "free", title: "Бесплатные", rows: [...connected, ...zenEntries].filter(matches) },
-      { key: "locked", title: "Подключить бесплатно", rows: lockable.filter(matches) },
-      { key: "own", title: "Мои", rows: own.filter(matches) }
+      { key: "free", title: "Бесплатные", rows: regularConnected.filter(matches) },
+      { key: "locked", title: "Подключить бесплатно", rows: regularLockable.filter(matches) },
+      { key: "uncensored", title: "Без цензуры", rows: [...uncensoredConnected, ...uncensoredLocked].filter(matches) },
+      { key: "own", title: "Мои", rows: [...own, ...zenEntries].filter(entry => !entry.uncensored && matches(entry)) }
     ];
   } else if (tab === "best") {
-    const top = connected.filter(entry => entry.model?.tier === "top");
-    const best = (top.length >= 3 ? top : [...top, ...connected.filter(entry => entry.model?.tier === "good")]).slice(0, 6);
+    const best = regularConnected.filter(entry => entry.model?.tier === "top" || entry.model?.tier === "good").slice(0, 6);
     sections = [
       { key: "best", title: "Лучшие бесплатные", rows: best },
-      { key: "locked", title: "Подключить бесплатно", rows: lockable.filter(entry => entry.model?.tier === "top" || entry.model?.tier === "good").slice(0, 3) }
+      { key: "locked", title: "Подключить бесплатно", rows: regularLockable.filter(entry => entry.model?.tier === "top" || entry.model?.tier === "good").slice(0, 3) }
     ];
   } else if (tab === "free") {
     sections = [
-      { key: "connected", title: "Подключены", rows: connected },
-      { key: "zen", title: "OpenCode Zen", rows: zenEntries },
-      { key: "locked", title: "Подключить бесплатно", rows: lockable }
+      { key: "connected", title: "Подключены", rows: regularConnected },
+      { key: "locked", title: "Подключить бесплатно", rows: regularLockable }
     ];
   } else if (tab === "uncensored") {
     sections = [
-      { key: "uncensored", rows: connected.filter(entry => entry.uncensored), note: "Версии моделей со снятыми отказами." },
-      { key: "locked", title: "Подключить бесплатно", rows: lockable.filter(entry => entry.uncensored) }
+      { key: "uncensored", rows: uncensoredConnected, note: "Версии моделей со снятыми отказами." },
+      { key: "locked", title: "Подключить бесплатно", rows: uncensoredLocked }
     ];
   } else {
     const groups = new Map<string, Section>();
@@ -200,6 +203,7 @@ export function ModelPicker({ selected, catalog, options, personal, zen, auto, l
       groups.get(key)!.rows.push(entry);
     }
     sections = [...groups.values()].map(group => ({ ...group, rows: group.rows.sort((a, b) => byName.compare(a.name, b.name)) }));
+    sections.push({ key: "zen", title: "OpenCode Zen", rows: zenEntries });
   }
   sections = sections.filter(section => section.rows.length);
   const first = sections[0]?.rows[0];
@@ -325,6 +329,7 @@ export function ModelPicker({ selected, catalog, options, personal, zen, auto, l
             <ul className="model-list">{section.rows.map(entry => row(entry, section.key))}</ul>
           </section>)}
           {!first && empty()}
+          {tab === "free" && !term && <p className="picker-note">Показаны модели не слабее GPT-5 по рейтингу Artificial Analysis. Без цензуры — в своей вкладке.</p>}
           {tab === "own" && !term && <button type="button" className="model-option picker-add" onClick={() => { close(); onSubscriptions(); }}>
             <Icon name="plus" />Подключить подписку, ключ или своего поставщика
           </button>}

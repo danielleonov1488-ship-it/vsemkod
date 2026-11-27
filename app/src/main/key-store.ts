@@ -1,9 +1,11 @@
 import { safeStorage } from "electron";
 import { z } from "zod";
+import { cloudflareAccountId } from "../shared/cloudflare";
 import { keyIdSchema, remoteModelsSchema, type KeyId } from "../shared/providers";
 import { readJson, writeJson } from "./storage";
 
-const profileSchema = z.object({ name: z.string().min(1).max(60).optional(), baseUrl: z.url(), models: remoteModelsSchema });
+const profileSchema = z.object({ name: z.string().min(1).max(60).optional(), baseUrl: z.url(), models: remoteModelsSchema,
+  accountId: z.string().regex(cloudflareAccountId).optional() });
 type Profile = z.infer<typeof profileSchema>;
 export type McpKeyId = `mcp:${string}`;
 type StoredKeyId = KeyId | McpKeyId | "telegram-bot";
@@ -36,7 +38,7 @@ export class KeyStore {
 
   profile(id: KeyId): Profile | undefined {
     const entry = Object.hasOwn(this.keys, id) ? this.keys[id] : undefined;
-    if (entry && typeof entry !== "string") return { name: entry.name, baseUrl: entry.baseUrl, models: entry.models };
+    if (entry && typeof entry !== "string") return { name: entry.name, baseUrl: entry.baseUrl, models: entry.models, ...(entry.accountId ? { accountId: entry.accountId } : {}) };
   }
 
   set(id: StoredKeyId, key: string, profile?: Profile): Promise<void> {

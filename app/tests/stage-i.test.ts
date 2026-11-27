@@ -67,7 +67,7 @@ test("groups equivalent upstream IDs and respects catalog offers and model ident
   const catalog = effectiveCatalog(base, {
     numes: list(remote(ids[3]), { id: "vendor/Other_Model-FP8", name: "vendor/Other Model (free)", context: 64_000 }),
     modelscope: list(remote(ids[2]), { ...remote("other-model-1017"), vision: true }),
-    openrouter: list(remote(ids[0]), remote("vendor/other-model:free"), remote("vendor/deepseek-v4.1-flash-uncensored-fp8:free"))
+    openrouter: list(remote(ids[0]), remote("vendor/other-model:free"), remote("vendor/deepseek-v4.1-flash-uncensored-qa-fp8:free"))
   });
   expect(catalogSchema.safeParse(catalog).success).toBe(true);
   const flashOffers = catalog.offers.filter(offer => offer.modelId === flash);
@@ -79,7 +79,7 @@ test("groups equivalent upstream IDs and respects catalog offers and model ident
     origin: "discovered", tier: "new", name: "Other Model", capabilities: ["code", "tools", "vision"]
   });
   expect(catalog.offers.filter(offer => offer.modelId === "x-other-model")).toHaveLength(3);
-  expect(catalog.models.some(model => model.id === "x-deepseek-v4.1-flash-uncensored")).toBe(true);
+  expect(catalog.models.some(model => model.id === "x-deepseek-v4.1-flash-uncensored-qa")).toBe(true);
   expect(automaticModels(catalog).every(model => model.origin !== "discovered")).toBe(true);
   expect(base.models.some(model => model.origin)).toBe(false);
 });
@@ -146,7 +146,7 @@ test("the free and paid route sets are disjoint even when the free routes are pa
     provider.baseUrl = free;
     provider.auth = { type: "none" };
   }
-  catalog.offers = [flash, "nemotron-3.5-lightning"].map((modelId, index) => ({
+  catalog.offers = [flash, "nemotron-3.5-super"].map((modelId, index) => ({
     ...catalog.offers.find(offer => offer.providerId === "kilo" && offer.status === "active")!,
     modelId, providerId: index === 0 ? "kilo" : "numes", providerModelId: modelId
   }));

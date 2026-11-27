@@ -180,6 +180,45 @@ export const draftOffers: Partial<Record<ProviderId, {
   // Конец черновиков approve
 };
 
+// Справочники перечисляют ID, поддержку tools и условия бесплатных маршрутов.
+const documentedRoutes = [
+  { providerId: "cloudflare", docs: "https://developers.cloudflare.com/workers-ai/models/",
+    routes: [
+      ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", 24000],
+      ["@cf/openai/gpt-oss-120b", 128000], ["@cf/openai/gpt-oss-20b", 128000],
+      ["@cf/zai-org/glm-4.7-flash", 131072], ["@cf/qwen/qwen3-30b-a3b-fp8", 32768],
+    ] },
+  { providerId: "longcat", docs: "https://longcat.chat/platform/docs/ChangeLog.html",
+    routes: [["LongCat-2.5", 1048576]] },
+  { providerId: "hetzner", docs: "https://docs.hetzner.com/general/company-and-policy/experiments/inference/",
+    expiresAt: "2026-12-08T00:00:00Z", routes: [["Qwen3.8-27B", 262144]] },
+  { providerId: "amd-token-lab", docs: "https://devcommunity.amd.com/t/cant-beat-free-gemma-4-31b-on-amd-token-lab-with-a-local-chat-page-and-an-adk-agent/",
+    routes: [["Gemma-4-31B-IT", 262144]] },
+  { providerId: "tokenhub", docs: "https://www.tencentcloud.com/document/product/1300/78934", expiresAt: "2026-12-31T23:59:59Z",
+    routes: [
+      ["hy4", 1048576], ["hy4-flash", 1048576], ["deepseek-v4.1-flash-1017", 1048576],
+      ["deepseek-v4-pro-0813", 1048576], ["glm-5.3", 1048576], ["glm-5.3-flash", 1048576],
+      ["kimi-k3.1-pro", 1048576], ["kimi-k2.7-code", 262144], ["minimax-m3", 1048576],
+      ["minimax-m3.1-flash", 1048576], ["mimo-v2.6-pro", 1048576], ["mimo-v2.6-flash", 1048576],
+      ["step-5-preview", 1048576],
+    ] },
+  { providerId: "axforge", docs: "https://axforge.ai/models/", routes: [["qwen3.8-27b", 262144]] },
+] satisfies { providerId: string; docs: string; expiresAt?: string; routes: [string, number][] }[];
+
+export function isDocumentedSource(providerId: string, source: string) {
+  return documentedRoutes.some(entry => entry.providerId === providerId && entry.docs === source);
+}
+
+function documentedBatches(): SourceResult[] {
+  return documentedRoutes.map(({ providerId, docs, expiresAt, routes }) => ({
+    id: providerId,
+    observations: routes.map(([providerModelId, contextWindow]) => ({
+      providerId, providerModelId, contextWindow, source: docs, confidence: "page", documentedRoute: true,
+      supportsTools: true, promo: !!expiresAt, expiresAt: expiresAt ?? null,
+    })),
+  }));
+}
+
 type RegistryProvider = keyof typeof registryPages;
 
 export function registryPageHash(providerId: ProviderId): string | undefined {
@@ -189,7 +228,7 @@ export function registryPageHash(providerId: ProviderId): string | undefined {
 }
 
 export function registryBatches(): SourceResult[] {
-  return (Object.keys(registryPages) as RegistryProvider[]).map((providerId) => {
+  return [...(Object.keys(registryPages) as RegistryProvider[]).map((providerId) => {
     const id = "registry:" + providerId;
     const { verifiedAt, routes }: { verifiedAt: string; routes: RegistryRoute[] } = registryPages[providerId];
     const reviewBy = new Date(Date.parse(verifiedAt) + registryReviewMs).toISOString();
@@ -198,7 +237,7 @@ export function registryBatches(): SourceResult[] {
       verifiedAt, reviewBy: route.reviewBy ?? reviewBy,
     }));
     return { id, observations };
-  });
+  }), ...documentedBatches()];
 }
 
 export function registryModelId(providerId: ProviderId, modelId: string): string {

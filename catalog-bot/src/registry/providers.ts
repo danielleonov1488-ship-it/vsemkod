@@ -1,8 +1,10 @@
 import type { Provider, ProviderId } from "../schema.js";
+import { additionalProviders } from "./stage-k6-providers.js";
 
 export const numesPublicModelsUrl = "https://numes.ai/api/public-catalogue/models";
 
 export const providers: Record<ProviderId, Provider> = {
+  ...additionalProviders,
   // 2026-11-24: https://openrouter.ai/docs/guides/overview/auth/oauth
   // https://openrouter.ai/api/v1/models; https://openrouter.ai/docs/api_reference/limits
   // https://openrouter.ai/docs/guides/privacy/data-collection
@@ -10,7 +12,7 @@ export const providers: Record<ProviderId, Provider> = {
     id: "openrouter", name: "OpenRouter", api: "openai", baseUrl: "https://openrouter.ai/api/v1",
     auth: { type: "oauth_pkce", authorizeUrl: "https://openrouter.ai/auth", exchangeUrl: "https://openrouter.ai/api/v1/auth/keys" },
     loginMethods: ["github", "google"], signupUrl: "https://openrouter.ai/", keyPageUrl: null, keyPattern: null,
-    clicksToConnect: 1, freeLimits: { rpm: 20, rpd: 50, note: "1000 запросов в сутки после покупки не менее $10 кредитов" },
+    clicksToConnect: 1, freeLimits: { rpm: 20, rpd: 50, note: "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN" },
     dataPolicy: "Бесплатные маршруты могут сохранять запросы. Политика зависит от поставщика модели.",
     termsUrl: "https://openrouter.ai/terms", notes: "OAuth PKCE для сторонних приложений.",
   },
@@ -74,7 +76,7 @@ export const providers: Record<ProviderId, Provider> = {
     id: "groq", name: "Groq", api: "openai", baseUrl: "https://api.groq.com/openai/v1",
     auth: { type: "manual_key" }, loginMethods: ["google"], signupUrl: "https://console.groq.com/login",
     keyPageUrl: "https://console.groq.com/keys", keyPattern: "^gsk_[A-Za-z0-9]+$", clicksToConnect: 3,
-    freeLimits: { rpm: 30, rpd: 1000, tpm: 8000, tpd: 200000, note: "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B" },
+    freeLimits: { rpm: 30, rpd: 1000, tpm: 8000, tpd: 200000, note: "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B. Из России может понадобиться VPN" },
     dataPolicy: "Политика Groq зависит от функции API и настроек организации.",
     termsUrl: "https://groq.com/terms-of-use", notes: "Только для коротких задач из-за лимита токенов в минуту.",
   },
@@ -85,7 +87,7 @@ export const providers: Record<ProviderId, Provider> = {
     id: "nvidia-nim", name: "NVIDIA Build", api: "openai", baseUrl: "https://integrate.api.nvidia.com/v1",
     auth: { type: "manual_key" }, loginMethods: [], signupUrl: "https://build.nvidia.com/",
     keyPageUrl: "https://build.nvidia.com/nvidia/nemotron-3-ultra-550b-a55b", keyPattern: "^nvapi-[A-Za-z0-9_-]+$", clicksToConnect: 3,
-    freeLimits: {note: "Бесплатный доступ NVIDIA Developer Program для тестов. Квота зависит от модели и аккаунта."},
+    freeLimits: {note: "Бесплатный доступ NVIDIA Developer Program для тестов. Квота зависит от модели и аккаунта. Подтверждение по номеру +7 не принимается"},
     dataPolicy: "Применяются условия пробного API NVIDIA и выбранной модели.",
     termsUrl: "https://assets.ngc.nvidia.com/products/api-catalog/legal/NVIDIA%20API%20Trial%20Terms%20of%20Service.pdf",
     notes: "Только тестирование и прототипирование. Корпоративные нагрузки требуют отдельной лицензии.",

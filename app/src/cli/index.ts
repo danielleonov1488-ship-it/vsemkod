@@ -21,6 +21,7 @@ const help = [
   "vsemkod serve|web [--port 4096] [--hostname 127.0.0.1] [--password <пароль>]",
   "vsemkod models [--all]                         Показать модели",
   "vsemkod connect <провайдер> [--url <адрес>]     Подключить ключ",
+  "vsemkod connect cloudflare --account-id <id>   Подключить Cloudflare Workers AI",
   "vsemkod connect --list                         Показать провайдеров",
   "vsemkod disconnect <провайдер>                 Удалить ключ из файла",
   "vsemkod doctor                                 Проверить установку",
@@ -80,13 +81,17 @@ async function main() {
       throw new Error("Укажите базовый URL через --url, например https://example.com/v1.");
     }
     const endpoint = command.url ?? keys.profile(provider.id)?.baseUrl;
+    const cloudflare = "auth" in provider && provider.auth.type === "cloudflare";
+    if (command.accountId !== undefined && !cloudflare) throw new Error("--account-id доступен для Cloudflare Workers AI.");
+    const accountId = command.accountId ?? keys.profile(provider.id)?.accountId;
+    if (cloudflare && !accountId) throw new Error("Укажите Account ID через --account-id. Он указан в Workers AI → Use REST API.");
     const key = keys.environment(provider.id) ?? await promptKey();
     if (provider.id.startsWith("custom-") && provider.id !== "custom-api") {
       const profile = keys.profile(provider.id)!;
       await connections.saveCustomProvider({ id, key, ...profile, name: profile.name ?? provider.name });
     } else {
       await connections.manual(personal ?? catalog.current.providers.find(item => item.id === id)!, key,
-        endpoint, AbortSignal.timeout(45_000));
+        endpoint, AbortSignal.timeout(45_000), undefined, accountId);
       if ("auth" in provider) await connections.refreshCatalogModels(catalog.current, undefined, provider.id);
     }
     console.log(provider.name + " · ключ сохранён.");

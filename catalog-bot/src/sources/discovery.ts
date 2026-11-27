@@ -16,6 +16,7 @@ export function publicUrl(raw: string): URL | undefined {
 
 export function providerBase(raw: string): string | undefined {
   const url = publicUrl(raw);
+  if (url?.href === "https://text.pollinations.ai/openai") return url.href;
   if (!url || url.search || url.hash || !/\/v\d+(?:beta\d*)?(?:\/openai)?\/?$/i.test(url.pathname) || /[%{}]/.test(url.pathname)) return;
   return url.href.replace(/\/+$/, "");
 }

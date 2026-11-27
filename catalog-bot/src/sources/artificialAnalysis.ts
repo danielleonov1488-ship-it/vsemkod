@@ -68,23 +68,40 @@ export function benchmarksChanged(previous: Benchmarks | undefined, next: Benchm
 
 const variantSuffix = /-(?:high|xhigh|medium|low|minimal|max|none|(?:non-)?reasoning|(?:non-)?thinking)(?:-reasoning(?:-effort)?)?$/;
 
-function matchCatalog(models: Pick<Model, "id">[]) {
+function analysisStem(value: string): string {
+  let stem = normalizeModelName(value);
+  for (;;) {
+    const shorter = stem.replace(variantSuffix, "").replace(/-(?:\d{4}|vl)$/, "");
+    if (shorter === stem) return stem;
+    stem = shorter;
+  }
+}
+
+function matchCatalog(models: (Pick<Model, "id"> & Partial<Pick<Model, "name">>)[]) {
   const find = catalogModelMatcher(models);
+  const normalized = new Map<string, string | null>();
+  for (const model of models) {
+    for (const value of [model.id, model.name]) {
+      if (!value) continue;
+      const stem = analysisStem(value);
+      const current = normalized.get(stem);
+      normalized.set(stem, current === undefined || current === model.id ? model.id : null);
+    }
+  }
   return ({ id, slug, name, model_creator }: AnalysisModel): string | undefined => {
     const names = [slug, name, id].filter((value): value is string => !!value);
     const direct = find(names);
     if (direct) return direct;
     const creator = normalizeModelName(model_creator?.name ?? "") + "-";
     const stems = names.flatMap((value) => {
-      const normalized = normalizeModelName(value);
-      const withoutVariant = normalized.replace(variantSuffix, "");
+      const withoutVariant = analysisStem(value);
       const candidates = [withoutVariant];
       if (creator !== "-" && withoutVariant.startsWith(creator)) {
         candidates.push(withoutVariant.slice(creator.length));
       }
       return candidates;
     });
-    return find(stems);
+    return stems.map(stem => normalized.get(stem)).find(Boolean) ?? find(stems);
   };
 }
 
@@ -102,8 +119,14 @@ function rounded(value: number | undefined, decimals: number): number | undefine
   return value === undefined ? undefined : Number(value.toFixed(decimals));
 }
 
+function roundedIndex(value: number | undefined): number | undefined {
+  const display = rounded(value, 1);
+  if (value !== undefined && (display === 12 && value < 12 || display === 25 && value < 25)) return value;
+  return display;
+}
+
 export async function fetchBenchmarks(
-  key: string, catalogModels: Pick<Model, "id">[], now: string,
+  key: string, catalogModels: (Pick<Model, "id"> & Partial<Pick<Model, "name">>)[], now: string,
 ): Promise<Benchmarks> {
   const match = matchCatalog(catalogModels);
   const best = new Map<string, Metrics>();
@@ -148,7 +171,7 @@ export async function fetchBenchmarks(
     generatedAt: now,
     source: { ...source, indexVersion: indexVersion ?? "unknown" },
     models: Object.fromEntries([...best].map(([id, { index, speed, ttft }]) => [id, {
-      index: rounded(index, 1), speed: rounded(speed, 1), ttft: rounded(ttft, 2),
+      index: roundedIndex(index), speed: rounded(speed, 1), ttft: rounded(ttft, 2),
     }])),
   });
 }

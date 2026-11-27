@@ -58,6 +58,7 @@ export async function checkOffers(
 
   // Последовательно внутри провайдера, независимо между провайдерами.
   await Promise.all(Object.entries(config.healthKeys).map(async ([providerId, key]) => {
+    if (providers[providerId]?.auth.type === "cloudflare") return;
     for (const offer of entries) {
       if (offer.providerId !== (providerId as ProviderId) || offer.status === "ended" || !key) continue;
       const identity = offerKey(offer);

@@ -3,6 +3,7 @@ import { compare } from "./merge.js";
 import { providers } from "./registry/providers.js";
 import type { Discovered, DiscoveredInput, Radar } from "./schema.js";
 import { discoveryId, providerBase } from "./sources/discovery.js";
+import { isTrackerSource } from "./sources/offerTrackers.js";
 import { discoveryIntervalMs } from "./sources/freeInference.js";
 import type { State } from "./state.js";
 import type { Config } from "./config.js";
@@ -16,6 +17,7 @@ const tinyGrad: Discovered = {
 export async function updateDiscovered(
   radar: Radar | undefined, discoveries: DiscoveredInput[], state: State, config: Config, now: string,
   probe = probeCandidate,
+  catalogRoutes: ReadonlySet<string> = new Set(),
 ) {
   const previous = radar?.discovered ?? [];
   const registered = new Set(Object.values(providers).map(provider => provider.baseUrl.replace(/\/+$/, "")));
@@ -23,13 +25,18 @@ export async function updateDiscovered(
   if (!entries.has(tinyGrad.id)) entries.set(tinyGrad.id, tinyGrad);
   const used = new Set([...Object.keys(providers), ...[...entries.values()].map(item => item.id)]);
   const added = new Set<string>();
-  for (const item of discoveries) {
-    if (!item.baseUrl || registered.has(item.baseUrl)) continue;
-    const existing = entries.get(item.baseUrl);
-    const id = existing?.id ?? availableId(item.baseUrl, used);
+  for (const input of discoveries) {
+    const baseUrl = input.baseUrl;
+    if (!baseUrl) continue;
+    const knownProvider = registered.has(baseUrl);
+    const item = knownProvider ? { ...input, models: input.models.filter(model =>
+      !catalogRoutes.has(baseUrl + "/" + model.toLowerCase())) } : input;
+    if (knownProvider && (!item.sources.some(isTrackerSource) || !item.models.length)) continue;
+    const existing = entries.get(baseUrl);
+    const id = existing?.id ?? availableId(baseUrl, used);
     used.add(id);
     if (!existing) added.add(id);
-    entries.set(item.baseUrl, {
+    entries.set(baseUrl, {
       ...item, id, name: item.name === item.id ? existing?.name ?? item.name : item.name,
       signupUrl: item.signupUrl ?? existing?.signupUrl ?? null,
       endsAt: item.endsAt ?? existing?.endsAt ?? null,
@@ -41,7 +48,12 @@ export async function updateDiscovered(
     });
   }
 
-  const known = [...entries.values()].filter(item => !item.baseUrl || !registered.has(item.baseUrl));
+  const known = [...entries.values()].flatMap(item => {
+    if (!item.baseUrl || !registered.has(item.baseUrl)) return [item];
+    if (!item.sources.some(isTrackerSource)) return [];
+    const models = item.models.filter(model => !catalogRoutes.has(item.baseUrl + "/" + model.toLowerCase()));
+    return models.length ? [{ ...item, models }] : [];
+  });
   const due = known.filter(item => item.baseUrl &&
     (!item.probe.at || Date.parse(now) - Date.parse(item.probe.at) >= discoveryIntervalMs));
   for (let i = 0; i < due.length; i += 8) {

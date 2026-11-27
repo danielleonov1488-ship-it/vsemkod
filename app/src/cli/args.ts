@@ -6,7 +6,7 @@ type Command =
   | { name: "run"; prompt: string; model?: string; json: boolean; dir?: string }
   | { name: "serve" | "web"; port: number; hostname: string; password?: string }
   | { name: "models"; all: boolean }
-  | { name: "connect"; provider: string; url?: string }
+  | { name: "connect"; provider: string; url?: string; accountId?: string }
   | { name: "disconnect"; provider: string };
 
 export function parseCliArgs(args: string[]): Command {
@@ -46,9 +46,10 @@ export function parseCliArgs(args: string[]): Command {
       return { name, all: values.all ?? false };
     }
     case "connect": {
-      const { values, positionals } = parse({ list: { type: "boolean" }, url: { type: "string" } });
-      if (values.list && !positionals.length && values.url === undefined) return { name: "connections" };
-      if (!values.list && positionals.length === 1 && values.url !== "") return { name, provider: positionals[0], url: values.url };
+      const { values, positionals } = parse({ list: { type: "boolean" }, url: { type: "string" }, "account-id": { type: "string" } });
+      if (values.list && !positionals.length && values.url === undefined && values["account-id"] === undefined) return { name: "connections" };
+      if (!values.list && positionals.length === 1 && values.url !== "") return { name, provider: positionals[0], url: values.url,
+        ...(values["account-id"] !== undefined ? { accountId: values["account-id"] } : {}) };
       throw invalid();
     }
     case "disconnect":

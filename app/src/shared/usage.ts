@@ -26,5 +26,6 @@ export function cachePercent(input: number, read: number | undefined): number | 
 }
 
 export function modelDisplayName(name: string, catalogName?: string): string {
-  return (catalogName || name).trim().replace(/^NVIDIA:\s*/i, "").replace(/\s+\(free\)$/i, "").trim();
+  // «Baidu: ERNIE…», «NVIDIA: Nemotron…» — префикс компании в меню лишний.
+  return (catalogName || name).trim().replace(/^[A-Za-z][\w .-]{1,24}:\s+/, "").replace(/\s+\(free\)$/i, "").trim();
 }

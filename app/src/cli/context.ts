@@ -2,13 +2,14 @@
 import { mkdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import bundled from "../../resources/catalog.json";
+import bundledBenchmarks from "../../resources/benchmarks.json";
 import { CatalogService } from "../main/catalog-service";
 import { ConnectService } from "../main/connect-service";
 import type { KeyStore } from "../main/key-store";
 import { Router } from "../main/router";
 import { ProviderHealth } from "../main/router/health";
 import { writeJson } from "../main/storage";
-import { activeOffers, rankedModels } from "../shared/catalog";
+import { activeOffers, rankedModels, visibleFreeModel } from "../shared/catalog";
 import { communityWarning, type Catalog } from "../shared/catalog-schema";
 import { personalProviders, type PersonalProvider } from "../shared/providers";
 import { FileKeys } from "./file-keys";
@@ -28,6 +29,10 @@ export async function openContext(data: string, refresh = true) {
   await mkdir(data, { recursive: true, mode: 0o700 });
   const bundledPath = join(data, "bundled", "catalog.json");
   if (await readFile(bundledPath, "utf8").catch(() => undefined) !== JSON.stringify(bundled)) await writeJson(bundledPath, bundled);
+  const benchmarksPath = join(data, "bundled", "benchmarks.json");
+  if (await readFile(benchmarksPath, "utf8").catch(() => undefined) !== JSON.stringify(bundledBenchmarks)) {
+    await writeJson(benchmarksPath, bundledBenchmarks);
+  }
   const catalog = new CatalogService(data, bundledPath);
   const keys = new FileKeys(join(data, "keys.json"));
   await Promise.all([keys.load(), catalog.loadInitial()]);
@@ -65,7 +70,9 @@ export async function startRouter(data: string, context: CliContext, catalog: Ca
   const { connections } = context;
   const router = new Router({
     catalog: () => catalog,
+    benchmarks: () => context.catalog.benchmarks,
     key: id => connections.key(id),
+    cloudflareAccount: id => connections.cloudflareAccount(id),
     personal: () => connections.personalRoutes(),
     customIds: () => connections.customProviders().map(provider => provider.id),
     legacyModel: id => connections.legacyCatalogModel(context.catalog.current, id),
@@ -76,7 +83,7 @@ export async function startRouter(data: string, context: CliContext, catalog: Ca
 }
 
 export function modelList(catalog: Catalog, context: CliContext, all: boolean) {
-  const free = rankedModels(catalog).flatMap(model => {
+  const free = rankedModels(catalog).filter(model => visibleFreeModel(catalog, model)).flatMap(model => {
     const offers = activeOffers(catalog, model.id).filter(({ offer }) => offer.free);
     const connected = offers.filter(({ provider }) => provider.auth.type === "none" || context.keys.get(provider.id));
     if (!connected.length && !all) return [];

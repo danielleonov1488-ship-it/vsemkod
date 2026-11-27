@@ -8,7 +8,7 @@ import { WindowControls } from "./window-controls";
 
 export type Connection =
   { name: string; model?: Model; community?: boolean } & (
-    { id: KeyId; kind: "manual"; keyPageUrl?: string; keyPattern?: string } |
+    { id: KeyId; kind: "manual"; keyPageUrl?: string; keyPattern?: string; cloudflare?: boolean } |
     { id: KeyId; kind: "oauth" } |
     { id: SubscriptionId; kind: "subscription" }
   );
@@ -16,7 +16,7 @@ export type Connection =
 export function catalogConnection(provider: Provider, model?: Model): Connection {
   const common = { id: provider.id, name: provider.name, model, community: provider.trust === "community" };
   return provider.auth.type === "oauth_pkce" ? { ...common, kind: "oauth" } : {
-    ...common, kind: "manual", keyPageUrl: provider.keyPageUrl ?? provider.signupUrl, keyPattern: provider.keyPattern ?? undefined
+    ...common, kind: "manual", cloudflare: provider.auth.type === "cloudflare", keyPageUrl: provider.keyPageUrl ?? provider.signupUrl, keyPattern: provider.keyPattern ?? undefined
   };
 }
 
@@ -35,6 +35,7 @@ export function ConnectDialog({ connection, clipboard, close, connected, guided 
   const [key, setKey] = useState("");
   const [clipboardCandidate, setClipboardCandidate] = useState<string>();
   const [baseUrl, setBaseUrl] = useState("");
+  const [accountId, setAccountId] = useState("");
   const [choices, setChoices] = useState<ModelChoice[]>();
   const [loadingModels, setLoadingModels] = useState(false);
   const [catchKey, setCatchKey] = useState(!guided && clipboard && connection.kind === "manual" && !!connection.keyPattern);
@@ -45,6 +46,7 @@ export function ConnectDialog({ connection, clipboard, close, connected, guided 
   const resultTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const pending = phase === "starting" || phase === "waiting";
   const manual = connection.kind === "manual";
+  const cloudflare = manual && connection.cloudflare;
   const copilot = connection.id === "github-copilot";
   const grok = connection.id === "xai";
   const plan = manual && personalProviders.some(provider => provider.id === connection.id && provider.kind === "plan");
@@ -54,7 +56,7 @@ export function ConnectDialog({ connection, clipboard, close, connected, guided 
     active.current = true;
     const restoreFocus = document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
     dialog.current?.showModal();
-    if (guided && connection.kind === "manual") void api.clipboardKey?.(connection.id)
+    if (guided && connection.kind === "manual" && !connection.cloudflare) void api.clipboardKey?.(connection.id)
       .then(value => { if (active.current) setClipboardCandidate(value); }).catch(() => {});
     const unsubscribe = api.onConnect(event => {
       if (event.id !== token) return;
@@ -98,7 +100,7 @@ export function ConnectDialog({ connection, clipboard, close, connected, guided 
     setCatchKey(false);
     setPhase("starting");
     try {
-      const state = await api.connect(token, connection.id, manual ? { key: providedKey.trim(), baseUrl: custom ? baseUrl.trim() : undefined, models: custom ? choices?.filter(item => item.checked) : undefined } : undefined);
+      const state = await api.connect(token, connection.id, manual ? { key: providedKey.trim(), baseUrl: custom ? baseUrl.trim() : undefined, models: custom ? choices?.filter(item => item.checked) : undefined, accountId: cloudflare ? accountId.trim() : undefined } : undefined);
       if (!active.current) return;
       setKey("");
       setPhase("done");
@@ -125,6 +127,7 @@ export function ConnectDialog({ connection, clipboard, close, connected, guided 
     <p className="connect-intro" id="connect-intro">
       {connection.model && <>Бесплатно через {connection.name}. </>}
       {manual ? custom ? "Укажите адрес API и ключ. Список моделей загрузится с вашего сервера."
+        : cloudflare ? "Откройте дашборд Cloudflare → Workers AI → Use REST API и скопируйте Account ID и API-токен."
         : plan ? "Возьмите ключ кодинг-плана в личном кабинете " + connection.name + ". Обычный ключ с оплатой за токены сюда не подойдёт."
         : "Возьмите ключ API в личном кабинете провайдера."
         : copilot ? "Подтвердите вход кодом на GitHub, чтобы использовать свой план Copilot."
@@ -148,8 +151,10 @@ export function ConnectDialog({ connection, clipboard, close, connected, guided 
           }}>Использовать ключ из буфера</button>}
           {custom && <label className="manual-field">Базовый URL<input type="url" value={baseUrl} required maxLength={4096}
             placeholder="https://example.com/v1" onChange={event => { setBaseUrl(event.target.value); setChoices(undefined); }} disabled={pending} /></label>}
-          <label className="manual-field">Вставь ключ<input type="password" value={key} required maxLength={4096}
-            autoComplete="off" spellCheck={false} placeholder="Ключ API" onChange={event => {
+          {cloudflare && <label className="manual-field">Account ID<input value={accountId} required maxLength={32}
+            pattern="[0-9a-fA-F]{32}" spellCheck={false} autoComplete="off" onChange={event => setAccountId(event.target.value)} disabled={pending} /></label>}
+          <label className="manual-field">{cloudflare ? "API-токен" : "Вставь ключ"}<input type="password" value={key} required maxLength={4096}
+            autoComplete="off" spellCheck={false} placeholder={cloudflare ? "API-токен" : "Ключ API"} onChange={event => {
               setKey(event.target.value);
               setChoices(undefined);
               setClipboardStatus("");
@@ -232,11 +237,12 @@ export function ConnectionsPage({ state, close, connect, openWizard, onCatalog, 
       <section className="settings-group"><h2>Ключи API</h2>
         <p className="settings-hint">Оплата за токены у самого провайдера.</p>
         {keys.map(provider => <ConnectionRow key={provider.id} name={provider.name} active={state?.personal.includes(provider.id)}
+          detail={provider.id === "google-api" ? "Из России может понадобиться VPN" : undefined}
           action={() => connect({ ...provider, kind: "manual" })} />)}
       </section>
-      {state?.catalog.providers.some(provider => provider.auth.type === "manual_key" || provider.auth.type === "oauth_pkce") &&
+      {state?.catalog.providers.some(provider => provider.auth.type === "manual_key" || provider.auth.type === "oauth_pkce" || provider.auth.type === "cloudflare") &&
         <details className="settings-group catalog-providers"><summary>Бесплатные провайдеры<Icon name="chevron" className="chevron" /></summary>
-          {state.catalog.providers.filter(provider => provider.auth.type === "manual_key" || provider.auth.type === "oauth_pkce")
+          {state.catalog.providers.filter(provider => provider.auth.type === "manual_key" || provider.auth.type === "oauth_pkce" || provider.auth.type === "cloudflare")
             .map(provider => <ConnectionRow key={provider.id} name={provider.name} active={state.connected.includes(provider.id)}
               action={() => connect(catalogConnection(provider))} />)}
         </details>}

@@ -39,6 +39,7 @@ export const providerSchema = z.object({
     z.object({ type: z.literal("oauth_pkce"), authorizeUrl: httpUrl, exchangeUrl: httpUrl }).strict(),
     z.object({ type: z.literal("device_code"), authorizeUrl: httpUrl, exchangeUrl: httpUrl }).strict(),
     z.object({ type: z.literal("manual_key") }).strict(),
+    z.object({ type: z.literal("cloudflare") }).strict(),
   ]),
   loginMethods: z.array(z.string().min(1)),
   signupUrl: httpUrl,

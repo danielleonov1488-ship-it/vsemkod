@@ -345,9 +345,10 @@ function App() {
   const ownModels = [...personal, ...zen];
   const available = options.filter(item => item.available.length);
   const ownModel = ownModels.find(item => item.id === model);
-  const preferred = catalog && defaultModel(catalog.catalog);
+  const preferred = catalog && defaultModel(catalog.catalog, undefined, catalog.benchmarks);
+  const candidates = catalog ? automaticModels(catalog.catalog, undefined, catalog.benchmarks) : [];
   const selected = available.find(item => item.model.id === model) ?? available.find(item => item.model.id === preferred?.id) ??
-    available.find(item => item.model.tier !== "new") ?? available[0];
+    candidates.map(candidate => available.find(item => item.model.id === candidate.id)).find(Boolean);
   const modelId = ownModel?.id ?? selected?.model.id;
   const currentProviderId = routeProvider ?? ownModel?.providerId ?? selected?.available[0]?.provider.id;
 
@@ -958,7 +959,7 @@ function App() {
   const firstSource = otherSources[0];
   const providerName = (id: string) => catalog?.catalog.providers.find(provider => provider.id === id)?.name ?? id;
   const answeredModel = !busy && !failed && issue && view.routedModel !== issue.modelId ? options.find(entry => entry.model.id === view.routedModel)?.model : undefined;
-  const nextModel = catalog && automaticModels(catalog.catalog).find(candidate =>
+  const nextModel = candidates.find(candidate =>
     candidate.id !== issue?.modelId && available.some(entry => entry.model.id === candidate.id));
   const switchInfo = view.routeSwitch;
   const [routeVisible, setRouteVisible] = useState(false);

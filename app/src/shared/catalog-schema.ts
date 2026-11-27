@@ -46,6 +46,7 @@ export const providerSchema = z.object({
     z.object({ type: z.literal("oauth_pkce"), authorizeUrl: httpUrl, exchangeUrl: httpUrl }).strict(),
     z.object({ type: z.literal("device_code"), authorizeUrl: httpUrl, exchangeUrl: httpUrl }).strict(),
     z.object({ type: z.literal("manual_key") }).strict(),
+    z.object({ type: z.literal("cloudflare") }).strict(),
   ]),
   loginMethods: z.array(z.string().min(1)),
   signupUrl: httpUrl,
@@ -57,7 +58,7 @@ export const providerSchema = z.object({
   termsUrl: httpUrl,
   notes: z.string(),
   trust: z.literal("community").optional(),
-}).strict().transform(provider => {
+}).passthrough().transform(provider => {
   const note = provider.freeLimits.note;
   if (provider.trust !== "community" || note?.includes(communityWarning)) return provider;
   return { ...provider, freeLimits: { ...provider.freeLimits, note: note ? note + " · " + communityWarning : communityWarning } };
@@ -83,7 +84,7 @@ export const offerSchema = z.object({
   reviewBy: dateSchema.optional(),
   /** Только в приложении: раздача найдена в списке бесплатных моделей подключённого провайдера. */
   origin: z.literal("discovered").optional(),
-}).strict();
+}).passthrough();
 
 export const candidateSchema = offerSchema.extend({
   suggestedTier: tierSchema.optional(),
@@ -136,7 +137,7 @@ const catalogEntries = z.object({
 const providerEnvelope = z.object({ id: providerIdSchema, api: z.string(), auth: z.unknown() });
 const authEnvelope = z.object({ type: z.string() });
 const offerEnvelope = z.object({ providerId: providerIdSchema });
-const supportedAuth = new Set(["none", "manual_key", "oauth_pkce", "device_code"]);
+const supportedAuth = new Set(["none", "manual_key", "oauth_pkce", "device_code", "cloudflare"]);
 
 export const catalogSchema = z.preprocess(input => {
   const parsed = catalogEntries.safeParse(input);

@@ -270,7 +270,9 @@ async function start() {
   await catalog.loadInitial();
   const router = new Router({
     catalog: effective,
+    benchmarks: () => catalog.benchmarks,
     key: providerId => connections.key(providerId),
+    cloudflareAccount: id => connections.cloudflareAccount(id),
     personal: () => connections.personalRoutes(),
     customIds: () => connections.customProviders().map(provider => provider.id),
     legacyModel,
@@ -566,7 +568,7 @@ async function start() {
       watching = undefined;
     }
   });
-  const keyInput = z.object({ key: z.string().trim().min(1).max(4096), baseUrl: z.string().trim().max(4096).optional(), models: remoteModelsSchema.optional() }).strict();
+  const keyInput = z.object({ key: z.string().trim().min(1).max(4096), baseUrl: z.string().trim().max(4096).optional(), models: remoteModelsSchema.optional(), accountId: z.string().trim().max(32).optional() }).strict();
   handle("connect:start", z.tuple([dialogId, connectionId, keyInput.optional()]), ([token, providerId, input]) => {
     if (attempts.has(token) || [...attempts.values()].some(attempt => attempt.provider === providerId && !attempt.controller.signal.aborted)) {
       throw new Error("Подключение уже запущено.");
@@ -595,8 +597,8 @@ async function start() {
           catch { throw new Error("Не удалось открыть системный браузер."); }
           signalConnect({ id: token, type: "waiting" });
         }, signal);
-      } else if (input && (!("auth" in provider) || provider.auth.type === "manual_key")) {
-        await connections.manual(provider, input.key, input.baseUrl, signal, input.models);
+      } else if (input && (!("auth" in provider) || provider.auth.type === "manual_key" || provider.auth.type === "cloudflare")) {
+        await connections.manual(provider, input.key, input.baseUrl, signal, input.models, input.accountId);
       } else throw new Error("Введите ключ провайдера.");
       router.resetProvider(provider.id);
       if ("auth" in provider) await connections.refreshCatalogModels(catalog.current, signal, provider.id);

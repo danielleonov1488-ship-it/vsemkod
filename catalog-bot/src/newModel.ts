@@ -1,3 +1,4 @@
+import { isUncensored } from "../../app/src/shared/uncensored.js";
 import { modelSlug } from "./match.js";
 import { models } from "./registry/models.js";
 import type { Model } from "./schema.js";
@@ -23,15 +24,17 @@ function isSmall(id: string): boolean {
 
 export function newModel(observation: Observation): Model | undefined {
   const { providerModelId, contextWindow, supportsTools, confidence } = observation;
-  if (confidence !== "structured" || !supportsTools || contextWindow === undefined || contextWindow < 128_000) {
+  const uncensored = isUncensored(providerModelId, observation.name);
+  if ((confidence !== "structured" && !observation.documentedRoute) || !supportsTools ||
+      !observation.documentedRoute && !uncensored && (contextWindow === undefined || contextWindow < 128_000)) {
     return undefined;
   }
-  const id = modelSlug(providerModelId);
+  const id = modelSlug(providerModelId).replace(/-free$/, "");
   const route = providerModelId.trim().toLowerCase().split(":")[0];
-  if (!id || route === "openrouter/free" || route === "kilo-auto/free" || isSmall(id) ||
+  if (!id || route === "openrouter/free" || route === "kilo-auto/free" || /^(?:auto|free|router)$/.test(id) ||
+      !observation.documentedRoute && !uncensored && isSmall(id) ||
       /(?:^|-)(?:embeddings?|embed|rerank(?:er|ing)?|moderat(?:ion|or)|safeguard|tts|stt|whisper|text-to-(?:audio|image)|(?:audio|image)-generation)(?:-|$)/i.test(id) ||
-      // Любительские дообучения без цензуры/«аблитерации» и роулплей — не для кодинга, людям не показываем.
-      /(?:^|-)(?:uncensored|abliterated|jailbreak|nsfw|roleplay|rp|erotic)(?:-|$)/i.test(id)) {
+      !uncensored && /(?:^|-)(?:jailbreak|nsfw|roleplay|rp|erotic)(?:-|$)/i.test(id)) {
     return undefined;
   }
 
@@ -47,7 +50,7 @@ export function newModel(observation: Observation): Model | undefined {
     vendor: vendor ?? "Неизвестно",
     tier: "new",
     description: "Новая бесплатная модель. Мало проверена — может работать нестабильно.",
-    contextWindow,
+    contextWindow: contextWindow ?? 32_768,
     capabilities,
     rank,
   };

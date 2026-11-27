@@ -1,3 +1,4 @@
+import { isUncensored } from "../../app/src/shared/uncensored.js";
 import { modelRegistry } from "./registry/models.js";
 import type { Model } from "./schema.js";
 
@@ -11,8 +12,10 @@ export function modelSlug(providerModelId: string): string {
 
 export function matchModel(providerModelId: string): Model | undefined {
   const slug = modelSlug(providerModelId);
-  const find = (name: string) => modelRegistry.find(({ id, aliases }) => id === name || aliases.some(alias => alias.test(name)));
-  const entry = find(slug) ?? (slug.endsWith("-free") ? find(slug.slice(0, -5)) : undefined);
+  const find = (name: string) => modelRegistry.find(({ id, aliases }) =>
+    id === name || !isUncensored(name) && aliases.some(alias => alias.test(name)));
+  const bare = slug.replace(/^coding-/, "").replace(/^xiaomi-(?=mimo-)/, "");
+  const entry = find(slug) ?? find(bare.replace(/-free$/, ""));
   if (!entry) return undefined;
   const { aliases: _aliases, ...model } = entry;
   return model;
