@@ -369,6 +369,10 @@
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
     },
+    "0605285d7f681a944678dcb97e2cb134d5d9d86529b51448a386253f39244f54": {
+      "observations": [],
+      "savedAt": "2026-11-27T22:54:40.133Z"
+    },
     "08f1fb388a3c5d979408fed6543875ee0f3b33550d809200a738458a6eea40f2": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
@@ -532,6 +536,10 @@
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
     },
+    "2d3b13c24483432948a875dc38a299b3f415db357a53e3b2a27c3859cd8ddca5": {
+      "observations": [],
+      "savedAt": "2026-11-27T22:54:40.133Z"
+    },
     "2d91104ff9ecf6632b4a4165ea466bd679b373cf7e18c4cbf4c01f10d4f71fce": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
@@ -613,6 +621,10 @@
       "observations": [],
       "savedAt": "2026-11-26T21:53:59.801Z"
     },
+    "500e845ebed49ef1ceffe4df1d9d5324229cb5b247704e4aefadd72aa351d7de": {
+      "observations": [],
+      "savedAt": "2026-11-27T22:54:40.133Z"
+    },
     "50999722758e485ff7bc467a249e6a58406d15a24ac07ad6d11d9ddf42d7304e": {
       "observations": [],
       "savedAt": "2026-11-27T17:55:20.968Z"
@@ -628,6 +640,10 @@
     "5a1b3dd782fd8156c41e0758ba95a7e2acc6b4c488368f6f01e543b896f1eeba": {
       "observations": [],
       "savedAt": "2026-11-26T12:19:22.119Z"
+    },
+    "5e9c910f03aa33ce42dac3ca45833b9698230d29413cdc83692a7450ef809752": {
+      "observations": [],
+      "savedAt": "2026-11-27T22:54:40.133Z"
     },
     "6228cea448fdff8e8f75840b66c7a51c9dc3b94d31c15dc13e1cbf2c10243b5e": {
       "observations": [],
@@ -3087,12 +3103,36 @@
     "hn:50669647": {
       "observations": [],
       "savedAt": "2026-11-27T17:55:20.968Z"
+    },
+    "hn:50669662": {
+      "observations": [],
+      "savedAt": "2026-11-27T22:54:40.133Z"
+    },
+    "hn:50669993": {
+      "observations": [],
+      "savedAt": "2026-11-27T22:54:40.133Z"
+    },
+    "hn:50670468": {
+      "observations": [],
+      "savedAt": "2026-11-27T22:54:40.133Z"
+    },
+    "hn:50670584": {
+      "observations": [],
+      "savedAt": "2026-11-27T22:54:40.133Z"
+    },
+    "hn:50670977": {
+      "observations": [],
+      "savedAt": "2026-11-27T22:54:40.133Z"
+    },
+    "hn:50671275": {
+      "observations": [],
+      "savedAt": "2026-11-27T22:54:40.133Z"
     }
   },
   "telegramLastPost": {
     "freemodelradar": 32,
-    "neuro_channel": 3251,
-    "rubiconzone": 136
+    "neuro_channel": 3253,
+    "rubiconzone": 137
   },
   "trackerCheckedAt": {
     "claw": "2026-11-27T13:42:15.137Z",
@@ -4474,7 +4514,7 @@
     "kilo:inclusionai/ling-3.2-flash:free": {
       "evidence": {
         "kilo": {
-          "missedRuns": 3,
+          "missedRuns": 4,
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
@@ -5489,7 +5529,7 @@
     "openrouter:inclusionai/ling-3.2-flash:free": {
       "evidence": {
         "openrouter": {
-          "missedRuns": 3,
+          "missedRuns": 4,
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
