@@ -82,7 +82,8 @@ test("принимает будущие поля провайдера и раз�
   expect(catalogSchema.safeParse(invalid).success).toBe(false);
 });
 
-test("Cloudflare сохраняет Account ID и роутит через OpenAI-совместимый адрес", async () => {
+// Cloudflare снят с каталога 2026-11-27 (не подключается у пользователей); поддержка в роутере осталась.
+test.skip("Cloudflare сохраняет Account ID и роутит через OpenAI-совместимый адрес", async () => {
   const dir = await mkdtemp(join(tmpdir(), "vsemkod-cloudflare-"));
   const calls: { path?: string; auth?: string; model: string }[] = [];
   const server = createServer(async (req, res) => {

@@ -137,6 +137,9 @@ const catalogEntries = z.object({
 const providerEnvelope = z.object({ id: providerIdSchema, api: z.string(), auth: z.unknown() });
 const authEnvelope = z.object({ type: z.string() });
 const offerEnvelope = z.object({ providerId: providerIdSchema });
+/** 2026-11-27: не подключаются у пользователей (карта, телефон, регион). Бот их уже не публикует — это страховка для старого кэша. */
+const retiredProviderIds = new Set(["amd-token-lab", "axforge", "cloudflare", "cohere", "hetzner", "inferx", "inkstone", "k-exaone", "kenari",
+  "llm7", "longcat", "nous", "nvidia-nim", "sensenova", "synap", "tokenhub", "vercel", "zro"]);
 const supportedAuth = new Set(["none", "manual_key", "oauth_pkce", "device_code", "cloudflare"]);
 
 export const catalogSchema = z.preprocess(input => {
@@ -149,7 +152,7 @@ export const catalogSchema = z.preprocess(input => {
     if (!result.success) return true;
     const { id, api, auth } = result.data;
     const type = authEnvelope.safeParse(auth).data?.type;
-    if (api === "openai" && (!type || supportedAuth.has(type)) && !reservedProviderId(id)) return true;
+    if (api === "openai" && (!type || supportedAuth.has(type)) && !reservedProviderId(id) && !retiredProviderIds.has(id)) return true;
     ignored.add(id);
     return false;
   });

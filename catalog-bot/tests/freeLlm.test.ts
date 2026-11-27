@@ -61,7 +61,6 @@ it("сортирует кандидатов по top-моделям и пока�
     { id: "glm-5.3-flash", catalogModelId: "glm-5.3-flash" },
   ]);
   expect(possible).toEqual([
-    { providerId: "cloudflare", id: "@cf/qwen/qwen3.8-27b", catalogModelId: "qwen3.8-27b" },
     { providerId: "ovh-ai-endpoints", id: "DeepSeek-V4.1-Flash-1017", catalogModelId: "deepseek-v4.1-flash" },
     { providerId: "ovh-ai-endpoints", id: "Qwen3.8-27B", catalogModelId: "qwen3.8-27b" },
   ]);
@@ -74,7 +73,7 @@ it("сортирует кандидатов по top-моделям и пока�
     "fixture-top", "aaa-good",
   ]);
   expect(catalog.providers.map(({ id }) => id)).not.toContain("ovh-ai-endpoints");
-  expect(catalog.providers.map(({ id }) => id)).toContain("nvidia-nim");
+  expect(catalog.providers.map(({ id }) => id)).not.toContain("nvidia-nim");
 });
 
 it("сохраняет данные рядом с другими радарами и сообщает о каждом новом провайдере один раз", async () => {

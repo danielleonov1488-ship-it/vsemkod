@@ -2,7 +2,7 @@ import { z } from "zod";
 import { freeLlmDenylist } from "../config.js";
 import { catalogModelMatcher, modelSlug } from "../match.js";
 import { compare } from "../merge.js";
-import { providers, providersUnderReview } from "../registry/providers.js";
+import { providers, providersUnderReview, retiredProviders } from "../registry/providers.js";
 import type { Catalog, Model, RadarFreeLlmProvider } from "../schema.js";
 import { request } from "./common.js";
 
@@ -91,6 +91,7 @@ export function matchFreeLlm(snapshot: SnapshotProvider[], catalog: Pick<Catalog
       return catalogModelId ? [{ id, catalogModelId }] : [];
     });
     const providerId = registeredProviderId(provider.slug, provider.baseUrl);
+    if (providerId && retiredProviders.has(providerId)) continue;
     if (providerId) {
       for (const model of models) {
         if (!existing.has(providerId + ":" + model.catalogModelId)) possible.push({ providerId, ...model });

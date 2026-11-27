@@ -3,7 +3,16 @@ import { additionalProviders } from "./stage-k6-providers.js";
 
 export const numesPublicModelsUrl = "https://numes.ai/api/public-catalogue/models";
 
-export const providers: Record<ProviderId, Provider> = {
+/**
+ * 2026-11-27: у владельца не подключились — нужна карта, телефон, подходящий регион
+ * или ключ так и не выдали. В каталог не попадают, поиск раздач их не возвращает.
+ */
+export const retiredProviders: ReadonlySet<string> = new Set([
+  "amd-token-lab", "axforge", "cloudflare", "cohere", "hetzner", "inferx", "inkstone", "k-exaone", "kenari",
+  "llm7", "longcat", "nous", "nvidia-nim", "sensenova", "synap", "tokenhub", "vercel", "zro",
+]);
+
+const registeredProviders: Record<ProviderId, Provider> = {
   ...additionalProviders,
   // 2026-11-24: https://openrouter.ai/docs/guides/overview/auth/oauth
   // https://openrouter.ai/api/v1/models; https://openrouter.ai/docs/api_reference/limits
@@ -242,6 +251,12 @@ export const providers: Record<ProviderId, Provider> = {
     notes: "Бесплатный ID акции — hy4-flash:free.",
   },
 };
+
+/** Полный реестр (для ссылок из источников); в каталог попадают только `activeProviders`. */
+export const providers = registeredProviders;
+export const activeProviders = Object.fromEntries(
+  Object.entries(registeredProviders).filter(([id]) => !retiredProviders.has(id)),
+) as Partial<Record<ProviderId, Provider>>;
 
 // Записи из approve ожидают ручной проверки перед включением в каталог.
 export const draftProviders: Partial<Record<ProviderId, Provider>> = {

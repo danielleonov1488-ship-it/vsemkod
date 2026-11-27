@@ -3,6 +3,8 @@ import type { CatalogState, ConnectionId, CustomProvider, Preferences, Subscript
 import type { Model, Provider } from "../shared/catalog-schema";
 import { nativeNames, personalProviders, type KeyId, type RemoteModel } from "../shared/providers";
 import { customBaseUrl } from "../shared/model-tags";
+import { providerPlan, type ProviderValue } from "../shared/provider-plan";
+import { modelDisplayName } from "../shared/usage";
 import { Icon } from "./icons";
 import { WindowControls } from "./window-controls";
 
@@ -240,12 +242,7 @@ export function ConnectionsPage({ state, close, connect, openWizard, onCatalog, 
           detail={provider.id === "google-api" ? "Из России может понадобиться VPN" : undefined}
           action={() => connect({ ...provider, kind: "manual" })} />)}
       </section>
-      {state?.catalog.providers.some(provider => provider.auth.type === "manual_key" || provider.auth.type === "oauth_pkce" || provider.auth.type === "cloudflare") &&
-        <details className="settings-group catalog-providers"><summary>Бесплатные провайдеры<Icon name="chevron" className="chevron" /></summary>
-          {state.catalog.providers.filter(provider => provider.auth.type === "manual_key" || provider.auth.type === "oauth_pkce" || provider.auth.type === "cloudflare")
-            .map(provider => <ConnectionRow key={provider.id} name={provider.name} active={state.connected.includes(provider.id)}
-              action={() => connect(catalogConnection(provider))} />)}
-        </details>}
+      {state && <FreeSources state={state} connect={connect} />}
     </div>
   </main>;
 }
@@ -503,4 +500,40 @@ export function PreferenceSwitch({ title, detail, value, toggle }: {
     <input className="switch" type="checkbox" role="switch" aria-label={title} checked={value}
       onChange={event => toggle(event.currentTarget.checked)} />
   </label>;
+}
+
+/** Строка источника: что он даёт и сколько. Общая для мастера и страницы «Подписки и ключи». */
+export function ProviderValueRow({ value, connected, connect, index }: {
+  value: ProviderValue; connected: boolean; connect: (connection: Connection) => void; index?: number;
+}) {
+  const { provider, models, limit } = value;
+  const names = models.map(model => modelDisplayName(model.name));
+  const vpn = /VPN/i.test(provider.freeLimits.note ?? "") || /VPN/i.test(provider.notes);
+  return <li className="provider-value">
+    {index !== undefined && <span className="provider-value-index" aria-hidden="true">{index}</span>}
+    <span className="provider-value-copy">
+      <strong>{provider.name}</strong>
+      <span className="provider-value-models">{names.slice(0, 3).join(", ")}{names.length > 3 && " и ещё " + (names.length - 3)}</span>
+      {(limit || vpn) && <span className="provider-value-meta">{[limit, vpn && "из России — с VPN"].filter(Boolean).join(" · ")}</span>}
+    </span>
+    {connected ? <span className="connection-label"><span className="status-dot" />Подключён</span> :
+      <button type="button" className="composer-control connect-label" aria-label={"Подключить " + provider.name}
+        onClick={() => connect(catalogConnection(provider))}>Подключить</button>}
+  </li>;
+}
+
+/** Бесплатные источники: сначала те несколько, что открывают все сильные модели, остальные свёрнуты. */
+function FreeSources({ state, connect }: { state: CatalogState; connect: (value: Connection) => void }) {
+  const plan = providerPlan(state.catalog, state.benchmarks);
+  if (!plan.recommended.length) return null;
+  return <section className="settings-group"><h2>Бесплатные источники моделей</h2>
+    <p className="settings-hint">Подключите эти {plan.recommended.length}: этого хватит для всех сильных бесплатных моделей. Остальные только добавляют лимиты.</p>
+    <ol className="provider-values">{plan.recommended.map((value, position) => <ProviderValueRow key={value.provider.id} value={value} index={position + 1}
+      connected={state.connected.includes(value.provider.id)} connect={connect} />)}</ol>
+    {plan.others.length > 0 && <details className="provider-values-more">
+      <summary>Ещё источники · дополнительные лимиты ({plan.others.length})<Icon name="chevron" className="chevron" /></summary>
+      <ul className="provider-values">{plan.others.map(value => <ProviderValueRow key={value.provider.id} value={value}
+        connected={state.connected.includes(value.provider.id)} connect={connect} />)}</ul>
+    </details>}
+  </section>;
 }

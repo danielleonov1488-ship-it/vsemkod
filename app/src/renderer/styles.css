@@ -720,3 +720,21 @@ fieldset.auto-field { border: 0; margin: 0; padding: 0; }
 .composer-context .worktree-toggle[aria-pressed="true"] { box-shadow: none; background: var(--mint-hover); color: var(--text); }
 .workspace--home .composer--home { padding-top: 12px; }
 .workspace--home .composer--home .composer-toolbar { margin-top: 14px; }
+
+/* Бесплатные источники: что даёт каждый и сколько. */
+.provider-values { margin: 6px 0 0; padding: 0; list-style: none; }
+.provider-value { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 2px; border-top: 1px solid var(--line); }
+.provider-value:last-child { border-bottom: 1px solid var(--line); }
+.provider-value-index { display: grid; flex: none; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--subtle-surface); color: var(--secondary); font-size: 12px; font-variant-numeric: tabular-nums; }
+.provider-value-copy { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.provider-value-copy strong { font-size: calc(13.5px * var(--font-scale, 1)); font-weight: 600; }
+.provider-value-models { overflow: hidden; color: var(--secondary); font-size: calc(12.5px * var(--font-scale, 1)); text-overflow: ellipsis; white-space: nowrap; }
+.provider-value-meta { overflow: hidden; color: var(--muted); font-size: calc(12px * var(--font-scale, 1)); text-overflow: ellipsis; white-space: nowrap; }
+.provider-value .connection-label, .provider-value .connect-label { flex: none; }
+.provider-values-more { margin-top: 10px; }
+.provider-values-more > summary { display: flex; align-items: center; justify-content: space-between; min-height: 34px; color: var(--secondary); font-size: calc(13px * var(--font-scale, 1)); cursor: pointer; list-style: none; }
+.provider-values-more > summary::-webkit-details-marker { display: none; }
+.provider-values-more > summary .chevron { width: 14px; height: 14px; transition: transform .15s; }
+.provider-values-more[open] > summary .chevron { transform: rotate(180deg); }
+.connect-wizard { width: min(560px, calc(100% - 32px)); max-height: calc(100dvh - 48px); overflow: auto; }
+.connect-wizard .connect-intro { margin-bottom: 8px; }

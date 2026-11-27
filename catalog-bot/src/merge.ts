@@ -2,7 +2,7 @@ import { modelSlug, matchModel } from "./match.js";
 import { newModel } from "./newModel.js";
 import { models } from "./registry/models.js";
 import { isDocumentedSource, registryPageHash, registryReviewMs } from "./registry/offers.js";
-import { providers } from "./registry/providers.js";
+import { providers, retiredProviders } from "./registry/providers.js";
 import { catalogSchema, offerKey } from "./schema.js";
 import type { Candidate, Catalog, Change, Model, Offer } from "./schema.js";
 import type { HealthState, Track, State } from "./state.js";
@@ -244,7 +244,7 @@ export function mergeCatalog(
       verifiedAt: registry?.verifiedAt ?? prior?.verifiedAt,
       reviewBy: registry?.reviewBy ?? prior?.reviewBy,
     };
-    if (eligible) {
+    if (eligible && !retiredProviders.has(entry.providerId)) {
       offers.push(entry);
       if (!registered) {
         const priority = entry.status === "ended" ? 0 : strongest.name ? 2 : 1;
@@ -264,7 +264,8 @@ export function mergeCatalog(
     schemaVersion: 1, generatedAt: now,
     models: [...models.filter(model => model.tier !== "new" || offeredModels.has(model.id)),
       ...[...automaticModels.values()].map(({ model }) => model)],
-    providers: Object.values(providers), offers, candidates,
+    providers: Object.values(providers).filter(provider => !retiredProviders.has(provider.id)), offers,
+    candidates: candidates.filter(candidate => !retiredProviders.has(candidate.providerId)),
   });
   catalogSchema.parse(catalog);
   return { catalog, tracks, changes: makeChanges(previous, catalog) };
