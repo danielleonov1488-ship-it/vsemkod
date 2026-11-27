@@ -125,6 +125,11 @@ const INSTALL_COMMANDS = {
   macOS: "curl -fsSL https://vsemkod.ru/install.sh | sh",
   Linux: "curl -fsSL https://vsemkod.ru/install.sh | sh"
 };
+const INSTALL_CLI_COMMANDS = {
+  Windows: "$env:VSEMKOD_CLI=1; irm https://vsemkod.ru/install.ps1 | iex",
+  macOS: "curl -fsSL https://vsemkod.ru/install.sh | sh -s -- --cli",
+  Linux: "curl -fsSL https://vsemkod.ru/install.sh | sh -s -- --cli"
+};
 
 // Команда установки из терминала: без окна SmartScreen и Gatekeeper.
 function configureInstallCommand(platform, mobile) {
@@ -134,7 +139,27 @@ function configureInstallCommand(platform, mobile) {
   const status = document.getElementById("install-copy-status");
   if (!line || !code || !button) return;
   if (mobile || !RELEASED) { line.hidden = true; return; }
-  code.textContent = INSTALL_COMMANDS[platform];
+  const toggle = document.getElementById("install-toggle");
+  const popover = document.getElementById("install-popover");
+  const title = document.getElementById("install-title");
+  const alt = document.getElementById("install-alt");
+  const shell = platform === "Windows" ? "PowerShell" : "Терминал";
+  let cli = false;
+  const render = () => {
+    code.textContent = (cli ? INSTALL_CLI_COMMANDS : INSTALL_COMMANDS)[platform];
+    title.textContent = cli ? "Терминальная версия: вставьте в " + shell : "Вставьте в " + shell;
+    alt.textContent = cli ? "Обычное приложение с окном" : "Для сервера или виртуалки — терминальная версия";
+  };
+  render();
+  const setOpen = (open) => {
+    popover.hidden = !open;
+    toggle.setAttribute("aria-expanded", String(open));
+    if (open) button.focus();
+  };
+  toggle.addEventListener("click", () => setOpen(popover.hidden));
+  alt.addEventListener("click", () => { cli = !cli; render(); });
+  document.addEventListener("pointerdown", (event) => { if (!popover.hidden && !line.contains(event.target)) setOpen(false); });
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !popover.hidden) { setOpen(false); toggle.focus(); } });
   let timer;
   button.addEventListener("click", async () => {
     try {

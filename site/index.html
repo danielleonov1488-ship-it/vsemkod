@@ -47,6 +47,7 @@
     <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 17v4h14v-4"/></symbol>
     <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></symbol>
     <symbol id="i-copied" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="m7.5 10 2.5 2.5-2.5 2.5M12.5 15.5h4"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
     <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/></symbol>
@@ -106,15 +107,22 @@
             <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg><span id="platform-label">Скачать для Windows</span>
           </a>
           <a class="button button-secondary" href="https://github.com/danielleonov1488-ship-it/vsemkod/releases">Все загрузки</a>
-          <span class="release-status" id="release-status">Скоро первая версия</span>
-          <div class="install-line" id="install-line">
-            <span class="install-label">или из терминала, без предупреждений системы</span>
-            <div class="install-command">
-              <code id="install-command">irm https://vsemkod.ru/install.ps1 | iex</code>
-              <button type="button" class="install-copy" id="install-copy" aria-label="Скопировать команду"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg></button>
+          <div class="install-terminal" id="install-line">
+            <button type="button" class="button button-secondary install-toggle" id="install-toggle" aria-expanded="false" aria-controls="install-popover">
+              <svg class="icon" aria-hidden="true"><use href="#i-terminal"/></svg><span>Из терминала</span>
+            </button>
+            <div class="install-popover" id="install-popover" role="dialog" aria-label="Установка из терминала" hidden>
+              <p class="install-popover-title" id="install-title">Вставьте в PowerShell</p>
+              <div class="install-command">
+                <code id="install-command">irm https://vsemkod.ru/install.ps1 | iex</code>
+                <button type="button" class="install-copy" id="install-copy" aria-label="Скопировать команду"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg></button>
+              </div>
+              <p class="install-popover-note">Без окна «Windows защитила компьютер»: скрипт сам скачает последнюю версию с GitHub и проверит контрольную сумму.</p>
+              <p class="install-popover-alt"><button type="button" class="install-alt" id="install-alt">Для сервера или виртуалки — терминальная версия</button></p>
+              <span class="visually-hidden" id="install-copy-status" role="status"></span>
             </div>
-            <span class="visually-hidden" id="install-copy-status" role="status"></span>
           </div>
+          <span class="release-status" id="release-status">Скоро первая версия</span>
         </div>
       </div>
 
