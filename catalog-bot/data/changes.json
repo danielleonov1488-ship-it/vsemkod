@@ -1,5 +1,123 @@
 [
   {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "command",
+    "providerModelId": "command",
+    "text": "Проверяем сведения о бесплатной модели command у Cohere",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "glm",
+    "providerId": "zai",
+    "providerModelId": "glm",
+    "text": "Проверяем сведения о бесплатной модели glm у Z.ai",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "modelscope",
+    "providerId": "modelscope",
+    "providerModelId": "modelscope",
+    "text": "Проверяем сведения о бесплатной модели modelscope у ModelScope",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "nvidia-nim",
+    "providerModelId": "nvidia-nim",
+    "text": "Проверяем сведения о бесплатной модели nvidia-nim у NVIDIA Build",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "runcrate",
+    "providerId": "runcrate",
+    "providerModelId": "runcrate",
+    "text": "Проверяем сведения о бесплатной модели runcrate у Runcrate",
+    "type": "candidate_added"
+  },
+  {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "deepseek-v4-flash",
+    "providerId": "modelscope",
+    "providerModelId": "deepseek-ai/DeepSeek-V4-Flash-0731",
+    "text": "DeepSeek V4 Flash теперь бесплатно у ModelScope",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "deepseek-v4-pro",
+    "providerId": "modelscope",
+    "providerModelId": "deepseek-ai/DeepSeek-V4-Pro",
+    "text": "DeepSeek V4 Pro теперь бесплатно у ModelScope",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "deepseek-v4-pro",
+    "providerId": "modelscope",
+    "providerModelId": "deepseek-ai/DeepSeek-V4-Pro-0813",
+    "text": "DeepSeek V4 Pro теперь бесплатно у ModelScope",
+    "type": "offer_added"
+  },
+  {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "deepseek-v4.1-flash",
+    "providerId": "modelscope",
+    "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+    "text": "Условия раздачи DeepSeek V4.1 Flash у ModelScope изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "deepseek-v4.1-flash",
+    "providerId": "modelscope",
+    "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+    "text": "Условия раздачи DeepSeek V4.1 Flash у ModelScope изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "glm-4.7-flash",
+    "providerId": "modelscope",
+    "providerModelId": "ZhipuAI/GLM-4.7-Flash",
+    "text": "Условия раздачи GLM-4.7-Flash у ModelScope изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "glm-5.2",
+    "providerId": "modelscope",
+    "providerModelId": "ZhipuAI/GLM-5.2",
+    "text": "Условия раздачи GLM 5.2 у ModelScope изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "kimi-k3.1-pro",
+    "providerId": "modelscope",
+    "providerModelId": "moonshotai/Kimi-K3.1-Pro",
+    "text": "Условия раздачи Kimi K3.1 Pro у ModelScope изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "minimax-m3",
+    "providerId": "modelscope",
+    "providerModelId": "MiniMax/MiniMax-M3",
+    "text": "Условия раздачи MiniMax M3 у ModelScope изменились",
+    "type": "offer_changed"
+  },
+  {
+    "date": "2026-11-27T13:42:15.137Z",
+    "modelId": "qwen3.8-27b",
+    "providerId": "modelscope",
+    "providerModelId": "Qwen/Qwen3.8-27B",
+    "text": "Условия раздачи Qwen3.8-27B у ModelScope изменились",
+    "type": "offer_changed"
+  },
+  {
     "date": "2026-11-27T11:16:31.091Z",
     "modelId": "command",
     "providerModelId": "command",

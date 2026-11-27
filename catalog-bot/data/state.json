@@ -2,16 +2,26 @@
   "benchmarksAttemptedAt": "2026-11-27T04:11:10.828Z",
   "discoveryFailures": {
     "assemblyai": 1,
+    "chat": 1,
     "cloud": 1,
     "deepgram": 1,
     "dots": 1,
     "endpoints": 1,
+    "free": 1,
     "generativelanguage": 1,
     "kilo-2": 1,
+    "miapi": 1,
+    "mixedbread": 1,
+    "oai": 1,
+    "oai-2": 1,
     "opencode": 1,
+    "opencode-2": 1,
+    "opentyphoon": 1,
+    "platform": 1,
     "scnet": 1,
     "synap402": 1,
-    "twigpine": 1
+    "twigpine": 1,
+    "vlm": 1
   },
   "freeInferenceCheckedAt": "2026-11-27T11:16:31.091Z",
   "freeListCheckedAt": "2026-11-27T11:16:31.091Z",
@@ -370,6 +380,121 @@
     "0b213c9698212ce214d2362490bb292ab28879ed6e1d3d8bdc36ae54db32bc1e": {
       "observations": [],
       "savedAt": "2026-11-25T20:09:57.184Z"
+    },
+    "0b726dc3a361bb205847ab3e35a2c8e6917a350a37f0f9e9890d25c4dca87772": {
+      "observations": [
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "MiniMax/MiniMax-M3",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "Qwen/Qwen3.8-27B",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "ZhipuAI/GLM-4.7-Flash",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "ZhipuAI/GLM-5.2",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4-Flash-0731",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4-Pro",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4-Pro-0813",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "moonshotai/Kimi-K3.1-Pro",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        }
+      ],
+      "savedAt": "2026-11-27T13:42:15.137Z"
     },
     "0f6546fd6e205726d70df2964441e7b002f4d29100feec98a9cb2b85e9a07e29": {
       "observations": [],
@@ -792,6 +917,10 @@
       "observations": [],
       "savedAt": "2026-11-26T21:53:59.801Z"
     },
+    "6c3d06daae60892d3a1e4b6ff88e1f9265942af4bbb04f3943d46b0256602091": {
+      "observations": [],
+      "savedAt": "2026-11-27T13:42:15.137Z"
+    },
     "6f0870cb76af020b25beb4a812920e39a2d47facef5e0f18af9ff2a8cd09f76c": {
       "observations": [],
       "savedAt": "2026-11-25T20:09:57.184Z"
@@ -1203,6 +1332,10 @@
       "observations": [],
       "savedAt": "2026-11-26T21:53:59.801Z"
     },
+    "c6039bfa8b02a4c10f8b911475657ceded287924a1e8371a69d00c1c80048793": {
+      "observations": [],
+      "savedAt": "2026-11-27T13:42:15.137Z"
+    },
     "c84b94f80edf09f56dae8d2247b8876a720dac29a7b6964b8830864185779944": {
       "observations": [],
       "savedAt": "2026-11-26T21:53:59.801Z"
@@ -1222,6 +1355,10 @@
     "ccba168ab2ff94a68c5e33697ee8d3bb05dc484ed841102886a39f54d479d0e6": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "cf290bceb5877028788bb01a17168f1099b67a9a7c6487589fe2d8a753aac8d6": {
+      "observations": [],
+      "savedAt": "2026-11-27T13:42:15.137Z"
     },
     "d159b2c396e7507c3f80688c3c6754898ac4a91a53576ffb39a2ff525d064b0a": {
       "observations": [],
@@ -1514,9 +1651,9 @@
       "hash": "34dcf2cfab29787fbf6996ff0beb94011ceb1dfe066670b92ed2458f37a2d4ad"
     },
     "page:modelscope": {
-      "changedAt": "2026-11-27T11:16:31.091Z",
-      "checkedAt": "2026-11-27T11:16:31.091Z",
-      "hash": "a14bdfcaa62452c3762cb5d8bc5b8b6831283cdf5b5b267ae04a29ce322c7293"
+      "changedAt": "2026-11-27T13:42:15.137Z",
+      "checkedAt": "2026-11-27T13:42:15.137Z",
+      "hash": "a8f76ba19635265425bc1a2cb8d19411b0f6d7e23205b247ef0d2198870653d6"
     },
     "page:numes": {
       "changedAt": "2026-11-27T11:16:31.091Z",
@@ -1540,13 +1677,13 @@
       "observations": []
     },
     "page:modelscope": {
-      "hash": "a14bdfcaa62452c3762cb5d8bc5b8b6831283cdf5b5b267ae04a29ce322c7293",
+      "hash": "a8f76ba19635265425bc1a2cb8d19411b0f6d7e23205b247ef0d2198870653d6",
       "observations": [
         {
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1557,7 +1694,7 @@
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1568,7 +1705,7 @@
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1579,7 +1716,7 @@
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1590,7 +1727,7 @@
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1601,7 +1738,29 @@
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4-Pro",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+          },
+          "promo": false,
+          "providerId": "modelscope",
+          "providerModelId": "deepseek-ai/DeepSeek-V4-Pro-0813",
+          "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+        },
+        {
+          "confidence": "page",
+          "expiresAt": null,
+          "limits": {
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1612,7 +1771,7 @@
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1623,7 +1782,7 @@
           "confidence": "page",
           "expiresAt": null,
           "limits": {
-            "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+            "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
           },
           "promo": false,
           "providerId": "modelscope",
@@ -1725,6 +1884,20 @@
         }
       ]
     }
+  },
+  "publicModelsCheckedAt": {
+    "aihubmix": "2026-11-27T13:42:15.137Z",
+    "bazaarlink": "2026-11-27T13:42:15.137Z",
+    "beatapi": "2026-11-27T13:42:15.137Z",
+    "cheapllm": "2026-11-27T13:42:15.137Z",
+    "crowllm": "2026-11-27T13:42:15.137Z",
+    "gonkabroker": "2026-11-27T13:42:15.137Z",
+    "llm7": "2026-11-27T13:42:15.137Z",
+    "nous": "2026-11-27T13:42:15.137Z",
+    "pollinations": "2026-11-27T13:42:15.137Z",
+    "synap": "2026-11-27T13:42:15.137Z",
+    "tokenrouter": "2026-11-27T13:42:15.137Z",
+    "vercel": "2026-11-27T13:42:15.137Z"
   },
   "radarMissingSince": {
     "tidepool-alpha-free": "2026-11-26T03:04:04.312Z"
@@ -2846,12 +3019,607 @@
     "hn:50664795": {
       "observations": [],
       "savedAt": "2026-11-27T11:16:31.091Z"
+    },
+    "hn:50665796": {
+      "observations": [],
+      "savedAt": "2026-11-27T13:42:15.137Z"
+    },
+    "hn:50666037": {
+      "observations": [],
+      "savedAt": "2026-11-27T13:42:15.137Z"
+    },
+    "hn:50666409": {
+      "observations": [],
+      "savedAt": "2026-11-27T13:42:15.137Z"
     }
   },
   "telegramLastPost": {
+    "freemodelradar": 32,
+    "neuro_channel": 3247,
     "rubiconzone": 135
   },
+  "trackerCheckedAt": {
+    "claw": "2026-11-27T13:42:15.137Z",
+    "coding": "2026-11-27T13:42:15.137Z",
+    "freeLlm": "2026-11-27T13:42:15.137Z",
+    "markdown": "2026-11-27T13:42:15.137Z",
+    "radar": "2026-11-27T13:42:15.137Z"
+  },
   "tracks": {
+    "aihubmix:coding-glm-4.6-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 200000,
+            "documentedRoute": true,
+            "name": "Coding GLM 4.6 (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "coding-glm-4.6-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:coding-glm-4.7-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 200000,
+            "documentedRoute": true,
+            "name": "Coding GLM 4.7 (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "coding-glm-4.7-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:coding-glm-5-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 200000,
+            "documentedRoute": true,
+            "name": "Coding GLM 5 (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "coding-glm-5-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:coding-glm-5-turbo-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 204800,
+            "documentedRoute": true,
+            "name": "Coding GLM 5 Turbo (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "coding-glm-5-turbo-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:coding-glm-5.1-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 200000,
+            "documentedRoute": true,
+            "name": "Coding GLM 5.1 (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "coding-glm-5.1-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:coding-glm-5.2-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1000000,
+            "documentedRoute": true,
+            "name": "Coding GLM 5.2 (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "coding-glm-5.2-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:coding-glm-5.3-flash-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1000000,
+            "documentedRoute": true,
+            "name": "Coding GLM 5.3 Flash (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "coding-glm-5.3-flash-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:coding-glm-5.3-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "name": "Coding GLM 5.3 (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "coding-glm-5.3-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:coding-kimi-k3-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "name": "Coding Kimi K3 (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "coding-kimi-k3-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:coding-minimax-m2-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 204800,
+            "documentedRoute": true,
+            "name": "Coding MiniMax M2 (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "coding-minimax-m2-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:coding-minimax-m2.1-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 204800,
+            "documentedRoute": true,
+            "name": "Coding MiniMax M2.1 (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "coding-minimax-m2.1-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:coding-minimax-m2.5-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 204800,
+            "documentedRoute": true,
+            "name": "Coding MiniMax M2.5 (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "coding-minimax-m2.5-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:coding-minimax-m2.7-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 204800,
+            "documentedRoute": true,
+            "name": "Coding MiniMax M2.7 (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "coding-minimax-m2.7-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:coding-minimax-m3-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1000000,
+            "documentedRoute": true,
+            "name": "Coding MiniMax M3 (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "coding-minimax-m3-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:dots-3-note-preview-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 524288,
+            "documentedRoute": true,
+            "name": "Dots 3 Note Preview (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "dots-3-note-preview-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:gemma-4-26b-a4b-it-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 262144,
+            "documentedRoute": true,
+            "name": "Gemma 4 26B A4B It (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "gemma-4-26b-a4b-it-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:gemma-4-31b-it-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 262144,
+            "documentedRoute": true,
+            "name": "Gemma 4 31B It (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "gemma-4-31b-it-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:glm-4.7-flash-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 200000,
+            "documentedRoute": true,
+            "name": "GLM 4.7 Flash (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "glm-4.7-flash-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:k2.6-code-preview-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 262144,
+            "documentedRoute": true,
+            "name": "K2.6 Code Preview (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "k2.6-code-preview-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:kimi-for-coding-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 256000,
+            "documentedRoute": true,
+            "name": "Kimi For Coding (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "kimi-for-coding-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:nemotron-3-nano-omni-30b-a3b-reasoning-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 262144,
+            "documentedRoute": true,
+            "name": "Nemotron 3 Nano Omni 30B A3B (reasoning) (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "nemotron-3-nano-omni-30b-a3b-reasoning-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:nemotron-3-ultra-550b-a55b-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "name": "Nemotron 3 Ultra 550B A55B (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "nemotron-3-ultra-550b-a55b-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:nemotron-3.5-lightning-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "name": "Nemotron 3.5 Lightning (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "nemotron-3.5-lightning-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "aihubmix:north-mini-code-free": {
+      "evidence": {
+        "aihubmix": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 256000,
+            "documentedRoute": true,
+            "name": "North Mini Code (free)",
+            "providerId": "aihubmix",
+            "providerModelId": "north-mini-code-free",
+            "source": "https://aihubmix.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "amd-token-lab:Gemma-4-31B-IT": {
+      "evidence": {
+        "amd-token-lab": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 262144,
+            "documentedRoute": true,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "amd-token-lab",
+            "providerModelId": "Gemma-4-31B-IT",
+            "source": "https://devcommunity.amd.com/t/cant-beat-free-gemma-4-31b-on-amd-token-lab-with-a-local-chat-page-and-an-adk-agent/",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "axforge:qwen3.8-27b": {
+      "evidence": {
+        "axforge": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 262144,
+            "documentedRoute": true,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "axforge",
+            "providerModelId": "qwen3.8-27b",
+            "source": "https://axforge.ai/models/",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "bazaarlink:beam-free": {
+      "evidence": {
+        "bazaarlink": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "name": "Beam Free",
+            "providerId": "bazaarlink",
+            "providerModelId": "beam-free",
+            "source": "https://api.bazaarlink.ai/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "bazaarlink:deepseek/deepseek-v4-flash-0731free:free": {
+      "evidence": {
+        "bazaarlink": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "name": "DeepSeek V4 Flash 0731 (Free)",
+            "providerId": "bazaarlink",
+            "providerModelId": "deepseek/deepseek-v4-flash-0731free:free",
+            "source": "https://api.bazaarlink.ai/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "bazaarlink:nemotron-3.5-lightning-free": {
+      "evidence": {
+        "bazaarlink": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1000000,
+            "documentedRoute": true,
+            "name": "Nemotron 3.5 Lightning Free",
+            "providerId": "bazaarlink",
+            "providerModelId": "nemotron-3.5-lightning-free",
+            "source": "https://api.bazaarlink.ai/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "bazaarlink:nvidia/nemotron-3.5-lightning-free:free": {
+      "evidence": {
+        "bazaarlink": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1000000,
+            "documentedRoute": true,
+            "name": "Nemotron 3.5 Lightning Free (free)",
+            "providerId": "bazaarlink",
+            "providerModelId": "nvidia/nemotron-3.5-lightning-free:free",
+            "source": "https://api.bazaarlink.ai/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "bazaarlink:reflection/beam-free:free": {
+      "evidence": {
+        "bazaarlink": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "name": "Beam Free (free)",
+            "providerId": "bazaarlink",
+            "providerModelId": "reflection/beam-free:free",
+            "source": "https://api.bazaarlink.ai/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "beatapi:deepseek-v4.1-flash-free": {
+      "evidence": {
+        "beatapi": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "beatapi",
+            "providerModelId": "deepseek-v4.1-flash-free",
+            "source": "https://api.beatapi.io/v1/text/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "beatapi:glm-5.3-flash-free": {
+      "evidence": {
+        "beatapi": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "beatapi",
+            "providerModelId": "glm-5.3-flash-free",
+            "source": "https://api.beatapi.io/v1/text/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "beatapi:hy4-flash-free": {
+      "evidence": {
+        "beatapi": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "beatapi",
+            "providerModelId": "hy4-flash-free",
+            "source": "https://api.beatapi.io/v1/text/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
     "berget:moonshotai/Kimi-K3.1-Pro": {
       "evidence": {
         "registry:berget": {
@@ -2909,6 +3677,112 @@
         }
       }
     },
+    "cheapllm:deepseek-v4.1-flash-1017": {
+      "evidence": {
+        "cheapllm": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 131072,
+            "documentedRoute": true,
+            "providerId": "cheapllm",
+            "providerModelId": "deepseek-v4.1-flash-1017",
+            "source": "https://cheapllm.shop/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "cloudflare:@cf/meta/llama-3.3-70b-instruct-fp8-fast": {
+      "evidence": {
+        "cloudflare": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 24000,
+            "documentedRoute": true,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "cloudflare",
+            "providerModelId": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+            "source": "https://developers.cloudflare.com/workers-ai/models/",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "cloudflare:@cf/openai/gpt-oss-120b": {
+      "evidence": {
+        "cloudflare": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 128000,
+            "documentedRoute": true,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "cloudflare",
+            "providerModelId": "@cf/openai/gpt-oss-120b",
+            "source": "https://developers.cloudflare.com/workers-ai/models/",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "cloudflare:@cf/openai/gpt-oss-20b": {
+      "evidence": {
+        "cloudflare": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 128000,
+            "documentedRoute": true,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "cloudflare",
+            "providerModelId": "@cf/openai/gpt-oss-20b",
+            "source": "https://developers.cloudflare.com/workers-ai/models/",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "cloudflare:@cf/qwen/qwen3-30b-a3b-fp8": {
+      "evidence": {
+        "cloudflare": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 32768,
+            "documentedRoute": true,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "cloudflare",
+            "providerModelId": "@cf/qwen/qwen3-30b-a3b-fp8",
+            "source": "https://developers.cloudflare.com/workers-ai/models/",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "cloudflare:@cf/zai-org/glm-4.7-flash": {
+      "evidence": {
+        "cloudflare": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 131072,
+            "documentedRoute": true,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "cloudflare",
+            "providerModelId": "@cf/zai-org/glm-4.7-flash",
+            "source": "https://developers.cloudflare.com/workers-ai/models/",
+            "supportsTools": true
+          }
+        }
+      }
+    },
     "cohere:command": {
       "evidence": {
         "github": {
@@ -2942,6 +3816,141 @@
             "source": "registry:cohere",
             "supportsTools": true,
             "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "crowllm:deepseek-v4-flash-0731-thinking:free": {
+      "evidence": {
+        "crowllm": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "crowllm",
+            "providerModelId": "deepseek-v4-flash-0731-thinking:free",
+            "source": "https://crowllm.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "crowllm:deepseek-v4-flash-0731:free": {
+      "evidence": {
+        "crowllm": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "crowllm",
+            "providerModelId": "deepseek-v4-flash-0731:free",
+            "source": "https://crowllm.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "crowllm:ernie-5.5-flash-preview:free": {
+      "evidence": {
+        "crowllm": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "crowllm",
+            "providerModelId": "ernie-5.5-flash-preview:free",
+            "source": "https://crowllm.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "crowllm:glm-5.3-flash:free": {
+      "evidence": {
+        "crowllm": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "crowllm",
+            "providerModelId": "glm-5.3-flash:free",
+            "source": "https://crowllm.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "crowllm:k2-horizon-375b-a23b:free": {
+      "evidence": {
+        "crowllm": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "crowllm",
+            "providerModelId": "k2-horizon-375b-a23b:free",
+            "source": "https://crowllm.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "crowllm:longcat-2.5:free": {
+      "evidence": {
+        "crowllm": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "crowllm",
+            "providerModelId": "longcat-2.5:free",
+            "source": "https://crowllm.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "crowllm:nemotron-3-ultra-550b-a55b:free": {
+      "evidence": {
+        "crowllm": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "crowllm",
+            "providerModelId": "nemotron-3-ultra-550b-a55b:free",
+            "source": "https://crowllm.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "crowllm:nemotron-3.5-super-vl:free": {
+      "evidence": {
+        "crowllm": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "crowllm",
+            "providerModelId": "nemotron-3.5-super-vl:free",
+            "source": "https://crowllm.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "crowllm:step-5-preview:free": {
+      "evidence": {
+        "crowllm": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "crowllm",
+            "providerModelId": "step-5-preview:free",
+            "source": "https://crowllm.com/v1/models",
+            "supportsTools": true
           }
         }
       }
@@ -2980,6 +3989,57 @@
             "source": "registry:dahl",
             "supportsTools": true,
             "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "gonkabroker:MiniMaxAI/MiniMax-M2.7": {
+      "evidence": {
+        "gonkabroker": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 204800,
+            "documentedRoute": true,
+            "name": "MiniMax-M2.7",
+            "providerId": "gonkabroker",
+            "providerModelId": "MiniMaxAI/MiniMax-M2.7",
+            "source": "https://proxy.gonkabroker.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "gonkabroker:deepseek-ai/DeepSeek-V4-Flash-0731": {
+      "evidence": {
+        "gonkabroker": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 400000,
+            "documentedRoute": true,
+            "name": "DeepSeek-V4-Flash-0731",
+            "providerId": "gonkabroker",
+            "providerModelId": "deepseek-ai/DeepSeek-V4-Flash-0731",
+            "source": "https://proxy.gonkabroker.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "gonkabroker:zai-org/GLM-5.3-Flash": {
+      "evidence": {
+        "gonkabroker": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 400000,
+            "documentedRoute": true,
+            "name": "GLM-5.3-Flash",
+            "providerId": "gonkabroker",
+            "providerModelId": "zai-org/GLM-5.3-Flash",
+            "source": "https://proxy.gonkabroker.com/v1/models",
+            "supportsTools": true
           }
         }
       }
@@ -3112,6 +4172,24 @@
             "source": "registry:groq",
             "supportsTools": true,
             "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "hetzner:Qwen3.8-27B": {
+      "evidence": {
+        "hetzner": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 262144,
+            "documentedRoute": true,
+            "expiresAt": "2026-12-08T00:00:00Z",
+            "promo": true,
+            "providerId": "hetzner",
+            "providerModelId": "Qwen3.8-27B",
+            "source": "https://docs.hetzner.com/general/company-and-policy/experiments/inference/",
+            "supportsTools": true
           }
         }
       }
@@ -3340,7 +4418,7 @@
     "kilo:inclusionai/ling-3.2-flash:free": {
       "evidence": {
         "kilo": {
-          "missedRuns": 0,
+          "missedRuns": 1,
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
@@ -3654,6 +4732,24 @@
         }
       }
     },
+    "longcat:LongCat-2.5": {
+      "evidence": {
+        "longcat": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "expiresAt": null,
+            "promo": false,
+            "providerId": "longcat",
+            "providerModelId": "LongCat-2.5",
+            "source": "https://longcat.chat/platform/docs/ChangeLog.html",
+            "supportsTools": true
+          }
+        }
+      }
+    },
     "modelscope:API-Inference": {
       "endedAt": "2026-11-26T07:39:04.135Z",
       "evidence": {
@@ -3682,7 +4778,7 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+              "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
             },
             "promo": false,
             "providerId": "modelscope",
@@ -3713,7 +4809,7 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+              "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
             },
             "promo": false,
             "providerId": "modelscope",
@@ -3731,7 +4827,7 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+              "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
             },
             "promo": false,
             "providerId": "modelscope",
@@ -3749,7 +4845,7 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+              "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
             },
             "promo": false,
             "providerId": "modelscope",
@@ -3780,11 +4876,47 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+              "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
             },
             "promo": false,
             "providerId": "modelscope",
             "providerModelId": "deepseek-ai/DeepSeek-V4-Flash-0731",
+            "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+          }
+        }
+      }
+    },
+    "modelscope:deepseek-ai/DeepSeek-V4-Pro": {
+      "evidence": {
+        "page:modelscope": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+            },
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "deepseek-ai/DeepSeek-V4-Pro",
+            "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+          }
+        }
+      }
+    },
+    "modelscope:deepseek-ai/DeepSeek-V4-Pro-0813": {
+      "evidence": {
+        "page:modelscope": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "expiresAt": null,
+            "limits": {
+              "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+            },
+            "promo": false,
+            "providerId": "modelscope",
+            "providerModelId": "deepseek-ai/DeepSeek-V4-Pro-0813",
             "source": "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
           }
         }
@@ -3798,7 +4930,7 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+              "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
             },
             "promo": false,
             "providerId": "modelscope",
@@ -3829,7 +4961,7 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+              "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
             },
             "promo": false,
             "providerId": "modelscope",
@@ -3866,7 +4998,7 @@
             "confidence": "page",
             "expiresAt": null,
             "limits": {
-              "note": "Бесплатно через API-Inference с ограничениями по квоте и параллелизму; требуется привязка и верификация аккаунта Alibaba Cloud. Сверх бесплатной квоты расходуются Magicube-кредиты (0.5/1/2 за вызов в зависимости от модели), возможны автоматические списания."
+              "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
             },
             "promo": false,
             "providerId": "modelscope",
@@ -3885,6 +5017,57 @@
             "reviewBy": "2026-12-08T00:00:00.000Z",
             "source": "registry:modelscope",
             "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "nous:stepfun/step-3.7-flash:free": {
+      "evidence": {
+        "nous": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 256000,
+            "documentedRoute": true,
+            "name": "StepFun: Step 3.7 Flash (free)",
+            "providerId": "nous",
+            "providerModelId": "stepfun/step-3.7-flash:free",
+            "source": "https://inference-api.nousresearch.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "nous:tencent/hy4-flash:free": {
+      "evidence": {
+        "nous": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "name": "Tencent: Hy4 flash (free)",
+            "providerId": "nous",
+            "providerModelId": "tencent/hy4-flash:free",
+            "source": "https://inference-api.nousresearch.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "nous:upstage/solar-mini4:free": {
+      "evidence": {
+        "nous": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 524288,
+            "documentedRoute": true,
+            "name": "Upstage: Solar Mini 4 (free)",
+            "providerId": "nous",
+            "providerModelId": "upstage/solar-mini4:free",
+            "source": "https://inference-api.nousresearch.com/v1/models",
+            "supportsTools": true
           }
         }
       }
@@ -4250,7 +5433,7 @@
     "openrouter:inclusionai/ling-3.2-flash:free": {
       "evidence": {
         "openrouter": {
-          "missedRuns": 0,
+          "missedRuns": 1,
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
@@ -4529,6 +5712,21 @@
             "source": "registry:orcarouter",
             "supportsTools": true,
             "verifiedAt": "2026-11-27T00:00:00Z"
+          }
+        }
+      }
+    },
+    "pollinations:openai-fast": {
+      "evidence": {
+        "pollinations": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "pollinations",
+            "providerModelId": "openai-fast",
+            "source": "https://text.pollinations.ai/openai/models",
+            "supportsTools": true
           }
         }
       }
@@ -4826,6 +6024,389 @@
             "source": "registry:runcrate",
             "supportsTools": true,
             "verifiedAt": "2026-11-24T00:00:00Z"
+          }
+        }
+      }
+    },
+    "synap:qwen3-coder-30b": {
+      "evidence": {
+        "synap": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 131072,
+            "documentedRoute": true,
+            "name": "Qwen: Qwen3 Coder 30B A3B Instruct",
+            "providerId": "synap",
+            "providerModelId": "qwen3-coder-30b",
+            "source": "https://synap402.com/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenhub:deepseek-v4-pro-0813": {
+      "evidence": {
+        "tokenhub": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "expiresAt": "2026-12-31T23:59:59Z",
+            "promo": true,
+            "providerId": "tokenhub",
+            "providerModelId": "deepseek-v4-pro-0813",
+            "source": "https://www.tencentcloud.com/document/product/1300/78934",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenhub:deepseek-v4.1-flash-1017": {
+      "evidence": {
+        "tokenhub": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "expiresAt": "2026-12-31T23:59:59Z",
+            "promo": true,
+            "providerId": "tokenhub",
+            "providerModelId": "deepseek-v4.1-flash-1017",
+            "source": "https://www.tencentcloud.com/document/product/1300/78934",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenhub:glm-5.3": {
+      "evidence": {
+        "tokenhub": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "expiresAt": "2026-12-31T23:59:59Z",
+            "promo": true,
+            "providerId": "tokenhub",
+            "providerModelId": "glm-5.3",
+            "source": "https://www.tencentcloud.com/document/product/1300/78934",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenhub:glm-5.3-flash": {
+      "evidence": {
+        "tokenhub": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "expiresAt": "2026-12-31T23:59:59Z",
+            "promo": true,
+            "providerId": "tokenhub",
+            "providerModelId": "glm-5.3-flash",
+            "source": "https://www.tencentcloud.com/document/product/1300/78934",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenhub:hy4": {
+      "evidence": {
+        "tokenhub": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "expiresAt": "2026-12-31T23:59:59Z",
+            "promo": true,
+            "providerId": "tokenhub",
+            "providerModelId": "hy4",
+            "source": "https://www.tencentcloud.com/document/product/1300/78934",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenhub:hy4-flash": {
+      "evidence": {
+        "tokenhub": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "expiresAt": "2026-12-31T23:59:59Z",
+            "promo": true,
+            "providerId": "tokenhub",
+            "providerModelId": "hy4-flash",
+            "source": "https://www.tencentcloud.com/document/product/1300/78934",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenhub:kimi-k2.7-code": {
+      "evidence": {
+        "tokenhub": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 262144,
+            "documentedRoute": true,
+            "expiresAt": "2026-12-31T23:59:59Z",
+            "promo": true,
+            "providerId": "tokenhub",
+            "providerModelId": "kimi-k2.7-code",
+            "source": "https://www.tencentcloud.com/document/product/1300/78934",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenhub:kimi-k3.1-pro": {
+      "evidence": {
+        "tokenhub": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "expiresAt": "2026-12-31T23:59:59Z",
+            "promo": true,
+            "providerId": "tokenhub",
+            "providerModelId": "kimi-k3.1-pro",
+            "source": "https://www.tencentcloud.com/document/product/1300/78934",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenhub:mimo-v2.6-flash": {
+      "evidence": {
+        "tokenhub": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "expiresAt": "2026-12-31T23:59:59Z",
+            "promo": true,
+            "providerId": "tokenhub",
+            "providerModelId": "mimo-v2.6-flash",
+            "source": "https://www.tencentcloud.com/document/product/1300/78934",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenhub:mimo-v2.6-pro": {
+      "evidence": {
+        "tokenhub": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "expiresAt": "2026-12-31T23:59:59Z",
+            "promo": true,
+            "providerId": "tokenhub",
+            "providerModelId": "mimo-v2.6-pro",
+            "source": "https://www.tencentcloud.com/document/product/1300/78934",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenhub:minimax-m3": {
+      "evidence": {
+        "tokenhub": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "expiresAt": "2026-12-31T23:59:59Z",
+            "promo": true,
+            "providerId": "tokenhub",
+            "providerModelId": "minimax-m3",
+            "source": "https://www.tencentcloud.com/document/product/1300/78934",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenhub:minimax-m3.1-flash": {
+      "evidence": {
+        "tokenhub": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "expiresAt": "2026-12-31T23:59:59Z",
+            "promo": true,
+            "providerId": "tokenhub",
+            "providerModelId": "minimax-m3.1-flash",
+            "source": "https://www.tencentcloud.com/document/product/1300/78934",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenhub:step-5-preview": {
+      "evidence": {
+        "tokenhub": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "page",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "expiresAt": "2026-12-31T23:59:59Z",
+            "promo": true,
+            "providerId": "tokenhub",
+            "providerModelId": "step-5-preview",
+            "source": "https://www.tencentcloud.com/document/product/1300/78934",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenrouter:deepseek/deepseek-v4.1-flash-1017-free": {
+      "evidence": {
+        "tokenrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "tokenrouter",
+            "providerModelId": "deepseek/deepseek-v4.1-flash-1017-free",
+            "source": "https://api.tokenrouter.com/api/pricing",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "tokenrouter:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+      "evidence": {
+        "tokenrouter": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "documentedRoute": true,
+            "providerId": "tokenrouter",
+            "providerModelId": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+            "source": "https://api.tokenrouter.com/api/pricing",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "vercel:humansand/ampersand-v0.1": {
+      "evidence": {
+        "vercel": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1000000,
+            "documentedRoute": true,
+            "name": "Ampersand v0.1",
+            "providerId": "vercel",
+            "providerModelId": "humansand/ampersand-v0.1",
+            "source": "https://ai-gateway.vercel.sh/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "vercel:nvidia/nemotron-3.5-lightning-free": {
+      "evidence": {
+        "vercel": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1000000,
+            "documentedRoute": true,
+            "name": "Nemotron 3.5 Lightning Free",
+            "providerId": "vercel",
+            "providerModelId": "nvidia/nemotron-3.5-lightning-free",
+            "source": "https://ai-gateway.vercel.sh/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "vercel:recursive/flint-v1.0": {
+      "evidence": {
+        "vercel": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 262144,
+            "documentedRoute": true,
+            "name": "Flint",
+            "providerId": "vercel",
+            "providerModelId": "recursive/flint-v1.0",
+            "source": "https://ai-gateway.vercel.sh/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "vercel:reflection/beam": {
+      "evidence": {
+        "vercel": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "name": "Beam 1.0",
+            "providerId": "vercel",
+            "providerModelId": "reflection/beam",
+            "source": "https://ai-gateway.vercel.sh/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "vercel:reflection/beam-free": {
+      "evidence": {
+        "vercel": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 1048576,
+            "documentedRoute": true,
+            "name": "Beam 1.0 (Free)",
+            "providerId": "vercel",
+            "providerModelId": "reflection/beam-free",
+            "source": "https://ai-gateway.vercel.sh/v1/models",
+            "supportsTools": true
+          }
+        }
+      }
+    },
+    "vercel:stealth/glyph-cluster": {
+      "evidence": {
+        "vercel": {
+          "missedRuns": 0,
+          "observation": {
+            "confidence": "structured",
+            "contextWindow": 256000,
+            "documentedRoute": true,
+            "name": "Glyph Cluster",
+            "providerId": "vercel",
+            "providerModelId": "stealth/glyph-cluster",
+            "source": "https://ai-gateway.vercel.sh/v1/models",
+            "supportsTools": true
           }
         }
       }

@@ -26,6 +26,28 @@
       "confidence": "news",
       "contextWindow": 0,
       "expiresAt": null,
+      "firstSeen": "2026-11-27T13:42:15.137Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:42:15.137Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Trial API key: 1,000 API calls/month, non-commercial use only",
+        "rpm": 20
+      },
+      "modelId": "command",
+      "promo": false,
+      "providerId": "cohere",
+      "providerModelId": "command",
+      "sources": [
+        "https://github.com/mnfst/awesome-free-llm-apis"
+      ],
+      "status": "unverified",
+      "supportsTools": false
+    },
+    {
+      "confidence": "news",
+      "contextWindow": 0,
+      "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
       "lastSeen": "2026-11-25T12:06:35.747Z",
@@ -49,10 +71,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
-        "note": "На IP-адрес",
+        "note": "200 requests/hour per IP, no API key required",
         "rph": 200
       },
       "modelId": "free",
@@ -71,10 +93,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
-        "note": "На IP-адрес",
+        "note": "200 requests/hour per IP, no API key required",
         "rph": 200
       },
       "modelId": "free",
@@ -109,12 +131,33 @@
       "supportsTools": false
     },
     {
+      "confidence": "news",
+      "contextWindow": 0,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:42:15.137Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:42:15.137Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Permanent free models, no credit card required"
+      },
+      "modelId": "glm",
+      "promo": false,
+      "providerId": "zai",
+      "providerModelId": "glm",
+      "sources": [
+        "https://github.com/mnfst/awesome-free-llm-apis"
+      ],
+      "status": "unverified",
+      "supportsTools": false
+    },
+    {
       "confidence": "page",
       "contextWindow": 0,
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "GLM-4.7-Flash бесплатна. Ограничение параллельных запросов смотрите в кабинете API."
@@ -135,7 +178,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "GLM-4.7-Flash бесплатна. Ограничение параллельных запросов смотрите в кабинете API."
@@ -156,7 +199,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -178,7 +221,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
@@ -201,7 +244,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -223,7 +266,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
@@ -246,7 +289,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -268,7 +311,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
@@ -281,12 +324,76 @@
       "providerModelId": "google/lyria-3-pro-preview",
       "sources": [
         "openrouter:/api/v1/models"
+      ],
+      "status": "unverified",
+      "supportsTools": false
+    },
+    {
+      "confidence": "news",
+      "contextWindow": 0,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:42:15.137Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:42:15.137Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Requires Alibaba Cloud binding and real-name verification; per-model daily quota capped at 500",
+        "rpd": 2000
+      },
+      "modelId": "modelscope",
+      "promo": false,
+      "providerId": "modelscope",
+      "providerModelId": "modelscope",
+      "sources": [
+        "https://github.com/mnfst/awesome-free-llm-apis"
+      ],
+      "status": "unverified",
+      "supportsTools": false
+    },
+    {
+      "confidence": "news",
+      "contextWindow": 0,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:42:15.137Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:42:15.137Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Free with NVIDIA Developer Program membership; rate-limited per model"
+      },
+      "modelId": "nvidia-nim",
+      "promo": false,
+      "providerId": "nvidia-nim",
+      "providerModelId": "nvidia-nim",
+      "sources": [
+        "https://github.com/mnfst/awesome-free-llm-apis"
+      ],
+      "status": "unverified",
+      "supportsTools": false
+    },
+    {
+      "confidence": "news",
+      "contextWindow": 0,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:42:15.137Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:42:15.137Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Free usage on five open models with GitHub sign-in (account at least 30 days old); weekly allowance resetting every Monday"
+      },
+      "modelId": "runcrate",
+      "promo": false,
+      "providerId": "runcrate",
+      "providerModelId": "runcrate",
+      "sources": [
+        "https://github.com/mnfst/awesome-free-llm-apis"
       ],
       "status": "unverified",
       "supportsTools": false
     }
   ],
-  "generatedAt": "2026-11-27T13:36:02.639Z",
+  "generatedAt": "2026-11-27T13:42:15.137Z",
   "models": [
     {
       "capabilities": [
@@ -1168,7 +1275,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1190,7 +1297,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатные маршруты и $5 кредита на 30 дней на Free. После покупки кредитов условия меняются."
@@ -1211,7 +1318,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "concurrent": 2,
@@ -1234,7 +1341,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "concurrent": 2,
@@ -1257,7 +1364,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -1279,7 +1386,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатные маршруты и $5 кредита на 30 дней на Free. После покупки кредитов условия меняются."
@@ -1300,7 +1407,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатные маршруты и $5 кредита на 30 дней на Free. После покупки кредитов условия меняются."
@@ -1321,7 +1428,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -1342,7 +1449,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -1363,7 +1470,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -1384,7 +1491,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -1405,7 +1512,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -1426,7 +1533,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -1447,7 +1554,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -1468,7 +1575,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -1489,7 +1596,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -1510,7 +1617,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "До 1000 вызовов в месяц с пробным ключом.",
@@ -1534,7 +1641,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "concurrent": 2,
@@ -1557,7 +1664,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
@@ -1578,7 +1685,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
@@ -1599,7 +1706,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "100 млн токенов при регистрации. Бесплатные токены сгорают после 7 дней без запросов."
@@ -1622,7 +1729,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "От 1 млн токенов в месяц после SMS-подтверждения. Платный баланс может использоваться после расходования бесплатного."
@@ -1643,7 +1750,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Стартовая квота 1 млн токенов, без карты. Актуальный баланс доступен в кабинете."
@@ -1663,10 +1770,73 @@
     {
       "confidence": "page",
       "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:42:15.137Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:42:15.137Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+      },
+      "modelId": "deepseek-v4-flash",
+      "promo": false,
+      "providerId": "modelscope",
+      "providerModelId": "deepseek-ai/DeepSeek-V4-Flash-0731",
+      "sources": [
+        "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+      ],
+      "status": "active",
+      "supportsTools": false
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:42:15.137Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:42:15.137Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+      },
+      "modelId": "deepseek-v4-pro",
+      "promo": false,
+      "providerId": "modelscope",
+      "providerModelId": "deepseek-ai/DeepSeek-V4-Pro",
+      "sources": [
+        "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+      ],
+      "status": "active",
+      "supportsTools": false
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 1048576,
+      "expiresAt": null,
+      "firstSeen": "2026-11-27T13:42:15.137Z",
+      "free": true,
+      "lastSeen": "2026-11-27T13:42:15.137Z",
+      "lastVerified": null,
+      "limits": {
+        "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
+      },
+      "modelId": "deepseek-v4-pro",
+      "promo": false,
+      "providerId": "modelscope",
+      "providerModelId": "deepseek-ai/DeepSeek-V4-Pro-0813",
+      "sources": [
+        "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md"
+      ],
+      "status": "active",
+      "supportsTools": false
+    },
+    {
+      "confidence": "page",
+      "contextWindow": 1048576,
       "expiresAt": "2026-12-31T23:59:59Z",
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
@@ -1687,7 +1857,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1 успешный запрос в минуту до пополнения. После пополнения до 10.",
@@ -1709,7 +1879,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная бета. После беты от 5000 входных и 1000 выходных токенов в час."
@@ -1730,10 +1900,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
-        "note": "До 250 бесплатных Magicubes в день за ежедневный вход и привязку Alibaba Cloud. Вызов расходует 0,5–2 Magicubes. Нужны подтверждённый email и верифицированный аккаунт Alibaba Cloud."
+        "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
       },
       "modelId": "deepseek-v4.1-flash",
       "promo": false,
@@ -1741,9 +1911,10 @@
       "providerModelId": "deepseek-ai/DeepSeek-V4.1-Flash",
       "reviewBy": "2026-12-08T00:00:00.000Z",
       "sources": [
+        "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md",
         "registry:modelscope"
       ],
-      "status": "unverified",
+      "status": "active",
       "supportsTools": false,
       "verifiedAt": "2026-11-24T00:00:00Z"
     },
@@ -1753,10 +1924,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
-        "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+        "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
       },
       "modelId": "deepseek-v4.1-flash",
       "promo": false,
@@ -1774,7 +1945,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -1795,7 +1966,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У бесплатных моделей ID заканчивается на -free. Список и квоты могут меняться."
@@ -1818,7 +1989,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."
@@ -1842,7 +2013,7 @@
       "expiresAt": "2026-12-31T23:59:59Z",
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
@@ -1863,7 +2034,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатные маршруты группы default. Числовая квота не опубликована."
@@ -1884,7 +2055,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная квота DeepSeek V4.1 Flash обновляется ежедневно."
@@ -1907,7 +2078,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -1928,7 +2099,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -1994,7 +2165,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
@@ -2015,7 +2186,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -2037,7 +2208,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
@@ -2060,7 +2231,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -2082,7 +2253,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -2104,7 +2275,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
@@ -2128,7 +2299,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатные маршруты и $5 кредита на 30 дней на Free. После покупки кредитов условия меняются."
@@ -2149,7 +2320,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -2170,7 +2341,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
@@ -2194,7 +2365,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -2215,7 +2386,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "20 запросов в минуту. Пробный ключ даёт 10 баллов на 30 дней."
@@ -2236,7 +2407,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
@@ -2260,7 +2431,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "200 запросов в день на бесплатных моделях, карта не нужна.",
@@ -2284,7 +2455,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -2305,7 +2476,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "10 000 нейронов в сутки на Free. Сброс в 00:00 UTC."
@@ -2326,7 +2497,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "50 бесплатных запросов в день без пополнения.",
@@ -2351,10 +2522,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
-        "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+        "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
       },
       "modelId": "glm-4.7-flash",
       "promo": false,
@@ -2372,7 +2543,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "GLM-4.7-Flash бесплатна. Ограничение параллельных запросов смотрите в кабинете API."
@@ -2396,7 +2567,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -2417,10 +2588,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
-        "note": "До 250 бесплатных Magicubes в день за ежедневный вход и привязку Alibaba Cloud. Вызов расходует 0,5–2 Magicubes. Нужны подтверждённый email и верифицированный аккаунт Alibaba Cloud."
+        "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
       },
       "modelId": "glm-5.2",
       "promo": false,
@@ -2428,9 +2599,10 @@
       "providerModelId": "ZhipuAI/GLM-5.2",
       "reviewBy": "2026-12-08T00:00:00.000Z",
       "sources": [
+        "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md",
         "registry:modelscope"
       ],
-      "status": "unverified",
+      "status": "active",
       "supportsTools": false,
       "verifiedAt": "2026-11-24T00:00:00Z"
     },
@@ -2440,7 +2612,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -2461,7 +2633,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -2482,7 +2654,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."
@@ -2506,7 +2678,7 @@
       "expiresAt": "2026-12-31T23:59:59Z",
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
@@ -2527,7 +2699,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -2548,7 +2720,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1 успешный запрос в минуту до пополнения. После пополнения до 10.",
@@ -2570,7 +2742,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "€5 стартового баланса на пробном плане, лимиты общие для аккаунта."
@@ -2593,7 +2765,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
@@ -2614,7 +2786,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "От 1 млн токенов в месяц после SMS-подтверждения. Платный баланс может использоваться после расходования бесплатного."
@@ -2635,7 +2807,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Стартовая квота 1 млн токенов, без карты. Актуальный баланс доступен в кабинете."
@@ -2658,7 +2830,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -2679,7 +2851,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У бесплатных моделей ID заканчивается на -free. Список и квоты могут меняться."
@@ -2702,7 +2874,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."
@@ -2726,7 +2898,7 @@
       "expiresAt": "2026-12-31T23:59:59Z",
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
@@ -2747,7 +2919,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -2768,7 +2940,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -2789,7 +2961,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -2812,7 +2984,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатные маршруты и $5 кредита на 30 дней на Free. После покупки кредитов условия меняются."
@@ -2833,7 +3005,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "10 000 нейронов в сутки на Free. Сброс в 00:00 UTC."
@@ -2854,7 +3026,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B. Из России может понадобиться VPN",
@@ -2881,7 +3053,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."
@@ -2905,7 +3077,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "10 000 нейронов в сутки на Free. Сброс в 00:00 UTC."
@@ -2926,7 +3098,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B. Из России может понадобиться VPN",
@@ -2953,7 +3125,7 @@
       "expiresAt": "2026-12-31T23:59:59Z",
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
@@ -2974,7 +3146,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1 успешный запрос в минуту до пополнения. После пополнения до 10.",
@@ -2996,7 +3168,7 @@
       "expiresAt": "2026-11-30T23:59:59Z",
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Акция HY4 Flash до 30 ноября 2026 года."
@@ -3019,7 +3191,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "50 бесплатных запросов в день без пополнения.",
@@ -3044,7 +3216,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Выберите Free. Числовая квота и требование карты для Free не указаны."
@@ -3065,7 +3237,7 @@
       "expiresAt": "2026-12-31T23:59:59Z",
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
@@ -3086,7 +3258,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У бесплатных моделей ID заканчивается на -free. Список и квоты могут меняться."
@@ -3109,7 +3281,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "allModelsFree": true,
@@ -3134,7 +3306,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "API пока бесплатен. Суточная квота зависит от согласия на использование данных."
@@ -3157,7 +3329,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
@@ -3178,7 +3350,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "allModelsFree": true,
@@ -3203,7 +3375,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -3224,7 +3396,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -3245,7 +3417,7 @@
       "expiresAt": "2026-12-31T23:59:59Z",
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
@@ -3266,7 +3438,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -3287,7 +3459,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "€5 стартового баланса на пробном плане, лимиты общие для аккаунта."
@@ -3310,10 +3482,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
-        "note": "До 250 бесплатных Magicubes в день за ежедневный вход и привязку Alibaba Cloud. Вызов расходует 0,5–2 Magicubes. Нужны подтверждённый email и верифицированный аккаунт Alibaba Cloud."
+        "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
       },
       "modelId": "kimi-k3.1-pro",
       "promo": false,
@@ -3321,9 +3493,10 @@
       "providerModelId": "moonshotai/Kimi-K3.1-Pro",
       "reviewBy": "2026-12-08T00:00:00.000Z",
       "sources": [
+        "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md",
         "registry:modelscope"
       ],
-      "status": "unverified",
+      "status": "active",
       "supportsTools": false,
       "verifiedAt": "2026-11-24T00:00:00Z"
     },
@@ -3333,7 +3506,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -3354,7 +3527,7 @@
       "expiresAt": "2026-12-31T23:59:59Z",
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
@@ -3420,7 +3593,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "10 000 нейронов в сутки на Free. Сброс в 00:00 UTC."
@@ -3441,7 +3614,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
@@ -3462,7 +3635,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатные токены LongCat. Объём зависит от уровня проверки аккаунта."
@@ -3483,7 +3656,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный маршрут из публичного списка. Доступность и квоту проверяйте в кабинете."
@@ -3506,7 +3679,7 @@
       "expiresAt": "2026-12-31T23:59:59Z",
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
@@ -3527,7 +3700,7 @@
       "expiresAt": "2026-12-31T23:59:59Z",
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
@@ -3548,7 +3721,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -3569,7 +3742,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "100 млн токенов при регистрации. Бесплатные токены сгорают после 7 дней без запросов."
@@ -3592,7 +3765,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "От 1 млн токенов в месяц после SMS-подтверждения. Платный баланс может использоваться после расходования бесплатного."
@@ -3613,7 +3786,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Стартовая квота 1 млн токенов, без карты. Актуальный баланс доступен в кабинете."
@@ -3636,7 +3809,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -3657,10 +3830,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
-        "note": "До 250 бесплатных Magicubes в день за ежедневный вход и привязку Alibaba Cloud. Вызов расходует 0,5–2 Magicubes. Нужны подтверждённый email и верифицированный аккаунт Alibaba Cloud."
+        "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
       },
       "modelId": "minimax-m3",
       "promo": false,
@@ -3668,9 +3841,10 @@
       "providerModelId": "MiniMax/MiniMax-M3",
       "reviewBy": "2026-12-08T00:00:00.000Z",
       "sources": [
+        "https://www.modelscope.cn/docs/model-service/API-Inference/limits.md",
         "registry:modelscope"
       ],
-      "status": "unverified",
+      "status": "active",
       "supportsTools": false,
       "verifiedAt": "2026-11-24T00:00:00Z"
     },
@@ -3680,7 +3854,7 @@
       "expiresAt": "2026-12-31T23:59:59Z",
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
@@ -3701,7 +3875,7 @@
       "expiresAt": "2026-12-31T23:59:59Z",
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."
@@ -3722,7 +3896,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "200 запросов в день на бесплатных моделях, карта не нужна.",
@@ -3746,7 +3920,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -3767,7 +3941,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -3790,7 +3964,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
@@ -3814,7 +3988,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "200 запросов в день на бесплатных моделях, карта не нужна.",
@@ -3838,7 +4012,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатные маршруты группы default. Числовая квота не опубликована."
@@ -3859,7 +4033,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -3880,7 +4054,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
@@ -3901,7 +4075,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "50 бесплатных запросов в день без пополнения.",
@@ -3926,7 +4100,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -3949,7 +4123,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Отдельная квота для бесплатных запросов. Требуется подтверждённый email."
@@ -3970,7 +4144,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный доступ NVIDIA Developer Program для тестов. Квота зависит от модели и аккаунта. Подтверждение по номеру +7 не принимается"
@@ -3993,7 +4167,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
@@ -4017,7 +4191,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "200 запросов в день на бесплатных моделях, карта не нужна.",
@@ -4041,7 +4215,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -4062,7 +4236,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "concurrent": 2,
@@ -4085,7 +4259,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "concurrent": 2,
@@ -4108,7 +4282,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "50 бесплатных запросов в день без пополнения.",
@@ -4133,7 +4307,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -4156,7 +4330,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
@@ -4180,7 +4354,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "200 запросов в день на бесплатных моделях, карта не нужна.",
@@ -4204,7 +4378,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатные маршруты и $5 кредита на 30 дней на Free. После покупки кредитов условия меняются."
@@ -4225,7 +4399,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
@@ -4246,7 +4420,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -4269,7 +4443,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T11:06:03.117Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный доступ NVIDIA Developer Program для тестов. Квота зависит от модели и аккаунта. Подтверждение по номеру +7 не принимается"
@@ -4292,7 +4466,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
@@ -4316,7 +4490,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "У coding-моделей обычно 5 запросов в минуту и 100–500 в сутки на модель."
@@ -4337,7 +4511,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Анонимный текстовый API. Числовой лимит старого маршрута не опубликован."
@@ -4358,7 +4532,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "На IP-адрес",
@@ -4380,7 +4554,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T14:58:16.109Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "1000 запросов в сутки после покупки не менее $10 кредитов. Из России может понадобиться VPN",
@@ -4403,7 +4577,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "10 000 нейронов в сутки на Free. Сброс в 00:00 UTC."
@@ -4424,7 +4598,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Qwen3 Coder 30B: первые 7 дней до 50 запросов или 100 тыс. токенов в сутки, затем 10 запросов или 50 тыс. токенов."
@@ -4445,7 +4619,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "3 млн бесплатных серверных токенов на 30 дней после проверки карты без списания."
@@ -4466,7 +4640,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный план для gpt-oss-120b, gpt-oss-20b и Qwen3.8-27B. Из России может понадобиться VPN",
@@ -4481,6 +4655,7 @@
       "providerModelId": "qwen/qwen3.8-27b",
       "reviewBy": "2026-12-08T00:00:00.000Z",
       "sources": [
+        "https://github.com/mnfst/awesome-free-llm-apis",
         "registry:groq"
       ],
       "status": "active",
@@ -4493,7 +4668,7 @@
       "expiresAt": "2026-12-08T00:00:00Z",
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Эксперимент бесплатен до 08.12.2026. До 10 запросов в минуту на ключ.",
@@ -4515,10 +4690,10 @@
       "expiresAt": null,
       "firstSeen": "2026-11-25T12:06:35.747Z",
       "free": true,
-      "lastSeen": "2026-11-26T07:39:04.135Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
-        "note": "API-Inference бесплатен, но требует привязки и верификации аккаунта Alibaba Cloud; при превышении бесплатной квоты списываются магические гранулы (0.5–2 за вызов), баланс пополняется ежедневным входом (200/день) и активностью"
+        "note": "Бесплатно через API-Inference с ограниченной квотой: требуется привязка и верификация аккаунта Alibaba Cloud; ежедневно начисляется 200 коротких «магических гранул» (действуют 24 ч) + 50 при привязке Alibaba Cloud; вызовы списывают гранулы (0.5/1/2 за лёгкую/основную/флагманскую модель), при исчерпании квоты вызовы недоступны, автоматических денежных списаний нет."
       },
       "modelId": "qwen3.8-27b",
       "promo": false,
@@ -4536,7 +4711,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-24T15:12:29.146Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатная недельная квота, сбрасывается каждый понедельник; общая на рабочее пространство. При входе через GitHub карта не нужна (аккаунт не младше 30 дней); при входе через Google нужна подтверждённая карта. После исчерпания квоты запросы останавливаются до сброса; при включённой Extra usage запросы тарифицируются с баланса (половина прайс-листа на shared capacity, полный прайс при занятости)."
@@ -4560,7 +4735,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Выберите Free. Числовая квота и требование карты для Free не указаны."
@@ -4581,7 +4756,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Выберите Free. Числовая квота и требование карты для Free не указаны."
@@ -4602,7 +4777,7 @@
       "expiresAt": null,
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Бесплатный тариф ограничивает частоту запросов. Текущая квота в кабинете."
@@ -4623,7 +4798,7 @@
       "expiresAt": "2026-12-31T23:59:59Z",
       "firstSeen": "2026-11-27T13:36:02.639Z",
       "free": true,
-      "lastSeen": "2026-11-27T13:36:02.639Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "lastVerified": null,
       "limits": {
         "note": "Промо до 31.12.2026. До 1 млн токенов на модель по условиям предложения. Проверьте регион и аккаунт."

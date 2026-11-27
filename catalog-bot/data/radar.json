@@ -1,6 +1,138 @@
 {
   "discovered": [
     {
+      "baseUrl": "https://api.1min.ai/openai/v1",
+      "endsAt": null,
+      "id": "1min",
+      "limits": {},
+      "models": [
+        "gpt-4.1-mini"
+      ],
+      "name": "1min.AI",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://app.1min.ai/",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.abliteration.ai/v1",
+      "endsAt": null,
+      "id": "abliteration",
+      "limits": {},
+      "models": [
+        "abliterated-model",
+        "abliterated-model-large",
+        "abliterated-model-large-flash",
+        "abliterated-model-large-v2"
+      ],
+      "name": "abliteration.ai",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://abliteration.ai/console",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://router.inference.ai.exchange/v1",
+      "endsAt": null,
+      "id": "ai",
+      "limits": {},
+      "models": [
+        "gpt-oss-120b"
+      ],
+      "name": "Liquid Inference",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "gpt-oss-120b",
+      "signupUrl": "https://inference.ai.exchange/",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://ai-gateway.kilo.ai/api/v1",
+      "endsAt": null,
+      "id": "ai-gateway",
+      "limits": {},
+      "models": [
+        "kilo-auto/free",
+        "liquid/lfm-3-1.7b:free"
+      ],
+      "name": "Kilo AI Gateway",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "available",
+        "tools": false
+      },
+      "probedModel": "kilo-auto/free",
+      "signupUrl": "https://free-llm.com/provider/kilo-gateway",
+      "sources": [
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://ai-gateway.vercel.sh/v1",
+      "endsAt": null,
+      "id": "ai-gateway-2",
+      "limits": {},
+      "models": [
+        "google/gemini-2.5-flash",
+        "meta/llama-3.3-70b",
+        "minimax/minimax-m3.1-flash",
+        "openai/gpt-oss-120b",
+        "poolside/laguna-s-2.1-free",
+        "zai/glm-4.7-flash"
+      ],
+      "name": "Vercel AI Gateway",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "humansand/ampersand-v0.1",
+      "signupUrl": "https://free-llm.com/provider/vercel-ai-gateway",
+      "sources": [
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json",
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
+      ]
+    },
+    {
+      "baseUrl": "https://aiapi-pro.com/v1",
+      "endsAt": null,
+      "id": "aiapi-pro",
+      "limits": {},
+      "models": [
+        "cogview-3-flash",
+        "glm-4.1v-thinking-flash",
+        "glm-4.6v-flash",
+        "glm-4.7-flash"
+      ],
+      "name": "NovAI",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "glm-4.6v-flash",
+      "signupUrl": "https://free-llm.com/provider/novai",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
       "baseUrl": "https://api.aihubmix.com/v1",
       "endsAt": null,
       "id": "aihubmix",
@@ -19,6 +151,126 @@
       "signupUrl": "https://aihubmix.com/",
       "sources": [
         "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://aihubmix.com/v1",
+      "endsAt": null,
+      "id": "aihubmix-2",
+      "limits": {},
+      "models": [
+        "agents-a1-free",
+        "coding-glm-5.4-free",
+        "ernie-5.5-flash-preview-free",
+        "flint-v1.0-free",
+        "intern-s2-free",
+        "lfm-2.5-2.6b-free",
+        "lfm-3-1.7b-free",
+        "ling-3.2-flash-free",
+        "mimo-v2-flash-free",
+        "nemotron-3.5-super-vl-free",
+        "particle-1-free",
+        "xiaomi-mimo-v2.6-flash-free",
+        "xiaomi-mimo-v2.6-pro-free"
+      ],
+      "name": "AIHubMix (free models)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "particle-1-free",
+      "signupUrl": "https://console.aihubmix.com/workspaces/default/keys",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.aionlabs.ai/v1",
+      "endsAt": null,
+      "id": "aionlabs",
+      "limits": {},
+      "models": [
+        "aion-labs/aion-2.0",
+        "aion-labs/aion-3.0-mini",
+        "aion-labs/aion-3.5-mini"
+      ],
+      "name": "Aion Labs",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "aion-labs/aion-2.0",
+      "signupUrl": "https://free-llm.com/provider/aion-labs",
+      "sources": [
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.anyapi.ai/v1",
+      "endsAt": null,
+      "id": "anyapi",
+      "limits": {},
+      "models": [
+        "inclusionai/ling-3.0-flash-fin:free",
+        "inclusionai/ling-3.0-flash-sante:free",
+        "qwen/qwen3.8-27b:free"
+      ],
+      "name": "AnyAPI",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://free-llm.com/provider/anyapi",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api-inference.modelscope.cn/v1",
+      "endsAt": null,
+      "id": "api-inference",
+      "limits": {},
+      "models": [
+        "Qwen/Qwen3.5-397B-A17B",
+        "Qwen/Qwen3.8-Flash-Next",
+        "nex-agi/Nex-N2.5-Pro",
+        "stepfun-ai/Step-3.7-Flash"
+      ],
+      "name": "ModelScope API-Inference (Alibaba)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "nex-agi/Nex-N2.5-Pro",
+      "signupUrl": "https://modelscope.cn/my/myaccesstoken",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://apihub.agnes-ai.com/v1",
+      "endsAt": null,
+      "id": "apihub",
+      "limits": {},
+      "models": [
+        "agnes-2.5-flash",
+        "agnes-3.0-flash"
+      ],
+      "name": "Agnes AI",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://free-llm.com/provider/agnes-ai",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
       ]
     },
     {
@@ -44,6 +296,44 @@
       ]
     },
     {
+      "baseUrl": "https://ark.cn-beijing.volces.com/api/v3",
+      "endsAt": null,
+      "id": "ark",
+      "limits": {},
+      "models": [],
+      "name": "Volcano Ark (ByteDance Doubao)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://console.volcengine.com/ark",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
+      ]
+    },
+    {
+      "baseUrl": "https://api.arliai.com/v1",
+      "endsAt": null,
+      "id": "arliai",
+      "limits": {},
+      "models": [
+        "Qwen3.5-27B-Derestricted"
+      ],
+      "name": "Arli AI",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://free-llm.com/provider/arli-ai",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
       "baseUrl": "https://api.assemblyai.com/v2",
       "endsAt": null,
       "id": "assemblyai",
@@ -60,6 +350,98 @@
       "signupUrl": "https://www.assemblyai.com/pricing",
       "sources": [
         "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.bazaarlink.ai/v1",
+      "endsAt": null,
+      "id": "bazaarlink-2",
+      "limits": {},
+      "models": [
+        "auto:free",
+        "qwen/qwen3.7-flash:free",
+        "reflection/beam-free",
+        "stealth/glyph-cluster:free"
+      ],
+      "name": "BazaarLink",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "qwen/qwen3.7-flash:free",
+      "signupUrl": "https://bazaarlink.ai/keys",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
+      ]
+    },
+    {
+      "baseUrl": "https://blockrun.ai/api/v1",
+      "endsAt": null,
+      "id": "blockrun",
+      "limits": {},
+      "models": [
+        "nvidia/muse-glimmer-30b",
+        "nvidia/nemotron-3.5-bolt",
+        "poolside/laguna-xs-2.1"
+      ],
+      "name": "BlockRun (free models)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "available",
+        "tools": true
+      },
+      "probedModel": "poolside/laguna-xs-2.1",
+      "signupUrl": "https://blockrun.ai/free",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.bytez.com/models/v2/openai/v1",
+      "endsAt": null,
+      "id": "bytez",
+      "limits": {},
+      "models": [
+        "Qwen/Qwen3-4B"
+      ],
+      "name": "Bytez",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://free-llm.com/provider/bytez",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://chat.merkium.nl/api/v1",
+      "endsAt": null,
+      "id": "chat",
+      "limits": {},
+      "models": [
+        "ceres-1.0",
+        "ceres-1.0-pro",
+        "ganymede-1.1",
+        "pluto-1.1-flash",
+        "pluto-1.1-pro",
+        "pluto-1.2-flash",
+        "pluto-1.2-pro"
+      ],
+      "name": "Merkium",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "signupUrl": "https://free-llm.com/provider/merkium",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
       ]
     },
     {
@@ -121,23 +503,98 @@
       ]
     },
     {
+      "baseUrl": "https://api.cohere.com/compatibility/v1",
+      "endsAt": null,
+      "id": "cohere-3",
+      "limits": {},
+      "models": [
+        "command-a-03-2025",
+        "command-a-plus-05-2026",
+        "command-a-reasoning-08-2025",
+        "command-a-vision-07-2025",
+        "command-r-08-2024",
+        "command-r-plus-08-2024",
+        "command-r7b-12-2024",
+        "north-mini-code-1-0"
+      ],
+      "name": "Cohere (trial keys)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://dashboard.cohere.com/api-keys",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.cohere.ai/compatibility/v1",
+      "endsAt": null,
+      "id": "cohere-4",
+      "limits": {},
+      "models": [
+        "c4ai-aya-expanse-32b",
+        "command-a-plus-05-2026",
+        "command-a-reasoning-08-2025",
+        "command-a-translate-08-2025",
+        "command-a-vision-07-2025",
+        "command-r-08-2024",
+        "command-r-plus-08-2024",
+        "command-r7b-12-2024",
+        "north-mini-code-1.0"
+      ],
+      "name": "Cohere",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://free-llm.com/provider/cohere",
+      "sources": [
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
       "baseUrl": "https://crowllm.com/v1",
       "endsAt": null,
       "id": "crowllm",
       "limits": {},
       "models": [
+        "gemma-4-31b-it:free",
         "qwen4-max:free"
       ],
-      "name": "CrowLLM",
+      "name": "CrowLLM (free models)",
       "probe": {
         "at": "2026-11-27T11:16:31.091Z",
         "status": "key-required",
         "tools": null
       },
       "probedModel": "ernie-5.5-flash-preview:free",
-      "signupUrl": "https://crowllm.com/",
+      "signupUrl": "https://crowllm.com/keys",
       "sources": [
-        "https://t.me/rubiconzone/119"
+        "https://t.me/rubiconzone/119",
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://inference.dahl.global/v1",
+      "endsAt": null,
+      "id": "dahl-2",
+      "limits": {},
+      "models": [
+        "zai-org/GLM-5.3-Flash"
+      ],
+      "name": "Dahl Inference",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "zai-org/GLM-5.3-Flash",
+      "signupUrl": "https://inference.dahl.global/account",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
       ]
     },
     {
@@ -160,6 +617,52 @@
       "signupUrl": "https://www.alibabacloud.com/help/en/model-studio/developer-reference/get-api-key",
       "sources": [
         "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+      "endsAt": null,
+      "id": "dashscope-intl",
+      "limits": {},
+      "models": [
+        "deepseek-v4-flash-0731",
+        "deepseek-v4-pro",
+        "deepseek-v4.1-flash",
+        "glm-5.1",
+        "glm-5.2",
+        "glm-5.3",
+        "qwen-flash",
+        "qwen-max",
+        "qwen-plus",
+        "qwen3-coder-flash",
+        "qwen3-vl-plus",
+        "qwen3.5-122b-a10b",
+        "qwen3.5-27b",
+        "qwen3.5-35b-a3b",
+        "qwen3.5-397b-a17b",
+        "qwen3.5-flash",
+        "qwen3.5-plus",
+        "qwen3.6-27b",
+        "qwen3.6-35b-a3b",
+        "qwen3.6-flash",
+        "qwen3.6-plus",
+        "qwen3.7-flash",
+        "qwen3.7-max",
+        "qwen3.7-plus",
+        "qwen3.8-2.4t-a95b",
+        "qwen3.8-27b",
+        "qwen3.8-flash",
+        "qwen3.8-max"
+      ],
+      "name": "Alibaba Cloud Model Studio (DashScope, international)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://modelstudio.console.alibabacloud.com/",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
       ]
     },
     {
@@ -230,6 +733,35 @@
       ]
     },
     {
+      "baseUrl": "https://developer.amd.com.cn/radeon/api/v1",
+      "endsAt": null,
+      "id": "developer",
+      "limits": {},
+      "models": [
+        "DeepSeek-V4-Flash",
+        "DeepSeek-V4.1-Flash",
+        "GLM-5.3-Flash",
+        "Gemma-4-31B-IT",
+        "MiMo-V2.6-Flash",
+        "MiniCPM-V-4.7-1B",
+        "MiniCPM-V-4.7-35B-A3B",
+        "MiniCPM5-2B",
+        "Qwen3.8-27B"
+      ],
+      "name": "AMD Token Factory (Radeon Cloud)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://free-llm.com/provider/amd-radeon-cloud-china",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json",
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
+      ]
+    },
+    {
       "baseUrl": "https://api.dots.ai/v1",
       "endsAt": null,
       "id": "dots",
@@ -270,6 +802,87 @@
       ]
     },
     {
+      "baseUrl": "https://api.experientiallabs.ai/v1",
+      "endsAt": null,
+      "id": "experientiallabs",
+      "limits": {},
+      "models": [],
+      "name": "Experiential Labs",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": null,
+      "sources": [
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
+      ]
+    },
+    {
+      "baseUrl": "https://api.fireworks.ai/inference/v1",
+      "endsAt": null,
+      "id": "fireworks",
+      "limits": {},
+      "models": [
+        "accounts/fireworks/models/deepseek-v4p1-flash",
+        "accounts/fireworks/models/glm-5p3",
+        "accounts/fireworks/models/glm-5p3-flash",
+        "accounts/fireworks/models/kimi-k3",
+        "accounts/fireworks/models/minimax-m3"
+      ],
+      "name": "Fireworks AI",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://app.fireworks.ai/settings/users/api-keys",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://free.empero.org/v1",
+      "endsAt": null,
+      "id": "free",
+      "limits": {},
+      "models": [],
+      "name": "Empero",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "signupUrl": null,
+      "sources": [
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
+      ]
+    },
+    {
+      "baseUrl": "https://freeinference.org/v1",
+      "endsAt": null,
+      "id": "freeinference",
+      "limits": {},
+      "models": [
+        "deepseek-v4-flash",
+        "glm-5.3-flash",
+        "minimax-m3",
+        "qwen3.6-35b"
+      ],
+      "name": "FreeInference",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "bge-m3",
+      "signupUrl": "https://free-llm.com/provider/freeinference",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
       "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai",
       "endsAt": null,
       "id": "generativelanguage",
@@ -277,6 +890,7 @@
       "models": [
         "gemini-2.5-flash",
         "gemini-2.5-flash-lite",
+        "gemini-2.5-pro",
         "gemini-3-flash-preview",
         "gemini-3.1-flash-lite",
         "gemini-3.1-flash-lite-preview",
@@ -285,6 +899,7 @@
         "gemini-3.6-flash",
         "gemini-3.7-flash",
         "gemini-3.8-flash",
+        "gemini-4-hydrogen",
         "gemini-flash-latest",
         "gemini-flash-lite-latest",
         "gemini-omni-1.1-flash",
@@ -292,15 +907,34 @@
         "gemma-4-26b-a4b-it",
         "gemma-4-31b-it"
       ],
-      "name": "Google AI Studio (Gemini API)",
+      "name": "Google AI Studio",
       "probe": {
         "at": "2026-11-27T11:16:31.091Z",
         "status": "unreachable",
         "tools": null
       },
-      "signupUrl": "https://ai.google.dev/gemini-api/docs/rate-limits",
+      "signupUrl": "https://free-llm.com/provider/google-ai-studio",
       "sources": [
-        "https://freeinference.dev/data/providers.json"
+        "https://freeinference.dev/data/providers.json",
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta",
+      "endsAt": null,
+      "id": "generativelanguage-2",
+      "limits": {},
+      "models": [],
+      "name": "Google AI Studio",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": null,
+      "sources": [
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
       ]
     },
     {
@@ -324,6 +958,171 @@
       "signupUrl": "https://api.hcnsec.cn/sign-up?aff=GlrI",
       "sources": [
         "https://t.me/rubiconzone/51"
+      ]
+    },
+    {
+      "baseUrl": "https://inference.hetzner.com/v1",
+      "endsAt": null,
+      "id": "hetzner-2",
+      "limits": {},
+      "models": [
+        "Qwen/Qwen3.6-35B-A3B-FP8"
+      ],
+      "name": "Hetzner Inference API",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://experiments.hetzner.com/inference",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.hpc-ai.com/inference/v1",
+      "endsAt": null,
+      "id": "hpc-ai",
+      "limits": {},
+      "models": [
+        "minimax/minimax-m3",
+        "moonshotai/kimi-k2.7-code",
+        "zai-org/glm-5.3-flash"
+      ],
+      "name": "HPC-AI Model APIs",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://www.hpc-ai.com/models-console/api-key",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.hunyuan.cloud.tencent.com/v1",
+      "endsAt": null,
+      "id": "hunyuan",
+      "limits": {},
+      "models": [],
+      "name": "~~Tencent Hunyuan~~ (legacy platform shuts down 9/30, no free model on the new one)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": null,
+      "sources": [
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
+      ]
+    },
+    {
+      "baseUrl": "https://api.impossibl.com/v1",
+      "endsAt": null,
+      "id": "impossibl",
+      "limits": {},
+      "models": [
+        "deepseek/deepseek-v4.1-flash",
+        "qwen/qwen3.8-27b",
+        "zai/glm-5.3-flash"
+      ],
+      "name": "Impossibl",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "deepseek/deepseek-v4.1-flash",
+      "signupUrl": "https://impossibl.com/dashboard",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.inceptionlabs.ai/v1",
+      "endsAt": null,
+      "id": "inceptionlabs",
+      "limits": {},
+      "models": [
+        "mercury-3"
+      ],
+      "name": "Inception Labs (Mercury)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "mercury-3",
+      "signupUrl": "https://platform.inceptionlabs.ai/",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.inferbase.ai/v1",
+      "endsAt": null,
+      "id": "inferbase",
+      "limits": {},
+      "models": [
+        "auto",
+        "deepseek-v4-flash",
+        "google-gemma-4-31b-it",
+        "moonshot-kimi-k2-7-code",
+        "openai-gpt-oss-120b",
+        "qwen3-6-27b",
+        "zai-glm-4-7-flash"
+      ],
+      "name": "Inferbase",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "auto",
+      "signupUrl": "https://free-llm.com/provider/inferbase",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.iteracompute.com/v1",
+      "endsAt": null,
+      "id": "iteracompute",
+      "limits": {},
+      "models": [
+        "Auto"
+      ],
+      "name": "IteraCompute",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "Auto",
+      "signupUrl": "https://platform.iteracompute.com/api-keys",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://jzstoken.com/api/v1",
+      "endsAt": null,
+      "id": "jzstoken",
+      "limits": {},
+      "models": [
+        "jzs-max-3.0"
+      ],
+      "name": "JZS Token",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://jzstoken.com/dashboard/keys",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
       ]
     },
     {
@@ -355,6 +1154,24 @@
       ]
     },
     {
+      "baseUrl": "https://api.kilo.ai/api/gateway/v1",
+      "endsAt": null,
+      "id": "kilo-3",
+      "limits": {},
+      "models": [],
+      "name": "Kilo Gateway",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "available",
+        "tools": false
+      },
+      "probedModel": "kilo-auto/free",
+      "signupUrl": null,
+      "sources": [
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
+      ]
+    },
+    {
       "baseUrl": "https://api.kimi.ai/coding/v1",
       "endsAt": null,
       "id": "kimi",
@@ -374,6 +1191,149 @@
       "signupUrl": "https://www.kimi.ai/code/docs/en/kimi-code/models.html",
       "sources": [
         "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.kiosapi.id/v1",
+      "endsAt": null,
+      "id": "kiosapi",
+      "limits": {},
+      "models": [
+        "aisingapore/sea-lion-27b",
+        "google/gemma-4-26b",
+        "meta/llama-3.1-8b",
+        "qwen/qwen3-30b",
+        "zai/glm-4.7-flash"
+      ],
+      "name": "Kiosapi.id",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "zai/glm-4.7-flash",
+      "signupUrl": "https://free-llm.com/provider/kiosapi",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.llm.kiwi/v1",
+      "endsAt": null,
+      "id": "kiwi",
+      "limits": {},
+      "models": [
+        "auto",
+        "minimax-m2.5",
+        "minimax-m3",
+        "nemotron-3-super",
+        "nemotron-3-ultra"
+      ],
+      "name": "LLM.kiwi",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://free-llm.com/provider/llm-kiwi",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://llmtr.com/v1",
+      "endsAt": null,
+      "id": "llmtr",
+      "limits": {},
+      "models": [
+        "lgai/k-exaone-2.5",
+        "liquid/lfm3-1.7b-free",
+        "nvidia/nemotron-3-ultra-550b-a55b",
+        "nvidia/nemotron-3.5-super-vl-free",
+        "parallel/parallel-free",
+        "qwen/qwen3.8-27b-free"
+      ],
+      "name": "LLMTR",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "nvidia/nemotron-3-ultra-550b-a55b",
+      "signupUrl": "https://llmtr.com/dashboard/api-keys",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://logfare.ai/v1",
+      "endsAt": null,
+      "id": "logfare",
+      "limits": {},
+      "models": [
+        "glm-5.3-flash"
+      ],
+      "name": "Logfare (Standard models)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "glm-5.3-flash",
+      "signupUrl": "https://logfare.ai/register",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.meganova.ai/v1",
+      "endsAt": null,
+      "id": "meganova",
+      "limits": {},
+      "models": [
+        "BruhzWater/Sapphira-L3.3-70b-0.1",
+        "FallenMerick/MN-Violet-Lotus-12B",
+        "Sao10K/L3-70B-Euryale-v2.1",
+        "Sao10K/L3-8B-Stheno-v3.2",
+        "Steelskull/L3.3-MS-Nevoria-70b",
+        "meganova-ai/manta-flash-1.0",
+        "meganova-ai/manta-mini-1.0",
+        "meganova-ai/manta-pro-1.0",
+        "mistralai/Mistral-Small-3.2-24B-Instruct-2506",
+        "zai-org/GLM-4.7-Flash"
+      ],
+      "name": "MegaNova AI",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "meganova-ai/manta-mini-1.0",
+      "signupUrl": "https://free-llm.com/provider/meganova",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.miapi.uk/v1",
+      "endsAt": null,
+      "id": "miapi",
+      "limits": {},
+      "models": [
+        "miapi-grounded"
+      ],
+      "name": "MIAPI",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "signupUrl": "https://miapi.uk/signup.html",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
       ]
     },
     {
@@ -398,59 +1358,256 @@
       ]
     },
     {
-      "baseUrl": "https://model.inferx.net/endpoints/v1",
+      "baseUrl": "https://api.mixedbread.com/v1",
       "endsAt": null,
-      "id": "model",
-      "limits": {
-        "rpd": 2000,
-        "rpm": 60
-      },
+      "id": "mixedbread",
+      "limits": {},
       "models": [
-        "Agents-A1",
-        "Devstral-2-123B-Instruct-2512-int4-AutoRound",
-        "Ornith-1.0-35B-FP8",
-        "Qwen3-Coder-Next-FP8-no-thinking",
-        "Qwen3-Embedding-8B",
-        "Qwen3.6-35B-A3B-fp8-no-thinking",
-        "deepseek-v4-flash",
-        "mimo-v25"
+        "toast-1"
       ],
-      "name": "InferX",
+      "name": "Mixedbread",
       "probe": {
-        "at": "2026-11-27T11:16:31.091Z",
-        "status": "key-required",
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "unreachable",
         "tools": null
       },
-      "signupUrl": "https://model.inferx.net/endpoints",
+      "signupUrl": "https://platform.mixedbread.com/platform?next=api-keys",
       "sources": [
-        "https://freeinference.dev/data/providers.json"
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
       ]
     },
     {
-      "baseUrl": "https://inference-api.nousresearch.com/v1",
+      "baseUrl": "https://api.moark.com/v1",
       "endsAt": null,
-      "id": "nousresearch",
-      "limits": {
-        "rpm": 50,
-        "tpm": 500000
-      },
+      "id": "moark",
+      "limits": {},
       "models": [
-        "ornith/ornith-1.5-122b:free",
-        "poolside/laguna-s-2.1:free",
-        "poolside/laguna-xs-2.1:free",
-        "reflection/beam-1.0-501b-a23b:free",
-        "stepfun/step-3.7-flash:free",
-        "upstage/solar-mini4:free"
+        "deepseek-v4-flash-0731"
       ],
-      "name": "Nous Portal",
+      "name": "Moark (Gitee AI)",
       "probe": {
-        "at": "2026-11-27T11:16:31.091Z",
+        "at": "2026-11-27T13:42:15.137Z",
         "status": "key-required",
         "tools": null
       },
-      "signupUrl": "https://portal.nousresearch.com/api-docs",
+      "probedModel": "Atria-Dawn-Free",
+      "signupUrl": "https://moark.com/dashboard/tokens",
       "sources": [
-        "https://freeinference.dev/data/providers.json"
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://models.mixlayer.ai/v1",
+      "endsAt": null,
+      "id": "models",
+      "limits": {},
+      "models": [
+        "qwen/qwen3.5-4b-free"
+      ],
+      "name": "Mixlayer",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://free-llm.com/provider/mixlayer",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.notrack.ai/v1",
+      "endsAt": null,
+      "id": "notrack",
+      "limits": {},
+      "models": [
+        "notrack-uncensored"
+      ],
+      "name": "NoTrack API",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://notrack.ai/api-keys",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.novita.ai/openai/v1",
+      "endsAt": null,
+      "id": "novita",
+      "limits": {},
+      "models": [
+        "apodex/apodex-1.1-mini"
+      ],
+      "name": "Novita AI",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "deepseek/deepseek-v4.1-flash-1017",
+      "signupUrl": "https://novita.ai/settings/key-management",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://integrate.api.nvidia.com/v1",
+      "endsAt": null,
+      "id": "nvidia",
+      "limits": {},
+      "models": [
+        "deepseek-ai/deepseek-v4.1-flash",
+        "google/diffusiongemma-26b-a4b-it",
+        "google/gemma-4-31b-it",
+        "meta/llama-3.2-11b-vision-instruct",
+        "meta/llama-3.2-90b-vision-instruct",
+        "meta/muse-glimmer-30b",
+        "minimaxai/minimax-m3.1-flash",
+        "mistralai/mistral-large-4-1t-a52b",
+        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+        "nvidia/nemotron-3.5-bolt-e4b",
+        "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "openai/gpt-oss-20b",
+        "poolside/laguna-xs-2.1",
+        "stepfun-ai/step-5-preview",
+        "z-ai/glm-5.3-flash"
+      ],
+      "name": "NVIDIA NIM (build.nvidia.com)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "minimaxai/minimax-m3.1-flash",
+      "signupUrl": "https://build.nvidia.com/",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1",
+      "endsAt": null,
+      "id": "oai",
+      "limits": {},
+      "models": [
+        "DeepSeek-V4.1-Flash-1017",
+        "Meta-Llama-3_3-70B-Instruct",
+        "Mistral-Small-3.2-24B-Instruct-2506",
+        "Qwen2.5-VL-72B-Instruct",
+        "Qwen3.5-397B-A17B",
+        "Qwen3.5-9B",
+        "Qwen3.6-27B",
+        "Qwen3.8-27B",
+        "gemma-4-26b-a4b",
+        "gpt-oss-120b",
+        "gpt-oss-20b",
+        "laguna-xs-2.1",
+        "nemotron3-nano-30b",
+        "nemotron3-omni-30b",
+        "qwen3-vl-30b-a3b",
+        "qwen3.6-35b-a3b",
+        "solaria-3"
+      ],
+      "name": "OVH AI Endpoints",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "probedModel": "solaria-3",
+      "signupUrl": "https://free-llm.com/provider/ovh-ai",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://oai.aihorde.net/v1",
+      "endsAt": null,
+      "id": "oai-2",
+      "limits": {},
+      "models": [
+        "koboldcpp/L3-8B-Stheno-v3.2",
+        "koboldcpp/Llama-3.2-1B-Instruct",
+        "koboldcpp/Qwen3-4B",
+        "koboldcpp/Rocinante-XL-16B-v1",
+        "koboldcpp/gemma-4-E4B-it"
+      ],
+      "name": "AI Horde (OpenAI-compatible front)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "probedModel": "koboldcpp/L3-8B-Stheno-v3.2",
+      "signupUrl": "https://free-llm.com/provider/ai-horde",
+      "sources": [
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://ollama.com/v1",
+      "endsAt": null,
+      "id": "ollama",
+      "limits": {},
+      "models": [],
+      "name": "Ollama Cloud",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "clef:27b",
+      "signupUrl": "https://ollama.com/settings/keys",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://llm.onerouter.pro/v1",
+      "endsAt": null,
+      "id": "onerouter",
+      "limits": {},
+      "models": [
+        "apodex/apodex-1.1-mini:free",
+        "internlm/atria-dawn-preview:free",
+        "qwen/qwen3.8-27b-abliterated-cyber:free",
+        "qwen/qwen3.8-27b:free"
+      ],
+      "name": "Infron",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "qwen/qwen3.8-27b:free",
+      "signupUrl": "https://infron.ai/dashboard/apiKeys",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://onomeo.com/v1",
+      "endsAt": null,
+      "id": "onomeo",
+      "limits": {},
+      "models": [
+        "z-ai/glm-5.3-flash-free"
+      ],
+      "name": "Onomeo",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": null,
+      "sources": [
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
       ]
     },
     {
@@ -464,7 +1621,7 @@
         "GLM-4.7-Flash",
         "GLM-5.1"
       ],
-      "name": "Z.AI (Zhipu)",
+      "name": "Zhipu AI",
       "probe": {
         "at": "2026-11-27T11:16:31.091Z",
         "status": "key-required",
@@ -472,7 +1629,8 @@
       },
       "signupUrl": "https://z.ai/",
       "sources": [
-        "https://freeinference.dev/data/providers.json"
+        "https://freeinference.dev/data/providers.json",
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
       ]
     },
     {
@@ -491,6 +1649,108 @@
       "signupUrl": "https://opencode.ai/v2/docs/console/models/",
       "sources": [
         "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://opencode.ai/zen/v1",
+      "endsAt": null,
+      "id": "opencode-2",
+      "limits": {},
+      "models": [],
+      "name": "Stealth Models",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "probedModel": "mimo-v2.6-flash-free",
+      "signupUrl": null,
+      "sources": [
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
+      ]
+    },
+    {
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "endsAt": null,
+      "id": "openrouter-2",
+      "limits": {},
+      "models": [
+        "cohere/north-mini-code:free",
+        "dots-studio/dots-3-note-preview:free",
+        "gemma-4-31b-it:free",
+        "liquid/lfm-2.5-2.6b:free",
+        "liquid/lfm-3-1.7b:free",
+        "nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "nemotron-3.5-lightning:free",
+        "nemotron-3.5-super-vl:free",
+        "nvidia/nemotron-3-super-120b-a12b:free",
+        "nvidia/nemotron-3.5-content-safety:free",
+        "openrouter/free",
+        "poolside/laguna-s-2.1:free",
+        "poolside/laguna-xs-2.1:free",
+        "thinkingmachines/inkling-2-small:free",
+        "thinkingmachines/inkling-small:free",
+        "thinkingmachines/inkling:free",
+        "xingchen-agi/xing4.0-29b-a4b:free"
+      ],
+      "name": "OpenRouter",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "liquid/lfm-3-1.7b:free",
+      "signupUrl": "https://free-llm.com/provider/openrouter",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/ClawLabsAI/free-ai-models/main/data/models.json",
+        "https://raw.githubusercontent.com/original0211/freemodel-radar/main/data.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json",
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
+      ]
+    },
+    {
+      "baseUrl": "https://api.opentyphoon.ai/v1",
+      "endsAt": null,
+      "id": "opentyphoon",
+      "limits": {},
+      "models": [
+        "typhoon-v2.5-30b-a3b-instruct"
+      ],
+      "name": "OpenTyphoon (Typhoon API)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "signupUrl": "https://free-llm.com/provider/opentyphoon",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.orcarouter.ai/v1",
+      "endsAt": null,
+      "id": "orcarouter-2",
+      "limits": {},
+      "models": [
+        "deepseek-v4.1-flash-free",
+        "deepseek/deepseek-v4-flash-free",
+        "orca/orcaverify-text1.0-free",
+        "tencent/hy3-free"
+      ],
+      "name": "OrcaRouter",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "deepseek/deepseek-v4-flash-free",
+      "signupUrl": "https://www.orcarouter.ai/",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
       ]
     },
     {
@@ -515,6 +1775,150 @@
       ]
     },
     {
+      "baseUrl": "https://api.platform.preferredai.jp/v1",
+      "endsAt": null,
+      "id": "platform",
+      "limits": {},
+      "models": [
+        "plamo-3.0-prime",
+        "plamo-3.1-prime"
+      ],
+      "name": "PLaMo API (Preferred Networks)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "signupUrl": "https://console.platform.preferredai.jp/",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.plugsky.com/v1",
+      "endsAt": null,
+      "id": "plugsky",
+      "limits": {},
+      "models": [],
+      "name": "Plugsky",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "plugsky-micro",
+      "signupUrl": "https://free-llm.com/provider/plugsky",
+      "sources": [
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.b.ai/v1",
+      "endsAt": null,
+      "id": "provider-b",
+      "limits": {},
+      "models": [],
+      "name": "B.AI",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": null,
+      "sources": [
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
+      ]
+    },
+    {
+      "baseUrl": "https://api.z.ai/api/paas/v4",
+      "endsAt": null,
+      "id": "provider-z",
+      "limits": {},
+      "models": [
+        "glm-4.5-flash",
+        "glm-4.6v-flash"
+      ],
+      "name": "Z.AI (GLM)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://free-llm.com/provider/z-ai",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://qianfan.baidubce.com/v2",
+      "endsAt": null,
+      "id": "qianfan",
+      "limits": {},
+      "models": [],
+      "name": "Baidu Qianfan",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": null,
+      "sources": [
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
+      ]
+    },
+    {
+      "baseUrl": "https://api.regolo.ai/v1",
+      "endsAt": null,
+      "id": "regolo",
+      "limits": {},
+      "models": [
+        "apertus-70b",
+        "gemma4-31b",
+        "glm5.2",
+        "gpt-oss-120b",
+        "gpt-oss-20b",
+        "mistral-small-4-119b",
+        "qwen3.5-122b",
+        "qwen3.5-9b",
+        "qwen3.8-27b"
+      ],
+      "name": "Regolo AI",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "apertus-70b",
+      "signupUrl": "https://dashboard.regolo.ai/",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://router.requesty.ai/v1",
+      "endsAt": null,
+      "id": "requesty-2",
+      "limits": {},
+      "models": [
+        "mistral/leanstral-1-5",
+        "novita/ling-3.1-flash",
+        "nvidia/nemotron-3-nano-30b-a3b"
+      ],
+      "name": "Requesty",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "signupUrl": "https://free-llm.com/provider/requesty",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
       "baseUrl": "https://gateway.respan.ai/v1",
       "endsAt": null,
       "id": "respan",
@@ -531,6 +1935,50 @@
       "signupUrl": "https://respan.ai/",
       "sources": [
         "https://t.me/rubiconzone/112"
+      ]
+    },
+    {
+      "baseUrl": "https://api.routerplex.com/v1",
+      "endsAt": null,
+      "id": "routerplex",
+      "limits": {},
+      "models": [
+        "claude-sonnet-4-6",
+        "deepseek-v4-flash",
+        "glm-5.3-flash"
+      ],
+      "name": "RouterPlex",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://routerplex.com/sign-up",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.routeway.ai/v1",
+      "endsAt": null,
+      "id": "routeway",
+      "limits": {},
+      "models": [
+        "deepseek-v4.1-flash:free",
+        "minimax-m3.1-flash:free",
+        "muse-glimmer-30b:free"
+      ],
+      "name": "Routeway",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "minimax-m3.1-flash:free",
+      "signupUrl": "https://free-llm.com/provider/routeway",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
       ]
     },
     {
@@ -551,6 +1999,26 @@
       "signupUrl": "https://cloud.sambanova.ai/apis",
       "sources": [
         "https://freeinference.dev/data/providers.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.sarvam.ai/v1",
+      "endsAt": null,
+      "id": "sarvam",
+      "limits": {},
+      "models": [
+        "sarvam-105b"
+      ],
+      "name": "Sarvam AI",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "sarvam-105b",
+      "signupUrl": "https://indus.sarvam.ai/key-management",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
       ]
     },
     {
@@ -579,20 +2047,94 @@
       ]
     },
     {
+      "baseUrl": "https://api.sea-lion.ai/v1",
+      "endsAt": null,
+      "id": "sea-lion",
+      "limits": {},
+      "models": [
+        "aisingapore/Llama-SEA-LION-v3.5-70B-R",
+        "aisingapore/Qwen-SEA-LION-v4.5-27B-IT"
+      ],
+      "name": "SEA-LION API",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://free-llm.com/provider/sea-lion",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
       "baseUrl": "https://api.siliconflow.cn/v1",
       "endsAt": null,
       "id": "siliconflow",
       "limits": {},
-      "models": [],
+      "models": [
+        "Qwen/Qwen2.5-7B-Instruct",
+        "Qwen/Qwen3-8B",
+        "Qwen/Qwen3.5-4B",
+        "THUDM/GLM-4-9B-0414",
+        "THUDM/GLM-Z1-9B-0414",
+        "XingChenAGI/Xing4.0-29B",
+        "deepseek-ai/DeepSeek-R1-0528-Qwen3-8B"
+      ],
       "name": "SiliconFlow",
       "probe": {
         "at": "2026-11-27T11:16:31.091Z",
         "status": "key-required",
         "tools": null
       },
-      "signupUrl": "https://siliconflow.cn/",
+      "signupUrl": "https://cloud.siliconflow.cn/account/ak",
       "sources": [
-        "https://freeinference.dev/data/providers.json"
+        "https://freeinference.dev/data/providers.json",
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
+      ]
+    },
+    {
+      "baseUrl": "https://api.simplellm.eu/v1",
+      "endsAt": null,
+      "id": "simplellm",
+      "limits": {},
+      "models": [
+        "Mistral-7B-Instruct-v0.3",
+        "free-Llama-3.1-8B-Instruct",
+        "free-gemma-4-E4B",
+        "kode-14b"
+      ],
+      "name": "SimpleLLM",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://free-llm.com/provider/simplellm",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/nejib1/Free-LLM/main/router/catalog.snapshot.json"
+      ]
+    },
+    {
+      "baseUrl": "https://spark-api-open.xf-yun.com/v1",
+      "endsAt": null,
+      "id": "spark-api-open",
+      "limits": {},
+      "models": [
+        "lite"
+      ],
+      "name": "iFlytek Spark (Xinghuo)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://console.xfyun.cn/",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
       ]
     },
     {
@@ -641,27 +2183,84 @@
       ]
     },
     {
-      "baseUrl": "https://synap402.com/v1",
+      "baseUrl": "https://api.stdcmpt.com/v1",
       "endsAt": null,
-      "id": "synap402",
-      "limits": {
-        "rpd": 50,
-        "rpm": 10,
-        "tpd": 100000
-      },
+      "id": "stdcmpt",
+      "limits": {},
       "models": [
-        "qwen3-coder-30b"
+        "StandardCompute",
+        "anthropic/claude-standardcompute"
       ],
-      "name": "Synap by Linkrra",
+      "name": "Standard Compute",
       "probe": {
-        "at": "2026-11-27T11:16:31.091Z",
-        "status": "unreachable",
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
         "tools": null
       },
-      "probedModel": "qwen3-coder-30b",
-      "signupUrl": "https://synap402.com/ai/account.html",
+      "probedModel": "StandardCompute",
+      "signupUrl": "https://standardcompute.com/signup",
       "sources": [
-        "https://freeinference.dev/data/providers.json"
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.teapotrouter.com/v1",
+      "endsAt": null,
+      "id": "teapotrouter",
+      "limits": {},
+      "models": [
+        "gpt-6.1-sol"
+      ],
+      "name": "Teapot Router",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://teapotrouter.com/en/register",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://text.pollinations.ai/openai",
+      "endsAt": null,
+      "id": "text",
+      "limits": {},
+      "models": [
+        "gpt-oss-20b"
+      ],
+      "name": "Pollinations.AI",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "available",
+        "tools": true
+      },
+      "probedModel": "openai-fast",
+      "signupUrl": "https://pollinations.ai/",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.thegrid.ai/v1",
+      "endsAt": null,
+      "id": "thegrid",
+      "limits": {},
+      "models": [
+        "agent-max",
+        "agent-prime",
+        "code-prime"
+      ],
+      "name": "The Grid",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://app.thegrid.ai/profile",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
       ]
     },
     {
@@ -684,30 +2283,84 @@
       ]
     },
     {
-      "baseUrl": "https://api.tokenlab.amd.com/v1",
+      "baseUrl": "https://api.together.xyz/v1",
       "endsAt": null,
-      "id": "tokenlab",
+      "id": "together",
       "limits": {},
       "models": [
-        "Clef",
-        "DeepSeek-V4-Flash-0731",
-        "DeepSeek-V4.1-Flash-1017",
-        "Gemma-4-31B-IT",
-        "MiniCPM-V-4.7-1B",
-        "MiniCPM-V-4.7-35B-A3B",
-        "MiniCPM5-2B",
-        "Qwen3.8-27B",
-        "d3"
+        "Prism-ML/Ternary-Bonsai-27B"
       ],
-      "name": "Token Lab",
+      "name": "Together AI (free model)",
       "probe": {
-        "at": "2026-11-27T11:16:31.091Z",
+        "at": "2026-11-27T13:42:15.137Z",
         "status": "key-required",
         "tools": null
       },
-      "signupUrl": "https://developer.amd.com/ai-developer-program/",
+      "signupUrl": "https://api.together.ai/settings/api-keys",
       "sources": [
-        "https://t.me/rubiconzone/99"
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://token.sensenova.cn/v1",
+      "endsAt": null,
+      "id": "token",
+      "limits": {},
+      "models": [
+        "sensenova-6.8-flash-lite"
+      ],
+      "name": "SenseNova (SenseTime 商汤)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://platform.sensenova.cn/",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://tokenharbor.ai/v1",
+      "endsAt": null,
+      "id": "tokenharbor",
+      "limits": {},
+      "models": [
+        "deepseek-v4.1-flash:free",
+        "mimo-v2.6-flash:free"
+      ],
+      "name": "Token Harbor",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://tokenharbor.ai/dashboard/api-keys",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json",
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
+      ]
+    },
+    {
+      "baseUrl": "https://tokenhub.tencentmaas.com/v1",
+      "endsAt": null,
+      "id": "tokenhub-2",
+      "limits": {},
+      "models": [
+        "glm-5.3",
+        "hy3",
+        "kimi-k3",
+        "minimax-m3"
+      ],
+      "name": "Tencent Cloud TokenHub",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://console.cloud.tencent.com/tokenhub/apikey",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
       ]
     },
     {
@@ -729,6 +2382,85 @@
       "signupUrl": "https://twigpine.com/opengateway?ref=VP4GW8CQ",
       "sources": [
         "https://t.me/rubiconzone/88"
+      ]
+    },
+    {
+      "baseUrl": "https://api.upstage.ai/v1",
+      "endsAt": null,
+      "id": "upstage",
+      "limits": {},
+      "models": [
+        "solar-pro4"
+      ],
+      "name": "Upstage (Solar API)",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://console.upstage.ai/api-keys",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://gateway.vlm.run/v1/openai",
+      "endsAt": null,
+      "id": "vlm",
+      "limits": {},
+      "models": [
+        "google/diffusiongemma-26b-a4b-it",
+        "qwen/qwen3.5-0.8b",
+        "qwen/qwen3.8-27b"
+      ],
+      "name": "VLM Run Gateway",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "unreachable",
+        "tools": null
+      },
+      "signupUrl": "https://app.vlm.run/",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.wallabytoken.com/v1",
+      "endsAt": null,
+      "id": "wallabytoken",
+      "limits": {},
+      "models": [
+        "kimi-k3",
+        "kimi-k3.1-pro",
+        "kimi-k3.1-pro-highspeed"
+      ],
+      "name": "Wallaby",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "signupUrl": "https://api.wallabytoken.com/register",
+      "sources": [
+        "https://raw.githubusercontent.com/mvalentsev/awesome-free-ai-coding/main/index.json"
+      ]
+    },
+    {
+      "baseUrl": "https://api.xkiro.com/v1",
+      "endsAt": null,
+      "id": "xkiro",
+      "limits": {},
+      "models": [],
+      "name": "xKiro AI",
+      "probe": {
+        "at": "2026-11-27T13:42:15.137Z",
+        "status": "key-required",
+        "tools": null
+      },
+      "probedModel": "qwen/qwen3.8-omni-flash:free",
+      "signupUrl": null,
+      "sources": [
+        "https://raw.githubusercontent.com/peter123023/awesome-free-llm-api/main/README.en.md"
       ]
     }
   ],
@@ -910,7 +2642,7 @@
       "slug": "novai"
     }
   ],
-  "generatedAt": "2026-11-27T11:16:31.091Z",
+  "generatedAt": "2026-11-27T13:42:15.137Z",
   "models": [
     {
       "active": true,
@@ -919,7 +2651,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "beam-free",
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "name": "Beam Free",
       "source": "opencode-zen",
       "tools": true
@@ -931,7 +2663,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "big-pickle",
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "name": "Big Pickle",
       "source": "opencode-zen",
       "tools": true
@@ -943,7 +2675,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "deepseek-v4.1-flash-free",
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "name": "DeepSeek V4.1 Flash Free",
       "source": "opencode-zen",
       "tools": true
@@ -955,7 +2687,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "flint-40b-free",
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "name": "Flint 40B Free",
       "source": "opencode-zen",
       "tools": true
@@ -967,7 +2699,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "hy4-flash-free",
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "name": "Hy4 flash Free",
       "source": "opencode-zen",
       "tools": true
@@ -979,7 +2711,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "iceman-free",
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "name": "Iceman Free",
       "source": "opencode-zen",
       "tools": true
@@ -991,7 +2723,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "jev-1.13-free",
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "name": "Jev 1.13 Free",
       "source": "opencode-zen",
       "tools": false
@@ -1003,7 +2735,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "mimo-v2.6-flash-free",
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "name": "MiMo-V2.6-Flash Free",
       "source": "opencode-zen",
       "tools": true
@@ -1015,7 +2747,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "nemotron-3.5-lightning-free",
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "name": "Nemotron 3.5 Lightning Free",
       "source": "opencode-zen",
       "tools": true
@@ -1027,7 +2759,7 @@
       "firstSeen": "2026-11-25T14:01:23.871Z",
       "free": true,
       "id": "nemotron-3.5-super-vl-free",
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "name": "Nemotron 3.5 Super VL Free",
       "source": "opencode-zen",
       "tools": true
@@ -1039,7 +2771,7 @@
       "firstSeen": "2026-11-26T03:04:04.312Z",
       "free": true,
       "id": "seaglass-alpha-free",
-      "lastSeen": "2026-11-27T11:16:31.091Z",
+      "lastSeen": "2026-11-27T13:42:15.137Z",
       "name": "Seaglass Alpha Free",
       "source": "opencode-zen",
       "tools": true
