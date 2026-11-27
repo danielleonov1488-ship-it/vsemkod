@@ -8,6 +8,8 @@ import type { ChatPart, FileChange, FileInfo, Permission, PermissionDecision, Qu
 import { fileReference, linkedFiles, linkFileReference, textFileReferences, type FileReference } from "../shared/file-links";
 import { FileChip, FileLink, LocalImage, TurnFiles, type ChatFiles } from "./chat-files";
 import { Icon } from "./icons";
+import { HookOutput } from "./automations";
+import type { ChatView } from "./chat-state";
 import { modelWaitState } from "../shared/model-wait";
 import { chatStatusLabel, duration, groupTurns, turnContent, type ChatStatus } from "./turns";
 
@@ -249,7 +251,7 @@ function Reasoning({ text }: { text: string }) {
 }
 
 export function Chat({ title, parts, permissions, questions, busy, answer, answerQuestion, children, headerTools, openBrowser, insertDraft,
-  copy, edit, revert, retry, reverted, executePlan, status, progress, failure, retryFailed, chooseModel, directory, preview, onError }: {
+  copy, edit, revert, retry, reverted, executePlan, status, progress, failure, retryFailed, chooseModel, directory, preview, onError, hook }: {
   title: string; parts: ChatPart[]; permissions: Permission[]; questions: Question[];
   busy: boolean; answer: (id: string, decision: PermissionDecision) => Promise<void>;
   answerQuestion: (id: string, answer?: QuestionAnswer) => Promise<void>; children: ReactNode;
@@ -258,7 +260,7 @@ export function Chat({ title, parts, permissions, questions, busy, answer, answe
   reverted: boolean; executePlan?: () => void;
   status?: ChatStatus; progress?: { started: number; since: number | null; routeWait?: number }; failure?: string;
   retryFailed: () => void; chooseModel: () => void;
-  directory: string; preview: (ref: FileReference) => void; onError: (error: unknown) => void;
+  directory: string; preview: (ref: FileReference) => void; onError: (error: unknown) => void; hook?: ChatView["hook"];
 }) {
   const lookup = useRef(new Map<string, Promise<FileInfo | null>>());
   const finishedWrites = parts.filter(part => part.kind === "tool" && (part.diffs?.length || part.diff)).length;
@@ -306,7 +308,7 @@ export function Chat({ title, parts, permissions, questions, busy, answer, answe
   const routeWait = progress?.routeWait && progress.routeWait > clock ? Math.ceil((progress.routeWait - clock) / 1000) : undefined;
   useEffect(() => {
     if (atBottom.current && scroll.current) scroll.current.scrollTop = scroll.current.scrollHeight;
-  }, [parts, permissions, questions, failure, progress?.started, wait]);
+  }, [parts, permissions, questions, failure, progress?.started, wait, hook]);
   const messages = groupTurns(parts);
   if (progress && !messages.length) messages.push({ agent: [] });
   const lastTodo = parts.findLast(part => part.kind === "tool" && part.todos !== undefined);
@@ -373,6 +375,14 @@ export function Chat({ title, parts, permissions, questions, busy, answer, answe
               </div>)}
               {content.answer.map(part => <AgentText key={part.id} text={part.text} files={fileLinks} />)}
               {(!busy || !last) && <TurnFiles changes={turnChanges(agent, end?.files)} linked={linkedFiles(response)} files={fileLinks} />}
+              {last && hook && <div className={"auto-chat-hook auto-" + hook.status}>
+                <div className="auto-result" role="status">
+                  <Icon name={hook.status === "running" ? "clock" : hook.status === "passed" ? "check" : "close"} />
+                  <span>Хук «{hook.name}»: <code className="auto-code">{hook.command}</code> — {hook.status === "running" ? "выполняется…" :
+                    hook.status === "passed" ? "прошёл" : "упал, код " + hook.exitCode}</span>
+                </div>
+                <HookOutput output={hook.output} />
+              </div>}
               {response && (!busy || !last) && <div className="message-actions">
                 <button type="button" className="composer-control" onClick={() => copy(response)}>Копировать</button>
                 {user && <button type="button" className="composer-control" disabled={busy} onClick={() => retry(user)}>Повторить</button>}

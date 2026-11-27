@@ -171,7 +171,13 @@ function App() {
     const stopProgress = api.onUpdateProgress?.(setUpdateProgress);
     const stopFocus = api.onChatFocus?.(id => {
       const target = sessionsRef.current.find(item => item.id === id);
-      if (target) void openChatRef.current?.(target);
+      if (target) { void openChatRef.current?.(target); return; }
+      // Чат создан без окна (задача по расписанию, Telegram): обновляем список и открываем.
+      void api.sessions().then(list => {
+        setSessions(previous => [...new Map([...list, ...previous].map(item => [item.id, item])).values()]);
+        const found = list.find(item => item.id === id);
+        if (found) void openChatRef.current?.(found);
+      }).catch(() => {});
     });
     const stopNewChat = api.onNewChat?.(() => startChatRef.current?.());
     const stopInstalling = api.onUpdateInstalling?.(version => notify({ text: "Устанавливаем vsemkod " + version + " — приложение перезапустится через пару секунд." }));
@@ -1054,7 +1060,7 @@ function App() {
             openWizard={api.clipboardKey && (() => setWizard(true))}
             open={url => void api.openExternal(url).catch(showError)} onError={showError} onNotice={text => notify({ text })}
             onCatalog={setCatalog} exportAll={() => void exportChats()} />
-          : chat ? <Chat key={chat.id} title={chat.title} parts={parts} permissions={permissions} questions={questions} headerTools={headerTools} openBrowser={openBrowser} insertDraft={insertDraft}
+          : chat ? <Chat key={chat.id} hook={view.hook} title={chat.title} parts={parts} permissions={permissions} questions={questions} headerTools={headerTools} openBrowser={openBrowser} insertDraft={insertDraft}
             busy={busy || !!loadingChat || historyOnly} status={status} progress={progress} failure={failed && !(issueModel && firstSource) ? failed.message : undefined}
              directory={directory} preview={openPreview} onError={showError}
             retryFailed={() => retryFailed()} chooseModel={() => setModelMenu(value => value + 1)}

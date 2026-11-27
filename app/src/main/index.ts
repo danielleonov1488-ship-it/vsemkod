@@ -36,6 +36,8 @@ import { projectTemplates, templateFolderName } from "../shared/templates";
 import { createTray } from "./tray";
 import { createBrowserHost } from "./browser-view";
 import { registerWorktreeIpc, Worktrees } from "./worktrees";
+import { registerHooks } from "./hooks";
+import { registerSchedules } from "./schedules";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const devUrl = process.env.ELECTRON_RENDERER_URL;
@@ -166,7 +168,7 @@ async function start() {
   const hiddenProjects = new Set(savedProjects?.hidden ?? []);
   let projectWrites = Promise.resolve();
   const attachments = new Attachments(join(data, "attachments"));
-  const activeSessions = new Map<string, { interrupted: boolean }>();
+  const activeSessions = new Map<string, { cancel: AbortController; scheduled: boolean }>();
   let power: number | undefined;
   function syncPower() {
     if (activeSessions.size && preferences.keepAwake && power === undefined) power = powerSaveBlocker.start("prevent-app-suspension");
@@ -290,7 +292,7 @@ async function start() {
       if (event.type === "part" && event.part.kind === "tool" && event.part.background && event.part.status === "running") {
         tasks.called(event.part.id, event.sessionId, event.part.target);
       }
-      broadcast("chat:event", event);
+      if (!(event.type === "turn-status" && activeSessions.get(event.sessionId)?.scheduled)) broadcast("chat:event", event);
       if (event.type === "permission" || event.type === "question") announce("Агент ждёт ответа", conversations.get(event.sessionId)?.title ?? "vsemkod", event.sessionId);
     }, personalModels, () => ({ agentSteps: preferences.agentSteps, webSearch: preferences.webSearch, mcp: { servers: connectors.engineConfigs() }, skills: skillsRevision }));
   const skills = new SkillsCatalog(join(resources, "skills-catalog"), engine.configDirectory);
@@ -305,6 +307,7 @@ async function start() {
     progress => { broadcast("updates:progress", progress); tray?.update({ downloading: progress }); });
   const attempts = new Map<string, { provider: z.infer<typeof connectionId>; controller: AbortController; done: Promise<unknown> }>();
   let watching: { id: string; watch: ClipboardWatch } | undefined;
+  let stopSchedules: (() => void) | undefined;
   let nativeQueue = Promise.resolve();
   function refreshNative(waitFor?: SubscriptionId) {
     const refresh = nativeQueue.then(() => engine.withAuth(async client => {
@@ -359,6 +362,8 @@ async function start() {
     for (const token of sideSessions.keys()) void closeSide(token).catch(() => {});
   };
   teardown = async () => {
+    stopSchedules?.();
+    for (const turn of activeSessions.values()) turn.cancel.abort();
     cancelAll();
     for (const attempt of connectorAuth.values()) attempt.cancel.abort();
     clearInterval(taskTimer);
@@ -612,6 +617,7 @@ async function start() {
     router.resetProvider(provider);
     return publishState();
   });
+  const hooks = await registerHooks(handle, join(data, "hooks.json"), project, event => broadcast("chat:event", event));
   handle("chat:list", z.tuple([localPath.optional()]), async ([directory]) => {
     if (directory) project(directory);
     const list = (await (await engine.ready()).list()).filter(chat => !sideIds.has(chat.id))
@@ -623,14 +629,15 @@ async function start() {
     });
     return list;
   });
-  handle("chat:create", z.tuple([localPath, z.string().trim().min(1).max(120)]), ([directory, title]) => {
+  function createChat(directory: string, title: string) {
     project(directory);
     return worktrees.use(directory, async () => {
       const chat = await (await engine.ready()).create(directory, title, worktrees.label(directory));
       conversations.set(chat.id, chat);
       return chat;
     });
-  });
+  }
+  handle("chat:create", z.tuple([localPath, z.string().trim().min(1).max(120)]), ([directory, title]) => createChat(directory, title));
   handle("chat:action", z.tuple([id, chatActionSchema]), async ([session, action]) => {
     const previous = conversation(session);
     if (activeSessions.has(session) && (action.type === "archive" || action.type === "delete")) throw new Error("Сначала остановите агента.");
@@ -638,7 +645,7 @@ async function start() {
     const changed = action.type === "fork" ? await worktrees.use(previous.directory, change) : await change();
     const chat = changed && worktrees.projectChat(changed);
     if (chat) conversations.set(chat.id, chat);
-    else conversations.delete(session);
+    else { conversations.delete(session); hooks.reset(session); }
     return chat;
   });
   handle("chat:history", z.tuple([id]), async ([session]) => ({
@@ -712,11 +719,11 @@ async function start() {
     });
   handle("side:close", z.tuple([dialogId]), ([token]) => closeSide(token));
 
-  handle("chat:send", z.tuple([id, z.string().trim().max(100_000), modelId, z.array(dialogId).max(10), turnSchema.optional()]), ([session, text, model, files, options]) => {
+  function sendTurn(session: string, text: string, model: string, files: string[], options?: z.infer<typeof turnSchema>, scheduled = false) {
     const chat = conversation(session);
-    return worktrees.use(chat.directory, () => sendChat(chat, text, model, files, options));
-  });
-  async function sendChat(chat: Conversation, text: string, model: string, files: string[], options?: z.infer<typeof turnSchema>) {
+    return worktrees.use(chat.directory, () => sendChat(chat, text, model, files, options, scheduled));
+  }
+  async function sendChat(chat: Conversation, text: string, model: string, files: string[], options: z.infer<typeof turnSchema> | undefined, scheduled: boolean) {
     const session = chat.id;
     if (activeSessions.has(session)) throw new Error("Агент уже отвечает в этом чате.");
     model = legacyModel(model) ?? model;
@@ -733,23 +740,35 @@ async function start() {
     if (!text && !files.length && !options?.compact && !options?.replayMessageId) throw new Error("Введите сообщение.");
     const access = options?.access ?? preferences.defaultAccess;
     if (access === "full" && !preferences.fullAccessConfirmed) throw new Error("Подтвердите полный доступ в настройках.");
-    const turn = { interrupted: false };
+    const cancel = new AbortController();
+    const turn = { cancel, scheduled };
+    if (!options?.compact) hooks.reset(session);
     activeSessions.set(session, turn);
     tasks.watch(session);
     syncPower();
     try {
       const paths = await attachments.resolve(chat.directory, files, details?.vision ?? catalogModel?.capabilities.includes("vision") ?? false, chat.worktree?.origin);
-      if (turn.interrupted) return { stopped: true, changes: (await engine.history(session, chat.directory)).changes };
-      const result = await engine.send(session, chat.directory, text, model, preferences.auto, paths, native?.upstream, { ...options, access });
-      if (!result.stopped && preferences.notifications && (!window?.isFocused() || visibleChat !== session)) {
+      if (cancel.signal.aborted) return { stopped: true, changes: (await engine.history(session, chat.directory)).changes };
+      let result = await engine.send(session, chat.directory, text, model, preferences.auto, paths, native?.upstream,
+        { ...options, access, unattended: scheduled });
+      while (!result.stopped && !options?.compact && !cancel.signal.aborted) {
+        const repair = await hooks.afterTurn(session, chat.directory, result.turnChanges.length > 0, cancel.signal);
+        if (!repair || cancel.signal.aborted) break;
+        if (!scheduled) broadcast("chat:event", { type: "part", sessionId: session,
+          part: { id: "local:" + randomUUID(), kind: "user", text: repair } } satisfies ChatEvent);
+        result = await engine.send(session, chat.directory, repair, model, preferences.auto, [], native?.upstream,
+          { access, variant: options?.variant, unattended: scheduled });
+      }
+      const stopped = result.stopped || cancel.signal.aborted;
+      if (!scheduled && !stopped && preferences.notifications && (!window?.isFocused() || visibleChat !== session)) {
         const history = await engine.history(session, chat.directory).catch(() => undefined);
         const answer = history?.parts.findLast(part => part.kind === "text");
         const body = answer?.kind === "text" ? answer.text.replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[#*_~`>]/g, "").replace(/\s+/g, " ").trim().slice(0, 120) : "";
         announce("Готово: " + chat.title, body || "Агент закончил работу.", session);
       }
-      return result;
+      return { changes: result.changes, stopped };
     } catch (error) {
-      announce("Не получилось: " + chat.title, error instanceof Error ? error.message.slice(0, 120) : "Не удалось получить ответ.", session);
+      if (!scheduled) announce("Не получилось: " + chat.title, error instanceof Error ? error.message.slice(0, 120) : "Не удалось получить ответ.", session);
       throw error;
     } finally {
       if (engine.runningClient) await tasks.refresh(engine.runningClient, conversations).catch(() => {});
@@ -758,6 +777,21 @@ async function start() {
       syncPower();
     }
   }
+  handle("chat:send", z.tuple([id, z.string().trim().max(100_000), modelId, z.array(dialogId).max(10), turnSchema.optional()]),
+    args => sendTurn(...args));
+  const schedules = await registerSchedules(handle, join(data, "schedules.json"), {
+    project(directory) {
+      project(directory);
+      if (hiddenProjects.has(directory)) throw new Error("Проект убран из списка.");
+    },
+    create: createChat,
+    send: (session, schedule) => sendTurn(session, schedule.prompt, schedule.model ?? "auto", [], { access: schedule.access }, true),
+    announce,
+    async focus(session) {
+      showWindow();
+      broadcast("chat:focus", session);
+    }
+  });
   let browserRoot: string | undefined;
   const browser = createBrowserHost({ window: () => window, projectRoot: () => browserRoot, publish: event => broadcast("browser:event", event) });
   const browserBounds = z.object({ x: z.number().finite(), y: z.number().finite(), width: z.number().finite().min(0), height: z.number().finite().min(0) }).strict();
@@ -984,7 +1018,7 @@ async function start() {
   });
   handle("chat:stop", z.tuple([id]), ([session]) => {
     const turn = activeSessions.get(session);
-    if (turn) turn.interrupted = true;
+    turn?.cancel.abort();
     return engine.stop(session);
   });
   handle("chat:answer", z.tuple([id, id, z.enum(["once", "always", "reject"])]), ([session, permission, decision]) =>
@@ -1055,6 +1089,7 @@ async function start() {
   app.on("browser-window-focus", () => updates.checkIfStale());
   powerMonitor.on("resume", () => updates.checkIfStale());
   createWindow();
+  stopSchedules = schedules.start();
   updates.start();
   if (preferences.catalogUpdates) catalog.start();
   refreshProviderModels();

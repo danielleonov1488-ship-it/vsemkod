@@ -522,7 +522,7 @@ export class EngineAdapter {
     files: string[],
     emit: (event: ChatEvent) => void,
     interrupted: () => boolean,
-    options: TurnOptions & { webSearch?: boolean; routerError?: () => string | undefined; displayModelId?: string; nativeSpeed?: (speed: NonNullable<ReturnType<typeof replySpeed>>, live: boolean) => void } = {}
+    options: TurnOptions & { unattended?: boolean; webSearch?: boolean; routerError?: () => string | undefined; displayModelId?: string; nativeSpeed?: (speed: NonNullable<ReturnType<typeof replySpeed>>, live: boolean) => void } = {}
   ) {
     const signal = new AbortController();
     const events = this.client.event.subscribe({ types: eventTypes, signal: signal.signal })[Symbol.asyncIterator]();
@@ -726,7 +726,10 @@ export class EngineAdapter {
       const info = await this.client.session.get({ sessionID: sessionId }, request());
       const access = options.access ?? "ask";
       const { agent, permissions } = sessionAccess(access, options.webSearch && !info.metadata?.vsemkodSide);
-      if (info.metadata?.vsemkodSide) permissions.push({ action: "question", resource: "*", effect: "deny" });
+      if (options.unattended) {
+        for (const permission of permissions) if (permission.effect === "ask") permission.effect = "deny";
+      }
+      if (info.metadata?.vsemkodSide || options.unattended) permissions.push({ action: "question", resource: "*", effect: "deny" });
       await this.client.session.update({
         sessionID: sessionId, permissions, metadata: { ...info.metadata, vsemkodAccess: access, ...(options.displayModelId && { vsemkodModel: options.displayModelId }) }
       }, request());

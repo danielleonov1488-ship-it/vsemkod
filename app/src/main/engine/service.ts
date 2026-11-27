@@ -87,9 +87,9 @@ export class EngineService {
     finally { this.authorizing--; }
   }
 
-  async send(sessionId: string, directory: string, text: string, modelId: string, auto: boolean, files: string[], native?: EngineModel, options: TurnOptions = {}) {
+  async send(sessionId: string, directory: string, text: string, modelId: string, auto: boolean, files: string[], native?: EngineModel, options: TurnOptions & { unattended?: boolean } = {}) {
     if (!await this.queue.acquire(sessionId, () => this.emit({ type: "turn-status", sessionId, status: "queued" }))) {
-      return { changes: (await this.history(sessionId, directory)).changes, stopped: true };
+      return { changes: (await this.history(sessionId, directory)).changes, turnChanges: [], stopped: true };
     }
     const startup = this.ready();
     const turn = { stopRequested: false, pending: new Map<string, Permission>(), approvals: [] as Approval[], saves: Promise.resolve() as Promise<unknown> };
@@ -103,7 +103,7 @@ export class EngineService {
         readJson(this.sessionFile(sessionId, "approvals"), approvalsSchema)]);
       diffs = previousDiffs ?? {};
       turn.approvals = approvals ?? [];
-      if (turn.stopRequested) return { changes: (await this.history(sessionId, directory)).changes, stopped: true };
+      if (turn.stopRequested) return { changes: (await this.history(sessionId, directory)).changes, turnChanges: [], stopped: true };
       const lastUser = (await client.history(sessionId, directory, diffs)).parts.findLast(part => part.kind === "user");
       const nativeProvider = nativeIdSchema.safeParse(native?.providerID);
       const needsRelay = !native && modelId !== "auto" && !this.configuredModels.has(modelId);
@@ -132,15 +132,17 @@ export class EngineService {
       const history = await client.history(sessionId, directory, diffs);
       const user = history.parts.findLast(part => part.kind === "user");
       const end = history.parts.at(-1);
+      let turnChanges: FileChange[] = [];
       if (user && user.id !== lastUser?.id && end?.kind === "turn") {
         const nativeChanges = await client.changes(sessionId, user.id);
         const turnFiles = new Map([...result.artifacts, ...nativeChanges].map(change => [change.file.replaceAll("\\", "/"), change]));
-        if (turnFiles.size) { diffs["turn:" + user.id] = [...turnFiles.values()]; changed = true; }
+        turnChanges = [...turnFiles.values()];
+        if (turnChanges.length) { diffs["turn:" + user.id] = turnChanges; changed = true; }
       }
       if (changed) { await writeJson(path, diffs); changed = false; }
       const reverted = await readJson(this.sessionFile(sessionId, "file-reverts"), z.record(z.string(), z.string()));
       if (reverted) history.changes = history.changes.filter(change => reverted[change.file] !== change.patch);
-      return { changes: history.changes, stopped: result.stopped };
+      return { changes: history.changes, turnChanges, stopped: result.stopped };
     } finally {
       if (changed) await writeJson(path, diffs).catch(() => {});
       await turn.saves;

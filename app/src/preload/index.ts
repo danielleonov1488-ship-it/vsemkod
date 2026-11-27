@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer, webUtils, type IpcRendererEvent } from "electron";
 import type { DesktopApi } from "../shared/api";
+import { automationMethods, exposeAutomationChat } from "./automations";
 
 function subscribe<T>(channel: string, listener: (data: T) => void) {
   const receive = (_event: IpcRendererEvent, data: T) => listener(data);
@@ -8,6 +9,7 @@ function subscribe<T>(channel: string, listener: (data: T) => void) {
 }
 
 const api: DesktopApi & { worktreeInitGit: (origin: string) => Promise<void> } = {
+  ...automationMethods,
   worktreeCreate: (origin, title) => ipcRenderer.invoke("worktree:create", origin, title),
   worktreeInfo: directory => ipcRenderer.invoke("worktree:info", directory),
   worktreeMerge: (directory, message) => ipcRenderer.invoke("worktree:merge", directory, message),
@@ -125,3 +127,4 @@ const api: DesktopApi & { worktreeInitGit: (origin: string) => Promise<void> } =
 };
 
 contextBridge.exposeInMainWorld("vsemkod", api);
+exposeAutomationChat();
