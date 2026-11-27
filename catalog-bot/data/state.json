@@ -1384,6 +1384,10 @@
       "observations": [],
       "savedAt": "2026-11-26T03:04:04.312Z"
     },
+    "ee39ef86867a8fb0ba7f1d3af8b83e7e5debba2c2f20f74a29cf105113bb6389": {
+      "observations": [],
+      "savedAt": "2026-11-27T14:17:56.466Z"
+    },
     "f231a00a20c2b41764abb1f6d18b04a728fe009c4b8d3a5f9c8e400fdb076b08": {
       "observations": [
         {
@@ -3031,12 +3035,16 @@
     "hn:50666409": {
       "observations": [],
       "savedAt": "2026-11-27T13:42:15.137Z"
+    },
+    "hn:50667197": {
+      "observations": [],
+      "savedAt": "2026-11-27T14:17:56.466Z"
     }
   },
   "telegramLastPost": {
     "freemodelradar": 32,
     "neuro_channel": 3247,
-    "rubiconzone": 135
+    "rubiconzone": 136
   },
   "trackerCheckedAt": {
     "claw": "2026-11-27T13:42:15.137Z",
@@ -4418,7 +4426,7 @@
     "kilo:inclusionai/ling-3.2-flash:free": {
       "evidence": {
         "kilo": {
-          "missedRuns": 1,
+          "missedRuns": 2,
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
@@ -5433,7 +5441,7 @@
     "openrouter:inclusionai/ling-3.2-flash:free": {
       "evidence": {
         "openrouter": {
-          "missedRuns": 1,
+          "missedRuns": 2,
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
