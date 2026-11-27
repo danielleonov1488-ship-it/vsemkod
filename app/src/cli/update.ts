@@ -65,7 +65,7 @@ export async function update(current: string) {
   const staging = await mkdtemp(join(dirname(executable), ".vsemkod-update-"));
   try {
     const download = join(staging, asset);
-    await downloadFile(base + asset, download);
+    await downloadFile(base + asset, download, "Скачиваю vsemkod");
     await verifySha256(download, matching[0]![1]);
     if (process.platform === "win32") {
       const previous = previousPath(executable);
