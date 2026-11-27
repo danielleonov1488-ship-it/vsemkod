@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import type { BackgroundTask, Attachment, ChatAction, ChatPart, CatalogState, ChatEvent, ConnectionId, Conversation, DesktopApi, InitialState, Notice, Preferences, ProjectTools, UpdateProgress, UpdateReady } from "../shared/api";
+import type { BackgroundTask, Attachment, ChatAction, ChatPart, CatalogState, ChatEvent, ConnectionId, Conversation, DesktopApi, InitialState, Notice, Preferences, ProjectTools, UpdateProgress, UpdateReady, Worktree } from "../shared/api";
 import type { RouterStats } from "../shared/api";
 import { Chat } from "./chat";
 import { catalogConnection, ConnectDialog, ConnectionsPage, readableError, type Connection } from "./connections";
@@ -13,6 +13,7 @@ import { modelSpeed } from "./models";
 import { ChatGroups } from "./chat-groups";
 import { Composer } from "./composer";
 import { ComposerStatus } from "./composer-status";
+import { WorktreeMenu } from "./worktree-menu";
 import { Settings } from "./settings";
 import { WorkspacePanel } from "./workspace-panel";
 import { HeaderTools, macShortcuts, PanelMenu, Summary, type PanelMenuAnchor } from "./panel-controls";
@@ -36,7 +37,8 @@ declare global {
   interface Window { vsemkod: DesktopApi }
 }
 
-const api = window.vsemkod;
+const api = window.vsemkod as DesktopApi & { worktreeInitGit?: (origin: string) => Promise<void> };
+type ActionNotice = Notice & { action?: { label: string; run: () => void } };
 const suggestions = ["Создать лендинг", "Найти баг", "Объяснить код", "Написать тесты"];
 function catalogAge(date?: string) {
   if (!date) return "Загружаем каталог моделей";
@@ -58,10 +60,25 @@ function App() {
   sessionsRef.current = sessions;
   const openChatRef = useRef<(session: Conversation) => Promise<void>>(undefined);
   const startChatRef = useRef<() => void>(undefined);
-  /** Задача, которую нужно отправить, как только откроется новый чат (шаблон проекта, публикация). */
   const pendingPrompt = useRef<string | undefined>(undefined);
   const [publishOpen, setPublishOpen] = useState(false);
   const [chat, setChat] = useState<Conversation>();
+  const [copyChoices, setCopyChoices] = useState<Record<string, boolean>>({});
+  const [copyInfo, setCopyInfo] = useState<{ path: string; value: Worktree | null }>();
+  const [copyRevision, refreshCopy] = useState(0);
+  const [copyOperation, setCopyOperation] = useState<string>();
+  const copyPath = chat?.worktree ? chat.directory : undefined;
+  const currentCopy = copyInfo?.path === copyPath ? copyInfo?.value : undefined;
+  const historyOnly = Boolean(copyPath && !currentCopy);
+  const separateCopy = !chat && directory && api.worktreeCreate
+    ? copyChoices[directory] ?? localStorage.getItem("vsemkod-worktree:" + directory) === "on"
+    : undefined;
+
+  function toggleSeparateCopy() {
+    const enabled = !separateCopy;
+    localStorage.setItem("vsemkod-worktree:" + directory, enabled ? "on" : "off");
+    setCopyChoices(choices => ({ ...choices, [directory]: enabled }));
+  }
   const [settings, setSettings] = useState(false);
   const [settingsSection, setSettingsSection] = useState(0);
   const [subscriptions, setSubscriptions] = useState(false);
@@ -113,7 +130,7 @@ function App() {
   const lastEscape = useRef(0);
   const stopping = useRef(new Set<string>());
   const navigation = useRef(0);
-  const [notice, setNotice] = useState<Notice>();
+  const [notice, setNotice] = useState<ActionNotice>();
   const [updateReady, setUpdateReady] = useState<UpdateReady>();
   const [updateProgress, setUpdateProgress] = useState<UpdateProgress>();
   const [applyAfterReply, setApplyAfterReply] = useState(false);
@@ -136,10 +153,10 @@ function App() {
   chatVisible.current = !settings && !subscriptions;
   liveCatalog.current = catalog;
 
-  const notify = useCallback((next: Notice) => {
+  const notify = useCallback((next: ActionNotice) => {
     setNotice(next);
     clearTimeout(noticeTimer.current);
-    noticeTimer.current = setTimeout(() => setNotice(undefined), next.connect ? 12_000 : 6500);
+    noticeTimer.current = setTimeout(() => setNotice(undefined), next.connect || next.action ? 12_000 : 6500);
   }, []);
   const notifyDownload = useCallback((name: string, path: string) => notify({ text: "Файл скачан · " + name, download: path }), [notify]);
   const showError = useCallback((error: unknown) => notify({ text: readableError(error), tone: "error" }), [notify]);
@@ -283,12 +300,28 @@ function App() {
     document.documentElement.dataset.fontSize = prefs?.fontSize ?? "normal";
   }, [theme, prefs?.fontSize]);
   useEffect(() => {
-    if (!directory) return;
-    let current = true;
+    const load = api.worktreeInfo;
+    if (!copyPath || !load) return;
+    let revision = 0;
+    const read = () => {
+      const request = ++revision;
+      void load(copyPath).then(value => {
+        if (request === revision) setCopyInfo({ path: copyPath, value });
+      }).catch(() => {});
+    };
+    read();
+    const timer = setInterval(read, 5000);
+    window.addEventListener("focus", read);
+    return () => { revision++; clearInterval(timer); window.removeEventListener("focus", read); };
+  }, [copyPath, busy, copyRevision]);
+
+  useEffect(() => {
     setTools(undefined);
+    if (!directory || historyOnly) return;
+    let current = true;
     void api.tools(directory).then(value => { if (current) setTools(value); }).catch(() => {});
     return () => { current = false; };
-  }, [directory]);
+  }, [directory, historyOnly]);
 
   useEffect(() => {
     if (!initial || !prefs || !api.clipboardKey || promptedWizard.current) return;
@@ -317,18 +350,19 @@ function App() {
   useEffect(() => {
     let current = true;
     setVariants([]);
-    if (directory && modelId) void api.modelVariants(directory, modelId).then(items => {
+    if (directory && modelId && !historyOnly) void api.modelVariants(directory, modelId).then(items => {
       if (current) { setVariants(items); updateView(viewId, old => ({ variant: items.includes(old.variant) ? old.variant : "" })); }
     }).catch(() => {});
     return () => { current = false; };
-  }, [directory, modelId, viewId]);
+  }, [directory, modelId, viewId, historyOnly]);
 
   function revealChat(session: Conversation) {
     activeChat.current = session.id;
     chatVisible.current = true;
     setChat(session);
     setDirectory(session.directory);
-    setVisibleProject(session.directory);
+    setVisibleProject(session.worktree?.origin ?? session.directory);
+    if (session.worktree) setExpandProject({ directory: session.worktree.origin });
     setSettings(false);
     setSubscriptions(false);
     setPreview(undefined);
@@ -347,7 +381,8 @@ function App() {
     chatViews.reset(homeId);
   }
 
-  const projectDirectories = [...new Set([directory, ...recentProjects, ...sessions.map(item => item.directory), prefs?.directory]
+  const projectDirectories = [...new Set([chat?.worktree?.origin ?? directory, ...recentProjects,
+    ...sessions.map(item => item.worktree?.origin ?? item.directory), prefs?.directory]
     .filter((path): path is string => !!path && !hiddenProjects.includes(path)))];
 
   async function chooseDirectory(asDefault = false, openForComposer = false) {
@@ -437,8 +472,8 @@ function App() {
     finally { updateView(id, () => ({ loading: false })); }
   }
 
-  async function runTurn(turn: PendingTurn) {
-    let session = chat;
+  async function runTurn(turn: PendingTurn, target = chat) {
+    let session = target;
     if (session && isRunning(statuses.current[session.id])) return;
     if (!session && cached.current[homeId]?.loading) return;
     const nav = navigation.current;
@@ -448,8 +483,19 @@ function App() {
       if (!session) {
         updateView(homeId, () => ({ loading: true }));
         const title = turn.text.replace(/\s+/g, " ").split(/(?<=[.!?])\s/, 1)[0].slice(0, 72) || turn.files[0]?.name.slice(0, 72) || "Новый чат";
-        try { session = await api.create(directory, title); }
-        finally {
+        let copyDirectory: string | undefined;
+        try {
+          if (separateCopy && api.worktreeCreate) {
+            const result = await api.worktreeCreate(directory, title) as { directory: string; worktree: Worktree; warning?: string };
+            copyDirectory = result.directory;
+            if (navigation.current === nav) setCopyInfo({ path: copyDirectory, value: result.worktree });
+            if (result.warning) notify({ text: result.warning });
+          }
+          session = await api.create(copyDirectory ?? directory, title);
+        } catch (error) {
+          if (copyDirectory) await api.worktreeRemove?.(copyDirectory).catch(() => {});
+          throw error;
+        } finally {
           if (navigation.current === nav) updateView(homeId, () => ({ loading: false }));
         }
         updateView(session.id, () => ({ loaded: true, model: turn.modelId, variant: turn.options.variant ?? "", access: turn.options.access }));
@@ -487,7 +533,14 @@ function App() {
       const exhausted = session && cached.current[session.id]?.routeIssue;
       const hasConnectionCard = exhausted && liveCatalog.current &&
         modelOptions(liveCatalog.current).some(entry => entry.model.id === exhausted.modelId && entry.locked.length > 0);
-      if (!hasConnectionCard && (!session || activeChat.current === session.id && chatVisible.current)) notify({ text: message, tone: "error" });
+      if (!hasConnectionCard && (!session || activeChat.current === session.id && chatVisible.current)) {
+        const initGit = api.worktreeInitGit;
+        if (!session && initGit && message.startsWith("not-a-repo: ")) {
+          notify({ text: message.slice("not-a-repo: ".length), tone: "error", action: { label: "Включить git", run: () => {
+            void initGit(directory).then(() => notify({ text: "Git включён. Отправьте задачу ещё раз." })).catch(showError);
+          } } });
+        } else showError(error);
+      }
       if (session) {
         const id = session.id;
         const history = await api.history(id).catch(() => undefined);
@@ -503,7 +556,7 @@ function App() {
   }
 
   function retryFailed(nextModel = modelId) {
-    if (!failed || !nextModel || busy || loadingChat) return;
+    if (!failed || !nextModel || busy || loadingChat || historyOnly) return;
     const acceptsImages = nextModel === modelId ? vision : available.find(entry => entry.model.id === nextModel)?.model.capabilities.includes("vision");
     if (!acceptsImages && failed.turn.files.some(file => file.image)) {
       showError("Выбранная модель не принимает изображения.");
@@ -528,13 +581,18 @@ function App() {
     } catch (error) { showError(error); }
   }
 
-  async function startChat(folder?: string, title = "Новый чат") {
+  async function startChat(folder?: string, title?: string) {
     const next = folder || visibleProject || directory || prefs?.directory;
     if (!next) return;
-    const nav = ++navigation.current;
     setExpandProject({ directory: next });
+    if (api.worktreeCreate && !title && !pendingPrompt.current) {
+      showHome(next);
+      requestAnimationFrame(() => draftInput.current?.focus());
+      return;
+    }
+    const nav = ++navigation.current;
     try {
-      const session = await api.create(next, title);
+      const session = await api.create(next, title ?? "Новый чат");
       chatViews.reset(session.id, { loaded: true, model, variant });
       setSessions(list => [session, ...list.filter(item => item.id !== session.id)]);
       if (nav !== navigation.current) return;
@@ -566,14 +624,14 @@ function App() {
       setRecentProjects(list => list.filter(item => item !== path));
       setHiddenProjects(list => [...list, path]);
       const fallback = projectDirectories.find(item => item !== path) ?? "";
-      if (directory === path) showHome(fallback);
+      if ((chat?.worktree?.origin ?? directory) === path) showHome(fallback);
       else if (visibleProject === path) setVisibleProject(fallback);
     } catch (error) { showError(error); }
   }
 
   function quickCommand(name: string) {
     if (name === "new") {
-      void startChat(directory);
+      void startChat(chat?.worktree?.origin ?? directory);
     } else if (name === "plan") setAccess("read");
     else if (name === "model") setModelMenu(value => value + 1);
     else if (name === "export") {
@@ -585,7 +643,7 @@ function App() {
   }
 
   function submit(text = draft, readyFiles = files, mode = access, replayMessageId: string | null | undefined = view.replayId) {
-    if ((!text.trim() && !readyFiles.length && !replayMessageId) || !directory || loadingChat) return;
+    if ((!text.trim() && !readyFiles.length && !replayMessageId) || !directory || loadingChat || historyOnly) return;
     const message = text.trim();
     const command = slashCommand(message);
     if (command && quickCommand(command.name)) return;
@@ -619,7 +677,7 @@ function App() {
 
   function compactContext(mode = access) {
     if (!chat) { showError("Сначала откройте чат."); return false; }
-    if (!modelId || !directory || loadingChat || busy) return false;
+    if (!modelId || !directory || loadingChat || busy || historyOnly) return false;
     void runTurn({ modelId, files: [], text: "/compact", options: { compact: true, access: mode, variant: variant || undefined } });
     return true;
   }
@@ -646,14 +704,14 @@ function App() {
       setSessions(list => next ? [next, ...list.filter(item => item.id !== next.id)] : list.filter(item => item.id !== session.id));
       if (action.type === "fork" && next) await openChat(next);
       else if (activeChat.current === session.id) {
-        if (!next || next.archived) showHome(session.directory);
+        if (!next || next.archived) showHome(session.worktree?.origin ?? session.directory);
         else setChat(next);
       }
     } catch (error) { showError(error); }
   }
 
   async function restoreHistory(load: (id: string) => ReturnType<DesktopApi["history"]>, draft?: Extract<ChatPart, { kind: "user" | "text" }>) {
-    if (!chat || busy || loadingChat) return;
+    if (!chat || busy || loadingChat || historyOnly) return;
     const id = chat.id;
     updateView(id, () => ({ loading: true }));
     try {
@@ -686,7 +744,7 @@ function App() {
     const keydown = (event: KeyboardEvent) => {
       if (event.defaultPrevented || event.isComposing || event.repeat) return;
       const shortcut = panelShortcut(event, macShortcuts);
-      if (shortcut && directory && !settings && !subscriptions) {
+      if (shortcut && directory && !settings && !subscriptions && !historyOnly) {
         event.preventDefault();
         if (panel && panelState.active === shortcut) hidePanel();
         else selectPanel(shortcut);
@@ -708,8 +766,8 @@ function App() {
       event.preventDefault();
       if (key === "KeyN") void startChat();
       if (key === "KeyK") searchInput.current?.focus();
-      if (key === "KeyB") { if (panel) hidePanel(); else selectPanel(panelState.active ?? "changes"); }
-      if (key === "KeyJ") { setSettings(false); setSubscriptions(false); selectPanel("terminal"); }
+      if (key === "KeyB" && !historyOnly) { if (panel) hidePanel(); else selectPanel(panelState.active ?? "changes"); }
+      if (key === "KeyJ" && !historyOnly) { setSettings(false); setSubscriptions(false); selectPanel("terminal"); }
       if (key === "Comma") { setSettingsSection(0); setSettings(value => subscriptions || !value); setSubscriptions(false); }
     };
     window.addEventListener("keydown", keydown);
@@ -793,7 +851,7 @@ function App() {
     requestAnimationFrame(() => draftInput.current?.focus());
   }
 
-  const sideContext = panelState.tabs.includes("side") ? JSON.stringify([directory, chat?.id]) : undefined;
+  const sideContext = !historyOnly && panelState.tabs.includes("side") ? JSON.stringify([directory, chat?.id]) : undefined;
   const [activeSide, setActiveSide] = useState<{ context: string; id: string }>();
   useEffect(() => {
     if (!sideContext) { setActiveSide(undefined); return; }
@@ -808,7 +866,7 @@ function App() {
   useEffect(() => {
     if (applyAfterReply && updateReady && !anyRunning) { setApplyAfterReply(false); void api.applyUpdate().catch(showError); }
   }, [applyAfterReply, updateReady, anyRunning, showError]);
-  const panelShown = Boolean(directory && panel && panelState.active && !settings && !subscriptions);
+  const panelShown = Boolean(directory && panel && panelState.active && !settings && !subscriptions && !historyOnly);
   const panelSize = panelWidth ?? prefs?.panelWidth ?? 360;
   useEffect(() => {
     const style = document.documentElement.style;
@@ -830,7 +888,52 @@ function App() {
     pendingPrompt.current = undefined;
     submit(text, [], access, null);
   }, [chat?.id, directory, loadingChat]);
-  const headerTools = <HeaderTools summary={summary} panelMenu={panelMenu === "header"}
+  const copyBusy = sessions.some(item => item.directory === copyPath && isRunning(running[item.id])) ||
+    tasks.some(task => task.directory === copyPath && task.ended === undefined);
+
+  async function removeCopy(target: Conversation) {
+    if (!target.worktree || !api.worktreeRemove || !window.confirm(
+      "Удалить копию и ветку " + target.worktree.branch + "? Невлитые изменения пропадут."
+    )) return;
+    setCopyOperation(target.directory);
+    try {
+      await api.worktreeRemove(target.directory);
+      if (currentDirectory.current === target.directory) setCopyInfo({ path: target.directory, value: null });
+      notify({ text: "Копия удалена" });
+    } catch (error) { showError(error); }
+    finally { setCopyOperation(path => path === target.directory ? undefined : path); }
+  }
+
+  async function mergeCopy(target: Conversation) {
+    if (!api.worktreeMerge || !currentCopy?.changed || copyBusy || copyOperation === target.directory) return;
+    setCopyOperation(target.directory);
+    try {
+      const result = await api.worktreeMerge(target.directory, target.title) as
+        Awaited<ReturnType<NonNullable<DesktopApi["worktreeMerge"]>>> & { baseBranch?: string };
+      if (result.merged) {
+        notify({ text: "Влито в основную папку", action: { label: "Удалить копию", run: () => void removeCopy(target) } });
+      } else {
+        const base = result.baseBranch ?? currentCopy.base;
+        const text = "Влей в эту ветку текущую основную ветку (git merge " + base + "), разреши конфликты в файлах: " +
+          result.conflicts.join(", ") + " и проверь, что всё работает";
+        notify({ text: result.message, tone: "error", action: modelId ? { label: "Попросить агента разобраться", run: () => {
+          void openChat(target).then(() => runTurn({ text, files: [], modelId,
+            options: { access, variant: variant || undefined } }, target));
+        } } : undefined });
+      }
+    } catch (error) { showError(error); }
+    finally {
+      refreshCopy(revision => revision + 1);
+      setCopyOperation(path => path === target.directory ? undefined : path);
+    }
+  }
+
+  const worktreeMenu = chat?.worktree && currentCopy && <WorktreeMenu key={chat.id} branch={chat.worktree.branch}
+    changed={currentCopy.changed} disabled={busy || copyBusy || copyOperation === directory}
+    onOpen={() => { setPanelMenu(undefined); setSummary(false); setPublishOpen(false); refreshCopy(revision => revision + 1); }}
+    merge={() => void mergeCopy(chat)} openFolder={() => void api.projectOpen?.(directory).catch(showError)}
+    remove={() => void removeCopy(chat)} />;
+  const headerTools = historyOnly ? null : <HeaderTools leading={worktreeMenu} summary={summary} panelMenu={panelMenu === "header"}
     showSummary={() => { setPanelMenu(undefined); setPublishOpen(false); setSummary(value => !value); }}
     showPanels={() => { setSummary(false); setPublishOpen(false); setPanelMenu(value => value === "header" ? undefined : "header"); }}>
     {directory && <PublishMenu open={publishOpen} close={() => setPublishOpen(false)} publish={publish} disabled={!!loadingChat}
@@ -877,7 +980,15 @@ function App() {
       <button type="button" className="composer-control" onClick={() => { secretBypass.current = true; setSecretWarning(false); submit(); }}>Отправить как есть</button>
     </div>}
     <Composer key={chat?.id ?? directory} preferences={prefs} updatePreferences={updatePrefs} active={!!chat} input={draftInput} draft={draft} change={setDraft} directory={directory} busy={busy}
-      projects={projectDirectories} switchProject={path => { if (!busy && path !== directory) void startChat(path); }}
+      separateCopy={separateCopy} toggleSeparateCopy={toggleSeparateCopy}
+      projects={projectDirectories} switchProject={path => {
+        if (busy || path === directory) return;
+        if (!chat && api.worktreeCreate) {
+          setDirectory(path);
+          setVisibleProject(path);
+          setFiles([]);
+        } else void startChat(path);
+      }}
       canSend={!!modelId && !!directory && !loadingChat} attachments={files} remove={id => setFiles(items => items.filter(file => file.id !== id))}
       add={value => void captureFiles(value)} pick={() => void chooseFiles()} choose={() => void chooseDirectory(false, true)}
       access={access} accessMenu={accessMenu} selectAccess={selectAccess} cycle={cycleAccess} submit={submit} stop={stop} selectCommand={quickCommand} tools={tools} vision={vision} onError={showError}
@@ -944,18 +1055,20 @@ function App() {
             open={url => void api.openExternal(url).catch(showError)} onError={showError} onNotice={text => notify({ text })}
             onCatalog={setCatalog} exportAll={() => void exportChats()} />
           : chat ? <Chat key={chat.id} title={chat.title} parts={parts} permissions={permissions} questions={questions} headerTools={headerTools} openBrowser={openBrowser} insertDraft={insertDraft}
-            busy={busy || !!loadingChat} status={status} progress={progress} failure={failed && !(issueModel && firstSource) ? failed.message : undefined}
+            busy={busy || !!loadingChat || historyOnly} status={status} progress={progress} failure={failed && !(issueModel && firstSource) ? failed.message : undefined}
              directory={directory} preview={openPreview} onError={showError}
             retryFailed={() => retryFailed()} chooseModel={() => setModelMenu(value => value + 1)}
             answer={(id, decision) => api.answer(chat.id, id, decision)} answerQuestion={(id, value) => api.answerQuestion(chat.id, id, value)}
             copy={text => void api.copyText(text).then(() => notify({ text: "Скопировано" })).catch(showError)}
             edit={part => void editMessage(part)} revert={message => void revertMessage(message)} retry={part => submit(part.text, [], access, part.files?.length ? part.id : null)}
-            reverted={!!reverted} executePlan={planReady ? () => {
+            reverted={!!reverted} executePlan={planReady && !historyOnly ? () => {
               const mode = prefs?.defaultAccess === "edit" ? "edit" : "ask";
               setAccess(mode);
               submit("Выполни план", [], mode, null);
             } : undefined}>
-            {composer}
+            {historyOnly ? currentCopy === null && <p className="subtle worktree-history" role="status">
+              Папка копии недоступна. Чат открыт только для чтения.
+            </p> : composer}
           </Chat> : <main className="workspace workspace--home">
             <div className="home-panel-toggle">{headerTools}</div>
             <div className="home">
@@ -970,7 +1083,7 @@ function App() {
               <TemplateGallery defaultFolder={prefs?.directory} start={startFromTemplate} />
             </div>
           </main>}
-        {directory && <WorkspacePanel key={directory} directory={directory} tab={panelState.active} tabs={panelState.tabs} setTab={selectPanel} closeTab={closeTab} preview={preview}
+        {directory && !historyOnly && <WorkspacePanel key={directory} directory={directory} tab={panelState.active} tabs={panelState.tabs} setTab={selectPanel} closeTab={closeTab} preview={preview}
           menuOpen={panelMenu === "tabs"} toggleMenu={() => { setSummary(false); setPanelMenu(value => value === "tabs" ? undefined : "tabs"); }} menu={panelChoices}
           tasks={projectTasks} openBrowser={openBrowser} browserRequest={browserRequest?.directory === directory ? browserRequest : undefined} sessionId={chat?.id}
           side={activeSide?.context === sideContext && activeSide && <SideChat key={activeSide.id} id={activeSide.id} directory={directory}
@@ -998,6 +1111,10 @@ function App() {
     {notice && <div className={"toast" + (notice.open ? " toast--background" : "") + (notice.tone === "error" ? " toast--error" : "")}
       role={notice.tone === "error" ? "alert" : "status"}><span className="status-dot" />
       <span>{notice.text}</span>
+      {notice.action && <button type="button" className="connect-label worktree-toast-action" onClick={() => {
+        setNotice(undefined);
+        notice.action?.run();
+      }}>{notice.action.label}</button>}
       {notice.connect && <button type="button" className="connect-label" onClick={connectFromNotice}>Подключить</button>}
       {notice.download && <button type="button" className="connect-label" onClick={() => {
         if (notice.download) void api.browser?.reveal(notice.download).catch(showError);

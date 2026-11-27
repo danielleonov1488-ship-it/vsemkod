@@ -21,11 +21,12 @@ export function ChatGroups({ sessions, projects, selectedProject, query, active,
   const [title, setTitle] = useState("");
   const [collapsed, setCollapsed] = useState<string[]>([]);
   useEffect(() => { if (expand) setCollapsed(value => value.filter(path => path !== expand.directory)); }, [expand]);
-  const filtered = sessions.filter(item => projects.includes(item.directory) && item.title.toLocaleLowerCase("ru").includes(query.trim().toLocaleLowerCase("ru")));
+  const filtered = sessions.filter(item => projects.includes(item.worktree?.origin ?? item.directory) && item.title.toLocaleLowerCase("ru").includes(query.trim().toLocaleLowerCase("ru")));
   const groups = new Map<string, Conversation[]>(query.trim() ? [] : projects.map(path => [path, []]));
   const ordered = (values: Conversation[]) => [...values].sort((a, b) => Number(!!b.pinned) - Number(!!a.pinned) || b.updatedAt - a.updatedAt);
   for (const chat of ordered(filtered.filter(item => !item.archived))) {
-    groups.set(chat.directory, [...groups.get(chat.directory) ?? [], chat]);
+    const directory = chat.worktree?.origin ?? chat.directory;
+    groups.set(directory, [...groups.get(directory) ?? [], chat]);
   }
   useEffect(() => {
     if (!menu) return;
@@ -57,8 +58,10 @@ export function ChatGroups({ sessions, projects, selectedProject, query, active,
         <button className="composer-control attach" type="submit" aria-label="Сохранить название"><Icon name="check" /></button>
       </form> : <>
         <button className="sidebar-row conversation" type="button" aria-current={active === chat.id ? "page" : undefined}
-          title={chat.title} onClick={() => open(chat)}>
-          {chat.pinned && <span className="pinned-mark" aria-hidden="true" title="Закреплён" />}<span>{chat.title}</span>
+          title={chat.worktree ? chat.worktree.branch : chat.title} onClick={() => open(chat)}>
+          {chat.pinned && <span className="pinned-mark" aria-hidden="true" title="Закреплён" />}
+          {chat.worktree && <Icon name="branch" className="conversation-branch" />}
+          <span>{chat.title}</span>
           {state && <span className="chat-status-dot" data-status={state} role="img" aria-label={chatStatusLabel[state]} title={chatStatusLabel[state]} />}
         </button>
         <button type="button" className="composer-control chat-more" aria-label={"Действия чата " + chat.title} aria-expanded={menu === chat.id}
@@ -89,7 +92,7 @@ export function ChatGroups({ sessions, projects, selectedProject, query, active,
       const expanded = !collapsed.includes(directory);
       const name = folderName(directory);
       const projectMenu = "project:" + directory;
-      const blocked = sessions.some(chat => chat.directory === directory && isRunning(running[chat.id]));
+      const blocked = sessions.some(chat => (chat.worktree?.origin ?? chat.directory) === directory && isRunning(running[chat.id]));
       const create = () => {
         setMenu("");
         setCollapsed(value => value.filter(path => path !== directory));

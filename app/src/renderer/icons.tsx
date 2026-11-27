@@ -30,6 +30,7 @@ const paths = {
   read: <><path d="M5 3H3.5A1.5 1.5 0 0 0 2 4.5V11m8-8 3 3v6.5A1.5 1.5 0 0 1 11.5 14h-5A1.5 1.5 0 0 1 5 12.5v-8A1.5 1.5 0 0 1 6.5 3H10Z" /><path d="M10 3v3h3" /></>,
   file: <><path d="M9 2.5H4.5A1.5 1.5 0 0 0 3 4v8A1.5 1.5 0 0 0 4.5 13.5h7A1.5 1.5 0 0 0 13 12V6.5l-4-4Z" /><path d="M9 2.5v4h4m-7 2h4m-4 2.5h3" /></>,
   terminal: <><rect x="1.75" y="3" width="12.5" height="10" rx="2" /><path d="m4.5 6 2 2-2 2m4 0h3" /></>,
+  branch: <><circle cx="4.5" cy="3" r="1.5" /><circle cx="4.5" cy="13" r="1.5" /><circle cx="11.5" cy="4" r="1.5" /><path d="M4.5 4.5v7m0 0c0-4 7-2.5 7-6" /></>,
   changes: <><circle cx="4" cy="3.5" r="1.5" /><circle cx="4" cy="12.5" r="1.5" /><circle cx="12" cy="4.5" r="1.5" /><path d="M4 5v6m0 .5c.4-4.2 8 .2 8-5.5" /></>,
   telegram: <><path d="M14.25 2 1.75 7l4.5 1.75L8 13.5l2.3-2.9 2.95 2.15Z" /><path d="m6.25 8.75 8-6.75" /></>,
   lock: <><rect x="3.5" y="7" width="9" height="6.5" rx="1.25" /><path d="M5.5 7V4.75a2.5 2.5 0 0 1 5 0V7M8 9.5v1.5" /></>

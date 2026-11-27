@@ -35,6 +35,7 @@ import { createUpdates } from "./updates";
 import { projectTemplates, templateFolderName } from "../shared/templates";
 import { createTray } from "./tray";
 import { createBrowserHost } from "./browser-view";
+import { registerWorktreeIpc, Worktrees } from "./worktrees";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const devUrl = process.env.ELECTRON_RENDERER_URL;
@@ -89,7 +90,7 @@ function broadcast(channel: string, payload: unknown) {
 function createWindow() {
   window = new BrowserWindow({
     title: "vsemkod",
-    width: 1400, height: 900, minWidth: 780, minHeight: 560,
+    width: 1400, height: 900, minWidth: 900, minHeight: 560,
     frame: false, show: false, backgroundColor: nativeBackground(),
     webPreferences: {
       preload: join(here, "../preload/index.cjs"),
@@ -159,7 +160,8 @@ async function start() {
     projectList.transform(recent => ({ recent, hidden: [] as string[] })),
     z.object({ recent: projectList, hidden: projectList })
   ]));
-  let recentProjects = savedProjects?.recent ?? [];
+  const worktrees = await Worktrees.load(data);
+  let recentProjects = (savedProjects?.recent ?? []).filter(path => !worktrees.managed(path));
   const projects = new Set([preferences.directory, ...recentProjects]);
   const hiddenProjects = new Set(savedProjects?.hidden ?? []);
   let projectWrites = Promise.resolve();
@@ -385,7 +387,11 @@ async function start() {
     });
   }
   function project(directory: string) {
-    if (!projects.has(directory)) throw new Error("Сначала выберите папку проекта.");
+    if (worktrees.managed(directory)) {
+      if (!worktrees.known(directory) || !statSync(directory, { throwIfNoEntry: false })?.isDirectory()) {
+        throw new Error("Папка копии недоступна.");
+      }
+    } else if (!projects.has(directory)) throw new Error("Сначала выберите папку проекта.");
     return directory;
   }
   function conversation(sessionId: string) {
@@ -394,6 +400,7 @@ async function start() {
     return session;
   }
 
+  registerWorktreeIpc(handle, worktrees, project, directory => tasks.running().some(task => task.directory === directory));
   handle("app:initial", z.tuple([]), () => ({ ...state(), projects: recentProjects, hiddenProjects: [...hiddenProjects], preferences, version: app.getVersion(), update: updates.ready }));
   handle("router:stats", z.tuple([]), () => router.stats());
   handle("updates:check", z.tuple([]), () => updates.check());
@@ -403,7 +410,7 @@ async function start() {
   handle("tasks:start", z.tuple([localPath, z.string().trim().min(1).max(16_384), id.optional()]), async ([directory, command, session]) => {
     project(directory);
     if (session && conversation(session).directory !== directory) throw new Error("Чат находится в другом проекте.");
-    await engine.withAuth(client => tasks.start(client, directory, command, session));
+    await worktrees.use(directory, () => engine.withAuth(client => tasks.start(client, directory, command, session)));
   });
   handle("tasks:stop", z.tuple([id]), ([task]) => tasks.stop(task));
   handle("projects:branch", z.tuple([localPath]), async ([directory]) => {
@@ -445,6 +452,7 @@ async function start() {
     });
     if (choice.canceled || !choice.filePaths[0]) return null;
     const directory = await realpath(choice.filePaths[0]);
+    if (worktrees.managed(directory)) throw new Error("Выберите основную папку проекта.");
     const write = projectWrites.then(async () => {
       const next = [directory, ...recentProjects.filter(path => path !== directory)];
       await writeJson(projectsPath, { recent: next, hidden: [...hiddenProjects].filter(path => path !== directory) });
@@ -465,7 +473,10 @@ async function start() {
   handle("projects:remove", z.tuple([localPath]), ([directory]) => {
     project(directory);
     const write = projectWrites.then(async () => {
-      if ([...activeSessions.keys()].some(id => conversations.get(id)?.directory === directory)) {
+      if ([...activeSessions.keys()].some(id => {
+        const chat = conversations.get(id);
+        return (chat?.worktree?.origin ?? chat?.directory) === directory;
+      })) {
         throw new Error("Сначала остановите агента.");
       }
       const next = recentProjects.filter(path => path !== directory);
@@ -486,7 +497,10 @@ async function start() {
   });
   let settingsQueue = Promise.resolve();
   function savePreferences(patch: Partial<Preferences>) {
-    if (patch.directory) project(patch.directory);
+    if (patch.directory) {
+      if (worktrees.managed(patch.directory)) throw new Error("Выберите основную папку проекта.");
+      project(patch.directory);
+    }
     const write = settingsQueue.then(async () => {
       const next = { ...preferences, ...patch };
       if (next.defaultAccess === "full" && !next.fullAccessConfirmed) throw new Error("Подтвердите полный доступ.");
@@ -600,20 +614,29 @@ async function start() {
   });
   handle("chat:list", z.tuple([localPath.optional()]), async ([directory]) => {
     if (directory) project(directory);
-    const list = (await (await engine.ready()).list(directory)).filter(chat => !sideIds.has(chat.id));
-    list.forEach(chat => { conversations.set(chat.id, chat); projects.add(chat.directory); });
+    const list = (await (await engine.ready()).list()).filter(chat => !sideIds.has(chat.id))
+      .map(chat => worktrees.projectChat(chat))
+      .filter(chat => !directory || chat.directory === directory || chat.worktree?.origin === directory);
+    list.forEach(chat => {
+      conversations.set(chat.id, chat);
+      if (!chat.worktree && !worktrees.managed(chat.directory)) projects.add(chat.directory);
+    });
     return list;
   });
-  handle("chat:create", z.tuple([localPath, z.string().trim().min(1).max(120)]), async ([directory, title]) => {
+  handle("chat:create", z.tuple([localPath, z.string().trim().min(1).max(120)]), ([directory, title]) => {
     project(directory);
-    const chat = await (await engine.ready()).create(directory, title);
-    conversations.set(chat.id, chat);
-    return chat;
+    return worktrees.use(directory, async () => {
+      const chat = await (await engine.ready()).create(directory, title, worktrees.label(directory));
+      conversations.set(chat.id, chat);
+      return chat;
+    });
   });
   handle("chat:action", z.tuple([id, chatActionSchema]), async ([session, action]) => {
-    conversation(session);
+    const previous = conversation(session);
     if (activeSessions.has(session) && (action.type === "archive" || action.type === "delete")) throw new Error("Сначала остановите агента.");
-    const chat = await (await engine.ready()).chatAction(session, action);
+    const change = async () => (await engine.ready()).chatAction(session, action);
+    const changed = action.type === "fork" ? await worktrees.use(previous.directory, change) : await change();
+    const chat = changed && worktrees.projectChat(changed);
     if (chat) conversations.set(chat.id, chat);
     else conversations.delete(session);
     return chat;
@@ -621,8 +644,14 @@ async function start() {
   handle("chat:history", z.tuple([id]), async ([session]) => ({
     ...await engine.history(session, conversation(session).directory), speed: health.lastReply(session)
   }));
-  handle("chat:revert", z.tuple([id, id.optional()]), ([session, message]) => engine.revert(session, conversation(session).directory, message));
-  handle("chat:revert-file", z.tuple([id, id]), ([session, file]) => engine.revertFile(session, conversation(session).directory, file));
+  handle("chat:revert", z.tuple([id, id.optional()]), ([session, message]) => {
+    const { directory } = conversation(session);
+    return worktrees.use(directory, () => engine.revert(session, directory, message));
+  });
+  handle("chat:revert-file", z.tuple([id, id]), ([session, file]) => {
+    const { directory } = conversation(session);
+    return worktrees.use(directory, () => engine.revertFile(session, directory, file));
+  });
   handle("chat:export", z.tuple([id.optional()]), async ([session]) => {
     const found = session ? [conversation(session)] : await (await engine.ready()).list();
     if (!found.length) return 0;
@@ -660,7 +689,7 @@ async function start() {
       const entry = sideSessions.get(token) ?? { directory, parent };
       if (entry.closed || entry.directory !== directory || entry.parent !== parent || entry.sending) throw new Error("Боковой чат занят или закрыт.");
       sideSessions.set(token, entry);
-      const sending = Promise.resolve().then(async () => {
+      const sending = worktrees.use(directory, async () => {
         if (!entry.session) {
           entry.client = await engine.ready();
           if (entry.closed) throw new Error("Боковой чат закрыт.");
@@ -683,9 +712,13 @@ async function start() {
     });
   handle("side:close", z.tuple([dialogId]), ([token]) => closeSide(token));
 
-  handle("chat:send", z.tuple([id, z.string().trim().max(100_000), modelId, z.array(dialogId).max(10), turnSchema.optional()]), async ([session, text, model, files, options]) => {
-    if (activeSessions.has(session)) throw new Error("Агент уже отвечает в этом чате.");
+  handle("chat:send", z.tuple([id, z.string().trim().max(100_000), modelId, z.array(dialogId).max(10), turnSchema.optional()]), ([session, text, model, files, options]) => {
     const chat = conversation(session);
+    return worktrees.use(chat.directory, () => sendChat(chat, text, model, files, options));
+  });
+  async function sendChat(chat: Conversation, text: string, model: string, files: string[], options?: z.infer<typeof turnSchema>) {
+    const session = chat.id;
+    if (activeSessions.has(session)) throw new Error("Агент уже отвечает в этом чате.");
     model = legacyModel(model) ?? model;
     const connected = connections.connected(catalog.current);
     const workingCatalog = effective();
@@ -705,7 +738,7 @@ async function start() {
     tasks.watch(session);
     syncPower();
     try {
-      const paths = await attachments.resolve(chat.directory, files, details?.vision ?? catalogModel?.capabilities.includes("vision") ?? false);
+      const paths = await attachments.resolve(chat.directory, files, details?.vision ?? catalogModel?.capabilities.includes("vision") ?? false, chat.worktree?.origin);
       if (turn.interrupted) return { stopped: true, changes: (await engine.history(session, chat.directory)).changes };
       const result = await engine.send(session, chat.directory, text, model, preferences.auto, paths, native?.upstream, { ...options, access });
       if (!result.stopped && preferences.notifications && (!window?.isFocused() || visibleChat !== session)) {
@@ -724,7 +757,7 @@ async function start() {
       activeSessions.delete(session);
       syncPower();
     }
-  });
+  }
   let browserRoot: string | undefined;
   const browser = createBrowserHost({ window: () => window, projectRoot: () => browserRoot, publish: event => broadcast("browser:event", event) });
   const browserBounds = z.object({ x: z.number().finite(), y: z.number().finite(), width: z.number().finite().min(0), height: z.number().finite().min(0) }).strict();

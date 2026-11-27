@@ -7,7 +7,12 @@ function subscribe<T>(channel: string, listener: (data: T) => void) {
   return () => ipcRenderer.removeListener(channel, receive);
 }
 
-const api: DesktopApi = {
+const api: DesktopApi & { worktreeInitGit: (origin: string) => Promise<void> } = {
+  worktreeCreate: (origin, title) => ipcRenderer.invoke("worktree:create", origin, title),
+  worktreeInfo: directory => ipcRenderer.invoke("worktree:info", directory),
+  worktreeMerge: (directory, message) => ipcRenderer.invoke("worktree:merge", directory, message),
+  worktreeRemove: directory => ipcRenderer.invoke("worktree:remove", directory),
+  worktreeInitGit: origin => ipcRenderer.invoke("worktree:init-git", origin),
   projectBranch: directory => ipcRenderer.invoke("projects:branch", directory),
   tasks: () => ipcRenderer.invoke("tasks:list"),
   startTask: (directory, command, sessionId) => ipcRenderer.invoke("tasks:start", directory, command, sessionId),

@@ -26,8 +26,16 @@ const eventTypes = [
   "form.created", "form.replied", "form.cancelled", "session.execution.failed", "session.execution.interrupted", "session.execution.succeeded"
 ] as const;
 
+function worktreeLabel(info: SessionInfo): Conversation["worktree"] {
+  const origin = info.metadata?.vsemkodWorktreeOrigin;
+  const branch = info.metadata?.vsemkodWorktreeBranch;
+  if (typeof origin === "string" && typeof branch === "string") return { origin, branch };
+}
+
 function conversation(info: SessionInfo): Conversation {
+  const worktree = worktreeLabel(info);
   return {
+    ...(worktree && { worktree }),
     id: info.id, title: info.title ?? "Новый чат", directory: info.location.directory,
     updatedAt: info.time.updated, archived: Boolean(info.time.archived), pinned: info.metadata?.vsemkodPinned === true,
     variant: info.model?.variant, access: accessModes.find(mode => mode === info.metadata?.vsemkodAccess),
@@ -206,8 +214,9 @@ export class EngineAdapter {
     return chats;
   }
 
-  async create(directory: string, title: string): Promise<Conversation> {
-    return conversation(await this.client.session.create({ location: { directory }, title }, request()));
+  async create(directory: string, title: string, worktree?: Conversation["worktree"]): Promise<Conversation> {
+    const metadata = worktree && { vsemkodWorktreeOrigin: worktree.origin, vsemkodWorktreeBranch: worktree.branch };
+    return conversation(await this.client.session.create({ location: { directory }, title, metadata }, request()));
   }
 
   async createSide(directory: string, parent?: string) {
@@ -276,8 +285,16 @@ export class EngineAdapter {
       await this.client.session.remove({ sessionID }, request());
       return null;
     }
-    if (action.type === "fork") return conversation(await this.client.session.fork({ sessionID }, request()));
     const info = await this.client.session.get({ sessionID }, request());
+    if (action.type === "fork") {
+      const fork = await this.client.session.fork({ sessionID }, request());
+      const worktree = worktreeLabel(info);
+      if (!worktree || worktreeLabel(fork)) return conversation(fork);
+      const metadata = { ...fork.metadata, vsemkodWorktreeOrigin: worktree.origin, vsemkodWorktreeBranch: worktree.branch };
+      const forkId = fork.id;
+      await this.client.session.update({ sessionID: forkId, metadata }, request());
+      return conversation({ ...fork, metadata });
+    }
     await this.client.session.update({
       sessionID,
       ...(action.type === "rename" ? { title: action.title } : action.type === "archive" ? { archived: action.value }

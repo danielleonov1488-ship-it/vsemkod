@@ -134,7 +134,7 @@ dialog > .connect-status { margin-top: 16px; }
 
 .workspace-layout { display: flex; min-width: 0; min-height: 0; }
 .workspace-layout > .workspace { flex: 1; }
-.workspace--home { position: relative; }
+.workspace--home { position: relative; grid-template-columns: minmax(0, 1fr); }
 .home-panel-toggle { position: absolute; top: 10px; right: 16px; }
 .sidebar-row[aria-current="page"] { background: var(--selected); color: var(--text); }
 
@@ -620,3 +620,20 @@ select.field-control { cursor: pointer; }
 .publish-popup { width: 290px; padding: 6px; }
 .publish-title { margin: 4px 8px 6px; color: var(--secondary); font-size: calc(12px * var(--font-scale, 1)); }
 .publish-note { margin: 6px 8px 4px; color: var(--muted); font-size: calc(11.5px * var(--font-scale, 1)); line-height: 16px; }
+
+.composer--home:has(.worktree-toggle) .composer-toolbar { flex-wrap: wrap; }
+.composer--home:has(.worktree-toggle) .composer-controls--right { margin-left: auto; }
+.composer-control.worktree-toggle { flex: none; white-space: nowrap; }
+.composer-control.worktree-toggle .icon { width: 16px; height: 16px; }
+.composer-control.worktree-toggle[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 1px var(--mint); background: var(--mint-hover); color: var(--text);
+}
+.conversation > .conversation-branch { flex: none; width: 12px; height: 12px; color: var(--muted); }
+.worktree-anchor { position: relative; }
+.composer-control.worktree-branch { font-size: 12px; white-space: nowrap; }
+.worktree-menu { width: 246px; padding: 4px; }
+.worktree-menu > .model-option { width: 100%; justify-content: flex-start; }
+.worktree-menu > .worktree-merge { display: grid; justify-items: start; gap: 3px; }
+.worktree-menu hr { margin: 4px; border: 0; border-top: 1px solid var(--line); }
+.worktree-history { margin: 0; padding: 10px 0; font-size: 13px; }
+.worktree-toast-action { flex: none; }

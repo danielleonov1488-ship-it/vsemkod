@@ -35,10 +35,10 @@ export class Attachments {
     return { id, name, image, preview: mime && bytes ? "data:" + mime + ";base64," + Buffer.from(bytes).toString("base64") : undefined };
   }
 
-  async resolve(directory: string, ids: string[], vision: boolean) {
+  async resolve(directory: string, ids: string[], vision: boolean, origin?: string) {
     return Promise.all(ids.map(async id => {
       const entry = this.paths.get(id);
-      if (!entry || entry.directory !== directory || await realpath(entry.path) !== entry.path) throw new Error("Вложение недоступно.");
+      if (!entry || (entry.directory !== directory && entry.directory !== origin) || await realpath(entry.path) !== entry.path) throw new Error("Вложение недоступно.");
       if (entry.image && !vision) throw new Error("Выбранная модель не принимает изображения. Выберите другую модель или уберите изображение.");
       const info = await stat(entry.path);
       if (!info.isFile() || info.size > attachmentLimit) throw new Error("Можно прикрепить файлы размером до 2 МБ.");

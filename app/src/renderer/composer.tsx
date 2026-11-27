@@ -9,12 +9,13 @@ const api = window.vsemkod;
 type Suggestion = { key: string; text: string; detail?: string; folder?: boolean };
 
 export function Composer({ active, input, draft, change, directory, busy, canSend, attachments, remove, add, pick, choose,
-  projects, switchProject, access, accessMenu, selectAccess, cycle, submit, stop, selectCommand, tools, modelControls, vision, onError, preferences, updatePreferences }: {
+  projects, switchProject, separateCopy, toggleSeparateCopy, access, accessMenu, selectAccess, cycle, submit, stop, selectCommand, tools, modelControls, vision, onError, preferences, updatePreferences }: {
   preferences?: Preferences; updatePreferences: (patch: Partial<Preferences>) => void;
   active: boolean; input: RefObject<HTMLTextAreaElement | null>; draft: string; change: (value: string) => void;
   directory: string; projects: string[]; switchProject: (path: string) => void; busy: boolean; canSend: boolean; attachments: Attachment[]; remove: (id: string) => void;
   add: (files: File[]) => void; pick: () => void; choose: () => void; access: AccessMode; accessMenu: number; selectAccess: (mode: AccessMode, confirmed?: boolean) => void; cycle: () => void;
   submit: () => void; stop: () => void; selectCommand: (name: string) => boolean;
+  separateCopy?: boolean; toggleSeparateCopy: () => void;
   tools?: ProjectTools; modelControls: ReactNode; vision: boolean; onError: (text: string) => void;
 }) {
   const voice = useVoiceComposer({ draft, input, change, preferences, update: updatePreferences,
@@ -198,6 +199,11 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
             </button>
           </div>}
         </div>
+        {separateCopy !== undefined && <button className="composer-control worktree-toggle" type="button"
+          aria-pressed={separateCopy} disabled={busy} onClick={toggleSeparateCopy}
+          title="Задача пойдёт в отдельной копии проекта: можно вести несколько задач параллельно и потом влить результат">
+          <Icon name="branch" />Отдельная копия
+        </button>}
         <AccessPicker value={access} confirmed={preferences?.fullAccessConfirmed} select={selectAccess} warningSignal={accessMenu} />
       </div>
       <div className="composer-controls composer-controls--right">

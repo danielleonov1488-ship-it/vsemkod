@@ -25,10 +25,12 @@ export function PanelMenu({ select, changes, running }: { select: (tab: PanelTab
   </div>;
 }
 
-export function HeaderTools({ summary, panelMenu, showSummary, showPanels, children }: {
+export function HeaderTools({ leading, summary, panelMenu, showSummary, showPanels, children }: {
+  leading?: ReactNode;
   summary: boolean; panelMenu: boolean; showSummary: () => void; showPanels: () => void; children: ReactNode;
 }) {
   return <div className="chat-header-tools" data-panel-anchor>
+    {leading}
     <button type="button" className="panel-icon-button" aria-label="Сводка" aria-expanded={summary} data-tip="Сводка" onClick={showSummary}><Icon name="summary" /></button>
     <button type="button" className="panel-icon-button" aria-label="Панели" aria-expanded={panelMenu} data-tip="Панели" onClick={showPanels}><Icon name="panel" /></button>
     {children}
