@@ -136,7 +136,32 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
     const supported = vision ? files : files.filter(file => !images.includes(file));
     if (supported.length) add(supported);
   }
-  return <form className={"composer" + (active ? "" : " composer--home") + (dragging ? " composer--dragging" : "")}
+  const context = <>
+        <div className="composer-popup composer-project">
+          <button className="composer-control folder-chip" type="button" title={directory || "Выбрать папку проекта"}
+            aria-label={"Проект · " + (folderName(directory) || "Выбрать папку")} aria-expanded={menu === "project"} disabled={busy}
+            onClick={event => toggleMenu("project", event.currentTarget)}><Icon name="folder" />
+            <span>{folderName(directory) || "Папка проекта"}</span><Icon name="chevron" className="chevron" />
+          </button>
+          {menu === "project" && <div className="model-panel composer-popup-list" aria-label="Выбор проекта" role="region">
+            {projects.map(path => <button className="model-option" key={path} type="button" title={path} aria-pressed={path === directory}
+              onClick={() => { setMenu(undefined); switchProject(path); }}>
+              <Icon name="folder" /><span className="project-option-name">{folderName(path)}</span>
+              {path === directory && <Icon name="check" />}
+            </button>)}
+            <button className="model-option project-pick" type="button" onClick={() => { setMenu(undefined); choose(); }}>
+              <Icon name="plus" />Выбрать папку…
+            </button>
+          </div>}
+        </div>
+        {separateCopy !== undefined && <button className="composer-control worktree-toggle" type="button"
+          aria-pressed={separateCopy} disabled={busy} onClick={toggleSeparateCopy}
+          title="Задача пойдёт в отдельной копии проекта: можно вести несколько задач параллельно и потом влить результат">
+          <Icon name="branch" />Отдельная копия
+        </button>}
+        <AccessPicker value={access} confirmed={preferences?.fullAccessConfirmed} select={selectAccess} warningSignal={accessMenu} />
+  </>;
+  return <>{!active && <div className="composer-context" aria-label="Проект и доступ">{context}</div>}<form className={"composer" + (active ? "" : " composer--home") + (dragging ? " composer--dragging" : "")}
     onSubmit={event => { event.preventDefault(); if (!voice.busy) submit(); }} onDragEnter={event => {
       if (!event.dataTransfer.types.includes("Files")) return;
       event.preventDefault(); dragDepth.current++; setDragging(true);
@@ -182,29 +207,7 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
             </button>
           </div>}
         </div>
-        <div className="composer-popup composer-project">
-          <button className="composer-control folder-chip" type="button" title={directory || "Выбрать папку проекта"}
-            aria-label={"Проект · " + (folderName(directory) || "Выбрать папку")} aria-expanded={menu === "project"} disabled={busy}
-            onClick={event => toggleMenu("project", event.currentTarget)}><Icon name="folder" />
-            <span>{folderName(directory) || "Папка проекта"}</span><Icon name="chevron" className="chevron" />
-          </button>
-          {menu === "project" && <div className="model-panel composer-popup-list" aria-label="Выбор проекта" role="region">
-            {projects.map(path => <button className="model-option" key={path} type="button" title={path} aria-pressed={path === directory}
-              onClick={() => { setMenu(undefined); switchProject(path); }}>
-              <Icon name="folder" /><span className="project-option-name">{folderName(path)}</span>
-              {path === directory && <Icon name="check" />}
-            </button>)}
-            <button className="model-option project-pick" type="button" onClick={() => { setMenu(undefined); choose(); }}>
-              <Icon name="plus" />Выбрать папку…
-            </button>
-          </div>}
-        </div>
-        {separateCopy !== undefined && <button className="composer-control worktree-toggle" type="button"
-          aria-pressed={separateCopy} disabled={busy} onClick={toggleSeparateCopy}
-          title="Задача пойдёт в отдельной копии проекта: можно вести несколько задач параллельно и потом влить результат">
-          <Icon name="branch" />Отдельная копия
-        </button>}
-        <AccessPicker value={access} confirmed={preferences?.fullAccessConfirmed} select={selectAccess} warningSignal={accessMenu} />
+        {active && context}
       </div>
       <div className="composer-controls composer-controls--right">
         {modelControls}
@@ -214,5 +217,5 @@ export function Composer({ active, input, draft, change, directory, busy, canSen
           aria-label="Отправить" disabled={!canSend || voice.busy}><Icon name="send" /></button>}
       </div>
     </div>
-  </form>;
+  </form></>;
 }

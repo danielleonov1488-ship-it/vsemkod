@@ -1,28 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { projectTemplates, templateFolderName, type ProjectTemplate } from "../shared/templates";
+import { templateFolderName, type ProjectTemplate } from "../shared/templates";
 import { readableError } from "./connections";
 import { Icon } from "./icons";
 import { WindowControls } from "./window-controls";
 
-/** «Начать новый проект» на домашнем экране: карточки шаблонов и короткий диалог с названием папки. */
-export function TemplateGallery({ defaultFolder, start }: {
-  defaultFolder?: string; start: (template: ProjectTemplate, name: string) => Promise<void>;
-}) {
-  const [chosen, setChosen] = useState<ProjectTemplate>();
-  if (!window.vsemkod.createFromTemplate) return null;
-  return <section className="templates" aria-labelledby="templates-title">
-    <h2 id="templates-title">Или начните новый проект</h2>
-    <div className="template-grid">
-      {projectTemplates.map(template => <button type="button" className="template-card" key={template.id} onClick={() => setChosen(template)}>
-        <span className="template-icon" aria-hidden="true"><Icon name={template.icon} /></span>
-        <span className="template-copy"><strong>{template.title}</strong><span>{template.description}</span></span>
-      </button>)}
-    </div>
-    {chosen && <TemplateDialog template={chosen} defaultFolder={defaultFolder} close={() => setChosen(undefined)} start={start} />}
-  </section>;
-}
-
-function TemplateDialog({ template, defaultFolder, close, start }: {
+/** Короткий диалог: название папки нового проекта из шаблона. */
+export function TemplateDialog({ template, defaultFolder, close, start }: {
   template: ProjectTemplate; defaultFolder?: string; close: () => void; start: (template: ProjectTemplate, name: string) => Promise<void>;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -39,7 +22,6 @@ function TemplateDialog({ template, defaultFolder, close, start }: {
     onCancel={event => { event.preventDefault(); if (!working) close(); }}>
     <WindowControls floating />
     <button className="composer-control attach dialog-close" type="button" title="Закрыть" aria-label="Закрыть" disabled={working} onClick={close}><Icon name="close" /></button>
-    <span className="template-icon template-icon--large" aria-hidden="true"><Icon name={template.icon} /></span>
     <h1 id="template-title">Новый проект: {template.title.toLowerCase()}</h1>
     <p className="connect-intro">{template.prompt
       ? "Создам папку с правилами для агента и сразу отправлю ему первую задачу. Её можно будет поправить в чате."

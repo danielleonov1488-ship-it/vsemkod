@@ -24,7 +24,7 @@ import notificationSound from "../../resources/notification.wav?url";
 import { WindowControls } from "./window-controls";
 import { Icon } from "./icons";
 import { UpdateRow } from "./update-pill";
-import { TemplateGallery } from "./templates";
+import { HomeStart } from "./home-start";
 import { PublishMenu } from "./publish";
 import type { ProjectTemplate } from "../shared/templates";
 import { findSecrets, maskSecrets } from "../shared/secrets";
@@ -39,7 +39,6 @@ declare global {
 
 const api = window.vsemkod as DesktopApi & { worktreeInitGit?: (origin: string) => Promise<void> };
 type ActionNotice = Notice & { action?: { label: string; run: () => void } };
-const suggestions = ["Создать лендинг", "Найти баг", "Объяснить код", "Написать тесты"];
 function catalogAge(date?: string) {
   if (!date) return "Загружаем каталог моделей";
   const minutes = Math.max(0, Math.floor((Date.now() - Date.parse(date)) / 60_000));
@@ -1079,15 +1078,15 @@ function App() {
           </Chat> : <main className="workspace workspace--home">
             <div className="home-panel-toggle">{headerTools}</div>
             <div className="home">
-              <h1>Чем займёмся?</h1>
-              {composer}
-              <div className="suggestions" aria-label="Подсказки">
-                {suggestions.map(suggestion => <button type="button" className="suggestion" key={suggestion} onClick={() => {
-                  setDraft(suggestion);
-                  draftInput.current?.focus();
-                }}>{suggestion}</button>)}
-              </div>
-              <TemplateGallery defaultFolder={prefs?.directory} start={startFromTemplate} />
+              <HomeStart logo={logo} directory={directory} projects={projectDirectories} sessions={sessions}
+                selectProject={path => {
+                  setVisibleProject(path);
+                  if (!activeChat.current && !cached.current[homeId]?.loading) { setDirectory(path); setFiles([]); }
+                }}
+                chooseProject={() => void chooseDirectory()} open={session => void openChat(session)}
+                example={text => { setDraft(text); draftInput.current?.focus(); }}
+                startTemplate={startFromTemplate} defaultFolder={prefs?.directory} />
+              <div className="home-compose">{composer}</div>
             </div>
           </main>}
         {directory && !historyOnly && <WorkspacePanel key={directory} directory={directory} tab={panelState.active} tabs={panelState.tabs} setTab={selectPanel} closeTab={closeTab} preview={preview}
