@@ -1,5 +1,5 @@
 {
-  "benchmarksAttemptedAt": "2026-11-26T07:20:05.075Z",
+  "benchmarksAttemptedAt": "2026-11-27T04:11:10.828Z",
   "freeListCheckedAt": "2026-11-26T07:15:32.656Z",
   "freeListProviders": [
     {
@@ -83,7 +83,7 @@
       "url": "https://cloud.siliconflow.cn/account/ak"
     }
   ],
-  "freeLlmCheckedAt": "2026-11-26T07:39:04.135Z",
+  "freeLlmCheckedAt": "2026-11-27T04:11:10.828Z",
   "freeLlmFirstSeen": {
     "cloudflare-workers-ai": "2026-11-26T07:39:04.135Z",
     "freeinference": "2026-11-26T07:39:04.135Z",
@@ -534,6 +534,10 @@
       "observations": [],
       "savedAt": "2026-11-26T12:19:22.119Z"
     },
+    "7e1cc329073ffc75f3717e7ce5bc7e3ca4e4b57e8ebd8593b2fdd45fe25add3f": {
+      "observations": [],
+      "savedAt": "2026-11-27T04:11:10.828Z"
+    },
     "7fd503cc174db1aebfabe5e200bb0b26afc482ec29842e72b5be5d2e9b4709e3": {
       "observations": [],
       "savedAt": "2026-11-25T14:01:23.871Z"
@@ -869,6 +873,10 @@
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
     },
+    "bab087e7987726b70f5631b87db298310f029a899fec71c45eb29294317fb43b": {
+      "observations": [],
+      "savedAt": "2026-11-27T04:11:10.828Z"
+    },
     "bdc5743b6616d3e249ffb54f4de2b9d2dbcaf5a156cab2d6935f783d9f96c4f9": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
@@ -1111,27 +1119,27 @@
   "pageChecks": {
     "page:groq": {
       "changedAt": "2026-11-24T15:12:29.146Z",
-      "checkedAt": "2026-11-26T03:04:04.312Z",
+      "checkedAt": "2026-11-27T04:11:10.828Z",
       "hash": "34dcf2cfab29787fbf6996ff0beb94011ceb1dfe066670b92ed2458f37a2d4ad"
     },
     "page:modelscope": {
       "changedAt": "2026-11-24T15:12:29.146Z",
-      "checkedAt": "2026-11-26T03:04:04.312Z",
+      "checkedAt": "2026-11-27T04:11:10.828Z",
       "hash": "b84f5a2c3f6c54778285e39fb4d064fe92a05e29aca9a2244b7e906fec73c33f"
     },
     "page:numes": {
       "changedAt": "2026-11-25T12:06:35.747Z",
-      "checkedAt": "2026-11-26T03:04:04.312Z",
+      "checkedAt": "2026-11-27T04:11:10.828Z",
       "hash": "c636e7f9d2482f208841317335ea973798f20138fa1197297d1ca826c1f00a8d"
     },
     "page:runcrate": {
       "changedAt": "2026-11-26T03:04:04.312Z",
-      "checkedAt": "2026-11-26T03:04:04.312Z",
+      "checkedAt": "2026-11-27T04:11:10.828Z",
       "hash": "654ae4ebc52522c40aa4d439edcea600f1335c0b37442b66dde591bee18a8aa1"
     },
     "page:zai": {
       "changedAt": "2026-11-24T15:12:29.146Z",
-      "checkedAt": "2026-11-26T03:04:04.312Z",
+      "checkedAt": "2026-11-27T04:11:10.828Z",
       "hash": "567997bd64b126bde95802f3b89ce19c02668f604244c22e04dbbda630a9bb72"
     }
   },
@@ -1497,7 +1505,7 @@
           "source": "https://github.com/mnfst/awesome-free-llm-apis"
         }
       ],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "github:db7a9b76865521101c18abde1b4b70bbd690b66eb064ba005291f00fffc7e781": {
       "observations": [
@@ -1867,7 +1875,7 @@
     },
     "hn:50619315": {
       "observations": [],
-      "savedAt": "2026-11-26T21:53:59.801Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50619761": {
       "observations": [],
@@ -1875,7 +1883,7 @@
     },
     "hn:50620027": {
       "observations": [],
-      "savedAt": "2026-11-26T12:19:22.119Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50620275": {
       "observations": [],
@@ -1883,7 +1891,7 @@
     },
     "hn:50622161": {
       "observations": [],
-      "savedAt": "2026-11-26T12:19:22.119Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50623005": {
       "observations": [],
@@ -1891,11 +1899,11 @@
     },
     "hn:50624684": {
       "observations": [],
-      "savedAt": "2026-11-26T12:19:22.119Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50627008": {
       "observations": [],
-      "savedAt": "2026-11-25T12:06:35.747Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50627051": {
       "observations": [],
@@ -1903,15 +1911,15 @@
     },
     "hn:50627625": {
       "observations": [],
-      "savedAt": "2026-11-26T21:53:59.801Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50627633": {
       "observations": [],
-      "savedAt": "2026-11-26T12:19:22.119Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50627646": {
       "observations": [],
-      "savedAt": "2026-11-26T12:19:22.119Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50627930": {
       "observations": [],
@@ -1931,7 +1939,7 @@
     },
     "hn:50629040": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50629216": {
       "observations": [],
@@ -1939,11 +1947,11 @@
     },
     "hn:50630132": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50630317": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50631044": {
       "observations": [],
@@ -1963,7 +1971,7 @@
     },
     "hn:50633297": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50633321": {
       "observations": [],
@@ -1971,15 +1979,15 @@
     },
     "hn:50633601": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50634230": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50634426": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50635126": {
       "observations": [],
@@ -1987,7 +1995,7 @@
     },
     "hn:50635452": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50638216": {
       "observations": [],
@@ -2007,7 +2015,7 @@
     },
     "hn:50641746": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50641798": {
       "observations": [],
@@ -2019,7 +2027,7 @@
     },
     "hn:50642169": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50642538": {
       "observations": [],
@@ -2031,11 +2039,11 @@
     },
     "hn:50642976": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50643708": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50643836": {
       "observations": [],
@@ -2047,7 +2055,7 @@
     },
     "hn:50644420": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50644731": {
       "observations": [],
@@ -2067,7 +2075,7 @@
     },
     "hn:50646533": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50648854": {
       "observations": [],
@@ -2083,59 +2091,75 @@
     },
     "hn:50651099": {
       "observations": [],
-      "savedAt": "2026-11-26T07:15:32.656Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50653751": {
       "observations": [],
-      "savedAt": "2026-11-26T12:19:22.119Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50654888": {
       "observations": [],
-      "savedAt": "2026-11-26T21:53:59.801Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50655719": {
       "observations": [],
-      "savedAt": "2026-11-26T21:53:59.801Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50656245": {
       "observations": [],
-      "savedAt": "2026-11-26T21:53:59.801Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50656277": {
       "observations": [],
-      "savedAt": "2026-11-26T21:53:59.801Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50656826": {
       "observations": [],
-      "savedAt": "2026-11-26T21:53:59.801Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50656884": {
       "observations": [],
-      "savedAt": "2026-11-26T21:53:59.801Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50656925": {
       "observations": [],
-      "savedAt": "2026-11-26T21:53:59.801Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50657070": {
       "observations": [],
-      "savedAt": "2026-11-26T21:53:59.801Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50658338": {
       "observations": [],
-      "savedAt": "2026-11-26T21:53:59.801Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50658345": {
       "observations": [],
-      "savedAt": "2026-11-26T21:53:59.801Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50658362": {
       "observations": [],
-      "savedAt": "2026-11-26T21:53:59.801Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
     },
     "hn:50659784": {
       "observations": [],
-      "savedAt": "2026-11-26T21:53:59.801Z"
+      "savedAt": "2026-11-27T04:11:10.828Z"
+    },
+    "hn:50660522": {
+      "observations": [],
+      "savedAt": "2026-11-27T04:11:10.828Z"
+    },
+    "hn:50660990": {
+      "observations": [],
+      "savedAt": "2026-11-27T04:11:10.828Z"
+    },
+    "hn:50661473": {
+      "observations": [],
+      "savedAt": "2026-11-27T04:11:10.828Z"
+    },
+    "hn:50662700": {
+      "observations": [],
+      "savedAt": "2026-11-27T04:11:10.828Z"
     }
   },
   "tracks": {
