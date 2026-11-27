@@ -9,7 +9,29 @@ import type { RemoteModel } from "./providers";
 import type { Catalog, ProviderId } from "./catalog-schema";
 import type { KeyId, NativeId, PersonalId, PersonalModel } from "./providers";
 
-export type Conversation = { id: string; title: string; directory: string; updatedAt: number; modelId?: string; variant?: string; access?: AccessMode; pinned?: boolean; archived?: boolean };
+export type Conversation = { id: string; title: string; directory: string; updatedAt: number; modelId?: string; variant?: string; access?: AccessMode; pinned?: boolean; archived?: boolean;
+  /** Чат работает в отдельной копии проекта (git worktree): directory — путь копии, origin — исходный проект. */
+  worktree?: { origin: string; branch: string } };
+/** Отдельная копия проекта для параллельной задачи. */
+export type Worktree = { path: string; branch: string; origin: string; base: string;
+  /** Изменённых файлов, ещё не влитых в основную ветку (включая незакоммиченные). */
+  changed: number; ahead: number };
+export type WorktreeMerge = { merged: true } | { merged: false; conflicts: string[]; message: string };
+/** Доступ с телефона: веб-интерфейс в локальной сети и Telegram-бот. */
+export type RemoteAccess = {
+  web: { enabled: boolean; urls: string[]; password?: string; error?: string };
+  telegram: { connected: boolean; botName?: string; pairedUser?: string; pairCode?: string; project?: string; error?: string };
+};
+/** Задача по расписанию: в нужное время vsemkod сам открывает новый чат в проекте и отправляет задачу. */
+export type ScheduleWhen = { type: "daily"; time: string; weekdays: number[] } | { type: "interval"; hours: number };
+export type Schedule = { id: string; name: string; directory: string; prompt: string; when: ScheduleWhen; access: AccessMode;
+  model?: string; enabled: boolean; lastRun?: { at: number; sessionId?: string; ok: boolean; error?: string }; nextRun?: number };
+export type ScheduleInput = Omit<Schedule, "id" | "lastRun" | "nextRun"> & { id?: string };
+/** Хук: после ответа агента запустить команду в папке проекта; если упала — попросить агента исправить. */
+export type Hook = { id: string; name: string; directory?: string; command: string; onlyWhenFilesChanged: boolean;
+  /** Сколько раз подряд просить агента исправить ошибку команды (0 — только показать результат). */
+  fixAttempts: number; enabled: boolean; lastRun?: { at: number; exitCode: number; output: string } };
+export type HookInput = Omit<Hook, "id" | "lastRun"> & { id?: string };
 export type PermissionDecision = "once" | "always" | "reject";
 export type Permission = { id: string; action: string; resources: string[]; save?: string[] };
 export type FileChange = { file: string; patch: string; additions: number; deletions: number; status: "added" | "deleted" | "modified" };
@@ -35,7 +57,9 @@ export type ChatEvent =
   | { type: "route"; sessionId: string; modelId: string; previousModelId?: string; previousProviderId?: KeyId;
     providerId: KeyId; averageMs: number; reason?: "quota" | "unavailable"; midStream?: boolean }
   /** Все бесплатные источники на паузе: роутер ждёт до until (мс) и сам повторит. null — ожидание закончилось. */
-  | { type: "route-wait"; sessionId: string; until: number | null };
+  | { type: "route-wait"; sessionId: string; until: number | null }
+  /** Хук запустил команду после ответа агента. */
+  | { type: "hook"; sessionId: string; hook: string; command: string; status: "running" | "passed" | "failed"; exitCode?: number; output?: string };
 
 export type Preferences = z.infer<typeof preferencesSchema>;
 export type Attachment = { id: string; name: string; image: boolean; preview?: string };
@@ -66,6 +90,23 @@ export type McpConfig = {
   type: "remote"; url: string; headers?: Record<string, string>; disabled?: boolean;
 };
 export type McpEntry = { name: string; status: "connected" | "disabled" | "failed" | "pending" | "needs_auth"; error?: string; managed: boolean };
+/** Готовый коннектор из каталога (resources/connectors.json). */
+export type Connector = {
+  id: string; name: string; description: string;
+  category: "docs" | "search" | "browser" | "code" | "data" | "deploy" | "design" | "work";
+  transport: "remote" | "local"; auth: "none" | "oauth" | "key";
+  keyLabel?: string; keyPageUrl?: string; homepage: string; requires?: ("node" | "chrome")[];
+  /** Что именно запустится или куда подключимся — показываем перед установкой. */
+  command?: string; url?: string; readOnly?: boolean; popular?: boolean;
+};
+export type ConnectorState = Connector & {
+  installed: boolean; status?: McpEntry["status"]; error?: string;
+  /** Чего не хватает на компьютере: node, chrome. */
+  missing?: ("node" | "chrome")[];
+};
+/** Готовый навык из каталога (resources/skills-catalog). */
+export type SkillEntry = { id: string; name: string; description: string; category: "design" | "code" | "docs" | "process";
+  source: string; license: string; installed: boolean };
 export type BackgroundTask = {
   id: string; directory: string; sessionId?: string; command: string; started: number;
   ended?: number; exitCode?: number; output: string;
@@ -114,6 +155,33 @@ export interface DesktopApi {
   projectOpen?(directory: string): Promise<void>;
   projectRemove?(directory: string): Promise<void>;
   routerStats?(): Promise<RouterStats>;
+  worktreeCreate?(origin: string, title: string): Promise<{ directory: string; worktree: Worktree }>;
+  worktreeInfo?(directory: string): Promise<Worktree | null>;
+  /** Закоммитить всё в копии и влить её ветку в текущую ветку исходного проекта. */
+  worktreeMerge?(directory: string, message: string): Promise<WorktreeMerge>;
+  /** Удалить копию и её ветку (незакоммиченное пропадёт). */
+  worktreeRemove?(directory: string): Promise<void>;
+  remoteAccess?(): Promise<RemoteAccess>;
+  setRemoteWeb?(enabled: boolean): Promise<RemoteAccess>;
+  /** Токен бота от @BotFather; null — отключить бота. */
+  setTelegramBot?(token: string | null, project?: string): Promise<RemoteAccess>;
+  onRemoteAccess?(listener: (state: RemoteAccess) => void): () => void;
+  schedules?(): Promise<Schedule[]>;
+  saveSchedule?(input: ScheduleInput): Promise<Schedule[]>;
+  removeSchedule?(id: string): Promise<Schedule[]>;
+  runSchedule?(id: string): Promise<Schedule[]>;
+  hooks?(): Promise<Hook[]>;
+  saveHook?(input: HookInput): Promise<Hook[]>;
+  removeHook?(id: string): Promise<Hook[]>;
+  connectors?(directory: string): Promise<ConnectorState[]>;
+  /** Установить коннектор (для auth "key" — с ключом). Для OAuth после установки вызывается authorizeConnector. */
+  installConnector?(directory: string, id: string, input?: { key?: string }): Promise<ConnectorState[]>;
+  /** Вход OAuth: открывает браузер, промис завершается, когда вход прошёл или отменён. */
+  authorizeConnector?(directory: string, id: string): Promise<ConnectorState[]>;
+  removeConnector?(directory: string, id: string): Promise<ConnectorState[]>;
+  skillCatalog?(): Promise<SkillEntry[]>;
+  installSkill?(id: string): Promise<SkillEntry[]>;
+  removeSkill?(id: string): Promise<SkillEntry[]>;
   /** Список моделей своего поставщика: по адресу и ключу (новый) или по id (уже сохранённый, ключ берётся из хранилища). */
   customProviderModels?(input: { baseUrl: string; key: string } | { id: string }): Promise<RemoteModel[]>;
   /** Создать (без id, ключ обязателен) или изменить (с id, без ключа — оставить прежний) своего поставщика. */

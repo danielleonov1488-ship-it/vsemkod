@@ -10,6 +10,8 @@
     "postinstall": "node scripts/install-electron.mjs && node scripts/fetch-engine.mjs && npm run fetch:voice -- --if-supported",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
+    "build:cli": "node scripts/build-cli.mjs",
+    "build:cli:binaries": "bun scripts/build-cli-binaries.mjs",
     "build:web": "vite build --config vite.web.config.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

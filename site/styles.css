@@ -123,6 +123,18 @@ summary::-webkit-details-marker { display: none; }
 .hero-copy p { margin-top: 8px; color: var(--muted); font-size: clamp(15px, 1.15vw, 17px); letter-spacing: -.012em; }
 .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .release-status { width: 100%; color: var(--faint); font-size: 12px; text-align: right; }
+/* Установка из терминала под кнопками скачивания. */
+.install-line { display: grid; justify-items: start; gap: 6px; width: 100%; margin-top: 4px; }
+.install-line[hidden] { display: none; }
+.install-label { color: var(--faint); font-size: 12px; }
+.install-command { display: flex; align-items: center; max-width: 100%; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.install-command code { flex: 1; overflow-x: auto; padding: 8px 4px 8px 12px; color: var(--text); font: 500 13px/1.4 var(--mono); white-space: nowrap; scrollbar-width: none; }
+.install-command code::-webkit-scrollbar { display: none; }
+.install-copy { display: grid; flex: none; place-items: center; width: 34px; height: 34px; margin: 1px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; transition: color .15s, background .15s; }
+.install-copy:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent-text); }
+.install-copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.install-copy.is-copied { color: var(--accent-text); }
+.install-copy .icon { width: 16px; height: 16px; }
 .hero-demo { position: relative; flex: 1 1 0; display: flex; min-height: 0; margin-top: clamp(14px, 2vh, 22px); }
 
 .app-window {
@@ -421,6 +433,7 @@ summary::-webkit-details-marker { display: none; }
   .hero-top { display: grid; }
   .hero-actions .button-secondary { display: none; }
   .release-status { text-align: left; }
+
   .hero { height: auto; }
   .hero-demo { flex: none; height: max(480px, 72svh); }
   .story-stage { height: 440px; }

@@ -1,0 +1,193 @@
+[
+  {
+    "id": "context7",
+    "name": "Context7",
+    "description": "Свежая документация библиотек с примерами кода.",
+    "category": "docs",
+    "transport": "remote",
+    "auth": "none",
+    "homepage": "https://context7.com",
+    "url": "https://mcp.context7.com/mcp",
+    "popular": true
+  },
+  {
+    "id": "deepwiki",
+    "name": "DeepWiki",
+    "description": "Ответы на вопросы о коде и устройстве публичных репозиториев GitHub.",
+    "category": "docs",
+    "transport": "remote",
+    "auth": "none",
+    "homepage": "https://deepwiki.com",
+    "url": "https://mcp.deepwiki.com/mcp",
+    "popular": true
+  },
+  {
+    "id": "exa",
+    "name": "Exa",
+    "description": "Поиск по интернету, документации и примерам кода.",
+    "category": "search",
+    "transport": "remote",
+    "auth": "none",
+    "homepage": "https://exa.ai",
+    "url": "https://mcp.exa.ai/mcp"
+  },
+  {
+    "id": "github",
+    "name": "GitHub",
+    "description": "Доступ к репозиториям, задачам и запросам на слияние GitHub.",
+    "category": "code",
+    "transport": "remote",
+    "auth": "key",
+    "homepage": "https://github.com/github/github-mcp-server",
+    "url": "https://api.githubcopilot.com/mcp/",
+    "popular": true,
+    "keyLabel": "Персональный токен GitHub",
+    "keyPageUrl": "https://github.com/settings/personal-access-tokens/new"
+  },
+  {
+    "id": "supabase",
+    "name": "Supabase",
+    "description": "Просмотр схемы, данных и настроек авторизации Supabase в режиме чтения.",
+    "category": "data",
+    "transport": "remote",
+    "auth": "oauth",
+    "homepage": "https://supabase.com/docs/guides/getting-started/mcp",
+    "url": "https://mcp.supabase.com/mcp?read_only=true",
+    "readOnly": true
+  },
+  {
+    "id": "vercel",
+    "name": "Vercel",
+    "description": "Доступ к развёртываниям проектов Vercel и их журналам.",
+    "category": "deploy",
+    "transport": "remote",
+    "auth": "oauth",
+    "homepage": "https://vercel.com/docs/mcp/vercel-mcp",
+    "url": "https://mcp.vercel.com"
+  },
+  {
+    "id": "cloudflare-docs",
+    "name": "Cloudflare",
+    "description": "Поиск ответов в документации Cloudflare.",
+    "category": "docs",
+    "transport": "remote",
+    "auth": "none",
+    "homepage": "https://developers.cloudflare.com/",
+    "url": "https://docs.mcp.cloudflare.com/mcp"
+  },
+  {
+    "id": "sentry",
+    "name": "Sentry",
+    "description": "Просмотр ошибок приложений и подробностей о сбоях в Sentry.",
+    "category": "code",
+    "transport": "remote",
+    "auth": "oauth",
+    "homepage": "https://docs.sentry.io/",
+    "url": "https://mcp.sentry.dev/mcp"
+  },
+  {
+    "id": "linear",
+    "name": "Linear",
+    "description": "Поиск и ведение задач команды в Linear.",
+    "category": "work",
+    "transport": "remote",
+    "auth": "oauth",
+    "homepage": "https://linear.app/docs/mcp",
+    "url": "https://mcp.linear.app/mcp"
+  },
+  {
+    "id": "notion",
+    "name": "Notion",
+    "description": "Поиск, чтение и редактирование страниц Notion.",
+    "category": "work",
+    "transport": "remote",
+    "auth": "oauth",
+    "homepage": "https://developers.notion.com/docs/mcp",
+    "url": "https://mcp.notion.com/mcp"
+  },
+  {
+    "id": "neon",
+    "name": "Neon",
+    "description": "Просмотр схемы и данных PostgreSQL в Neon в режиме чтения.",
+    "category": "data",
+    "transport": "remote",
+    "auth": "oauth",
+    "homepage": "https://github.com/neondatabase/mcp-server-neon",
+    "url": "https://mcp.neon.tech/mcp?readonly=true",
+    "readOnly": true
+  },
+  {
+    "id": "stripe",
+    "name": "Stripe",
+    "description": "Для проверки платежей выберите только тестовую среду при входе в Stripe.",
+    "category": "data",
+    "transport": "remote",
+    "auth": "oauth",
+    "homepage": "https://docs.stripe.com/mcp",
+    "url": "https://mcp.stripe.com"
+  },
+  {
+    "id": "figma",
+    "name": "Figma",
+    "description": "Доступ к макетам Figma, чтобы переносить их в код.",
+    "category": "design",
+    "transport": "remote",
+    "auth": "oauth",
+    "homepage": "https://developers.figma.com/docs/figma-mcp-server/",
+    "url": "https://mcp.figma.com/mcp"
+  },
+  {
+    "id": "playwright",
+    "name": "Playwright",
+    "description": "Открывает сайты в браузере и проверяет, что страницы и кнопки работают.",
+    "category": "browser",
+    "transport": "local",
+    "auth": "none",
+    "homepage": "https://github.com/microsoft/playwright-mcp",
+    "command": "npx -y @playwright/mcp@0.0.86",
+    "requires": [
+      "node"
+    ],
+    "popular": true
+  },
+  {
+    "id": "chrome-devtools",
+    "name": "Chrome DevTools",
+    "description": "Помогает проверять ошибки страницы, сетевые запросы и скорость работы в Chrome.",
+    "category": "browser",
+    "transport": "local",
+    "auth": "none",
+    "homepage": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+    "command": "npx -y chrome-devtools-mcp@1.14.0",
+    "requires": [
+      "node",
+      "chrome"
+    ]
+  },
+  {
+    "id": "shadcn",
+    "name": "shadcn/ui",
+    "description": "Находит готовые компоненты интерфейса и подсказывает, как добавить их в проект.",
+    "category": "design",
+    "transport": "local",
+    "auth": "none",
+    "homepage": "https://ui.shadcn.com/docs/mcp",
+    "command": "npx -y shadcn@4.23.1 mcp",
+    "requires": [
+      "node"
+    ]
+  },
+  {
+    "id": "memory",
+    "name": "Memory",
+    "description": "Сохраняет сведения о проекте, чтобы агент мог вернуться к ним позже.",
+    "category": "work",
+    "transport": "local",
+    "auth": "none",
+    "homepage": "https://github.com/modelcontextprotocol/servers/tree/main/src/memory",
+    "command": "npx -y @modelcontextprotocol/server-memory@2.2.2",
+    "requires": [
+      "node"
+    ]
+  }
+]

@@ -6,9 +6,10 @@ import { Icon } from "./icons";
 import { panelTabs } from "../shared/panels";
 import { macShortcuts } from "./panel-controls";
 import { VoiceSettings } from "./voice-settings";
+import { ConnectorCatalog, SkillCatalog } from "./catalog-settings";
 
 const api = window.vsemkod;
-const sections = ["Общие", "Модели и подключения", "Агент", "MCP-серверы", "Навыки", "Горячие клавиши", "Данные", "О программе", "Голос"];
+const sections = ["Общие", "Модели и подключения", "Агент", "Коннекторы", "Навыки", "Горячие клавиши", "Данные", "О программе", "Голос"];
 const hotkeys = [
   ["Ctrl+N", "Новый чат"], ["Ctrl+K", "Поиск чатов"], ["Ctrl+B", "Правая панель"],
   ...panelTabs.flatMap(tab => "key" in tab ? [[(macShortcuts ? "Cmd" : "Ctrl") + "+" + (tab.shift ? "Shift+" : "") + tab.key, tab.title]] : []),
@@ -147,6 +148,15 @@ function Skills({ directory, onError }: { directory: string; onError: (error: un
   </>;
 }
 
+function SkillsPage({ directory, onError }: { directory: string; onError: (error: unknown) => void }) {
+  const [revision, setRevision] = useState(0);
+  return <>
+    {/* Движок перечитывает навыки при перезапуске (пара секунд): обновляем список сразу и ещё раз чуть позже. */}
+    <SkillCatalog onError={onError} onChange={() => { setRevision(value => value + 1); setTimeout(() => setRevision(value => value + 1), 6000); }} />
+    <Group title="Установленные навыки"><Skills key={directory + revision} directory={directory} onError={onError} /></Group>
+  </>;
+}
+
 type SettingsProps = Omit<Parameters<typeof ModelSettings>[0], "prefs"> & {
   prefs?: Preferences; version?: string; directory: string; choose: () => void; open: (url: string) => void;
   checkUpdates: () => void; checkingUpdates: boolean; updateStatus?: string; restartUpdate?: () => void; testNotification?: () => void; exportAll: () => void; state?: CatalogState;
@@ -203,8 +213,11 @@ export function Settings({ prefs, version, directory, choose, update, open, chec
         </>}
         {section === 1 && <ModelSettings {...models} prefs={prefs} update={update} onError={onError} />}
         {section === 2 && prefs && <AgentSettings prefs={prefs} update={update} onError={onError} />}
-        {section === 3 && <McpSettings key={directory} directory={directory} onError={onError} />}
-        {section === 4 && <Skills key={directory} directory={directory} onError={onError} />}
+        {section === 3 && <>
+          <ConnectorCatalog key={directory} directory={directory} onError={onError} />
+          <Group title="Свои MCP-серверы"><McpSettings key={directory} directory={directory} onError={onError} /></Group>
+        </>}
+        {section === 4 && <SkillsPage directory={directory} onError={onError} />}
         {section === 5 && <dl className="hotkey-list">{hotkeys.map(([key, action]) => <div key={key}><dt>{action}</dt><dd><kbd>{key}</kbd></dd></div>)}</dl>}
         {section === 6 && <>
           <p className="subtle settings-detail">Телеметрии нет: vsemkod ничего не отправляет, кроме запросов к выбранным вами моделям.</p>

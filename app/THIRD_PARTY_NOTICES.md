@@ -88,3 +88,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Каталог навыков
+
+- Навыки Anthropic: frontend-design, webapp-testing, pdf, docx, xlsx, pptx, mcp-builder и skill-creator. В каждом каталоге сохранён исходный текст Apache 2.0. [Anthropic Skills](https://github.com/anthropics/skills/tree/e4bb5d960d87126ff3b3a8af1a104b7db67560ba/skills)
+- Навыки Superpowers: test-driven-development, systematic-debugging, verification-before-completion, brainstorming и writing-plans. Copyright (c) 2025 Jesse Vincent. Текст MIT прилагается к каждому навыку. [Лицензия Superpowers](https://github.com/obra/superpowers/blob/22f0b463e7a5e579904dd6211a520321035526f7/LICENSE)

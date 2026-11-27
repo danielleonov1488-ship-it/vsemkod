@@ -9,6 +9,10 @@ extraResources:
     to: catalog.json
   - from: resources/benchmarks.json
     to: benchmarks.json
+  - from: resources/connectors.json
+    to: connectors.json
+  - from: resources/skills-catalog
+    to: skills-catalog
   - from: resources/tray
     to: tray
   - from: tests/fixtures/voice-en.wav

@@ -13,7 +13,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { z } from "zod";
 import { activeOffers, rankedModels } from "../shared/catalog";
 import { keyIdSchema, personalProviders, remoteModelsSchema } from "../shared/providers";
-import type { ChatEvent, ConnectEvent, Conversation, McpConfig, McpEntry, Notice, Preferences, SubscriptionId } from "../shared/api";
+import type { ChatEvent, ConnectEvent, Conversation, McpEntry, Notice, Preferences, SubscriptionId } from "../shared/api";
 import { accessModes } from "../shared/workspace";
 import { Attachments, attachmentLimit } from "./attachments";
 import { chatMarkdown } from "./chat-export";
@@ -26,6 +26,8 @@ import { ConnectService, customProviderIdSchema, customSelectionSchema } from ".
 import type { NativeModel } from "./engine/adapter";
 import { EngineService, enableOpenCodeZenFree, engineBinary } from "./engine/service";
 import { KeyStore } from "./key-store";
+import { Connectors, mcpConfig, mcpName } from "./connectors";
+import { SkillsCatalog, skillId } from "./skills-catalog";
 import { Router } from "./router";
 import { ProviderHealth } from "./router/health";
 import { readJson, writeJson } from "./storage";
@@ -51,10 +53,6 @@ const dialogId = z.uuid();
 const id = z.string().min(1).max(250);
 const modelId = z.string().min(1).max(514);
 const localPath = z.string().min(1).max(32_768).refine(isAbsolute);
-const mcpConfig = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("local"), command: z.array(z.string().min(1)).min(1).max(64), environment: z.record(z.string(), z.string()).optional(), disabled: z.boolean().optional() }),
-  z.object({ type: z.literal("remote"), url: z.url({ protocol: /^https?$/ }), headers: z.record(z.string(), z.string()).optional(), disabled: z.boolean().optional() })
-]);
 const chatActionSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("rename"), title: z.string().trim().min(1).max(120) }),
   z.object({ type: z.enum(["pin", "archive"]), value: z.boolean() }),
@@ -165,8 +163,6 @@ async function start() {
   const hiddenProjects = new Set(savedProjects?.hidden ?? []);
   let projectWrites = Promise.resolve();
   const attachments = new Attachments(join(data, "attachments"));
-  const mcpPath = join(data, "mcp.json");
-  let mcp: Record<string, McpConfig> = await readJson(mcpPath, z.record(z.string(), mcpConfig)) ?? {};
   const activeSessions = new Map<string, { interrupted: boolean }>();
   let power: number | undefined;
   function syncPower() {
@@ -223,6 +219,8 @@ async function start() {
   };
   const keys = new KeyStore(join(data, "keys.json"));
   await keys.load();
+  const connectors = await Connectors.load(join(resources, "connectors.json"), join(data, "mcp.json"), keys);
+  const connectorAuth = new Map<string, { cancel: AbortController; done: Promise<unknown> }>();
   const voice = new VoiceService(data, join(resources, "voice", process.platform + "-" + process.arch),
     join(here, "voice-worker.js"), app.isPackaged ? join(resources, "voice-benchmark.wav") : join(resources, "../tests/fixtures/voice-en.wav"),
     () => keys.get("groq-api"), event => broadcast("voice:event", event));
@@ -281,6 +279,8 @@ async function start() {
   });
   await router.start();
   console.info("[router] Запущен: " + router.baseUrl);
+  // Навыки движок читает при запуске: смена номера перезапускает его, когда агент свободен.
+  let skillsRevision = 0;
   const engine = new EngineService(engineBinary(resources), join(data, "opencode"), effective, router,
     event => {
       if (sideIds.has(event.sessionId)) return;
@@ -289,7 +289,8 @@ async function start() {
       }
       broadcast("chat:event", event);
       if (event.type === "permission" || event.type === "question") announce("Агент ждёт ответа", conversations.get(event.sessionId)?.title ?? "vsemkod", event.sessionId);
-    }, personalModels, () => ({ agentSteps: preferences.agentSteps, webSearch: preferences.webSearch, mcp }));
+    }, personalModels, () => ({ agentSteps: preferences.agentSteps, webSearch: preferences.webSearch, mcp: { servers: connectors.engineConfigs() }, skills: skillsRevision }));
+  const skills = new SkillsCatalog(join(resources, "skills-catalog"), engine.configDirectory);
   engine.keepBackground = () => tasks.running().length > 0 || sideSessions.size > 0 || terminals.size > 0;
   const taskTimer = setInterval(() => {
     if (engine.runningClient) void tasks.refresh(engine.runningClient, conversations).catch(() => {});
@@ -356,6 +357,7 @@ async function start() {
   };
   teardown = async () => {
     cancelAll();
+    for (const attempt of connectorAuth.values()) attempt.cancel.abort();
     clearInterval(taskTimer);
     await Promise.allSettled(tasks.running().map(task => tasks.stop(task.id)));
     await Promise.allSettled([...sideSessions.keys()].map(closeSide));
@@ -798,33 +800,105 @@ async function start() {
   async function mcpList(directory: string): Promise<McpEntry[]> {
     const list = await (await engine.ready()).mcpList(project(directory));
     return list.map(({ name, status }) => ({
-      name, status: status.status, error: "error" in status ? status.error : undefined, managed: Object.hasOwn(mcp, name)
+      name, status: status.status, error: "error" in status ? status.error : undefined, managed: !!connectors.get(name)
     }));
   }
   handle("mcp:list", z.tuple([localPath]), ([directory]) => mcpList(directory));
   let mcpQueue: Promise<unknown> = Promise.resolve();
-  const mcpName = z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/);
+  function changeMcp<T>(directory: string, run: () => Promise<T>): Promise<T> {
+    project(directory);
+    const task = mcpQueue.then(run);
+    mcpQueue = task.catch(() => {});
+    return task;
+  }
+
+  async function cancelConnectorAuth(name: string) {
+    const attempt = connectorAuth.get(name);
+    attempt?.cancel.abort();
+    await attempt?.done.catch(() => {});
+  }
+
+  async function applyMcp(directory: string, name: string) {
+    const running = engine.runningClient;
+    const client = await engine.ready();
+    // The next launch reads the persisted config. A busy instance also needs the live change.
+    if (running === client) await client.mcpSet(directory, name, connectors.engineConfig(name));
+    return client;
+  }
+
   handle("mcp:change", z.tuple([localPath, mcpName, z.enum(["put", "delete", "enable", "disable", "check"]), mcpConfig.optional()]),
-    ([directory, name, action, config]) => {
-      project(directory);
-      const task = mcpQueue.then(async () => {
-        if (action === "check") {
-          await (await engine.ready()).mcpCheck(directory, name, mcp[name]);
-          return mcpList(directory);
-        }
-        const next = { ...mcp };
-        if (action === "put" && config) next[name] = config;
-        else if (action === "delete" && Object.hasOwn(next, name)) delete next[name];
-        else if ((action === "enable" || action === "disable") && Object.hasOwn(next, name)) {
-          next[name] = { ...next[name], disabled: action === "disable" };
-        } else throw new Error("Сервер MCP не найден.");
-        await writeJson(mcpPath, next);
-        mcp = next;
-        return mcpList(directory);
-      });
-      mcpQueue = task.catch(() => {});
-      return task;
+    ([directory, name, action, config]) => changeMcp(directory, async () => {
+      if (action === "check") {
+        await (await engine.ready()).mcpCheck(directory, name, connectors.engineConfig(name));
+      } else {
+        await cancelConnectorAuth(name);
+        await connectors.change(name, action, config);
+        if (action === "delete") await connectors.clearKey(name);
+        await applyMcp(directory, name);
+      }
+      return mcpList(directory);
+    }));
+
+  const connectorList = async (directory: string) => {
+    project(directory);
+    const statuses = await mcpList(directory).catch(() => []);
+    return connectors.list(statuses);
+  };
+  handle("connectors:list", z.tuple([localPath]), ([directory]) => connectorList(directory));
+  const connectorInput = z.object({ key: z.string().trim().min(1).max(4096).regex(/^[\x21-\x7e]+$/).optional() });
+  handle("connectors:install", z.tuple([localPath, mcpName, connectorInput.optional()]),
+    ([directory, name, input]) => changeMcp(directory, async () => {
+      await cancelConnectorAuth(name);
+      await connectors.install(name, input?.key);
+      const client = await applyMcp(directory, name);
+      await client.mcpCheck(directory, name, connectors.engineConfig(name));
+      return connectorList(directory);
+    }));
+
+  handle("connectors:authorize", z.tuple([localPath, mcpName]), async ([directory, name]) => {
+    const attempt = await changeMcp(directory, async () => {
+      const entry = connectors.entry(name);
+      const config = connectors.get(name);
+      if (entry.auth !== "oauth" || entry.transport !== "remote" || config?.type !== "remote" || config.url !== entry.url || config.disabled) {
+        throw new Error("Сначала включите коннектор из каталога.");
+      }
+      const existing = connectorAuth.get(name);
+      if (existing) return existing;
+      const cancel = new AbortController();
+      const signal = AbortSignal.any([cancel.signal, AbortSignal.timeout(5 * 60_000)]);
+      const done = engine.withAuth(client => client.mcpAuthorize(directory, name, async value => {
+        const url = new URL(value);
+        if (url.protocol !== "https:" || url.username || url.password) throw new Error("Сервер вернул небезопасный адрес входа.");
+        await shell.openExternal(url.href);
+      }, signal)).catch(error => {
+        if (!signal.aborted) throw error;
+      }).then(() => cancel.signal.aborted ? connectors.list([]) : connectorList(directory))
+        .finally(() => connectorAuth.delete(name));
+      // A queued change can cancel this attempt before its IPC caller has received the promise.
+      void done.catch(() => {});
+      const attempt = { cancel, done };
+      connectorAuth.set(name, attempt);
+      return attempt;
     });
+    return attempt.done;
+  });
+
+  handle("connectors:remove", z.tuple([localPath, mcpName]), ([directory, name]) => changeMcp(directory, async () => {
+    const entry = connectors.entry(name);
+    await cancelConnectorAuth(name);
+    const installed = connectors.get(name);
+    if (installed) {
+      if (entry.auth === "oauth") await (await engine.ready()).mcpLogout(directory, name);
+      await connectors.change(name, "delete");
+    }
+    await connectors.clearKey(name);
+    if (installed) await applyMcp(directory, name);
+    return connectorList(directory);
+  }));
+
+  handle("skills:catalog", z.tuple([]), () => skills.list());
+  handle("skills:install", z.tuple([skillId]), async ([name]) => { const list = await skills.install(name); skillsRevision++; return list; });
+  handle("skills:remove", z.tuple([skillId]), async ([name]) => { const list = await skills.remove(name); skillsRevision++; return list; });
   handle("app:folder", z.tuple([z.enum(["data", "logs", "skills"])]), async ([folder]) => {
     const path = folder === "data" ? data : folder === "logs" ? join(data, "opencode", "data", "opencode", "log") : join(engine.configDirectory, "skills");
     await mkdir(path, { recursive: true });

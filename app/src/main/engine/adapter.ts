@@ -335,8 +335,74 @@ export class EngineAdapter {
   async mcpCheck(directory: string, server: string, config?: McpConfig) {
     const location = { directory };
     if (config?.disabled) return;
-    await this.client.experimental.mcp.disconnect({ location, server }, request());
+    if (config && !(await this.mcpList(directory)).some(item => item.name === server)) {
+      await this.mcpSet(directory, server, config);
+    }
     await this.client.experimental.mcp.connect({ location, server }, request());
+  }
+
+  async mcpSet(directory: string, server: string, config?: McpConfig) {
+    const location = { directory };
+    if (config) {
+      await this.client.experimental.mcp.add({ location, server, config }, request());
+    } else if ((await this.mcpList(directory)).some(item => item.name === server)) {
+      await this.client.experimental.mcp.remove({ location, server }, request());
+    }
+  }
+
+  async mcpAuthorize(directory: string, server: string, present: (url: string) => Promise<void>, signal: AbortSignal) {
+    const location = { directory };
+    const options = () => ({ signal: AbortSignal.any([signal, AbortSignal.timeout(20_000)]) });
+    const status = async () => (await this.client.mcp.list({ location }, options())).data.find(item => item.name === server);
+    const current = await status();
+    if (current?.status.status === "connected") return;
+    if (!current?.integrationID || current.status.status === "disabled") throw new Error("Вход для этого коннектора недоступен.");
+    const integrationID = current.integrationID;
+    const { data: integration } = await this.client.integration.get({ integrationID, location }, options());
+    const method = integration.methods.find(item => item.type === "oauth");
+    if (!method || method.form) throw new Error("Этот коннектор не поддерживает автоматический вход в OpenCode.");
+
+    let attempt;
+    try {
+      ({ data: attempt } = await this.client.integration.oauth.connect({ integrationID, methodID: method.id, location }, options()));
+    } catch (error) {
+      signal.throwIfAborted();
+      throw new Error("OpenCode не смог начать вход для этого коннектора. " + (error instanceof Error ? error.message : ""));
+    }
+    const input = { integrationID, attemptID: attempt.attemptID, location };
+    let complete = false;
+    try {
+      signal.throwIfAborted();
+      if (attempt.mode === "code") throw new Error("Сервер запрашивает ручной ввод кода.");
+      await present(attempt.url);
+      while (Date.now() < attempt.time.expires) {
+        const { data } = await this.client.integration.oauth.status(input, options());
+        if (data.status === "expired") return;
+        if (data.status === "failed") {
+          if (/access[_ ]denied|cancel(?:led|ed)|denied the request/i.test(data.message)) return;
+          throw new Error("Сервер не подтвердил вход. Попробуйте ещё раз.");
+        }
+        if (data.status === "complete") { complete = true; break; }
+        await delay(500, undefined, { signal });
+      }
+      while (complete) {
+        const serverStatus = (await status())?.status.status;
+        if (serverStatus === "connected") return;
+        await delay(500, undefined, { signal });
+      }
+    } finally {
+      if (!complete) await this.client.integration.oauth.cancel(input, { signal: AbortSignal.timeout(2_000) }).catch(() => {});
+    }
+  }
+
+  async mcpLogout(directory: string, server: string) {
+    const location = { directory };
+    const integrationID = (await this.mcpList(directory)).find(item => item.name === server)?.integrationID;
+    if (!integrationID) return;
+    const { data } = await this.client.integration.get({ integrationID, location }, request());
+    for (const connection of data.connections) {
+      if (connection.type === "credential") await this.client.credential.remove({ credentialID: connection.id }, request());
+    }
   }
 
   async openTerminal(directory: string, onData: (text: string) => void, onClose: () => void) {

@@ -5,14 +5,13 @@ import { join } from "node:path";
 import { createInterface } from "node:readline";
 import { setTimeout as delay } from "node:timers/promises";
 import { z } from "zod";
-import { rankedModels } from "../../shared/catalog";
 import type { Catalog } from "../../shared/catalog-schema";
 import type { ChatEvent, ChatPart, FileChange, Permission, PermissionDecision, TurnOptions } from "../../shared/api";
 import { nativeIdSchema, type PersonalModel } from "../../shared/providers";
 import type { Router } from "../router";
 import { readJson, writeJson } from "../storage";
 import { applyFileChanges } from "./revert-files";
-import { sessionAccess } from "./access";
+import { engineConfig } from "./config";
 import { EngineAdapter, type EngineModel } from "./adapter";
 import { TurnQueue } from "./turn-queue";
 
@@ -50,8 +49,6 @@ export function engineBinary(resources: string): string {
 
 export const enableOpenCodeZenFree = process.env.ENABLE_OPENCODE_ZEN_FREE === "true";
 
-const filePermissions = sessionAccess("ask").permissions;
-
 export class EngineService {
   private child?: ChildProcess;
   private client?: EngineAdapter;
@@ -73,7 +70,7 @@ export class EngineService {
     private readonly router: Router,
     private readonly emit: (event: ChatEvent) => void,
     private readonly personalModels: () => PersonalModel[] = () => [],
-    private readonly settings: () => { agentSteps: number; webSearch: boolean; mcp: object } = () => ({ agentSteps: 0, webSearch: false, mcp: {} })
+    private readonly settings: () => { agentSteps: number; webSearch: boolean; mcp: object; skills?: number } = () => ({ agentSteps: 0, webSearch: false, mcp: {} })
   ) {}
 
   async ready(): Promise<EngineAdapter> {
@@ -336,56 +333,6 @@ export class EngineService {
   }
 
   private config(catalog: Catalog, personal: PersonalModel[]) {
-    const models = rankedModels(catalog);
-    const entries = models.map(model => [model.id, {
-      name: model.name,
-      limit: { context: model.contextWindow, output: Math.min(8192, Math.floor(model.contextWindow / 4)) },
-      capabilities: { tools: model.capabilities.includes("tools"), input: ["text", ...(model.capabilities.includes("vision") ? ["image"] : [])], output: ["text"] }
-    }]);
-    const personalEntries = personal.map(model => [model.id, {
-      name: model.name,
-      limit: { context: model.context ?? 32_768, output: model.output ?? Math.min(8192, Math.floor((model.context ?? 32_768) / 4)) },
-      capabilities: { tools: true, input: ["text", ...(model.vision ? ["image"] : [])], output: ["text"] }
-    }]);
-    return {
-      model: "vsemkod/auto",
-      update: "disable",
-      share: "disabled",
-      formatter: false,
-      lsp: false,
-      snapshots: true,
-      instructions: ["AGENTS.md"],
-      skills: [join(this.configDirectory, "skills"), ".opencode/skills"],
-      todo: true,
-      websearch: this.settings().webSearch ? { provider: "tinyfish" } : false,
-      compaction: { auto: true },
-      policies: this.settings().webSearch ? [] : [{ action: "websearch.use", resource: "*", effect: "deny" }],
-      mcp: this.settings().mcp,
-      permissions: filePermissions,
-      agents: {
-        ...Object.fromEntries(["build", "plan", "general"].map(agent => [agent, { ...(this.settings().agentSteps ? { steps: this.settings().agentSteps } : {}), ...(agent === "plan" ? { permissions: sessionAccess("read").permissions } : {}) }])),
-        title: { disabled: true }
-      },
-      plugins: [
-        "-opencode.provider.kilo", "-opencode.provider.claude-agent", "-opencode.config.compatibility", "-opencode.skill", "-opencode.browser",
-        ...(enableOpenCodeZenFree ? [] : ["-opencode.provider.opencode"])
-      ],
-      providers: {
-        vsemkod: {
-          name: "vsemkod",
-          package: "@opencode/ai/providers/openai-compatible",
-          settings: { baseURL: this.router.baseUrl, apiKey: this.router.token },
-          models: Object.fromEntries([["auto", {
-            name: "Автовыбор",
-            limit: { context: Math.min(...models.filter(model => model.tier !== "basic" && model.origin !== "discovered").map(model => model.contextWindow), 128_000), output: 8192 },
-            capabilities: { tools: true, input: ["text"], output: ["text"] }
-          }], ["relay", {
-            name: "vsemkod",
-            limit: { context: 32_768, output: 8192 },
-            capabilities: { tools: true, input: ["text", "image"], output: ["text"] }
-          }], ...entries, ...personalEntries])
-        }
-      }
-    };
+    return engineConfig(catalog, personal, this.router, this.configDirectory, () => this.settings(), enableOpenCodeZenFree);
   }
 }

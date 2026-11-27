@@ -1,0 +1,106 @@
+[
+  {
+    "id": "frontend-design",
+    "name": "Дизайн интерфейсов",
+    "description": "Помогает спроектировать и собрать интерфейс с продуманной типографикой и компоновкой.",
+    "category": "design",
+    "source": "https://github.com/anthropics/skills/tree/e4bb5d960d87126ff3b3a8af1a104b7db67560ba/skills/frontend-design",
+    "license": "Apache-2.0"
+  },
+  {
+    "id": "webapp-testing",
+    "name": "Проверка веб-приложений",
+    "description": "Помогает проверить работу веб-приложения в браузере и найти ошибки.",
+    "category": "code",
+    "source": "https://github.com/anthropics/skills/tree/e4bb5d960d87126ff3b3a8af1a104b7db67560ba/skills/webapp-testing",
+    "license": "Apache-2.0"
+  },
+  {
+    "id": "pdf",
+    "name": "Работа с PDF",
+    "description": "Помогает читать, создавать, объединять и заполнять PDF-файлы.",
+    "category": "docs",
+    "source": "https://github.com/anthropics/skills/tree/e4bb5d960d87126ff3b3a8af1a104b7db67560ba/skills/pdf",
+    "license": "Apache-2.0"
+  },
+  {
+    "id": "docx",
+    "name": "Работа с Word",
+    "description": "Помогает создавать и редактировать документы Word с сохранением оформления.",
+    "category": "docs",
+    "source": "https://github.com/anthropics/skills/tree/e4bb5d960d87126ff3b3a8af1a104b7db67560ba/skills/docx",
+    "license": "Apache-2.0"
+  },
+  {
+    "id": "xlsx",
+    "name": "Работа с таблицами Excel",
+    "description": "Помогает создавать таблицы, работать с формулами и проверять расчёты.",
+    "category": "docs",
+    "source": "https://github.com/anthropics/skills/tree/e4bb5d960d87126ff3b3a8af1a104b7db67560ba/skills/xlsx",
+    "license": "Apache-2.0"
+  },
+  {
+    "id": "pptx",
+    "name": "Работа с PowerPoint",
+    "description": "Помогает создавать и редактировать презентации PowerPoint.",
+    "category": "docs",
+    "source": "https://github.com/anthropics/skills/tree/e4bb5d960d87126ff3b3a8af1a104b7db67560ba/skills/pptx",
+    "license": "Apache-2.0"
+  },
+  {
+    "id": "mcp-builder",
+    "name": "Создание коннекторов",
+    "description": "Помогает спроектировать и реализовать сервер для подключения инструментов агента.",
+    "category": "code",
+    "source": "https://github.com/anthropics/skills/tree/e4bb5d960d87126ff3b3a8af1a104b7db67560ba/skills/mcp-builder",
+    "license": "Apache-2.0"
+  },
+  {
+    "id": "skill-creator",
+    "name": "Создание навыков",
+    "description": "Помогает написать навык для агента и проверить его на примерах.",
+    "category": "process",
+    "source": "https://github.com/anthropics/skills/tree/e4bb5d960d87126ff3b3a8af1a104b7db67560ba/skills/skill-creator",
+    "license": "Apache-2.0"
+  },
+  {
+    "id": "test-driven-development",
+    "name": "Разработка через тесты",
+    "description": "Помогает начать изменение с теста и проверить результат небольшими шагами.",
+    "category": "code",
+    "source": "https://github.com/obra/superpowers/tree/22f0b463e7a5e579904dd6211a520321035526f7/skills/test-driven-development",
+    "license": "MIT"
+  },
+  {
+    "id": "systematic-debugging",
+    "name": "Системная отладка",
+    "description": "Помогает воспроизвести ошибку, найти её причину и проверить исправление.",
+    "category": "code",
+    "source": "https://github.com/obra/superpowers/tree/22f0b463e7a5e579904dd6211a520321035526f7/skills/systematic-debugging",
+    "license": "MIT"
+  },
+  {
+    "id": "verification-before-completion",
+    "name": "Проверка результата",
+    "description": "Помогает собрать свежие подтверждения того, что задача выполнена.",
+    "category": "process",
+    "source": "https://github.com/obra/superpowers/tree/22f0b463e7a5e579904dd6211a520321035526f7/skills/verification-before-completion",
+    "license": "MIT"
+  },
+  {
+    "id": "brainstorming",
+    "name": "Проработка идеи",
+    "description": "Помогает уточнить цель и обсудить варианты решения перед разработкой.",
+    "category": "process",
+    "source": "https://github.com/obra/superpowers/tree/22f0b463e7a5e579904dd6211a520321035526f7/skills/brainstorming",
+    "license": "MIT"
+  },
+  {
+    "id": "writing-plans",
+    "name": "План разработки",
+    "description": "Помогает разбить задачу на шаги с понятными результатами и проверками.",
+    "category": "process",
+    "source": "https://github.com/obra/superpowers/tree/22f0b463e7a5e579904dd6211a520321035526f7/skills/writing-plans",
+    "license": "MIT"
+  }
+]

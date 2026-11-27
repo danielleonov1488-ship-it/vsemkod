@@ -94,3 +94,30 @@ jobs:
         run: node scripts/package.mjs ${{ matrix.targets }} --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-cli:
+    needs: draft
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.5'
+      - run: npm ci --ignore-scripts --cache ./.npm-cache
+      - run: npm run build:cli
+      - run: npm run build:cli:binaries
+      - name: Upload CLI to the draft release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --clobber \
+            out/cli/vsemkod-cli-linux-x64 out/cli/vsemkod-cli-linux-arm64 \
+            out/cli/vsemkod-cli-macos-arm64 out/cli/vsemkod-cli-macos-x64 \
+            out/cli/vsemkod-cli-windows-x64.exe out/cli/vsemkod-cli-checksums.txt

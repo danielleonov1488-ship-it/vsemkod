@@ -45,6 +45,8 @@
     <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
     <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 17v4h14v-4"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></symbol>
+    <symbol id="i-copied" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
     <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/></symbol>
@@ -105,6 +107,14 @@
           </a>
           <a class="button button-secondary" href="https://github.com/danielleonov1488-ship-it/vsemkod/releases">Все загрузки</a>
           <span class="release-status" id="release-status">Скоро первая версия</span>
+          <div class="install-line" id="install-line">
+            <span class="install-label">или из терминала, без предупреждений системы</span>
+            <div class="install-command">
+              <code id="install-command">irm https://vsemkod.ru/install.ps1 | iex</code>
+              <button type="button" class="install-copy" id="install-copy" aria-label="Скопировать команду"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg></button>
+            </div>
+            <span class="visually-hidden" id="install-copy-status" role="status"></span>
+          </div>
         </div>
       </div>
 
@@ -283,7 +293,8 @@
         <details><summary>Где хранятся мои ключи и код?</summary><p>Только на твоём компьютере. Запросы идут напрямую к провайдеру. Бесплатные провайдеры могут логировать запросы, поэтому не отправляй секреты.</p></details>
         <details><summary>Что будет, когда раздача закончится?</summary><p>Каталог обновится, и приложение переключится на другую бесплатную модель.</p></details>
         <details><summary>Нужна ли регистрация в vsemkod?</summary><p>Нет, аккаунта у нас нет.</p></details>
-        <details><summary>Система предупреждает при установке — это нормально?</summary><p>Да. Приложение пока без платной подписи разработчика. Windows: «Подробнее» → «Выполнить в любом случае». macOS: «Системные настройки» → «Конфиденциальность и безопасность» → «Всё равно открыть»; если пишет «повреждено», выполни в Терминале <code>xattr -cr /Applications/vsemkod.app</code>. Код открыт — можно проверить и собрать самому.</p></details>
+        <details><summary>Система предупреждает при установке — это нормально?</summary><p>Да. Приложение пока без платной подписи разработчика. Проще всего поставить из терминала — так предупреждений нет. Windows (PowerShell): <code>irm https://vsemkod.ru/install.ps1 | iex</code>. macOS и Linux: <code>curl -fsSL https://vsemkod.ru/install.sh | sh</code>. Если ставите обычным установщиком — Windows: «Подробнее» → «Выполнить в любом случае». macOS: «Системные настройки» → «Конфиденциальность и безопасность» → «Всё равно открыть»; если пишет «повреждено», выполни в Терминале <code>xattr -cr /Applications/vsemkod.app</code>. Код открыт — можно проверить и собрать самому.</p></details>
+        <details><summary>Можно поставить на сервер или виртуалку?</summary><p>Да, есть терминальная версия без окна — для серверов, SSH, Docker и CI. Linux и macOS: <code>curl -fsSL https://vsemkod.ru/install.sh | sh -s -- --cli</code>. Windows: <code>$env:VSEMKOD_CLI=1; irm https://vsemkod.ru/install.ps1 | iex</code>. Потом в папке проекта: <code>vsemkod</code> — интерфейс в терминале, <code>vsemkod run "задача"</code> — разовый запуск, <code>vsemkod web</code> — работа из браузера с другого устройства.</p></details>
         <details><summary>Что за демо-чат на сайте и что вы сохраняете?</summary><p>Демо позволяет попробовать vsemkod в браузере. Чаты живут только в памяти вкладки и исчезают при перезагрузке или закрытии страницы. Для ответа последние сообщения передаются демо-API.</p></details>
       </div>
     </section>

@@ -120,6 +120,43 @@ function configureReveal(motion) {
   document.querySelectorAll("[data-reveal]").forEach((item) => observer.observe(item));
 }
 
+const INSTALL_COMMANDS = {
+  Windows: "irm https://vsemkod.ru/install.ps1 | iex",
+  macOS: "curl -fsSL https://vsemkod.ru/install.sh | sh",
+  Linux: "curl -fsSL https://vsemkod.ru/install.sh | sh"
+};
+
+// Команда установки из терминала: без окна SmartScreen и Gatekeeper.
+function configureInstallCommand(platform, mobile) {
+  const line = document.getElementById("install-line");
+  const code = document.getElementById("install-command");
+  const button = document.getElementById("install-copy");
+  const status = document.getElementById("install-copy-status");
+  if (!line || !code || !button) return;
+  if (mobile || !RELEASED) { line.hidden = true; return; }
+  code.textContent = INSTALL_COMMANDS[platform];
+  let timer;
+  button.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(code.textContent);
+      button.classList.add("is-copied");
+      button.querySelector("use")?.setAttribute("href", "#i-copied");
+      status.textContent = "Команда скопирована. Вставьте её в " + (platform === "Windows" ? "PowerShell" : "Терминал") + ".";
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        button.classList.remove("is-copied");
+        button.querySelector("use")?.setAttribute("href", "#i-copy");
+        status.textContent = "";
+      }, 1800);
+    } catch {
+      const range = document.createRange();
+      range.selectNodeContents(code);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+    }
+  });
+}
+
 function configureDownload(motion) {
   const agent = navigator.userAgent;
   const mobile = /Android|iPhone|iPad|iPod/i.test(agent) ||
@@ -140,6 +177,7 @@ function configureDownload(motion) {
       .then(({ architecture }) => { if (architecture === "x86") setLinks(ASSETS.macOSIntel); })
       .catch(() => {});
   }
+  configureInstallCommand(platform, mobile);
   document.getElementById("platform-label").textContent = label;
   document.getElementById("step-download-label").textContent = label;
   document.getElementById("release-status").hidden = RELEASED;
