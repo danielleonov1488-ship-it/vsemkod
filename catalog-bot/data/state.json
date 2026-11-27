@@ -613,6 +613,10 @@
       "observations": [],
       "savedAt": "2026-11-26T21:53:59.801Z"
     },
+    "50999722758e485ff7bc467a249e6a58406d15a24ac07ad6d11d9ddf42d7304e": {
+      "observations": [],
+      "savedAt": "2026-11-27T17:55:20.968Z"
+    },
     "526b030561f3f01d107a403451f226552e2edf6a9314c18e693f75ce9359f8ee": {
       "observations": [],
       "savedAt": "2026-11-27T11:16:31.091Z"
@@ -632,6 +636,10 @@
     "624fadc60a3ad376bede15c54198065fb9e8794cbd861345f4e255e735e1ea10": {
       "observations": [],
       "savedAt": "2026-11-26T21:53:59.801Z"
+    },
+    "6336486698f12a71fd1d006c9a9ae7d363961e6748d9f676d6314450a798bc81": {
+      "observations": [],
+      "savedAt": "2026-11-27T17:55:20.968Z"
     },
     "647bba2d7bd9cf28be7608db7d6b728b95e0e114b2cca2e740818172e39f26c1": {
       "observations": [
@@ -932,6 +940,10 @@
     "715b14bf63883ec5ecb2afc38a8050687ab4cb069c2b834da9b818e18d3e67d3": {
       "observations": [],
       "savedAt": "2026-11-25T12:06:35.747Z"
+    },
+    "71616ec93a91afa1048423c3bcb561af1a5af2bb01881cd1930cb3e6ae452ed7": {
+      "observations": [],
+      "savedAt": "2026-11-27T17:55:20.968Z"
     },
     "7315d0ff9b733c9a63afccc1a5e62c380f8420dc5735b74f9597090834e300e6": {
       "observations": [],
@@ -1384,6 +1396,10 @@
       "observations": [],
       "savedAt": "2026-11-26T03:04:04.312Z"
     },
+    "eba70297356f6b142603ebd2003e92e67248deb2392d6788025ba86cfdbb240a": {
+      "observations": [],
+      "savedAt": "2026-11-27T17:55:20.968Z"
+    },
     "ee39ef86867a8fb0ba7f1d3af8b83e7e5debba2c2f20f74a29cf105113bb6389": {
       "observations": [],
       "savedAt": "2026-11-27T14:17:56.466Z"
@@ -1529,6 +1545,10 @@
         }
       ],
       "savedAt": "2026-11-26T03:04:04.312Z"
+    },
+    "f553aa1ad47e825f538dbe5f7efebf43cfff09f301f4291aae51f2930d4c6a7f": {
+      "observations": [],
+      "savedAt": "2026-11-27T17:55:20.968Z"
     },
     "f581162f93b40b0f6bfc53aa93c31a119a2c18a0a7025bc83fed2dc4ad1ba7a4": {
       "observations": [],
@@ -2922,7 +2942,7 @@
     },
     "hn:50648854": {
       "observations": [],
-      "savedAt": "2026-11-26T03:04:04.312Z"
+      "savedAt": "2026-11-27T17:55:20.968Z"
     },
     "hn:50650316": {
       "observations": [],
@@ -3039,11 +3059,39 @@
     "hn:50667197": {
       "observations": [],
       "savedAt": "2026-11-27T14:17:56.466Z"
+    },
+    "hn:50667373": {
+      "observations": [],
+      "savedAt": "2026-11-27T17:55:20.968Z"
+    },
+    "hn:50667549": {
+      "observations": [],
+      "savedAt": "2026-11-27T17:55:20.968Z"
+    },
+    "hn:50667780": {
+      "observations": [],
+      "savedAt": "2026-11-27T17:55:20.968Z"
+    },
+    "hn:50668024": {
+      "observations": [],
+      "savedAt": "2026-11-27T17:55:20.968Z"
+    },
+    "hn:50668077": {
+      "observations": [],
+      "savedAt": "2026-11-27T17:55:20.968Z"
+    },
+    "hn:50668691": {
+      "observations": [],
+      "savedAt": "2026-11-27T17:55:20.968Z"
+    },
+    "hn:50669647": {
+      "observations": [],
+      "savedAt": "2026-11-27T17:55:20.968Z"
     }
   },
   "telegramLastPost": {
     "freemodelradar": 32,
-    "neuro_channel": 3247,
+    "neuro_channel": 3251,
     "rubiconzone": 136
   },
   "trackerCheckedAt": {
@@ -4426,7 +4474,7 @@
     "kilo:inclusionai/ling-3.2-flash:free": {
       "evidence": {
         "kilo": {
-          "missedRuns": 2,
+          "missedRuns": 3,
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
@@ -5441,7 +5489,7 @@
     "openrouter:inclusionai/ling-3.2-flash:free": {
       "evidence": {
         "openrouter": {
-          "missedRuns": 2,
+          "missedRuns": 3,
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
