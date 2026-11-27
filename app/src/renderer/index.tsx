@@ -23,6 +23,9 @@ import notificationSound from "../../resources/notification.wav?url";
 import { WindowControls } from "./window-controls";
 import { Icon } from "./icons";
 import { UpdateRow } from "./update-pill";
+import { TemplateGallery } from "./templates";
+import { PublishMenu } from "./publish";
+import type { ProjectTemplate } from "../shared/templates";
 import { findSecrets, maskSecrets } from "../shared/secrets";
 import { ModelPicker, modelOptions } from "./models";
 import logo from "./assets/logo.svg";
@@ -55,6 +58,9 @@ function App() {
   sessionsRef.current = sessions;
   const openChatRef = useRef<(session: Conversation) => Promise<void>>(undefined);
   const startChatRef = useRef<() => void>(undefined);
+  /** Задача, которую нужно отправить, как только откроется новый чат (шаблон проекта, публикация). */
+  const pendingPrompt = useRef<string | undefined>(undefined);
+  const [publishOpen, setPublishOpen] = useState(false);
   const [chat, setChat] = useState<Conversation>();
   const [settings, setSettings] = useState(false);
   const [settingsSection, setSettingsSection] = useState(0);
@@ -522,19 +528,36 @@ function App() {
     } catch (error) { showError(error); }
   }
 
-  async function startChat(folder?: string) {
+  async function startChat(folder?: string, title = "Новый чат") {
     const next = folder || visibleProject || directory || prefs?.directory;
     if (!next) return;
     const nav = ++navigation.current;
     setExpandProject({ directory: next });
     try {
-      const session = await api.create(next, "Новый чат");
+      const session = await api.create(next, title);
       chatViews.reset(session.id, { loaded: true, model, variant });
       setSessions(list => [session, ...list.filter(item => item.id !== session.id)]);
       if (nav !== navigation.current) return;
       revealChat(session);
       requestAnimationFrame(() => draftInput.current?.focus());
     } catch (error) { showError(error); }
+  }
+
+  async function startFromTemplate(template: ProjectTemplate, name: string) {
+    if (!api.createFromTemplate) return;
+    const folder = await api.createFromTemplate(template.id, name);
+    setRecentProjects(list => [folder, ...list.filter(path => path !== folder)]);
+    setHiddenProjects(list => list.filter(path => path !== folder));
+    if (template.skills?.length && api.installSkill) await Promise.allSettled(template.skills.map(id => api.installSkill!(id)));
+    pendingPrompt.current = template.prompt || undefined;
+    await startChat(folder, template.title);
+  }
+
+  function publish(prompt: string) {
+    if (busy) { notify({ text: "Агент ещё работает. Опубликую, когда он закончит: нажмите ещё раз после ответа." }); return; }
+    if (chat) { submit(prompt, [], access, null); return; }
+    pendingPrompt.current = prompt;
+    void startChat(directory || undefined);
   }
 
   async function removeProject(path: string) {
@@ -801,9 +824,17 @@ function App() {
   const used = usage ? usage.input + usage.output + usage.reasoning + usage.cache.read + usage.cache.write : 0;
   const contextPercent = capacity ? Math.min(100, Math.round(used / capacity * 100)) : 0;
   const panelChoices = <PanelMenu select={selectPanel} changes={changes} running={runningTasks} />;
+  useEffect(() => {
+    const text = pendingPrompt.current;
+    if (!text || !chat || directory !== chat.directory || loadingChat) return;
+    pendingPrompt.current = undefined;
+    submit(text, [], access, null);
+  }, [chat?.id, directory, loadingChat]);
   const headerTools = <HeaderTools summary={summary} panelMenu={panelMenu === "header"}
-    showSummary={() => { setPanelMenu(undefined); setSummary(value => !value); }}
-    showPanels={() => { setSummary(false); setPanelMenu(value => value === "header" ? undefined : "header"); }}>
+    showSummary={() => { setPanelMenu(undefined); setPublishOpen(false); setSummary(value => !value); }}
+    showPanels={() => { setSummary(false); setPublishOpen(false); setPanelMenu(value => value === "header" ? undefined : "header"); }}>
+    {directory && <PublishMenu open={publishOpen} close={() => setPublishOpen(false)} publish={publish} disabled={!!loadingChat}
+      toggle={() => { setSummary(false); setPanelMenu(undefined); setPublishOpen(value => !value); }} />}
     {panelMenu === "header" && panelChoices}
     {summary && <Summary key={directory} directory={directory} percent={contextPercent} changes={changes} running={runningTasks}
       openContext={() => { setSummary(false); setContextSignal(value => value + 1); }}
@@ -936,6 +967,7 @@ function App() {
                   draftInput.current?.focus();
                 }}>{suggestion}</button>)}
               </div>
+              <TemplateGallery defaultFolder={prefs?.directory} start={startFromTemplate} />
             </div>
           </main>}
         {directory && <WorkspacePanel key={directory} directory={directory} tab={panelState.active} tabs={panelState.tabs} setTab={selectPanel} closeTab={closeTab} preview={preview}

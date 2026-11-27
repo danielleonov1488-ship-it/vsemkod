@@ -598,3 +598,25 @@ select.field-control { cursor: pointer; }
 .catalog-key .field-control { flex: 1 1 160px; min-width: 0; height: 30px; }
 .catalog-more, .catalog-key-link { margin-left: auto; color: var(--secondary); font-size: calc(12px * var(--font-scale, 1)); }
 .catalog-more:hover, .catalog-key-link:hover { color: var(--text); }
+
+/* Шаблоны новых проектов на домашнем экране. */
+.templates { width: 100%; max-width: 760px; margin: 28px auto 0; }
+.templates h2 { margin: 0 0 10px; color: var(--secondary); font-size: calc(13px * var(--font-scale, 1)); font-weight: 500; text-align: center; }
+.template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 172px), 1fr)); gap: 8px; }
+.template-card { display: flex; align-items: flex-start; gap: 10px; min-width: 0; padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; background: transparent; color: var(--text); text-align: left; transition: border-color .12s, background .12s; }
+.template-card:hover { border-color: color-mix(in srgb, var(--mint) 40%, var(--line)); background: var(--mint-hover); }
+.template-card:focus-visible { outline: 2px solid var(--mint); outline-offset: 1px; }
+.template-icon { display: grid; flex: none; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--raised); color: var(--mint); }
+.template-icon .icon { width: 15px; height: 15px; }
+.template-icon--large { width: 40px; height: 40px; margin-bottom: 14px; border-radius: 12px; }
+.template-icon--large .icon { width: 20px; height: 20px; }
+.template-copy { display: grid; gap: 2px; min-width: 0; }
+.template-copy strong { font-size: calc(13px * var(--font-scale, 1)); font-weight: 600; }
+.template-copy span { color: var(--muted); font-size: calc(12px * var(--font-scale, 1)); line-height: 16px; }
+.template-path { margin: 6px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Меню «Опубликовать» в шапке. */
+.publish-menu { position: relative; }
+.publish-popup { width: 290px; padding: 6px; }
+.publish-title { margin: 4px 8px 6px; color: var(--secondary); font-size: calc(12px * var(--font-scale, 1)); }
+.publish-note { margin: 6px 8px 4px; color: var(--muted); font-size: calc(11.5px * var(--font-scale, 1)); line-height: 16px; }

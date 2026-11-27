@@ -35,6 +35,7 @@ const api: DesktopApi = {
   filePreview: (directory, path) => ipcRenderer.invoke("file:preview", directory, path),
   fileAction: (directory, path, action) => ipcRenderer.invoke("file:action", directory, path, action),
   projectOpen: directory => ipcRenderer.invoke("projects:open", directory),
+  createFromTemplate: (templateId, name) => ipcRenderer.invoke("projects:template", templateId, name),
   projectRemove: directory => ipcRenderer.invoke("projects:remove", directory),
   routerStats: () => ipcRenderer.invoke("router:stats"),
   onRouterStats: listener => subscribe("router:stats", listener),

@@ -153,6 +153,8 @@ export interface DesktopApi {
   filePreview?(directory: string, path: string): Promise<FilePreview>;
   fileAction?(directory: string, path: string, action: FileAction): Promise<void>;
   projectOpen?(directory: string): Promise<void>;
+  /** Создать проект из шаблона в папке по умолчанию; возвращает путь новой папки. */
+  createFromTemplate?(templateId: string, name: string): Promise<string>;
   projectRemove?(directory: string): Promise<void>;
   routerStats?(): Promise<RouterStats>;
   worktreeCreate?(origin: string, title: string): Promise<{ directory: string; worktree: Worktree }>;

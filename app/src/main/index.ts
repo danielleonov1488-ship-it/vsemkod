@@ -32,6 +32,7 @@ import { Router } from "./router";
 import { ProviderHealth } from "./router/health";
 import { readJson, writeJson } from "./storage";
 import { createUpdates } from "./updates";
+import { projectTemplates, templateFolderName } from "../shared/templates";
 import { createTray } from "./tray";
 import { createBrowserHost } from "./browser-view";
 
@@ -413,6 +414,31 @@ async function start() {
     return revision?.stdout.trim() || null;
   });
   handle("updates:apply", z.tuple([]), () => updates.apply());
+  // Новый проект из шаблона: папка в папке по умолчанию + AGENTS.md с правилами шаблона.
+  handle("projects:template", z.tuple([z.string().regex(/^[a-z0-9-]{1,40}$/), z.string().trim().min(1).max(80)]), async ([templateId, name]) => {
+    const template = projectTemplates.find(item => item.id === templateId);
+    if (!template) throw new Error("Шаблон не найден.");
+    const base = templateFolderName(name);
+    let directory = join(preferences.directory, base);
+    for (let index = 2; index < 100; index++) {
+      try { await stat(directory); directory = join(preferences.directory, base + "-" + index); } catch { break; }
+    }
+    await mkdir(directory, { recursive: true });
+    await writeFile(join(directory, "AGENTS.md"), template.agents, { encoding: "utf8", flag: "wx" }).catch(error => {
+      if (error.code !== "EEXIST") throw error;
+    });
+    directory = await realpath(directory);
+    const write = projectWrites.then(async () => {
+      const next = [directory, ...recentProjects.filter(path => path !== directory)];
+      await writeJson(projectsPath, { recent: next, hidden: [...hiddenProjects].filter(path => path !== directory) });
+      recentProjects = next;
+      projects.add(directory);
+      hiddenProjects.delete(directory);
+    });
+    projectWrites = write.catch(() => {});
+    await write;
+    return directory;
+  });
   handle("projects:choose", z.tuple([]), async () => {
     const choice = await dialog.showOpenDialog(window!, {
       title: "Выбрать папку проекта", defaultPath: preferences.directory, properties: ["openDirectory", "createDirectory"]
