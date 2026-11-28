@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Terminal } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 import type { BackgroundTask, ChatPart, FileChange, ProjectEntry } from "../shared/api";
@@ -7,8 +7,8 @@ import type { FileReference } from "../shared/file-links";
 import { Preview, useFileMenu, type ChatFiles } from "./chat-files";
 import { Icon } from "./icons";
 import { BrowserPanel } from "./browser-panel";
-import { findLocalUrls, projectFileUrl } from "../shared/browser";
-import { panelTabs, type PanelTab } from "../shared/panels";
+import { addressLabel, findLocalUrls, projectFileUrl } from "../shared/browser";
+import { isBrowserTab, panelInfo, type BrowserTab, type PanelTab } from "../shared/panels";
 import { BackgroundTasks } from "./background-tasks";
 
 const api = window.vsemkod;
@@ -147,10 +147,33 @@ function ProjectTerminal({ directory, theme, parts, openBrowser, sessionId }: {
   </div>;
 }
 
+/** Где хранится последний адрес вкладки браузера (первая вкладка — под старым ключом). */
+export function browserStorageKey(directory: string, tab: BrowserTab) {
+  return "vsemkod-browser:" + directory + (tab === "browser" ? "" : "#" + tab);
+}
+
+type BrowserSectionProps = {
+  tab: BrowserTab; directory: string; active: boolean; quickLinks: string[]; projectIndex?: string; request?: { url: string };
+  setTitle: (tab: BrowserTab, title: string) => void; openTab: (url: string) => void;
+  insertDraft: (text: string) => void; notify: (text: string) => void; notifyDownload: (name: string, path: string) => void;
+};
+
+function BrowserSection({ tab, directory, active, quickLinks, projectIndex, request, setTitle, openTab, insertDraft, notify, notifyDownload }: BrowserSectionProps) {
+  const key = browserStorageKey(directory, tab);
+  const [initialUrl] = useState(() => localStorage.getItem(key) ?? undefined);
+  const onUrl = useCallback((url: string) => localStorage.setItem(key, url), [key]);
+  const onTitle = useCallback((title: string) => setTitle(tab, title), [setTitle, tab]);
+  return <section className="panel-body panel-body--browser" hidden={!active}>
+    <BrowserPanel api={api.browser} directory={directory} active={active} quickLinks={quickLinks} projectIndex={projectIndex} initialUrl={initialUrl}
+      request={request} onUrl={onUrl} onTitle={onTitle} onOpenTab={openTab} onSendErrors={insertDraft} onNotice={notify} onDownload={notifyDownload} />
+  </section>;
+}
+
 export function WorkspacePanel({ directory, tab, tabs, setTab, closeTab, menuOpen, toggleMenu, menu, visible, width, resize, close, parts, changes,
-  revert, busy, theme, onError, preview, openPreview, insertDraft, notify, notifyDownload, browserRequest, openBrowser, tasks, side, sessionId }: {
+  revert, busy, theme, onError, preview, openPreview, insertDraft, notify, notifyDownload, browserRequests, openBrowser, openBrowserTab, tasks, side, sessionId }: {
   tabs: PanelTab[]; closeTab: (tab: PanelTab) => void; menuOpen: boolean; toggleMenu: () => void; menu: ReactNode;
-  browserRequest?: { url: string }; openBrowser: (url: string) => void; tasks: BackgroundTask[]; side: ReactNode; sessionId?: string;
+  browserRequests: Partial<Record<BrowserTab, { url: string }>>; openBrowser: (url: string) => void; openBrowserTab: (url: string) => void;
+  tasks: BackgroundTask[]; side: ReactNode; sessionId?: string;
   preview?: FileReference; openPreview: (ref: FileReference) => void;
   insertDraft: (text: string) => void; notify: (text: string) => void; notifyDownload: (name: string, path: string) => void;
   directory: string; tab?: PanelTab; setTab: (tab: PanelTab) => void; visible: boolean; width: number;
@@ -190,7 +213,12 @@ export function WorkspacePanel({ directory, tab, tabs, setTab, closeTab, menuOpe
   const [fileError, setFileError] = useState("");
   useEffect(() => { if (visible && tab === "terminal") setTerminalStarted(true); }, [visible, tab]);
 
-  const browserKey = "vsemkod-browser:" + directory;
+  const [browserTitles, setBrowserTitles] = useState<Record<string, string>>({});
+  const setBrowserTitle = useCallback((id: BrowserTab, title: string) =>
+    setBrowserTitles(value => value[id] === title ? value : { ...value, [id]: title }), []);
+  const tabTitle = (id: PanelTab) => isBrowserTab(id)
+    ? browserTitles[id] || addressLabel(localStorage.getItem(browserStorageKey(directory, id)) ?? undefined) || "Браузер"
+    : panelInfo(id).title;
   const quickLinks = useMemo(() => findLocalUrls([
     ...parts.map(part => part.kind === "text" ? part.text : part.kind === "tool" ? part.output ?? "" : ""),
     ...tasks.map(task => task.output)
@@ -230,11 +258,12 @@ export function WorkspacePanel({ directory, tab, tabs, setTab, closeTab, menuOpe
       }} />
     <header className="panel-heading">
       <div className="panel-tabs" ref={tabList} role="tablist" aria-label="Вкладки панели" data-compact={compact || undefined}>{tabs.map(id => {
-        const item = panelTabs.find(value => value.id === id)!;
-        return <div className="panel-tab" data-active={tab === id || undefined} key={id}>
-          <button type="button" role="tab" aria-selected={tab === id} aria-label={item.title} title={compact && tab !== id ? item.title : undefined}
-            onClick={() => setTab(id)}><Icon name={item.icon} /><span className="panel-tab-title">{item.title}</span></button>
-          <button type="button" className="panel-tab-close" aria-label={"Закрыть вкладку «" + item.title + "»"} onClick={() => closeTab(id)}><Icon name="close" /></button>
+        const item = panelInfo(id);
+        const title = tabTitle(id);
+        return <div className="panel-tab" data-active={tab === id || undefined} data-browser={isBrowserTab(id) || undefined} key={id}>
+          <button type="button" role="tab" aria-selected={tab === id} aria-label={title} title={(compact && tab !== id) || title !== item.title ? title : undefined}
+            onClick={() => setTab(id)}><Icon name={item.icon} /><span className="panel-tab-title">{title}</span></button>
+          <button type="button" className="panel-tab-close" aria-label={"Закрыть вкладку «" + title + "»"} onClick={() => closeTab(id)}><Icon name="close" /></button>
         </div>;
       })}</div>
       <div className="panel-add" data-panel-anchor>
@@ -255,11 +284,9 @@ export function WorkspacePanel({ directory, tab, tabs, setTab, closeTab, menuOpe
       {selected && <details className="file-preview" open key={selected}><summary>{selected}</summary><pre>{fileError || content || (!fileError && content === "" ? "Пустой файл" : "Открываем файл…")}</pre></details>}
     </section>}
     {tab === "preview" && <Preview directory={directory} reference={preview} onError={onError} />}
-    {tabs.includes("browser") && <section className="panel-body panel-body--browser" hidden={tab !== "browser"}>
-      <BrowserPanel api={api.browser} directory={directory} active={visible && tab === "browser"} quickLinks={quickLinks}
-        projectIndex={hasIndex ? projectIndex : undefined} initialUrl={localStorage.getItem(browserKey) ?? undefined}
-        request={browserRequest} onUrl={url => localStorage.setItem(browserKey, url)} onSendErrors={insertDraft} onNotice={notify} onDownload={notifyDownload} />
-    </section>}
+    {tabs.filter(isBrowserTab).map(id => <BrowserSection key={id} tab={id} directory={directory} active={visible && tab === id} quickLinks={quickLinks}
+      projectIndex={hasIndex ? projectIndex : undefined} request={browserRequests[id]} setTitle={setBrowserTitle} openTab={openBrowserTab}
+      insertDraft={insertDraft} notify={notify} notifyDownload={notifyDownload} />)}
     {terminalStarted && <section className="panel-body panel-body--terminal" hidden={tab !== "terminal"}>
       <ProjectTerminal key={directory} directory={directory} parts={parts} theme={theme} openBrowser={openBrowser} sessionId={sessionId} />
     </section>}

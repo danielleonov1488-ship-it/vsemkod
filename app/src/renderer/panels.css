@@ -108,6 +108,7 @@
 .panel-tab:is(:hover, :focus-within) .panel-tab-close { opacity: 1; }
 .panel-tab-close:hover { background: var(--strong-line); }
 .panel-tab-close .icon { width: 11px; height: 11px; }
+.panel-tab[data-browser] .panel-tab-title { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .panel-tabs[data-compact] .panel-tab:not([data-active]) :is(.panel-tab-title, .panel-tab-close) { display: none; }
 .panel-tabs[data-compact] .panel-tab:not([data-active]) [role=tab] { padding-inline: 7px; }
 .panel-add { position: relative; flex: none; }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import { emptyBrowserState, type BrowserApi, type BrowserState } from "../shared/browser";
+import { addressLabel, emptyBrowserState, type BrowserApi, type BrowserState } from "../shared/browser";
 import "./panels.css";
 
 const glyphs: Record<string, ReactNode> = {
@@ -18,8 +18,6 @@ function Glyph({ name }: { name: keyof typeof glyphs }) {
 }
 
 /** Всплывающие элементы приложения, которые не должен перекрывать нативный слой браузера. */
-let currentProject: string | undefined;
-
 const overlaySelector = ".model-panel, .chat-menu, .composer-menu, dialog[open], [role=dialog], .modal, .tooltip, [data-overlay]";
 
 function overlaps(a: DOMRect, b: DOMRect) {
@@ -30,11 +28,13 @@ function shortUrl(url: string) {
   return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
 }
 
-export function BrowserPanel({ api, directory, active, quickLinks, projectIndex, initialUrl, request, onUrl, onSendErrors, onNotice, onDownload }: {
+/** Одна вкладка браузера. Её страница живёт, пока вкладка открыта, и выгружается при закрытии. */
+export function BrowserPanel({ api, directory, active, quickLinks, projectIndex, initialUrl, request, onUrl, onTitle, onOpenTab, onSendErrors, onNotice, onDownload }: {
   api?: BrowserApi; directory: string; active: boolean; quickLinks: string[]; projectIndex?: string; initialUrl?: string; request?: { url: string };
-  onDownload?: (name: string, path: string) => void;
+  onDownload?: (name: string, path: string) => void; onTitle?: (title: string) => void; onOpenTab?: (url: string) => void;
   onUrl?: (url: string) => void; onSendErrors: (text: string) => void; onNotice: (text: string) => void;
 }) {
+  const [id] = useState(() => crypto.randomUUID());
   const host = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<BrowserState>(emptyBrowserState);
   const [address, setAddress] = useState("");
@@ -44,64 +44,64 @@ export function BrowserPanel({ api, directory, active, quickLinks, projectIndex,
   const opened = useRef(false);
   const handled = useRef<typeof request>(undefined);
 
+  const callbacks = useRef({ onDownload, onOpenTab });
+  callbacks.current = { onDownload, onOpenTab };
   useEffect(() => {
     if (!api) return;
-    let alive = true;
-    void api.state().then(value => { if (alive && currentProject === directory) setState(value); });
     const stop = api.subscribe(event => {
-      if (currentProject !== directory) return;
+      if (event.id !== id) return;
       if (event.type === "state") setState(event.state);
-      if (event.type === "download") onDownload?.(event.name, event.path);
+      if (event.type === "download") callbacks.current.onDownload?.(event.name, event.path);
+      if (event.type === "open") callbacks.current.onOpenTab?.(event.url);
     });
-    return () => { alive = false; stop(); };
-  }, [api, directory, onDownload]);
+    return () => { stop(); void api.close(id).catch(() => {}); };
+  }, [api, id]);
 
   useEffect(() => { if (!editing) setAddress(state.url.startsWith("about:") ? "" : state.url); }, [state.url, editing]);
   useEffect(() => { if (state.url && !state.url.startsWith("about:")) onUrl?.(state.url); }, [state.url, onUrl]);
+  useEffect(() => { onTitle?.(state.title.trim() || addressLabel(state.url)); }, [state.title, state.url, onTitle]);
 
   const navigate = useCallback((value: string) => {
     if (!api || !value.trim()) return;
     setEditing(false);
     setMenu("");
-    currentProject = directory;
-    void api.navigate(value, directory).catch(() => onNotice("Не удалось открыть адрес."));
-  }, [api, directory, onNotice]);
+    void api.navigate(id, value, directory).catch(() => onNotice("Не удалось открыть адрес."));
+  }, [api, id, directory, onNotice]);
 
-  // Восстановить последний адрес проекта при первом показе.
+  // Адрес из запроса (ссылка из чата, новая вкладка) или последний адрес вкладки — при первом показе.
   useEffect(() => {
     if (!active) return;
     if (request && handled.current !== request) {
       opened.current = true;
       handled.current = request;
       navigate(request.url);
-    } else if (!opened.current || currentProject !== directory) {
+    } else if (!opened.current) {
       opened.current = true;
-      if (currentProject !== directory) setState(emptyBrowserState);
-      if (initialUrl && currentProject !== directory) navigate(initialUrl);
+      if (initialUrl) navigate(initialUrl);
     }
-  }, [active, directory, initialUrl, request, navigate]);
+  }, [active, initialUrl, request, navigate]);
 
-  const showPage = Boolean(api && active && currentProject === directory && state.url && !state.url.startsWith("about:") && !state.loading && !menu && !covered);
+  const showPage = Boolean(api && active && state.url && !state.url.startsWith("about:") && !state.loading && !menu && !covered);
 
   // Нативный слой следует за областью вкладки; прячется, когда поверх открыт любой попап приложения.
   useLayoutEffect(() => {
     if (!api) return;
-    if (!showPage || !host.current) { void api.hide(); return; }
+    if (!showPage || !host.current) { void api.hide(id); return; }
     let frame = 0;
     const place = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         const rect = host.current?.getBoundingClientRect();
-        if (rect && rect.width > 1 && rect.height > 1) void api.show({ x: rect.left, y: rect.top, width: rect.width, height: rect.height });
-        else void api.hide();
+        if (rect && rect.width > 1 && rect.height > 1) void api.show(id, { x: rect.left, y: rect.top, width: rect.width, height: rect.height });
+        else void api.hide(id);
       });
     };
     place();
     const observer = new ResizeObserver(place);
     observer.observe(host.current);
     window.addEventListener("resize", place);
-    return () => { cancelAnimationFrame(frame); observer.disconnect(); window.removeEventListener("resize", place); void api.hide(); };
-  }, [api, showPage]);
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); window.removeEventListener("resize", place); void api.hide(id); };
+  }, [api, id, showPage]);
 
   useEffect(() => {
     if (!active) return;
@@ -152,11 +152,11 @@ export function BrowserPanel({ api, directory, active, quickLinks, projectIndex,
 
   return <div className="browser-panel">
     <div className="browser-toolbar" role="toolbar" aria-label="Навигация браузера">
-      <button type="button" className="browser-button" aria-label="Назад" title="Назад" disabled={!state.canGoBack} onClick={() => void api.back()}><Glyph name="back" /></button>
-      <button type="button" className="browser-button" aria-label="Вперёд" title="Вперёд" disabled={!state.canGoForward} onClick={() => void api.forward()}><Glyph name="forward" /></button>
+      <button type="button" className="browser-button" aria-label="Назад" title="Назад" disabled={!state.canGoBack} onClick={() => void api.back(id)}><Glyph name="back" /></button>
+      <button type="button" className="browser-button" aria-label="Вперёд" title="Вперёд" disabled={!state.canGoForward} onClick={() => void api.forward(id)}><Glyph name="forward" /></button>
       {state.loading
-        ? <button type="button" className="browser-button" aria-label="Остановить" title="Остановить" onClick={() => void api.stop()}><Glyph name="stop" /></button>
-        : <button type="button" className="browser-button" aria-label="Обновить" title="Обновить" disabled={!state.url} onClick={() => void api.reload()}><Glyph name="reload" /></button>}
+        ? <button type="button" className="browser-button" aria-label="Остановить" title="Остановить" onClick={() => void api.stop(id)}><Glyph name="stop" /></button>
+        : <button type="button" className="browser-button" aria-label="Обновить" title="Обновить" disabled={!state.url} onClick={() => void api.reload(id)}><Glyph name="reload" /></button>}
       <form className="browser-address" onSubmit={event => { event.preventDefault(); navigate(address); }}>
         <input value={address} spellCheck={false} placeholder="Адрес или localhost:5173" aria-label="Адрес страницы"
           onFocus={event => { setEditing(true); event.currentTarget.select(); }} onBlur={() => setEditing(false)}
@@ -166,7 +166,7 @@ export function BrowserPanel({ api, directory, active, quickLinks, projectIndex,
       {errors.length > 0 && <button type="button" className="browser-errors browser-menu-button" aria-expanded={menu === "errors"}
         onClick={() => setMenu(value => value === "errors" ? "" : "errors")}>● {errors.length} {errorWord}</button>}
       <button type="button" className="browser-button" aria-label="Открыть во внешнем браузере" title="Открыть во внешнем браузере"
-        disabled={!state.url} onClick={() => void api.external()}><Glyph name="external" /></button>
+        disabled={!state.url} onClick={() => void api.external(id)}><Glyph name="external" /></button>
       <button type="button" className="browser-button browser-menu-button" aria-label="Ещё" aria-expanded={menu === "more"}
         onClick={() => setMenu(value => value === "more" ? "" : "more")}><Glyph name="more" /></button>
       {state.loading && <span className="browser-progress" aria-hidden="true" />}
@@ -174,11 +174,11 @@ export function BrowserPanel({ api, directory, active, quickLinks, projectIndex,
     {state.failure && <p className="browser-failure" role="alert">{state.failure}</p>}
     <div ref={host} className="browser-host">
       {menu === "more" && <div className="browser-popover browser-popover--menu model-panel" data-overlay>
-        <button type="button" className="model-option" disabled={!state.url} onClick={() => { setMenu(""); void api.devtools(); }}>Инструменты разработчика</button>
-        <button type="button" className="model-option" disabled={!state.url} onClick={() => { setMenu(""); void api.clearData(); }}>Очистить данные сайта</button>
+        <button type="button" className="model-option" disabled={!state.url} onClick={() => { setMenu(""); void api.devtools(id); }}>Инструменты разработчика</button>
+        <button type="button" className="model-option" disabled={!state.url} onClick={() => { setMenu(""); void api.clearData(id); }}>Очистить данные сайта</button>
       </div>}
       {menu === "errors" && <div className="browser-popover browser-popover--errors model-panel" data-overlay>
-        <header><strong>Ошибки консоли</strong><button type="button" className="text-link" onClick={() => { void api.clearErrors(); setMenu(""); }}>Очистить</button></header>
+        <header><strong>Ошибки консоли</strong><button type="button" className="text-link" onClick={() => { void api.clearErrors(id); setMenu(""); }}>Очистить</button></header>
         <ol>{errors.map((error, index) => <li key={index + "-" + error.at}>
           <code>{error.message}</code>
           {error.source && <span className="subtle">{error.source.replace(/^.*\//, "")}{error.line ? ":" + error.line : ""}</span>}

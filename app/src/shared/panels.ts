@@ -7,7 +7,24 @@ export const panelTabs = [
   { id: "tasks", title: "Фоновые задачи", icon: "clock" },
   { id: "preview", title: "Просмотр", icon: "eye" }
 ] as const;
-export type PanelTab = typeof panelTabs[number]["id"];
+export type BasePanelTab = typeof panelTabs[number]["id"];
+/** Вкладки браузера: первая — «browser», следующие — «browser:<id>». */
+export type BrowserTab = "browser" | `browser:${string}`;
+export type PanelTab = BasePanelTab | BrowserTab;
+
+export function isBrowserTab(tab: unknown): tab is BrowserTab {
+  return tab === "browser" || typeof tab === "string" && /^browser:[a-z0-9]{1,16}$/.test(tab);
+}
+
+export function newBrowserTab(): BrowserTab {
+  return `browser:${Math.random().toString(36).slice(2, 10) || "1"}`;
+}
+
+/** Описание вкладки (иконка, название, сочетание); у всех вкладок браузера оно общее. */
+export function panelInfo(tab: PanelTab) {
+  const id = isBrowserTab(tab) ? "browser" : tab;
+  return panelTabs.find(item => item.id === id) ?? panelTabs[0];
+}
 export type PanelState = { tabs: PanelTab[]; active?: PanelTab };
 
 export function panelShortcut(event: Pick<KeyboardEvent, "code" | "ctrlKey" | "metaKey" | "altKey" | "shiftKey">, mac: boolean) {
@@ -19,7 +36,7 @@ export function readPanels(value: string | null): PanelState {
   try {
     const data = JSON.parse(value ?? "null");
     if (!Array.isArray(data?.tabs)) return { tabs: [] };
-    const tabs = [...new Set<PanelTab>(data.tabs.filter((id: unknown) => panelTabs.some(tab => tab.id === id)))];
+    const tabs = [...new Set<PanelTab>(data.tabs.filter((id: unknown) => isBrowserTab(id) || panelTabs.some(tab => tab.id === id)))];
     return { tabs, active: tabs.includes(data.active) ? data.active : tabs.at(-1) };
   } catch { return { tabs: [] }; }
 }

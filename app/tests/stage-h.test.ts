@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { findLocalUrls, isAllowedNavigation, normalizeAddress } from "../src/shared/browser";
-import { panelShortcut, quoteText, readPanels } from "../src/shared/panels";
+import { addressLabel, findLocalUrls, isAllowedNavigation, normalizeAddress } from "../src/shared/browser";
+import { isBrowserTab, newBrowserTab, panelInfo, panelShortcut, quoteText, readPanels } from "../src/shared/panels";
 import { keyFromClipboard } from "../src/main/clipboard-watch";
 import { findSecrets, maskSecrets } from "../src/shared/secrets";
 
@@ -81,6 +81,8 @@ describe("горячие клавиши и вкладки", () => {
     expect(readPanels('{"tabs":["browser","bad","tools","terminal","browser"],"active":"bad"}'))
       .toEqual({ tabs: ["browser", "terminal"], active: "terminal" });
     expect(readPanels("old")).toEqual({ tabs: [] });
+    expect(readPanels('{"tabs":["browser","browser:k3x9","browser:../x","terminal"],"active":"browser:k3x9"}'))
+      .toEqual({ tabs: ["browser", "browser:k3x9", "terminal"], active: "browser:k3x9" });
     expect(quoteText("Привет\r\n\r\nЭтот текст")).toBe("> Привет\n> \n> Этот текст");
   });
 });
@@ -128,5 +130,26 @@ describe("значок в трее", () => {
     expect(trayStatus({ running: 3, tasks: 2 })).toBe("агент работает: 3 чата · 2 фоновые задачи");
     expect(trayStatus({ running: 5, tasks: 1 })).toBe("агент работает: 5 чатов · 1 фоновая задача");
     expect(trayStatus({ running: 0, tasks: 11 })).toBe("агент свободен · 11 фоновых задач");
+  });
+});
+
+describe("вкладки браузера", () => {
+  it("каждая новая вкладка получает свой id и общее описание «Браузер»", () => {
+    const first = newBrowserTab();
+    const second = newBrowserTab();
+    expect(first).not.toBe(second);
+    expect(isBrowserTab(first)).toBe(true);
+    expect(isBrowserTab("browser")).toBe(true);
+    expect(isBrowserTab("terminal")).toBe(false);
+    expect(isBrowserTab("browser:")).toBe(false);
+    expect(panelInfo(first).title).toBe("Браузер");
+    expect(panelInfo("terminal").title).toBe("Терминал");
+  });
+  it("подписывает вкладку коротким адресом", () => {
+    expect(addressLabel("http://localhost:5173/app")).toBe("localhost:5173");
+    expect(addressLabel("https://www.example.com/a")).toBe("example.com");
+    expect(addressLabel("file:///G:/%D0%98%D0%B3%D1%80%D0%B0/index.html")).toBe("index.html");
+    expect(addressLabel("about:blank")).toBe("");
+    expect(addressLabel(undefined)).toBe("");
   });
 });

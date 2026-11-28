@@ -798,24 +798,23 @@ async function start() {
       broadcast("chat:focus", session);
     }
   });
-  let browserRoot: string | undefined;
-  const browser = createBrowserHost({ window: () => window, projectRoot: () => browserRoot, publish: event => broadcast("browser:event", event) });
+  const browser = createBrowserHost({ window: () => window, publish: event => broadcast("browser:event", event) });
   const browserBounds = z.object({ x: z.number().finite(), y: z.number().finite(), width: z.number().finite().min(0), height: z.number().finite().min(0) }).strict();
-  handle("browser:show", z.tuple([browserBounds]), ([bounds]) => browser.show(bounds));
-  handle("browser:hide", z.tuple([]), () => browser.hide());
-  handle("browser:navigate", z.tuple([z.string().max(8192), localPath.optional()]), ([input, directory]) => {
-    if (directory) browserRoot = project(directory);
-    return browser.navigate(input, browserRoot);
-  });
-  handle("browser:back", z.tuple([]), () => browser.back());
-  handle("browser:forward", z.tuple([]), () => browser.forward());
-  handle("browser:reload", z.tuple([]), () => browser.reload());
-  handle("browser:stop", z.tuple([]), () => browser.stop());
-  handle("browser:external", z.tuple([]), () => browser.external());
-  handle("browser:devtools", z.tuple([]), () => browser.devtools());
-  handle("browser:clear-data", z.tuple([]), () => browser.clearData());
-  handle("browser:clear-errors", z.tuple([]), () => browser.clearErrors());
-  handle("browser:state", z.tuple([]), () => browser.state());
+  const browserTab = z.string().uuid();
+  handle("browser:show", z.tuple([browserTab, browserBounds]), ([id, bounds]) => browser.show(id, bounds));
+  handle("browser:hide", z.tuple([browserTab]), ([id]) => browser.hide(id));
+  handle("browser:navigate", z.tuple([browserTab, z.string().max(8192), localPath.optional()]), ([id, input, directory]) =>
+    browser.navigate(id, input, directory ? project(directory) : undefined));
+  handle("browser:back", z.tuple([browserTab]), ([id]) => browser.back(id));
+  handle("browser:forward", z.tuple([browserTab]), ([id]) => browser.forward(id));
+  handle("browser:reload", z.tuple([browserTab]), ([id]) => browser.reload(id));
+  handle("browser:stop", z.tuple([browserTab]), ([id]) => browser.stop(id));
+  handle("browser:external", z.tuple([browserTab]), ([id]) => browser.external(id));
+  handle("browser:devtools", z.tuple([browserTab]), ([id]) => browser.devtools(id));
+  handle("browser:clear-data", z.tuple([browserTab]), ([id]) => browser.clearData(id));
+  handle("browser:clear-errors", z.tuple([browserTab]), ([id]) => browser.clearErrors(id));
+  handle("browser:close", z.tuple([browserTab]), ([id]) => browser.close(id));
+  handle("browser:state", z.tuple([browserTab]), ([id]) => browser.state(id));
   handle("browser:reveal", z.tuple([localPath]), ([path]) => {
     const downloads = app.getPath("downloads");
     if (relative(downloads, path).startsWith("..") || isAbsolute(relative(downloads, path))) throw new Error("Можно показать только скачанные файлы.");

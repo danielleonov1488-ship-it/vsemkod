@@ -11,16 +11,18 @@ const api = window.vsemkod;
 export const macShortcuts = /Mac/i.test(navigator.platform);
 export type PanelMenuAnchor = "header" | "tabs";
 
-export function PanelMenu({ select, changes, running }: { select: (tab: PanelTab) => void; changes: FileChange[]; running: number }) {
+export function PanelMenu({ select, changes, running, browserOpen }: {
+  select: (tab: PanelTab) => void; changes: FileChange[]; running: number; browserOpen?: boolean;
+}) {
   const additions = changes.reduce((sum, file) => sum + file.additions, 0);
   const deletions = changes.reduce((sum, file) => sum + file.deletions, 0);
   return <div className="model-panel panel-popup panel-picker" role="group" aria-label="Доступные панели">
     {panelTabs.filter(tab => tab.id !== "preview").map(tab => <button type="button" key={tab.id} className="model-option panel-pick"
       data-divider={tab.id === "side" || undefined} onClick={() => select(tab.id)}>
-      <Icon name={tab.icon} /><span>{tab.title}</span>
+      <Icon name={tab.icon} /><span>{tab.id === "browser" && browserOpen ? "Новая вкладка браузера" : tab.title}</span>
       {tab.id === "changes" && changes.length > 0 && <small className="subtle">+{additions} −{deletions}</small>}
       {tab.id === "tasks" && running > 0 && <small className="subtle">Выполняется: {running}</small>}
-      {"key" in tab && <kbd className="subtle">{macShortcuts ? "Cmd" : "Ctrl"}+{tab.shift && "Shift+"}{tab.key}</kbd>}
+      {"key" in tab && !(tab.id === "browser" && browserOpen) && <kbd className="subtle">{macShortcuts ? "Cmd" : "Ctrl"}+{tab.shift && "Shift+"}{tab.key}</kbd>}
     </button>)}
   </div>;
 }

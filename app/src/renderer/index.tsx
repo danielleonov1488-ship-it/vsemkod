@@ -15,9 +15,9 @@ import { Composer } from "./composer";
 import { ComposerStatus } from "./composer-status";
 import { WorktreeMenu } from "./worktree-menu";
 import { Settings } from "./settings";
-import { WorkspacePanel } from "./workspace-panel";
+import { browserStorageKey, WorkspacePanel } from "./workspace-panel";
 import { HeaderTools, macShortcuts, PanelMenu, Summary, type PanelMenuAnchor } from "./panel-controls";
-import { panelShortcut, readPanels, type PanelState, type PanelTab } from "../shared/panels";
+import { isBrowserTab, newBrowserTab, panelShortcut, readPanels, type BrowserTab, type PanelState, type PanelTab } from "../shared/panels";
 import { ConnectWizard } from "./connect-wizard";
 import { SideChat } from "./side-chat";
 import notificationSound from "../../resources/notification.wav?url";
@@ -116,7 +116,8 @@ function App() {
   const [summary, setSummary] = useState(false);
   const [contextSignal, setContextSignal] = useState(0);
   const [tasks, setTasks] = useState<BackgroundTask[]>([]);
-  const [browserRequest, setBrowserRequest] = useState<{ url: string; directory: string }>();
+  /** Адреса, которые надо открыть во вкладках браузера: ключ — папка проекта и вкладка. */
+  const [browserRequests, setBrowserRequests] = useState<Record<string, Partial<Record<BrowserTab, { url: string }>>>>({});
   const projectTasks = tasks.filter(task => task.directory === directory);
   const runningTasks = projectTasks.filter(task => task.ended === undefined).length;
   const [panelWidth, setPanelWidth] = useState<number>();
@@ -752,7 +753,10 @@ function App() {
       const shortcut = panelShortcut(event, macShortcuts);
       if (shortcut && directory && !settings && !subscriptions && !historyOnly) {
         event.preventDefault();
-        if (panel && panelState.active === shortcut) hidePanel();
+        if (shortcut === "browser") {
+          if (panel && isBrowserTab(panelState.active)) hidePanel();
+          else selectPanel(currentBrowserTab() ?? "browser");
+        } else if (panel && panelState.active === shortcut) hidePanel();
         else selectPanel(shortcut);
         return;
       }
@@ -844,12 +848,34 @@ function App() {
     const active = panelState.active === tab ? tabs[Math.max(0, panelState.tabs.indexOf(tab) - 1)] ?? tabs.at(-1) : panelState.active;
     savePanels({ tabs, active });
     if (!tabs.length) hidePanel();
-    if (tab === "browser") setBrowserRequest(undefined);
+    if (isBrowserTab(tab)) {
+      // Закрытая вкладка забывает свою страницу: при следующем открытии браузер начнётся с чистого листа.
+      localStorage.removeItem(browserStorageKey(directory, tab));
+      setBrowserRequests(value => {
+        const { [tab]: _closed, ...rest } = value[directory] ?? {};
+        return { ...value, [directory]: rest };
+      });
+    }
+  }
+
+  /** Вкладка браузера, в которой открывать ссылки: текущая, иначе последняя открытая. */
+  function currentBrowserTab() {
+    return isBrowserTab(panelState.active) ? panelState.active : panelState.tabs.filter(isBrowserTab).at(-1);
+  }
+
+  function requestBrowser(tab: BrowserTab, url: string) {
+    setBrowserRequests(value => ({ ...value, [directory]: { ...value[directory], [tab]: { url } } }));
+    selectPanel(tab);
   }
 
   function openBrowser(url: string) {
-    setBrowserRequest({ url, directory });
-    selectPanel("browser");
+    requestBrowser(currentBrowserTab() ?? "browser", url);
+  }
+
+  /** Меню «+»: если браузер уже открыт, пункт «Браузер» открывает ещё одну вкладку. */
+  function pickPanel(tab: PanelTab) {
+    if (tab === "browser" && panelState.tabs.some(isBrowserTab)) selectPanel(newBrowserTab());
+    else selectPanel(tab);
   }
 
   function insertDraft(text: string) {
@@ -887,7 +913,7 @@ function App() {
   const capacity = usage?.context ?? contextWindow;
   const used = usage ? usage.input + usage.output + usage.reasoning + usage.cache.read + usage.cache.write : 0;
   const contextPercent = capacity ? Math.min(100, Math.round(used / capacity * 100)) : 0;
-  const panelChoices = <PanelMenu select={selectPanel} changes={changes} running={runningTasks} />;
+  const panelChoices = <PanelMenu select={pickPanel} changes={changes} running={runningTasks} browserOpen={panelState.tabs.some(isBrowserTab)} />;
   useEffect(() => {
     const text = pendingPrompt.current;
     if (!text || !chat || directory !== chat.directory || loadingChat) return;
@@ -1091,7 +1117,7 @@ function App() {
           </main>}
         {directory && !historyOnly && <WorkspacePanel key={directory} directory={directory} tab={panelState.active} tabs={panelState.tabs} setTab={selectPanel} closeTab={closeTab} preview={preview}
           menuOpen={panelMenu === "tabs"} toggleMenu={() => { setSummary(false); setPanelMenu(value => value === "tabs" ? undefined : "tabs"); }} menu={panelChoices}
-          tasks={projectTasks} openBrowser={openBrowser} browserRequest={browserRequest?.directory === directory ? browserRequest : undefined} sessionId={chat?.id}
+          tasks={projectTasks} openBrowser={openBrowser} openBrowserTab={url => requestBrowser(newBrowserTab(), url)} browserRequests={browserRequests[directory] ?? {}} sessionId={chat?.id}
           side={activeSide?.context === sideContext && activeSide && <SideChat key={activeSide.id} id={activeSide.id} directory={directory}
             parent={chat?.id} model={modelId} variant={variant} insert={insertDraft} />} openPreview={openPreview} visible={panelShown}
           width={panelSize} resize={(width, final) => {

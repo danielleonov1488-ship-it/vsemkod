@@ -12,22 +12,29 @@ export type BrowserState = {
   /** Текст ошибки загрузки или запрета адреса. */
   failure?: string;
 };
-export type BrowserEvent = { type: "state"; state: BrowserState } | { type: "download"; name: string; path: string };
+/** События относятся к одной вкладке браузера (id вкладки задаёт окно приложения). */
+export type BrowserEvent =
+  | { type: "state"; id: string; state: BrowserState }
+  | { type: "download"; id: string; name: string; path: string }
+  /** Страница попросила открыть адрес в новой вкладке (target=_blank, window.open). */
+  | { type: "open"; id: string; url: string };
 
 export type BrowserApi = {
-  show(bounds: BrowserBounds): Promise<void>;
-  hide(): Promise<void>;
-  navigate(input: string, directory?: string): Promise<BrowserState>;
-  back(): Promise<void>;
-  forward(): Promise<void>;
-  reload(): Promise<void>;
-  stop(): Promise<void>;
-  external(): Promise<void>;
-  devtools(): Promise<void>;
-  clearData(): Promise<void>;
-  clearErrors(): Promise<void>;
+  show(id: string, bounds: BrowserBounds): Promise<void>;
+  hide(id: string): Promise<void>;
+  navigate(id: string, input: string, directory?: string): Promise<BrowserState>;
+  back(id: string): Promise<void>;
+  forward(id: string): Promise<void>;
+  reload(id: string): Promise<void>;
+  stop(id: string): Promise<void>;
+  external(id: string): Promise<void>;
+  devtools(id: string): Promise<void>;
+  clearData(id: string): Promise<void>;
+  clearErrors(id: string): Promise<void>;
+  /** Закрыть вкладку: страница выгружается, память освобождается. */
+  close(id: string): Promise<void>;
   reveal(path: string): Promise<void>;
-  state(): Promise<BrowserState>;
+  state(id: string): Promise<BrowserState>;
   subscribe(listener: (event: BrowserEvent) => void): () => void;
 };
 
@@ -87,6 +94,16 @@ export function findLocalUrls(text: string): string[] {
     try { found.add(new URL(value).href); } catch { /* не адрес */ }
   }
   return [...found];
+}
+
+/** Короткое имя адреса для вкладки: «localhost:5173», «example.com», «index.html». */
+export function addressLabel(href: string | undefined) {
+  if (!href || href.startsWith("about:")) return "";
+  try {
+    const url = new URL(href);
+    if (url.protocol === "file:") return decodeURIComponent(url.pathname.split("/").filter(Boolean).at(-1) ?? "");
+    return url.host.replace(/^www\./, "");
+  } catch { return ""; }
 }
 
 export function projectFileUrl(path: string) {
