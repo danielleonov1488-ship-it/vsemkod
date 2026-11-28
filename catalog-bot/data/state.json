@@ -107,7 +107,7 @@
       "url": "https://cloud.siliconflow.cn/account/ak"
     }
   ],
-  "freeLlmCheckedAt": "2026-11-27T04:11:10.828Z",
+  "freeLlmCheckedAt": "2026-11-28T04:42:18.415Z",
   "freeLlmFirstSeen": {
     "cloudflare-workers-ai": "2026-11-26T07:39:04.135Z",
     "freeinference": "2026-11-26T07:39:04.135Z",
@@ -645,6 +645,10 @@
       "observations": [],
       "savedAt": "2026-11-27T22:54:40.133Z"
     },
+    "60d756a8a13c5b78484c0b537de86c14130d92e8f7a13130c9aa71a152e2f411": {
+      "observations": [],
+      "savedAt": "2026-11-28T04:42:18.415Z"
+    },
     "6228cea448fdff8e8f75840b66c7a51c9dc3b94d31c15dc13e1cbf2c10243b5e": {
       "observations": [],
       "savedAt": "2026-11-26T03:04:04.312Z"
@@ -1080,6 +1084,10 @@
     "8ee70db79beeaa8816cbb70e1a665053bfd585f8e5a9588a6d9f6528a4390810": {
       "observations": [],
       "savedAt": "2026-11-26T12:19:22.119Z"
+    },
+    "8f02dedc6a4d184ffd9aa08f06bddb1f37634d5be964ba9434f53ce307861fea": {
+      "observations": [],
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "8fdb8c7b0ca72d46f77fce7ed5d180b3d234c863b6132b347a8fa0392340f47d": {
       "observations": [],
@@ -1687,27 +1695,27 @@
   "pageChecks": {
     "page:groq": {
       "changedAt": "2026-11-24T15:12:29.146Z",
-      "checkedAt": "2026-11-27T04:11:10.828Z",
+      "checkedAt": "2026-11-28T04:42:18.415Z",
       "hash": "34dcf2cfab29787fbf6996ff0beb94011ceb1dfe066670b92ed2458f37a2d4ad"
     },
     "page:modelscope": {
       "changedAt": "2026-11-27T13:42:15.137Z",
-      "checkedAt": "2026-11-27T13:42:15.137Z",
+      "checkedAt": "2026-11-28T04:42:18.415Z",
       "hash": "a8f76ba19635265425bc1a2cb8d19411b0f6d7e23205b247ef0d2198870653d6"
     },
     "page:numes": {
       "changedAt": "2026-11-27T11:16:31.091Z",
-      "checkedAt": "2026-11-27T11:16:31.091Z",
+      "checkedAt": "2026-11-28T04:42:18.415Z",
       "hash": "f6a85ef8c4bbf5a451a98a27dadbdecb2413a53179a1f4d958b0e2ff36699646"
     },
     "page:runcrate": {
       "changedAt": "2026-11-26T03:04:04.312Z",
-      "checkedAt": "2026-11-27T04:11:10.828Z",
+      "checkedAt": "2026-11-28T04:42:18.415Z",
       "hash": "654ae4ebc52522c40aa4d439edcea600f1335c0b37442b66dde591bee18a8aa1"
     },
     "page:zai": {
       "changedAt": "2026-11-24T15:12:29.146Z",
-      "checkedAt": "2026-11-27T04:11:10.828Z",
+      "checkedAt": "2026-11-28T04:42:18.415Z",
       "hash": "567997bd64b126bde95802f3b89ce19c02668f604244c22e04dbbda630a9bb72"
     }
   },
@@ -2205,7 +2213,7 @@
           "source": "https://github.com/mnfst/awesome-free-llm-apis"
         }
       ],
-      "savedAt": "2026-11-27T11:16:31.091Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "github:692fbee205f7e74e87155aae308bf507ed150780fe7c76daf3c6720209d86aed": {
       "observations": [
@@ -2978,160 +2986,168 @@
     },
     "hn:50654888": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50655719": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50656245": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50656277": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50656826": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50656884": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50656925": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50657070": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50658338": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50658345": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50658362": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50659784": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50660522": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50660990": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50661473": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50662700": {
       "observations": [],
-      "savedAt": "2026-11-27T04:11:10.828Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50663124": {
       "observations": [],
-      "savedAt": "2026-11-27T11:16:31.091Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50664165": {
       "observations": [],
-      "savedAt": "2026-11-27T11:16:31.091Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50664246": {
       "observations": [],
-      "savedAt": "2026-11-27T11:16:31.091Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50664461": {
       "observations": [],
-      "savedAt": "2026-11-27T11:16:31.091Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50664795": {
       "observations": [],
-      "savedAt": "2026-11-27T11:16:31.091Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50665796": {
       "observations": [],
-      "savedAt": "2026-11-27T13:42:15.137Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50666037": {
       "observations": [],
-      "savedAt": "2026-11-27T13:42:15.137Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50666409": {
       "observations": [],
-      "savedAt": "2026-11-27T13:42:15.137Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50667197": {
       "observations": [],
-      "savedAt": "2026-11-27T14:17:56.466Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50667373": {
       "observations": [],
-      "savedAt": "2026-11-27T17:55:20.968Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50667549": {
       "observations": [],
-      "savedAt": "2026-11-27T17:55:20.968Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50667780": {
       "observations": [],
-      "savedAt": "2026-11-27T17:55:20.968Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50668024": {
       "observations": [],
-      "savedAt": "2026-11-27T17:55:20.968Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50668077": {
       "observations": [],
-      "savedAt": "2026-11-27T17:55:20.968Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50668691": {
       "observations": [],
-      "savedAt": "2026-11-27T17:55:20.968Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50669647": {
       "observations": [],
-      "savedAt": "2026-11-27T17:55:20.968Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50669662": {
       "observations": [],
-      "savedAt": "2026-11-27T22:54:40.133Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50669993": {
       "observations": [],
-      "savedAt": "2026-11-27T22:54:40.133Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50670468": {
       "observations": [],
-      "savedAt": "2026-11-27T22:54:40.133Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50670584": {
       "observations": [],
-      "savedAt": "2026-11-27T22:54:40.133Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50670977": {
       "observations": [],
-      "savedAt": "2026-11-27T22:54:40.133Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
     },
     "hn:50671275": {
       "observations": [],
-      "savedAt": "2026-11-27T22:54:40.133Z"
+      "savedAt": "2026-11-28T04:42:18.415Z"
+    },
+    "hn:50672567": {
+      "observations": [],
+      "savedAt": "2026-11-28T04:42:18.415Z"
+    },
+    "hn:50672741": {
+      "observations": [],
+      "savedAt": "2026-11-28T04:42:18.415Z"
     }
   },
   "telegramLastPost": {
-    "freemodelradar": 32,
-    "neuro_channel": 3253,
+    "freemodelradar": 33,
+    "neuro_channel": 3254,
     "rubiconzone": 137
   },
   "trackerCheckedAt": {
@@ -4514,7 +4530,7 @@
     "kilo:inclusionai/ling-3.2-flash:free": {
       "evidence": {
         "kilo": {
-          "missedRuns": 4,
+          "missedRuns": 5,
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
@@ -5529,7 +5545,7 @@
     "openrouter:inclusionai/ling-3.2-flash:free": {
       "evidence": {
         "openrouter": {
-          "missedRuns": 4,
+          "missedRuns": 5,
           "observation": {
             "confidence": "structured",
             "contextWindow": 1048576,
